@@ -1,7 +1,8 @@
 #include <iostream> 
 #include <sys/ipc.h> 
 #include <sys/shm.h> 
-#include <stdio.h> 
+#include <stdio.h>
+#include <string.h> 
 
 namespace tk{ namespace common{
 
@@ -9,7 +10,7 @@ template <class T>
 class sharedMemory{
 
     private:
-        T*  data;
+        char*  data;
         int type;
         int shmid;
     public:
@@ -18,17 +19,17 @@ class sharedMemory{
 
             key_t key = ftok(name.c_str(),id);
             shmid = shmget(key,1024,0666|IPC_CREAT);
-            data = (T*) shmat(shmid,(void*)0,0);
+            data = (char*) shmat(shmid,(void*)0,0);
         }
 
         T read(){
-
-            return *data;
+		T a;
+		memcpy(&a,data,sizeof(T));
+            return a;
         }
 
         bool write(T d){
-
-            data = *d;
+		memcpy(data,&d,sizeof(T));
         }
 
         void close(){
