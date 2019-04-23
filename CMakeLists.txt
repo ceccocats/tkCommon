@@ -6,6 +6,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --std=c++11 -fPIC -fopenmp")
 set(CMAKE_BUILD_TYPE "Release")
 include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 #-------------------------------------------------------------------------------
 # Libraries
@@ -37,22 +38,30 @@ set(GUI_LIBS
     ${OPENGL_LIBRARIES}
 )
 
-
 #-------------------------------------------------------------------------------
 # library
 #-------------------------------------------------------------------------------
 add_library(tkGUI SHARED src/gui/lodepng.cpp src/gui/Viewer.cpp)
 target_link_libraries(tkGUI ${GUI_LIBS})
-set_target_properties(tkGUI PROPERTIES AUTOMOC TRUE)
 
 add_library(tkCommon SHARED src/common.cpp)
 target_link_libraries(tkCommon tkGUI)
+
+# QT5 AUTOMOC
+set_target_properties(tkGUI PROPERTIES AUTOMOC TRUE)
 
 #-------------------------------------------------------------------------------
 # apps
 #-------------------------------------------------------------------------------
 add_executable(tkGUI_simple app/tkGUI_simple.cpp)
 target_link_libraries(tkGUI_simple tkCommon ${GUI_LIBS})
+
+
+qt5_wrap_cpp(UI_CPP app/Viewer2dgui.h)
+QT5_WRAP_UI(UI_HEADERS app/Viewer2dgui.ui)
+add_executable(tkGUI_2dgui app/tkGUI_2dgui.cpp ${UI_HEADERS} ${UI_CPP})
+target_link_libraries(tkGUI_2dgui tkCommon ${GUI_LIBS})
+
 
 #-------------------------------------------------------------------------------
 # install

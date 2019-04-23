@@ -74,7 +74,6 @@ void *update_th(void *data) {
 
 int main(int argc, char *argv[]) {
 
-    std::cout<<"lidar\n";
     signal(SIGINT, sig_handler);
     gRun = true;
 
