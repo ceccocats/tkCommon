@@ -86,6 +86,12 @@ int Viewer::tkLoadTexture(std::string filename, GLuint &tex) {
         tex = 0;
     }
 
+    std::cout<<"loading "<<filename<<"    ";
+    if(error == 0)
+        std::cout<<" OK!!\n";
+    else
+        std::cout<<" ERROR: "<<error<<"\n";
+
     return error == 0;
 }
 
@@ -119,7 +125,7 @@ void Viewer::tkRainbowColor(float hue) {
     case 3: b = 255; g = 255 - x; break;
     case 4: b = 255; r = x;       break;
     //case 5: r = 255; b = 255 - x; break;
-    case 5: b = 255; r = x;       break;
+    case 5: r = 255; g = x; b = 255 - x; break;
     }
     glColor3f(float(r)/255.0, float(g)/255.0, float(b)/255.0);
 }
@@ -136,6 +142,21 @@ void Viewer::tkDrawCloud(Eigen::MatrixXf *points, Zcol_t *z_col) {
         }
         glEnd();
 }
+
+void Viewer::tkViewport2D() {
+    //This sets up the viewport so that the coordinates (0, 0) are at the top left of the window
+    glViewport(0, 0, width(), height());  
+    float ratio = (float) width() / (float) height();
+    glOrtho(0, width(), height(), 0, -10, 10);
+
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    //Back to the modelview so we can draw stuff 
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
+
 
 void Viewer::draw() {
 

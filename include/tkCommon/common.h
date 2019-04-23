@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include "utils.h"
 #include "timer.h"
 #include "Eigen/Dense"
 

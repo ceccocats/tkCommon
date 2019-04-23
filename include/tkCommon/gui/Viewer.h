@@ -28,6 +28,6 @@ namespace tk { namespace gui {
         void tkDrawCircle(float x, float y, float z, float r);
         void tkDrawCloud(Eigen::MatrixXf *data, Zcol_t *col = nullptr);
         void tkRainbowColor(float hue);
-
+        void tkViewport2D();
     };
 }}
