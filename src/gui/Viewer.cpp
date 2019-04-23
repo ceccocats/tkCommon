@@ -101,6 +101,41 @@ void Viewer::tkDrawCircle(float x, float y, float z, float r) {
     glEnd(); 
 }
 
+void Viewer::tkRainbowColor(float hue) {
+    if(hue <= 0.0)
+        hue = 0.000001;
+    if(hue >= 1.0)
+        hue = 0.999999;
+
+    int h = int(hue * 256 * 6);
+    int x = h % 0x100;
+
+    int r = 0, g = 0, b = 0;
+    switch (h / 256)
+    {
+    case 0: r = 255; g = x;       break;
+    case 1: g = 255; r = 255 - x; break;
+    case 2: g = 255; b = x;       break;
+    case 3: b = 255; g = 255 - x; break;
+    case 4: b = 255; r = x;       break;
+    //case 5: r = 255; b = 255 - x; break;
+    case 5: b = 255; r = x;       break;
+    }
+    glColor3f(float(r)/255.0, float(g)/255.0, float(b)/255.0);
+}
+
+
+void Viewer::tkDrawCloud(Eigen::MatrixXf *points, Zcol_t *z_col) {
+        
+        glBegin(GL_POINTS);
+        for (int p = 0; p < points->cols(); p++) {
+            Eigen::Vector4f v = points->col(p);
+            if(z_col != nullptr)
+                tkRainbowColor( (v(2) - z_col->min) / z_col->max );
+            glVertex3f(v(0), v(1), v(2));
+        }
+        glEnd();
+}
 
 void Viewer::draw() {
 

@@ -51,8 +51,8 @@ target_link_libraries(tkCommon tkGUI)
 #-------------------------------------------------------------------------------
 # apps
 #-------------------------------------------------------------------------------
-add_executable(tkGUI_empty app/tkGUI_empty.cpp)
-target_link_libraries(tkGUI_empty tkCommon ${GUI_LIBS})
+add_executable(tkGUI_simple app/tkGUI_simple.cpp)
+target_link_libraries(tkGUI_simple tkCommon ${GUI_LIBS})
 
 #-------------------------------------------------------------------------------
 # install

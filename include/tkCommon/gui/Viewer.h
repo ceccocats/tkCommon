@@ -8,9 +8,6 @@ namespace tk { namespace gui {
 
     class Viewer : public QGLViewer {
 
-    private:
-        GLuint texures[256];
-
     protected:
         virtual void draw();
         virtual void init();
@@ -19,11 +16,18 @@ namespace tk { namespace gui {
     public:
         Viewer(QWidget *parent = nullptr);
 
+        struct Zcol_t {
+            float min, max;
+        };
+
     protected:
         void tkApplyTf(tk::common::Tfpose tf);
         void tkDrawAxis(float s = 2.0);
         void tkDrawTexture(GLuint tex, float s);
         int  tkLoadTexture(std::string filename, GLuint &tex);
         void tkDrawCircle(float x, float y, float z, float r);
+        void tkDrawCloud(Eigen::MatrixXf *data, Zcol_t *col = nullptr);
+        void tkRainbowColor(float hue);
+
     };
 }}
