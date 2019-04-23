@@ -30,11 +30,14 @@ set(GUI_LIBS
 
 set(tkCommon_INCLUDE_DIRS
     ${EIGEN3_INCLUDE_DIR}
-    ${GUI_INCLUDES})
+    ${GUI_INCLUDES}
+)
 
 set(tkCommon_LIBRARIES 
     yaml-cpp
     ${GUI_LIBS}
+    tkGUI
+    tkCommon
 )
 
 # This causes catkin_simple to link against these libraries
