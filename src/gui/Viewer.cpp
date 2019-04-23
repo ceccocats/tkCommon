@@ -95,11 +95,11 @@ int Viewer::tkLoadTexture(std::string filename, GLuint &tex) {
     return error == 0;
 }
 
-void Viewer::tkDrawCircle(float x, float y, float z, float r) {
+void Viewer::tkDrawCircle(float x, float y, float z, float r, int res) {
 
     glBegin(GL_LINE_LOOP);
-    for (int j = 0; j < 20; j++)   {
-        float theta = 2.0f * 3.1415926f * float(j) / float(20);//get the current angle 
+    for (int j = 0; j < res; j++)   {
+        float theta = 2.0f * 3.1415926f * float(j) / float(res);//get the current angle 
         float xr = r * cosf(theta);//calculate the x component 
         float yr = r * sinf(theta);//calculate the y component 
         glVertex3f(x + xr, y + yr, z);//output vertex

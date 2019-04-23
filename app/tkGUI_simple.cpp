@@ -30,6 +30,9 @@ protected:
         glColor4f(1.0, 1.0, 1.0, 1.0);
         tkDrawTexture(hipertTex, 10);
 
+        glColor4f(1.0, 0.0, 0.0, 1.0);
+        tkDrawCircle(0, 0, 0, 8.0, 100);
+
         tkApplyTf(tf);
         if(cloud != nullptr) {
             glColor4f(1.0, 0, 0, 1.0);
@@ -85,7 +88,7 @@ int main(int argc, char *argv[]) {
         int h_idx = i/360;
         double ang = double(i % 360)/180.0*M_PI;
         cloud(0,i) = cos(ang)*(d/h_idx);
-        cloud(1,i) = sin(ang)*(d/h_idx) + 5;
+        cloud(1,i) = sin(ang)*(d/h_idx) + 8;
         cloud(2,i) = h_d*(N/360) - h_d*h_idx;
         cloud(3,i) = 1;
     }

@@ -25,7 +25,7 @@ namespace tk { namespace gui {
         void tkDrawAxis(float s = 2.0);
         void tkDrawTexture(GLuint tex, float s);
         int  tkLoadTexture(std::string filename, GLuint &tex);
-        void tkDrawCircle(float x, float y, float z, float r);
+        void tkDrawCircle(float x, float y, float z, float r, int res = 20);
         void tkDrawCloud(Eigen::MatrixXf *data, Zcol_t *col = nullptr);
         void tkRainbowColor(float hue);
         void tkViewport2D();
