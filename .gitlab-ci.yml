@@ -1,0 +1,13 @@
+image: ceccocats/tk:latest
+
+before_script:
+    # Install build dependencies
+
+build:
+    # Build the application
+    stage: build
+    script:
+        - mkdir build
+        - cd build
+        - cmake ..
+        - make
