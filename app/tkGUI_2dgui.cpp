@@ -1,7 +1,12 @@
 #include <iostream>
 #include <signal.h>
 #include <qapplication.h>
-#include "ViewerUI.h"
+
+#include "ui_Viewer2dgui.h"
+class ViewerUI : public QDialog, public Ui::Dialog {
+public:
+  ViewerUI() { setupUi(this); }
+};
 
 bool gRun;
 ViewerUI *viewer = nullptr;

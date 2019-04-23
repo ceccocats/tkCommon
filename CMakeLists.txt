@@ -47,9 +47,6 @@ target_link_libraries(tkGUI ${GUI_LIBS})
 add_library(tkCommon SHARED src/common.cpp)
 target_link_libraries(tkCommon tkGUI)
 
-# QT5 AUTOMOC
-set_target_properties(tkGUI PROPERTIES AUTOMOC TRUE)
-
 #-------------------------------------------------------------------------------
 # apps
 #-------------------------------------------------------------------------------
