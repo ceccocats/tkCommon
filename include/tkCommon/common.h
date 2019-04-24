@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
+#include <math.h>
 #include <fstream>
 #include "utils.h"
 #include "timer.h"

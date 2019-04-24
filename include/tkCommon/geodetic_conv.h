@@ -223,4 +223,5 @@ class GeodeticConverter
   bool haveReference_;
 
 }; // class GeodeticConverter
-}; // namespace geodetic_conv
+
+}}
