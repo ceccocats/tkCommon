@@ -37,7 +37,7 @@ set(tkCommon_LIBRARIES
     yaml-cpp
     ${GUI_LIBS}
     tkGUI
-    tkCommon
+    #tkCommon
 )
 
 # This causes catkin_simple to link against these libraries

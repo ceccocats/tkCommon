@@ -68,7 +68,7 @@ install(DIRECTORY "${CMAKE_SOURCE_DIR}/include/" # source directory
         DESTINATION "include/"
 )
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/cmake/" # source directory
-        DESTINATION "share/tkGUI/cmake/" # target directory
+        DESTINATION "share/tkCommon/cmake/" # target directory
 )
 
 
