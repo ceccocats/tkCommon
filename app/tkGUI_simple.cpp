@@ -30,34 +30,39 @@ protected:
 
         tkDrawAxis();
 
+        // hipert logo as pavement
         glColor4f(1.0, 1.0, 1.0, 1.0);
         tkDrawTexture(hipertTex, 10);
 
         glColor4f(1.0, 0.0, 0.0, 1.0);
         tkDrawCircle(0, 0, 0, 8.0, 100);
 
+        // tornado cloud
+        glPushMatrix(); {
+            tkApplyTf(tf);
+            if(cloud != nullptr) {
+                glColor4f(1.0, 0, 0, 1.0);
+                glPointSize(1.0f);
+
+                Zcol_t zcol;
+                zcol.min = 0; 
+                zcol.max = 10;
+                tkDrawCloud(cloud, &zcol);
+            }
+        } glPopMatrix();
+
+        // 2 car, one textured, one wireframe
         glPushMatrix(); {
             glTranslatef(0, -4, 0);
+            glColor4f(1.0, 1.0, 1.0, 1.0);
+            tkDrawObject3D(&carObj, 1, GL_TRIANGLES, true);
+
+            glTranslatef(0, 8, 0);
             glColor4f(0.0, 0.0, 1.0, 0.3);
             tkDrawObject3D(&carObj, 1);
             glColor4f(0.0, 0.0, 1.0, 1.0);
             tkDrawObject3D(&carObj, 1, GL_LINES);
-            
-            glTranslatef(0, 8, 0);
-            glColor4f(1.0, 1.0, 1.0, 1.0);
-            tkDrawObject3D(&carObj, 1, GL_TRIANGLES, true);
         } glPopMatrix();
-
-        tkApplyTf(tf);
-        if(cloud != nullptr) {
-            glColor4f(1.0, 0, 0, 1.0);
-            glPointSize(1.0f);
-
-            Zcol_t zcol;
-            zcol.min = 0; 
-            zcol.max = 10;
-            tkDrawCloud(cloud, &zcol);
-        }
 
         // draw 2D
         tkViewport2D();
