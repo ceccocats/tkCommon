@@ -1,5 +1,5 @@
 #include "tkCommon/gui/Viewer.h"
-
+#include "tkCommon/gui/OBJ_Loader.h"
 using namespace tk::gui;
 
 // Constructor must call the base class constructor.
@@ -92,7 +92,67 @@ int Viewer::tkLoadTexture(std::string filename, GLuint &tex) {
     else
         std::cout<<" ERROR: "<<error<<"\n";
 
-    return error == 0;
+    return error;
+}
+
+int Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
+
+    int error = 0;
+    std::cout<<"loading "<<filename<<".obj    ";
+    
+    // correct locale dependent stof
+    std::setlocale(LC_ALL, "C");
+
+    objl::Loader loader;
+    if(loader.LoadFile((filename + ".obj").c_str())) {
+        
+        std::vector<unsigned int> indices = loader.LoadedMeshes[0].Indices;
+        std::vector<objl::Vertex> verts = loader.LoadedMeshes[0].Vertices;
+
+        std::cout<<" OK!!\t";
+        std::cout<<"name: "<<loader.LoadedMeshes[0].MeshName<<"  verts: "<<verts.size()<<"\n";
+
+        obj.triangles = Eigen::MatrixXf(5, indices.size());
+        for(int i=0; i<indices.size(); i++) {
+            int idx = indices[i];
+            obj.triangles(0,i) = verts[idx].Position.X;
+            obj.triangles(1,i) = verts[idx].Position.Y;
+            obj.triangles(2,i) = verts[idx].Position.Z;
+            obj.triangles(3,i) = verts[idx].TextureCoordinate.X;
+            obj.triangles(4,i) = 1 - verts[idx].TextureCoordinate.Y;
+        }
+
+    } else {
+        error = 1;
+        std::cout<<" ERROR\n";
+    }
+    
+    error = error || tkLoadTexture((filename + ".png"), obj.tex);
+    return error;
+}
+
+void Viewer::tkDrawObject3D(object3D_t *obj, float size, int GL_method, bool textured) {
+
+    glPushMatrix();
+    glScalef(size, size, size);
+
+    if(textured) {
+        glBindTexture(GL_TEXTURE_2D, obj->tex);
+        glEnable(GL_TEXTURE_2D);
+    }
+
+    glBegin(GL_method);
+    for(int i=0; i<obj->triangles.cols(); i++) {
+        glTexCoord2f(obj->triangles(3,i), obj->triangles(4,i)); 
+        glVertex3f(obj->triangles(0,i),obj->triangles(1,i),obj->triangles(2,i));
+    }
+    glEnd();
+
+    if(textured) {
+        glDisable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+    glPopMatrix();
 }
 
 void Viewer::tkDrawCircle(float x, float y, float z, float r, int res) {
@@ -178,6 +238,7 @@ void Viewer::init() {
 
     this->camera()->setZNearCoefficient(0.00001);
     this->camera()->setZClippingCoefficient(10000.0);
+
 }
 
 QString Viewer::helpString() const {

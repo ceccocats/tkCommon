@@ -8,6 +8,7 @@ class MyViewer : public tk::gui::Viewer {
 
 private:
     GLuint hipertTex;
+    object3D_t carObj;
     tk::common::Tfpose tf = tk::common::Tfpose::Identity();
     Eigen::MatrixXf *cloud = nullptr;
 
@@ -20,18 +21,32 @@ public:
 protected:
     void init() {
         tk::gui::Viewer::init();
-        int status = tkLoadTexture("../data/HipertLab.png", hipertTex);
+        int err = 0;
+        err = err || tkLoadTexture("../data/HipertLab.png", hipertTex);
+        err = err || tkLoadOBJ("../data/car", carObj);
     }
 
     void draw() {
 
         tkDrawAxis();
-       
+
         glColor4f(1.0, 1.0, 1.0, 1.0);
         tkDrawTexture(hipertTex, 10);
 
         glColor4f(1.0, 0.0, 0.0, 1.0);
         tkDrawCircle(0, 0, 0, 8.0, 100);
+
+        glPushMatrix(); {
+            glTranslatef(0, -4, 0);
+            glColor4f(0.0, 0.0, 1.0, 0.3);
+            tkDrawObject3D(&carObj, 1);
+            glColor4f(0.0, 0.0, 1.0, 1.0);
+            tkDrawObject3D(&carObj, 1, GL_LINES);
+            
+            glTranslatef(0, 8, 0);
+            glColor4f(1.0, 1.0, 1.0, 1.0);
+            tkDrawObject3D(&carObj, 1, GL_TRIANGLES, true);
+        } glPopMatrix();
 
         tkApplyTf(tf);
         if(cloud != nullptr) {
