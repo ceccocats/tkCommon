@@ -10,29 +10,32 @@ private:
     GLuint hipertTex;
     object3D_t carObj;
     tk::common::Tfpose tf = tk::common::Tfpose::Identity();
+    float angle;
     Eigen::MatrixXf *cloud = nullptr;
 
 public:
     MyViewer(QWidget *parent = nullptr) {}
 
     void setCloud(Eigen::MatrixXf *cloud) { this->cloud = cloud; }
-    void setAngle(float angle) { tf = tk::common::odom2tf(0, 0, angle); update(); }
+    void setAngle(float angle) { this->angle = angle; tf = tk::common::odom2tf(0, 0, angle); update(); }
 
 protected:
     void init() {
         tk::gui::Viewer::init();
         int err = 0;
         err = err || tkLoadTexture("../data/HipertLab.png", hipertTex);
-        err = err || tkLoadOBJ("../data/car", carObj);
+        err = err || tkLoadOBJ("../data/levante", carObj);
+
+        //Turn on wireframe mode
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        // Turn off
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
     }
 
     void draw() {
 
         tkDrawAxis();
-
-        // hipert logo as pavement
-        glColor4f(1.0, 1.0, 1.0, 1.0);
-        tkDrawTexture(hipertTex, 10);
 
         glColor4f(1.0, 0.0, 0.0, 1.0);
         tkDrawCircle(0, 0, 0, 8.0, 100);
@@ -51,17 +54,20 @@ protected:
             }
         } glPopMatrix();
 
-        // 2 car, one textured, one wireframe
+        // levante
+        glPushMatrix(); {        
+            glRotatef( (angle/10)*180/M_PI, 0, 0, 1);   
+            glColor4f(1.0, 1.0, 1.0, 1.0);
+            tkDrawObject3D(&carObj, 1, false);
+
+        } glPopMatrix();
+
+        // alpha blended object must be drawn at the end
+        // hipert logo as pavement
         glPushMatrix(); {
             glTranslatef(0, -4, 0);
             glColor4f(1.0, 1.0, 1.0, 1.0);
-            tkDrawObject3D(&carObj, 1, GL_TRIANGLES, true);
-
-            glTranslatef(0, 8, 0);
-            glColor4f(0.0, 0.0, 1.0, 0.3);
-            tkDrawObject3D(&carObj, 1);
-            glColor4f(0.0, 0.0, 1.0, 1.0);
-            tkDrawObject3D(&carObj, 1, GL_LINES);
+            tkDrawTexture(hipertTex, 10);
         } glPopMatrix();
 
         // draw 2D

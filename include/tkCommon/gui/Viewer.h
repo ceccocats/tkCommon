@@ -22,7 +22,8 @@ namespace tk { namespace gui {
 
         struct object3D_t {
             GLuint tex;
-            Eigen::MatrixXf triangles;
+            std::vector<Eigen::MatrixXf> triangles;
+            std::vector<tk::common::Vector3<float>> colors;
         };
 
     protected:
@@ -31,7 +32,7 @@ namespace tk { namespace gui {
         void tkDrawTexture(GLuint tex, float s);
         int  tkLoadTexture(std::string filename, GLuint &tex);
         int  tkLoadOBJ(std::string filename, object3D_t &obj);
-        void tkDrawObject3D(object3D_t *obj, float size = 1.0, int GL_method = GL_TRIANGLES, bool textured = false);
+        void tkDrawObject3D(object3D_t *obj, float size = 1.0, bool textured = false);
         void tkDrawCircle(float x, float y, float z, float r, int res = 20);
         void tkDrawCloud(Eigen::MatrixXf *data, Zcol_t *col = nullptr);
         void tkRainbowColor(float hue);

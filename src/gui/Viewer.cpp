@@ -105,22 +105,33 @@ int Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
 
     objl::Loader loader;
     if(loader.LoadFile((filename + ".obj").c_str())) {
-        
-        std::vector<unsigned int> indices = loader.LoadedMeshes[0].Indices;
-        std::vector<objl::Vertex> verts = loader.LoadedMeshes[0].Vertices;
+   
+        std::cout<<" OK!!\n";
+        obj.triangles.resize(loader.LoadedMeshes.size());
+        obj.colors.resize(loader.LoadedMeshes.size());
 
-        std::cout<<" OK!!\t";
-        std::cout<<"name: "<<loader.LoadedMeshes[0].MeshName<<"  verts: "<<verts.size()<<"\n";
+        for(int o=0; o<loader.LoadedMeshes.size(); o++) {
+            std::cout<<"name: "<<loader.LoadedMeshes[o].MeshName<<"  verts: "<<loader.LoadedMeshes[o].Vertices.size()<<"\n";
+   
+            std::vector<unsigned int> indices = loader.LoadedMeshes[o].Indices;
+            std::vector<objl::Vertex> verts = loader.LoadedMeshes[o].Vertices;
 
-        obj.triangles = Eigen::MatrixXf(5, indices.size());
-        for(int i=0; i<indices.size(); i++) {
-            int idx = indices[i];
-            obj.triangles(0,i) = verts[idx].Position.X;
-            obj.triangles(1,i) = verts[idx].Position.Y;
-            obj.triangles(2,i) = verts[idx].Position.Z;
-            obj.triangles(3,i) = verts[idx].TextureCoordinate.X;
-            obj.triangles(4,i) = 1 - verts[idx].TextureCoordinate.Y;
+            obj.colors[o].x = loader.LoadedMeshes[o].MeshMaterial.Kd.X;
+            obj.colors[o].y = loader.LoadedMeshes[o].MeshMaterial.Kd.Y;
+            obj.colors[o].z = loader.LoadedMeshes[o].MeshMaterial.Kd.Z;
+            std::cout<<"mat: "<<loader.LoadedMeshes[o].MeshMaterial.name<<" diffuse: "<<obj.colors[o]<<"\n";
+            
+            obj.triangles[o] = Eigen::MatrixXf(5, indices.size());
+            for(int i=0; i<indices.size(); i++) {
+                int idx = indices[i];
+                obj.triangles[o](0,i) = verts[idx].Position.X;
+                obj.triangles[o](1,i) = verts[idx].Position.Y;
+                obj.triangles[o](2,i) = verts[idx].Position.Z;
+                obj.triangles[o](3,i) = verts[idx].TextureCoordinate.X;
+                obj.triangles[o](4,i) = 1 - verts[idx].TextureCoordinate.Y;
+            }
         }
+
 
     } else {
         error = 1;
@@ -131,7 +142,7 @@ int Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
     return error;
 }
 
-void Viewer::tkDrawObject3D(object3D_t *obj, float size, int GL_method, bool textured) {
+void Viewer::tkDrawObject3D(object3D_t *obj, float size, bool textured) {
 
     glPushMatrix();
     glScalef(size, size, size);
@@ -141,10 +152,15 @@ void Viewer::tkDrawObject3D(object3D_t *obj, float size, int GL_method, bool tex
         glEnable(GL_TEXTURE_2D);
     }
 
-    glBegin(GL_method);
-    for(int i=0; i<obj->triangles.cols(); i++) {
-        glTexCoord2f(obj->triangles(3,i), obj->triangles(4,i)); 
-        glVertex3f(obj->triangles(0,i),obj->triangles(1,i),obj->triangles(2,i));
+    glBegin(GL_TRIANGLES);
+    for(int o=0; o<obj->triangles.size(); o++) {
+        if(!textured)
+            glColor3f(obj->colors[o].x, obj->colors[o].y, obj->colors[o].z);
+
+        for(int i=0; i<obj->triangles[o].cols(); i++) {
+            glTexCoord2f(obj->triangles[o](3,i), obj->triangles[o](4,i)); 
+            glVertex3f(obj->triangles[o](0,i),obj->triangles[o](1,i),obj->triangles[o](2,i));
+        }
     }
     glEnd();
 
