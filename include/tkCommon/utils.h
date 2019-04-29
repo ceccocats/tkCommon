@@ -189,7 +189,7 @@ struct FIFOQueue {
 template<typename T>
 struct PoolQueue {
 
-    static const int MAX_DIM = 10;
+    static const int MAX_DIM = 64;
     T array[PoolQueue::MAX_DIM];
     int dim;
 
@@ -207,8 +207,8 @@ struct PoolQueue {
     }
     
     void setDim(int _dim) {
-        if(dim > PoolQueue::MAX_DIM)
-            dim = PoolQueue::MAX_DIM;
+        if(_dim > PoolQueue::MAX_DIM)
+            _dim = PoolQueue::MAX_DIM;
         dim = _dim;
     }
 
@@ -222,7 +222,7 @@ struct PoolQueue {
             }
 
             // search first free object        
-            int insert_to = last;
+            int insert_to = (last + 1) % dim;
             while(true) {
                 if(mtx[ insert_to%dim ].try_lock())
                     break;
@@ -239,9 +239,10 @@ struct PoolQueue {
         return insert_to;
     }
 
-    int getIdx(int idx, T &out) {    
+    int getIdx(/*int idx,*/ T &out) {    
 
         gmtx.lock();
+        int idx = last;
         if(mtx[ idx%dim ].try_lock()) {
             out = array[ idx%dim ];
             locked++;
