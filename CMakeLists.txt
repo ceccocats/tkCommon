@@ -45,7 +45,7 @@ add_library(tkGUI SHARED src/gui/lodepng.cpp src/gui/Viewer.cpp)
 target_link_libraries(tkGUI ${GUI_LIBS})
 
 add_library(tkCommon SHARED src/common.cpp)
-target_link_libraries(tkCommon tkGUI)
+target_link_libraries(tkCommon tkGUI yaml-cpp)
 
 #-------------------------------------------------------------------------------
 # apps

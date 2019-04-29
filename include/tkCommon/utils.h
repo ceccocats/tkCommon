@@ -25,8 +25,12 @@ T clamp(T val, T min, T max) {
     return val;
 }
 
+inline YAML::Node loadYAMLconf(std::string conf_file) {
+    return YAML::LoadFile(conf_file);
+}
+
 template<typename T>
-T getYAMLconf(YAML::Node conf, std::string key, T defaultVal) {
+inline T getYAMLconf(YAML::Node conf, std::string key, T defaultVal) {
     T val = defaultVal;
     if(conf && conf[key]) {
         val = conf[key].as<T>();
