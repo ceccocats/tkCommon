@@ -35,7 +35,7 @@
     #define TIMER_STOP_COL(name, col)  clock_gettime(CLOCK_MONOTONIC, &end##name);     \
         {double t_ns = ((double)(end##name.tv_sec - start##name.tv_sec) * 1.0e9 +      \
                     (double)(end##name.tv_nsec - start##name.tv_nsec))/1.0e6;          \
-        std::cout<<col<<name<<" Time:"<<std::setw(16)<<t_ns<<" ms\n"<<COL_END; }
+        std::cout<<col<<#name<<" Time:"<<std::setw(16)<<t_ns<<" ms\n"<<COL_END; }
 
     #define TIMER_STOP(name) TIMER_STOP_COL(name, COL_CYANB)
 
