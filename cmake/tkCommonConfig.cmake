@@ -1,4 +1,4 @@
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
+message("-- Found tkCommon")
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --std=c++11 -fPIC -fopenmp")
 
 find_package(Eigen3 REQUIRED)
