@@ -83,6 +83,8 @@ namespace tk { namespace common {
     };
 
     typedef Eigen::Isometry3f Tfpose;
+    typedef std::vector< Eigen::Matrix3d, Eigen::aligned_allocator<Eigen::Matrix3d> > MatricesVector;
+
     typedef uint64_t TimeStamp;
 
     inline static Tfpose odom2tf(float x, float y, float yaw) {
