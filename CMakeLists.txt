@@ -1,11 +1,10 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
 
 PROJECT(tkCommon)
-
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --std=c++11 -fPIC -fopenmp")
 set(CMAKE_BUILD_TYPE "Release")
-include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 #-------------------------------------------------------------------------------
@@ -64,10 +63,10 @@ target_link_libraries(tkGUI_2dgui tkCommon ${GUI_LIBS})
 # install
 #-------------------------------------------------------------------------------
 install(TARGETS tkGUI DESTINATION lib)
-install(DIRECTORY "${CMAKE_SOURCE_DIR}/include/" # source directory
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" # source directory
         DESTINATION "include/"
 )
-install(DIRECTORY "${CMAKE_SOURCE_DIR}/cmake/" # source directory
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" # source directory
         DESTINATION "share/tkCommon/cmake/" # target directory
 )
 

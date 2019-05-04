@@ -41,4 +41,4 @@ set(tkCommon_LIBRARIES
 )
 
 # This causes catkin_simple to link against these libraries
-set(tkCommon_FOUND_CATKIN_PROJECT true)
+set(tkCommon_FOUND true)
