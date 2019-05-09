@@ -7,6 +7,7 @@
 #include "utils.h"
 #include "timer.h"
 #include "Eigen/Dense"
+#include "geodetic_conv.h"
 
 namespace tk { namespace common {
 
@@ -111,15 +112,36 @@ namespace tk { namespace common {
         return false;
     }
 
-    inline static bool readGPS(std::ifstream &is, Eigen::Vector3d& xyz) {
+    inline static bool readGPS(std::ifstream &is, Eigen::Vector3d& xyz, GeodeticConverter &geoconv) {
         
-        float x, y, z;
+        double gpsX, gpsY, gpsH;
         if(!is)
             return false;
 
-        if(is>>x>>y>>z) {
-            xyz << x, y, z;
-            std::cout<<"gps_xyz: "<<x <<" "<<y<<" "<<z<<"\n";
+        if(is>>gpsX>>gpsY>>gpsH) {
+            
+            // check if it need to be converted from lat/lon to XY
+            double lat, lon, h, hdop;
+            int quality, nsat;            
+            if(is>>quality>>hdop>>nsat) {
+                // data is in LAT/LON
+                lat = gpsX;
+                lon = gpsY;
+                h = gpsH;
+
+                if(lat == 0 || lon == 0)
+                    return false;
+
+                // init at first data
+                if(!geoconv.isInitialised())
+                    geoconv.initialiseReference(lat, lon, h);
+            
+                geoconv.geodetic2Enu(lat, lon, h, &gpsX, &gpsY, &gpsH);
+            } 
+            
+            // data is in XYZ
+            xyz << gpsX, gpsY, gpsH;
+            std::cout<<"gps_xyz: "<<gpsX<<" "<<gpsY<<" "<<gpsH<<"\n";
             return true;
         }
         return false;
