@@ -33,8 +33,8 @@ class GeodeticConverter
 
   void getReference(double* latitude, double* longitude, double* altitude)
   {
-    *latitude = initial_latitude_;
-    *longitude = initial_longitude_;
+    *latitude = rad2Deg(initial_latitude_);
+    *longitude = rad2Deg(initial_longitude_);
     *altitude = initial_altitude_;
   }
 
@@ -173,6 +173,21 @@ class GeodeticConverter
     double x, y, z;
     ned2Ecef(aux_north, aux_east, aux_down, &x, &y, &z);
     ecef2Geodetic(x, y, z, latitude, longitude, altitude);
+  }
+
+  void loadReference(std::string file) {
+    std::ifstream f(file);
+    double lat, lon, h;
+    f >> lat >> lon >> h;
+    initialiseReference(lat, lon, h);
+  }
+
+
+  void saveReference(std::string file) {
+    std::ofstream of(file);
+    double lat, lon, h;
+    getReference(&lat, &lon, &h);
+    of << std::setprecision(10) << lat <<" "<<lon<<" "<<h<<"\n";
   }
 
  private:
