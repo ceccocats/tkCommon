@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QGLViewer/qglviewer.h>
+#include <QMouseEvent>
 #include "lodepng.h"
 #include "../common.h"
 
@@ -11,7 +12,7 @@ namespace tk { namespace gui {
     protected:
         virtual void draw();
         virtual void init();
-        virtual QString helpString() const;
+        void wheelEvent(QWheelEvent *event) override;
 
     public:
         Viewer(QWidget *parent = nullptr);

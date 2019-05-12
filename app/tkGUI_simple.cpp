@@ -34,6 +34,7 @@ protected:
     }
 
     void draw() {
+        tk::gui::Viewer::draw();
 
         tkDrawAxis();
 
