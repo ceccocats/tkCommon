@@ -27,16 +27,16 @@ namespace tk { namespace gui {
             std::vector<tk::common::Vector3<float>> colors;
         };
 
-    protected:
-        void tkApplyTf(tk::common::Tfpose tf);
-        void tkDrawAxis(float s = 2.0);
-        void tkDrawTexture(GLuint tex, float s);
-        int  tkLoadTexture(std::string filename, GLuint &tex);
-        int  tkLoadOBJ(std::string filename, object3D_t &obj);
-        void tkDrawObject3D(object3D_t *obj, float size = 1.0, bool textured = false);
-        void tkDrawCircle(float x, float y, float z, float r, int res = 20);
-        void tkDrawCloud(Eigen::MatrixXf *data, Zcol_t *col = nullptr);
-        void tkRainbowColor(float hue);
-        void tkViewport2D();
+    public:
+        static void tkApplyTf(tk::common::Tfpose tf);
+        static void tkDrawAxis(float s = 2.0);
+        static void tkDrawTexture(GLuint tex, float s);
+        static int  tkLoadTexture(std::string filename, GLuint &tex);
+        static int  tkLoadOBJ(std::string filename, object3D_t &obj);
+        static void tkDrawObject3D(object3D_t *obj, float size = 1.0, bool textured = false);
+        static void tkDrawCircle(float x, float y, float z, float r, int res = 20);
+        static void tkDrawCloud(Eigen::MatrixXf *data, Zcol_t *col = nullptr);
+        static void tkRainbowColor(float hue);
+        static void tkViewport2D(int width, int height);
     };
 }}

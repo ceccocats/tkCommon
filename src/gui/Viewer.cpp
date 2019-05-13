@@ -206,7 +206,6 @@ void Viewer::tkRainbowColor(float hue) {
     glColor3f(float(r)/255.0, float(g)/255.0, float(b)/255.0);
 }
 
-
 void Viewer::tkDrawCloud(Eigen::MatrixXf *points, Zcol_t *z_col) {
         
         glBegin(GL_POINTS);
@@ -219,11 +218,11 @@ void Viewer::tkDrawCloud(Eigen::MatrixXf *points, Zcol_t *z_col) {
         glEnd();
 }
 
-void Viewer::tkViewport2D() {
+void Viewer::tkViewport2D(int width, int height) {
     //This sets up the viewport so that the coordinates (0, 0) are at the top left of the window
-    glViewport(0, 0, width(), height());  
-    float ratio = (float) width() / (float) height();
-    glOrtho(0, width(), height(), 0, -10, 10);
+    glViewport(0, 0, width, height);  
+    float ratio = (float) width / (float) height;
+    glOrtho(0, width, height, 0, -10, 10);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();

@@ -72,7 +72,7 @@ protected:
         } glPopMatrix();
 
         // draw 2D
-        tkViewport2D();
+        tkViewport2D(width(), height());
         glLoadIdentity();
         glTranslatef(0.8, -0.88, 0);
         tkDrawTexture(hipertTex, 0.2);
