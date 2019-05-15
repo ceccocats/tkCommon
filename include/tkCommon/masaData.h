@@ -27,7 +27,7 @@ struct Obj{
     float   x1;
     float   y1;
     float   z1;
-    float   cl;     //CLASS
+    int     cl;     //CLASS
 };
 
 static const int    MAXOBJ = 50;
