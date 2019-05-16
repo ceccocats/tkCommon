@@ -1,7 +1,7 @@
-#include <iostream>
-#include <boost/interprocess/managed_shared_memory.hpp>
-
-using namespace boost::interprocess;
+#include <iostream> 
+#include <sys/ipc.h> 
+#include <sys/shm.h> 
+#include <stdio.h> 
 
 namespace tk{ namespace common{
 
@@ -9,40 +9,31 @@ template <class T>
 class sharedMemory{
 
     private:
-        std::string                     name;
-
-        std::pair<T*, std::size_t>      ref;
-
+        T*  data;
+        int type;
+        int shmid;
     public:
 
-        bool init(std::string name){
+        bool init(std::string name, int id ){
 
-            this->name = name;
-
-            try{
-                managed_shared_memory segment(open_only, this->name.c_str());
-                ref = segment.find<T>(this->name.c_str());
-            }catch(...){
-                managed_shared_memory segment(create_only, this->name.c_str(), 200);
-                T *r = segment.construct<T>(this->name.c_str())();
-                ref = segment.find<T>(this->name.c_str());
-            }
+            key_t key = ftok(name.c_str(),id);
+            shmid = shmget(key,1024,0666|IPC_CREAT);
+            data = (T*) shmat(shmid,(void*)0,0);
         }
 
         T read(){
 
-            return *ref.first;
+            return *data;
         }
 
-        bool write(T data){
+        bool write(T d){
 
-            ref.first = data;
-            return true;
+            data = *d;
         }
 
         void close(){
 
-            shared_memory_object::remove(this->name.c_str());
+            shmctl(shmid,IPC_RMID,NULL);
         }
 
 
