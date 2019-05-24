@@ -11,16 +11,29 @@
 
 namespace tk { namespace common {
 
-    // Vector 4 class
+    /**
+     * Vector of 4 elements [ x y z i ]
+     * @tparam T
+     */
     template <class T> 
     class Vector4 {
         public:
             T x, y, z, i;
 
+            /**
+             * init all to zero
+             */
             Vector4() {
                 x = y = z = i = 0;
             }
 
+            /**
+             * init with values
+             * @param x
+             * @param y
+             * @param z
+             * @param i
+             */
             Vector4(T x, T y, T z, T i) {
                 this->x = x;
                 this->y = y;
@@ -30,22 +43,41 @@ namespace tk { namespace common {
 
             ~Vector4() {}
 
+            /**
+             * override ostream to a nice print
+             * @param os
+             * @param v
+             * @return
+             */
             friend std::ostream& operator<<(std::ostream& os, const Vector4& v) {
                 os << "v4(" << v.x <<", "<< v.y <<", "<< v.z <<", "<< v.i <<")";
                 return os;
             }  
     };
 
-    // Vector3 class
-    template <class T> 
+
+    /**
+     * Vector of 3 elements [ x y z ]
+     * @tparam T
+     */
+    template <class T>
     class Vector3 {
         public:        
             T x, y, z;
 
+            /**
+             * init all to zero
+             */
             Vector3() {
                 x = y = z = 0;
             }
 
+            /**
+             * init with values
+             * @param x
+             * @param y
+             * @param z
+             */
             Vector3(T x, T y, T z) {
                 this->x = x;
                 this->y = y;
@@ -54,22 +86,39 @@ namespace tk { namespace common {
 
             ~Vector3() {}
 
+            /**
+             * override ostream for a nice print
+             * @param os
+             * @param v
+             * @return
+             */
             friend std::ostream& operator<<(std::ostream& os, const Vector3& v) {
                 os << "v3(" << v.x <<", "<< v.y <<", "<< v.z <<")";
                 return os;
             }  
     };
 
-    // Vector2 class
-    template <class T> 
+    /**
+     * Vector of 2 elements [ x y ]
+     * @tparam T
+     */
+    template <class T>
     class Vector2 {
         public:        
             T x, y;
 
+            /**
+             * init all to zero
+             */
             Vector2() {
                 x = y = 0;
             }
 
+            /**
+             * init with values
+             * @param x
+             * @param y
+             */
             Vector2(T x, T y) {
                 this->x = x;
                 this->y = y;
@@ -77,17 +126,49 @@ namespace tk { namespace common {
 
             ~Vector2() {}
 
+            /**
+             * override ostream for a nice print
+             * @param os
+             * @param v
+             * @return
+             */
             friend std::ostream& operator<<(std::ostream& os, const Vector2& v) {
                 os << "v2(" << v.x <<", "<< v.y <<")";
                 return os;
             }  
     };
 
+    /**
+     *  RotoTranslation transform
+     *  it is implemented as a matrix 4x4
+     *      r r r x
+     *      r r r y
+     *      r r r z
+     *      0 0 0 1
+     *  [ r ]    : 3d rotation matrix
+     *  [x y z ] : 3d translation
+     */
     typedef Eigen::Isometry3f Tfpose;
+
+    /**
+     * Vector of 3x3 Matrix
+     * used by GICP
+     */
     typedef std::vector< Eigen::Matrix3d, Eigen::aligned_allocator<Eigen::Matrix3d> > MatricesVector;
 
+    /**
+     * Timestamp value
+     * espessed in microseconds from epoch
+     */
     typedef uint64_t TimeStamp;
 
+    /**
+     * Convert odometry to TfPose
+     * @param x   translation forward
+     * @param y   translation sideways
+     * @param yaw rotation
+     * @return transform
+     */
     inline static Tfpose odom2tf(float x, float y, float yaw) {
         Eigen::Quaternionf quat = 
             Eigen::AngleAxisf(0, Eigen::Vector3f::UnitX())*
@@ -99,6 +180,16 @@ namespace tk { namespace common {
         return isometry;
     }
 
+    /**
+     * Read odometry from ifstream as a TfPose
+     * Format:
+     * x y yaw stamp
+     *
+     * @param is input stream
+     * @param out output transform
+     * @param stamp output timestamp of odometry
+     * @return true if correctly readed
+     */
     inline static bool readOdom(std::ifstream &is, Tfpose &out, uint64_t &stamp) {
         
         float x, y, yaw;
@@ -112,6 +203,19 @@ namespace tk { namespace common {
         return false;
     }
 
+    /**
+     * Read GPS data from ifstream
+     * Format1 [ direct xyz ENU coords ] :
+     * x y z
+     * Format2 [ gps raw data ] :
+     * lat lon height
+     * quality hdop n_satellites
+     *
+     * @param is input stream
+     * @param xyz output 3d position
+     * @param geoconv input geodetic reference of the map
+     * @return true if correcty readed
+     */
     inline static bool readGPS(std::ifstream &is, Eigen::Vector3d& xyz, GeodeticConverter &geoconv) {
         
         double gpsX, gpsY, gpsH;
@@ -147,6 +251,13 @@ namespace tk { namespace common {
         return false;
     }
 
+    /**
+     * Read odometry from file
+     * @param file_name file path
+     * @param odom_out readed odometry
+     * @param odom_stamp readed odometry stamp
+     * @return true if correctly readed
+     */
     inline static bool readOdomFile(std::string file_name, Tfpose &odom_out, uint64_t &odom_stamp) {
 
         std::ifstream is(file_name);
@@ -155,6 +266,11 @@ namespace tk { namespace common {
         return state;
     }
 
+    /**
+     * Extract 3d translation from TfPose
+     * @param tf
+     * @return
+     */
     inline static Vector3<float> tf2pose(Tfpose tf) {
                 
         Eigen::Vector3f p = tf.translation(); 
@@ -163,10 +279,24 @@ namespace tk { namespace common {
     }
 
 
+    /**
+     * check if x is close to y
+     * formula: fabs(x-y) <= a_tol + r_tol * fabs(y)
+     * @param x x value
+     * @param y y value
+     * @param r_tol
+     * @param a_tol
+     * @return
+     */
     inline static bool isclose(double x, double y, double r_tol=1.e-5, double a_tol=1.e-8) {
         return fabs(x-y) <= a_tol + r_tol * fabs(y);
     }
 
+    /**
+     * Extract 3d rotation from TfPose
+     * @param tf
+     * @return
+     */
     inline static Vector3<float> tf2rot(Tfpose tf) {
 
         double psi, theta, phi;

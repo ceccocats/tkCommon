@@ -7,15 +7,34 @@
 #include "yaml-cpp/yaml.h" 
 
 typedef uint64_t timeStamp_t;
+
+/**
+ * get current timestamp
+ * @return microseconds from epoch
+ */
 inline timeStamp_t getTimeStamp() {
     struct timeval cur_time;
     gettimeofday(&cur_time, NULL);
     return timeStamp_t(cur_time.tv_sec)*1e6 + cur_time.tv_usec;
 }
+
+/**
+ * Convert timeval to microseconds from epoch
+ * @param tv
+ * @return
+ */
 inline timeStamp_t tv2TimeStamp(struct timeval tv) {
     return timeStamp_t(tv.tv_sec)*1e6 + tv.tv_usec;
 } 
 
+/**
+ * clamp value between min and max
+ * @tparam T
+ * @param val
+ * @param min
+ * @param max
+ * @return
+ */
 template<typename T>
 T clamp(T val, T min, T max) {
     if(val < min)
@@ -25,10 +44,23 @@ T clamp(T val, T min, T max) {
     return val;
 }
 
+/**
+ * Load YAML node from file
+ * @param conf_file
+ * @return
+ */
 inline YAML::Node loadYAMLconf(std::string conf_file) {
     return YAML::LoadFile(conf_file);
 }
 
+/**
+ * Get configuration from YAML node
+ * @tparam T
+ * @param conf yaml node
+ * @param key configuration KEY
+ * @param defaultVal defalt value in case of no KEY found
+ * @return conf value
+ */
 template<typename T>
 inline T getYAMLconf(YAML::Node conf, std::string key, T defaultVal) {
     T val = defaultVal;
@@ -39,22 +71,31 @@ inline T getYAMLconf(YAML::Node conf, std::string key, T defaultVal) {
     return val;
 }
 
-/* 
-    Class for loop rate at a certain delta time
-    in microsecs
-*/
+/**
+ *   Class for loop rate at a certain delta time
+ *   in microsecs
+ */
 struct LoopRate {
 
     std::string name;
     timeStamp_t dt;
     timeStamp_t T, lastT;
 
+    /**
+     * init Looprate
+     * @param _dt delta time in microsecs
+     * @param _name name of the loop
+     */
     LoopRate(timeStamp_t _dt, std::string _name = "anonymous") {
         dt  = _dt;
         name = _name;
         T = lastT = 0;
     }
 
+    /**
+     * Wait remaining time
+     * it will print a warning on deadline miss
+     */
     void wait() {
         T = getTimeStamp();
 
@@ -69,6 +110,10 @@ struct LoopRate {
     }
 };
 
+/**
+ * Cirular Array implementation
+ * @tparam T
+ */
 template<typename T>
 struct CircularArray {
 
@@ -78,17 +123,29 @@ struct CircularArray {
 
     std::mutex m;
 
+    /**
+     * init circular array
+     * @param _dim array dimension
+     */
     CircularArray(int _dim = 100) {
         setDim(_dim);
         position = 0;
     }
 
+    /**
+     * set array dimension
+     * @param _dim
+     */
     void setDim(int _dim) {
         if(dim > CircularArray::MAX_DIM)
             dim = CircularArray::MAX_DIM;
         dim = _dim;
     }
 
+    /**
+     * push an element to array
+     * @param element
+     */
     void add(T element) {
         std::lock_guard<std::mutex> lock(m);
 
@@ -96,6 +153,11 @@ struct CircularArray {
         position++;
     }
 
+    /**
+     * pop element from array head
+     * @param n
+     * @return
+     */
     T head(int n) {
         std::lock_guard<std::mutex> lock(m);
         
@@ -104,6 +166,10 @@ struct CircularArray {
         return array[index];
     }
 
+    /**
+     * get maximum value without popping it
+     * @return
+     */
     T max() {
         T val = -9999999999;
         int idx = 0;
@@ -116,6 +182,10 @@ struct CircularArray {
         return array[idx];
     }
 
+    /**
+     * get minimum value without popping it
+     * @return
+     */
     T min() {
         T val = +9999999999;
         int idx = 0;
@@ -128,6 +198,10 @@ struct CircularArray {
         return array[idx];
     }
 
+    /**
+     * get number of elements in array
+     * @return
+     */
     int size() {
         if(position < dim)
             return position;
@@ -135,6 +209,10 @@ struct CircularArray {
             return dim;
     }
 
+    /**
+     * dump to file
+     * @param file
+     */
     void dump(std::string file) {     
         std::ofstream os;
         os.open(file);
@@ -145,6 +223,10 @@ struct CircularArray {
     }
 };
 
+/**
+ * Fifo queue implementation
+ * @tparam T
+ */
 template<typename T>
 struct FIFOQueue {
 
@@ -154,18 +236,30 @@ struct FIFOQueue {
 
     std::mutex m;
 
+    /**
+     * init FIFO
+     * @param _dim dimension
+     */
     FIFOQueue(int _dim=1) {
         setDim(_dim);
         position = 0;
         inserted = 0;
     }
-    
+
+    /**
+     * Set FIFO dimension
+     * @param _dim
+     */
     void setDim(int _dim) {
         if(dim > FIFOQueue::MAX_DIM)
             dim = FIFOQueue::MAX_DIM;
         dim = _dim;
     }
 
+    /**
+     * push element to FIFO
+     * @param element
+     */
     void add(T element) {
         std::lock_guard<std::mutex> lock(m);
 
@@ -175,6 +269,11 @@ struct FIFOQueue {
             inserted = dim;
     }
 
+    /**
+     * pop element from FIFO
+     * @param out output element
+     * @return true if correctly popped
+     */
     bool get(T &out) {  
         std::lock_guard<std::mutex> lock(m);
         
@@ -190,6 +289,13 @@ struct FIFOQueue {
 };
 
 
+/**
+ * PoolQUEUE implementation
+ * is is a pool of free elements ready to be used
+ * is useful for use data structures and leave them
+ * for later without deallocate
+ * @tparam T
+ */
 template<typename T>
 struct PoolQueue {
 
@@ -203,19 +309,32 @@ struct PoolQueue {
     int        locked = 0;
     int        inserted = 0;
 
+    /**
+     * Init Pool with dimension
+     * @param _dim
+     */
     PoolQueue(int _dim=1) {
         setDim(_dim);
         for(int i=0; i<MAX_DIM; i++) {
             mtx[i].unlock();
         }
     }
-    
+
+    /**
+     * Set pool dimension
+     * @param _dim
+     */
     void setDim(int _dim) {
         if(_dim > PoolQueue::MAX_DIM)
             _dim = PoolQueue::MAX_DIM;
         dim = _dim;
     }
 
+    /**
+     * Add an element to pool
+     * @param element
+     * @return index for the added element, -1 on fail
+     */
     int add(T element) {
         
         gmtx.lock();
@@ -243,6 +362,11 @@ struct PoolQueue {
         return insert_to;
     }
 
+    /**
+     * Get the index of the first free element
+     * @param out
+     * @return index, -1 on fail
+     */
     int getIdx(/*int idx,*/ T &out) {    
 
         gmtx.lock();
@@ -259,6 +383,10 @@ struct PoolQueue {
         return idx;
     }
 
+    /**
+     * Release index
+     * @param idx
+     */
     void releaseIdx(int idx) {
         gmtx.lock();
 
