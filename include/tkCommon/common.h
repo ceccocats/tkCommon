@@ -169,7 +169,7 @@ namespace tk { namespace common {
      * @param yaw rotation
      * @return transform
      */
-    inline static Tfpose odom2tf(float x, float y, float yaw) {
+    inline Tfpose odom2tf(float x, float y, float yaw) {
         Eigen::Quaternionf quat = 
             Eigen::AngleAxisf(0, Eigen::Vector3f::UnitX())*
             Eigen::AngleAxisf(0, Eigen::Vector3f::UnitY())*
@@ -190,7 +190,7 @@ namespace tk { namespace common {
      * @param stamp output timestamp of odometry
      * @return true if correctly readed
      */
-    inline static bool readOdom(std::ifstream &is, Tfpose &out, uint64_t &stamp) {
+    inline bool readOdom(std::ifstream &is, Tfpose &out, uint64_t &stamp) {
         
         float x, y, yaw;
         if(!is)
@@ -216,7 +216,7 @@ namespace tk { namespace common {
      * @param geoconv input geodetic reference of the map
      * @return true if correcty readed
      */
-    inline static bool readGPS(std::ifstream &is, Eigen::Vector3d& xyz, GeodeticConverter &geoconv) {
+    inline bool readGPS(std::ifstream &is, Eigen::Vector3d& xyz, GeodeticConverter &geoconv) {
         
         double gpsX, gpsY, gpsH;
         if(!is)
@@ -258,7 +258,7 @@ namespace tk { namespace common {
      * @param odom_stamp readed odometry stamp
      * @return true if correctly readed
      */
-    inline static bool readOdomFile(std::string file_name, Tfpose &odom_out, uint64_t &odom_stamp) {
+    inline bool readOdomFile(std::string file_name, Tfpose &odom_out, uint64_t &odom_stamp) {
 
         std::ifstream is(file_name);
         bool state = true;
@@ -271,7 +271,7 @@ namespace tk { namespace common {
      * @param tf
      * @return
      */
-    inline static Vector3<float> tf2pose(Tfpose tf) {
+    inline Vector3<float> tf2pose(Tfpose tf) {
                 
         Eigen::Vector3f p = tf.translation(); 
         Vector3<float> out(p[0], p[1], p[2]);
@@ -288,7 +288,7 @@ namespace tk { namespace common {
      * @param a_tol
      * @return
      */
-    inline static bool isclose(double x, double y, double r_tol=1.e-5, double a_tol=1.e-8) {
+    inline bool isclose(double x, double y, double r_tol=1.e-5, double a_tol=1.e-8) {
         return fabs(x-y) <= a_tol + r_tol * fabs(y);
     }
 
@@ -297,7 +297,7 @@ namespace tk { namespace common {
      * @param tf
      * @return
      */
-    inline static Vector3<float> tf2rot(Tfpose tf) {
+    inline Vector3<float> tf2rot(Tfpose tf) {
 
         double psi, theta, phi;
         Eigen::MatrixXd R = tf.matrix().cast<double>();
