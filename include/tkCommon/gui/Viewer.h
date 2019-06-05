@@ -36,6 +36,8 @@ namespace tk { namespace gui {
         static void tkDrawObject3D(object3D_t *obj, float size = 1.0, bool textured = false);
         static void tkDrawCircle(float x, float y, float z, float r, int res = 20);
         static void tkDrawCloud(Eigen::MatrixXf *data, Zcol_t *col = nullptr);
+        static void tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght);
+        static void tkDrawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
         static void tkRainbowColor(float hue);
         static void tkViewport2D(int width, int height);
     };

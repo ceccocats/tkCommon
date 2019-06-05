@@ -218,6 +218,76 @@ void Viewer::tkDrawCloud(Eigen::MatrixXf *points, Zcol_t *z_col) {
         glEnd();
 }
 
+void Viewer::tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght) {
+    qglviewer::Vec from;
+    qglviewer::Vec to;
+
+    from.x = pose.x;
+    from.y = pose.y;
+    from.z = pose.z;
+
+    to.x = from.x + lenght*cos(yaw);
+    to.y = from.y + lenght*sin(yaw);
+    to.z = from.z;
+
+    glColor3f(1.0, 0.0, 0.0);
+    drawArrow(from, to);
+}
+
+void Viewer::tkDrawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled) {
+    if (!filled)
+        glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
+
+    glPushMatrix();
+    glTranslatef(pose.x, pose.y, pose.z);
+    glScalef(size.x, size.y, size.z);
+
+    // BACK
+    glBegin(GL_POLYGON);
+    glVertex3f(  0.5, -0.5, 0.5 );
+    glVertex3f(  0.5,  0.5, 0.5 );
+    glVertex3f( -0.5,  0.5, 0.5 );
+    glVertex3f( -0.5, -0.5, 0.5 );
+    glEnd();
+    
+    // RIGHT
+    glBegin(GL_POLYGON);
+    glVertex3f( 0.5, -0.5, -0.5 );
+    glVertex3f( 0.5,  0.5, -0.5 );
+    glVertex3f( 0.5,  0.5,  0.5 );
+    glVertex3f( 0.5, -0.5,  0.5 );
+    glEnd();
+    
+    // LEFT
+    glBegin(GL_POLYGON);
+    glVertex3f( -0.5, -0.5,  0.5 );
+    glVertex3f( -0.5,  0.5,  0.5 );
+    glVertex3f( -0.5,  0.5, -0.5 );
+    glVertex3f( -0.5, -0.5, -0.5 );
+    glEnd();
+    
+    // TOP
+    glBegin(GL_POLYGON);
+    glVertex3f(  0.5,  0.5,  0.5 );
+    glVertex3f(  0.5,  0.5, -0.5 );
+    glVertex3f( -0.5,  0.5, -0.5 );
+    glVertex3f( -0.5,  0.5,  0.5 );
+    glEnd();
+    
+    // BOTTOM
+    glBegin(GL_POLYGON);
+    glVertex3f(  0.5, -0.5, -0.5 );
+    glVertex3f(  0.5, -0.5,  0.5 );
+    glVertex3f( -0.5, -0.5,  0.5 );
+    glVertex3f( -0.5, -0.5, -0.5 );
+    glEnd();
+
+    glPopMatrix();
+
+    if (!filled)
+        glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
+}
+
 void Viewer::tkViewport2D(int width, int height) {
     //This sets up the viewport so that the coordinates (0, 0) are at the top left of the window
     glViewport(0, 0, width, height);  
@@ -243,7 +313,7 @@ void Viewer::init() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
     glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LEQUAL);
+    //glDepthFunc(GL_LEQUAL);
 
     // Restore previous viewer state.
     restoreStateFromFile();

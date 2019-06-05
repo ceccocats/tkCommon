@@ -36,8 +36,12 @@ protected:
     void draw() {
         tk::gui::Viewer::draw();
 
-        tkDrawAxis();
+        tkDrawAxis(1);
 
+        tk::common::Vector3<float>p(0.0, 0.0, 1.0);
+        tk::common::Vector3<float>s(3.0, 3.0, 2.0);
+        tkDrawCube(p, s, false);
+        
         glColor4f(1.0, 0.0, 0.0, 1.0);
         tkDrawCircle(0, 0, 0, 8.0, 100);
 
