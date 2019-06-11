@@ -1,5 +1,6 @@
 #include "tkCommon/gui/Viewer.h"
 #include <thread>
+#include <signal.h>
 
 class MyViewer : public tk::gui::Viewer {
     private:
@@ -26,13 +27,15 @@ class MyViewer : public tk::gui::Viewer {
         void draw() {
             tk::gui::Viewer::draw();
 
-            tkDrawAxis();
-
-            tk::common::Vector3<float>p(0.0, 0.0, 1.0);
-            tk::common::Vector3<float>s(3.0, 3.0, 2.0);
-            tkSetColor(tk::gui::color::LIME);
+            tk::common::Vector3<float>p(0.0, 4.0, 1.0);
+            tk::common::Vector3<float>s(4.0, 2.0, 2.0);
+            tk::gui::Color_t col = tk::gui::color::PINK;
+            tkSetColor(col);
             tkDrawCube(p, s, false);
-            
+            col.a /= 4;
+            tkSetColor(col);
+            tkDrawCube(p, s, true);
+
             tkSetColor(tk::gui::color::PINK);
             tkDrawCircle(0, 0, 0, 8.0, 100);
             
@@ -49,10 +52,7 @@ class MyViewer : public tk::gui::Viewer {
 
             // levante
             glPushMatrix(); {        
-                glRotatef( (angle/10)*180/M_PI, 0, 0, 1);   
-                //glColor4f(1.0, 1.0, 1.0, 1.0);
                 tkDrawObject3D(&carObj, 1, false);
-
             } glPopMatrix();
 
             // alpha blended object must be drawn at the end
@@ -78,7 +78,28 @@ class MyViewer : public tk::gui::Viewer {
 MyViewer *viewer = nullptr;
 bool gRun = true;
 
+
+void sig_handler(int signo) {
+    std::cout<<"request gateway stop\n";
+    gRun = false;
+}
+
+void *update_th(void *data) {
+
+    float angle = 0;
+
+    LoopRate rate(10000, "UPDATE");
+    while(gRun){
+        angle += M_PI/100;
+        viewer->setAngle(angle);
+        rate.wait();
+    }
+}
+
 int main( int argc, char** argv){
+
+    signal(SIGINT, sig_handler);
+    gRun = true;
 
     // TEST CLOUD
     int h_n = 100;
@@ -100,20 +121,14 @@ int main( int argc, char** argv){
     viewer->setBackground(tk::gui::color::DARK_GRAY);
     viewer->init();
     viewer->setCloud(&cloud);
+
+    // update thread
+    pthread_t       t0;
+    pthread_create(&t0, NULL, update_th, NULL);
+
     viewer->run();
-    // use the context in a separate rendering thread
-    /*std::thread render_loop;
-    render_loop = viewer->spawn();
 
-    float angle = 0.0;
-    LoopRate rate(10000, "UPDATE");
-    while(viewer->isRunning()){
-        angle += M_PI/100;
-        viewer->setAngle(angle);
-        rate.wait();
-    }
-
-    render_loop.join();*/
-
+    gRun = false;
+    pthread_join(t0, NULL);
     return 0;
 }

@@ -12,7 +12,7 @@ MouseView3D::MouseView3D()
     , m_fovRads(DEG2RAD(60.0f))
     , m_zNear(0.1f)
     , m_zFar(1000.f)
-    , m_radius(100)
+    , m_radius(25)
     , m_mouseLeft(false)
     , m_mouseRight(false)
 {
@@ -24,8 +24,8 @@ MouseView3D::MouseView3D()
     m_up[1] = 0;
     m_up[2] = 1;
 
-    m_angles[0] = DEG2RAD(0.0f);
-    m_angles[1] = DEG2RAD(85.0f);
+    m_angles[0] = DEG2RAD(-90.0f);
+    m_angles[1] = DEG2RAD(45.0f);
 
     m_currentPos[0] = 0.0f;
     m_currentPos[1] = 0.0f;

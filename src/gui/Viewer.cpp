@@ -49,9 +49,11 @@ Viewer::draw() {
     tkSetColor(tk::gui::color::RED);
     tkDrawCube(mouseView.getPointOnGround(), s, true);
 
-    tkSetColor(tk::gui::color::GREEN);
-    tkDrawCube(mouseView.getWorldPos(), s, true);
-
+    glPushMatrix();
+    tk::common::Vector3<float> p = mouseView.getWorldPos();
+    tkApplyTf(tk::common::odom2tf(p.x, p.y, 0));
+    tkDrawAxis();
+    glPopMatrix();
 }
 
 void Viewer::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) 
