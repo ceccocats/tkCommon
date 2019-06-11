@@ -402,18 +402,10 @@ void Viewer::tkDrawTexture(GLuint tex, float s) {
 
 
 void Viewer::tkViewport2D(int width, int height) {
-    //This sets up the viewport so that the coordinates (0, 0) are at the top left of the window
-    glViewport(0, 0, width, height);  
-    float ratio = (float) width / (float) height;
-    glOrtho(0, width, height, 0, -10, 10);
-
-    glMatrixMode(GL_PROJECTION);
+    glViewport(0, 0, width, height);
+    glOrtho(0, width, 0, height, -1, 1);
     glLoadIdentity();
-
-    //Back to the modelview so we can draw stuff 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-}
+ }
 
 void 
 Viewer::errorCallback(int error, const char* description) {

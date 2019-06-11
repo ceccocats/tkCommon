@@ -65,10 +65,8 @@ class MyViewer : public tk::gui::Viewer {
 
             // draw 2D     
             tkViewport2D(width, height);
-            glLoadIdentity();
-            glTranslatef(0.8, -0.88, 0);
-            tkDrawTexture(hipertTex, 0.2);
-            std::cout<<width<<"\n";
+            glTranslatef(0.7, -0.85, 0);
+            tkDrawTexture(hipertTex, 0.5);
         }
 
         void setCloud(Eigen::MatrixXf *cloud) { this->cloud = cloud; }
