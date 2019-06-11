@@ -387,12 +387,6 @@ void Viewer::tkDrawTexture(GLuint tex, float s) {
     glBindTexture(GL_TEXTURE_2D, tex);
     glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
-    /*
-    glTexCoord2f(0, 0); glVertex3f(i, i, 0);
-    glTexCoord2f(0, 1); glVertex3f(i, j, 0);
-    glTexCoord2f(1, 1); glVertex3f(j, j, 0);
-    glTexCoord2f(1, 0); glVertex3f(j, i, 0);
-    */
 
     // 2d draw
     glTexCoord2f(0, 1); glVertex3f(i, i, 0);
