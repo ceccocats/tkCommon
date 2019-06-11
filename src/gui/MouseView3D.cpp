@@ -2,58 +2,10 @@
 #include "tkCommon/gui/MathUtils.h"
 
 #include <math.h>
+#include "tkCommon/common.h"
 #include <Eigen/Dense>
 
 namespace tk { namespace gui  {
-
-inline Eigen::Vector3f unproj_3d(Eigen::Matrix4f p_mat, Eigen::Matrix4f v_mat, 
-    float screenW, float screenH, Eigen::Vector3f pos) {
-
-    Eigen::Matrix4f invProjView = (p_mat*v_mat).inverse();
-    float viewX = 0, viewY = 0; // screen pos
-    float viewWidth  = screenW;
-    float viewHeight = screenH;
-
-    float x = pos(0);
-    float y = pos(1);
-    float z = pos(2);
-
-    x = x - viewX;
-    y = viewHeight - y - 1;
-    y = y - viewY;
-
-    Eigen::Vector4f in;
-    in(0) = (2 * x) / viewWidth - 1;
-    in(1) = (2 * y) / viewHeight - 1;
-    in(2) = 2 * z - 1;
-    in(3) = 1.0;
-
-    Eigen::Vector4f out = invProjView*in;
-
-    float w = 1.0 / out[3];
-    out(0) *= w;
-    out(1) *= w;
-    out(2) *= w;
-
-    pos << out(0), out(1), out(2);
-    return pos;
-}
-
-
-inline Eigen::Vector2f proj_2d(Eigen::Matrix4f p_mat, Eigen::Matrix4f v_mat, 
-    float screenW, float screenH, Eigen::Vector4f pos) {
-
-    pos = v_mat*pos;
-    pos = p_mat*pos;
-
-    Eigen::Vector2f p;
-    p(0) = pos(0) / pos(3);
-    p(1) = -pos(1) / pos(3);
-    p(0) = (p(0) + 1) * screenW / 2;
-    p(1) = (p(1) + 1) * screenH / 2;
-    return p;
-}
-
 
 MouseView3D::MouseView3D()
     : m_windowAspect(1.0f)
@@ -111,9 +63,6 @@ void MouseView3D::mouseDown(int button, float x, float y)
 
 void MouseView3D::mouseUp(int button, float x, float y)
 {
-    (void)button;
-    (void)x;
-    (void)y;
     m_mouseLeft  = false;
     m_mouseRight = false;
 }
@@ -137,8 +86,8 @@ void MouseView3D::mouseMove(float x, float y)
 
         updateEye();
         updateMatrices();
+
     } else if (m_mouseRight) {
-    
         tk::common::Vector3<float> C = getPointOnGround();
         m_center[0] += m_startCenter[0] - C.x;
         m_center[1] += m_startCenter[1] - C.y;
@@ -147,16 +96,10 @@ void MouseView3D::mouseMove(float x, float y)
         updateEye();
         updateMatrices();
     }
-
-    if(m_request_pose_insert) {
-        req_pose1 = getPointOnGround();
-    }
 }
 
 void MouseView3D::mouseWheel(float dx, float dy)
 {
-    (void)dx;
-
     float tmpRadius = m_radius - dy * 1.5f;
 
     if (tmpRadius > 0.0f) {
@@ -182,8 +125,8 @@ void MouseView3D::setCenter(float x, float y, float z)
 
 void MouseView3D::updateMatrices()
 {
-    lookAt(m_modelView, m_eye, m_center, m_up);
-    perspective(m_projection, m_fovRads, 1.0f * m_windowAspect, m_zNear, m_zFar);
+    lookAt(m_modelView.data(), m_eye, m_center, m_up);
+    perspective(m_projection.data(), m_fovRads, 1.0f * m_windowAspect, m_zNear, m_zFar);
 }
 
 tk::common::Vector3<float> MouseView3D::unproject(float zplane) {
@@ -193,10 +136,10 @@ tk::common::Vector3<float> MouseView3D::unproject(float zplane) {
     Eigen::Matrix4f view(m_modelView);
     Eigen::Vector3f pos;
     pos << screenPos.x, screenPos.y, zplane;
-    
+
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
-    pos = unproj_3d(proj, view, width, height, pos);
+    pos = tk::common::unproj_3d(proj, view, width, height, pos);
 
     tk::common::Vector3<float> p;
     p.x = pos(0);
@@ -214,7 +157,7 @@ tk::common::Vector2<float> MouseView3D::project(tk::common::Vector3<float> p3d) 
     
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
-    Eigen::Vector2f pos = proj_2d(proj, view, width, height, point);
+    Eigen::Vector2f pos = tk::common::proj_2d(proj, view, width, height, point);
 
     tk::common::Vector2<float> p;
     p.x = pos(0);

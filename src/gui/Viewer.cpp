@@ -10,69 +10,6 @@ Viewer::Viewer() {
 Viewer::~Viewer() {
 }
 
-
-inline void Mat4_identity(float M[16])
-{
-    memset(M, 0, 16*sizeof(float));
-    M[0] = 1.0f;
-    M[5] = 1.0f;
-    M[10] = 1.0f;
-    M[15] = 1.0f;
-}
-
-inline void Mat4_IsoInv(float res[16], const float A[16])
-{
-    //Transpose R
-    res[0 + 0 * 4] = A[0 + 0 * 4];
-    res[1 + 0 * 4] = A[0 + 1 * 4];
-    res[2 + 0 * 4] = A[0 + 2 * 4];
-
-    res[0 + 1 * 4] = A[1 + 0 * 4];
-    res[1 + 1 * 4] = A[1 + 1 * 4];
-    res[2 + 1 * 4] = A[1 + 2 * 4];
-
-    res[0 + 2 * 4] = A[2 + 0 * 4];
-    res[1 + 2 * 4] = A[2 + 1 * 4];
-    res[2 + 2 * 4] = A[2 + 2 * 4];
-
-    //ti = -Rt
-    const float tx = A[0 + 3 * 4];
-    const float ty = A[1 + 3 * 4];
-    const float tz = A[2 + 3 * 4];
-    res[0 + 3 * 4] = -(A[0 + 0 * 4] * tx + A[1 + 0 * 4] * ty + A[2 + 0 * 4] * tz);
-    res[1 + 3 * 4] = -(A[0 + 1 * 4] * tx + A[1 + 1 * 4] * ty + A[2 + 1 * 4] * tz);
-    res[2 + 3 * 4] = -(A[0 + 2 * 4] * tx + A[1 + 2 * 4] * ty + A[2 + 2 * 4] * tz);
-
-    //Empty row
-    res[3 + 0 * 4] = 0;
-    res[3 + 1 * 4] = 0;
-    res[3 + 2 * 4] = 0;
-    res[3 + 3 * 4] = 1;
-}
-
-inline void Mat4_AxB(float res[16], const float A[16], const float B[16])
-{
-    res[0 + 0 * 4] = A[0 + 0 * 4] * B[0 + 0 * 4] + A[0 + 1 * 4] * B[1 + 0 * 4] + A[0 + 2 * 4] * B[2 + 0 * 4] + A[0 + 3 * 4] * B[3 + 0 * 4];
-    res[1 + 0 * 4] = A[1 + 0 * 4] * B[0 + 0 * 4] + A[1 + 1 * 4] * B[1 + 0 * 4] + A[1 + 2 * 4] * B[2 + 0 * 4] + A[1 + 3 * 4] * B[3 + 0 * 4];
-    res[2 + 0 * 4] = A[2 + 0 * 4] * B[0 + 0 * 4] + A[2 + 1 * 4] * B[1 + 0 * 4] + A[2 + 2 * 4] * B[2 + 0 * 4] + A[2 + 3 * 4] * B[3 + 0 * 4];
-    res[3 + 0 * 4] = A[3 + 0 * 4] * B[0 + 0 * 4] + A[3 + 1 * 4] * B[1 + 0 * 4] + A[3 + 2 * 4] * B[2 + 0 * 4] + A[3 + 3 * 4] * B[3 + 0 * 4];
-
-    res[0 + 1 * 4] = A[0 + 0 * 4] * B[0 + 1 * 4] + A[0 + 1 * 4] * B[1 + 1 * 4] + A[0 + 2 * 4] * B[2 + 1 * 4] + A[0 + 3 * 4] * B[3 + 1 * 4];
-    res[1 + 1 * 4] = A[1 + 0 * 4] * B[0 + 1 * 4] + A[1 + 1 * 4] * B[1 + 1 * 4] + A[1 + 2 * 4] * B[2 + 1 * 4] + A[1 + 3 * 4] * B[3 + 1 * 4];
-    res[2 + 1 * 4] = A[2 + 0 * 4] * B[0 + 1 * 4] + A[2 + 1 * 4] * B[1 + 1 * 4] + A[2 + 2 * 4] * B[2 + 1 * 4] + A[2 + 3 * 4] * B[3 + 1 * 4];
-    res[3 + 1 * 4] = A[3 + 0 * 4] * B[0 + 1 * 4] + A[3 + 1 * 4] * B[1 + 1 * 4] + A[3 + 2 * 4] * B[2 + 1 * 4] + A[3 + 3 * 4] * B[3 + 1 * 4];
-
-    res[0 + 2 * 4] = A[0 + 0 * 4] * B[0 + 2 * 4] + A[0 + 1 * 4] * B[1 + 2 * 4] + A[0 + 2 * 4] * B[2 + 2 * 4] + A[0 + 3 * 4] * B[3 + 2 * 4];
-    res[1 + 2 * 4] = A[1 + 0 * 4] * B[0 + 2 * 4] + A[1 + 1 * 4] * B[1 + 2 * 4] + A[1 + 2 * 4] * B[2 + 2 * 4] + A[1 + 3 * 4] * B[3 + 2 * 4];
-    res[2 + 2 * 4] = A[2 + 0 * 4] * B[0 + 2 * 4] + A[2 + 1 * 4] * B[1 + 2 * 4] + A[2 + 2 * 4] * B[2 + 2 * 4] + A[2 + 3 * 4] * B[3 + 2 * 4];
-    res[3 + 2 * 4] = A[3 + 0 * 4] * B[0 + 2 * 4] + A[3 + 1 * 4] * B[1 + 2 * 4] + A[3 + 2 * 4] * B[2 + 2 * 4] + A[3 + 3 * 4] * B[3 + 2 * 4];
-
-    res[0 + 3 * 4] = A[0 + 0 * 4] * B[0 + 3 * 4] + A[0 + 1 * 4] * B[1 + 3 * 4] + A[0 + 2 * 4] * B[2 + 3 * 4] + A[0 + 3 * 4] * B[3 + 3 * 4];
-    res[1 + 3 * 4] = A[1 + 0 * 4] * B[0 + 3 * 4] + A[1 + 1 * 4] * B[1 + 3 * 4] + A[1 + 2 * 4] * B[2 + 3 * 4] + A[1 + 3 * 4] * B[3 + 3 * 4];
-    res[2 + 3 * 4] = A[2 + 0 * 4] * B[0 + 3 * 4] + A[2 + 1 * 4] * B[1 + 3 * 4] + A[2 + 2 * 4] * B[2 + 3 * 4] + A[2 + 3 * 4] * B[3 + 3 * 4];
-    res[3 + 3 * 4] = A[3 + 0 * 4] * B[0 + 3 * 4] + A[3 + 1 * 4] * B[1 + 3 * 4] + A[3 + 2 * 4] * B[2 + 3 * 4] + A[3 + 3 * 4] * B[3 + 3 * 4];
-}
-
 void 
 Viewer::init() {
     glfwSetErrorCallback(errorCallback);
@@ -94,9 +31,7 @@ Viewer::init() {
     glfwSetKeyCallback(window, keyCallback);
     glfwMakeContextCurrent(window);
     //gladLoadGL(glfwGetProcAddress);
-
     //glfwSwapInterval(1);
-    Mat4_identity(rig2world);
 
     // OPENGL confs
     glDisable(GL_LIGHTING);
@@ -109,6 +44,14 @@ Viewer::init() {
 
 void 
 Viewer::draw() {
+
+    tk::common::Vector3<float> s = { 1, 1, 1 };
+    tkSetColor(tk::gui::color::RED);
+    tkDrawCube(mouseView.getPointOnGround(), s, true);
+
+    tkSetColor(tk::gui::color::GREEN);
+    tkDrawCube(mouseView.getWorldPos(), s, true);
+
 }
 
 void Viewer::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) 
@@ -143,18 +86,14 @@ Viewer::run() {
 
         mouseView.setWindowAspect(float(width)/height);
 
-        float tmp[16];
-        memcpy(tmp, mouseView.getModelView(), 16 * sizeof(float));
-        float pi[16];
-        Mat4_IsoInv(pi, rig2world);
-        Mat4_AxB(mview, tmp, pi);
 
         glPushMatrix();
-        glMultMatrixf(mouseView.getProjection());
-        glMultMatrixf(mview);
+
+        // apply matrix
+        glMultMatrixf(mouseView.getProjection()->data());
+        glMultMatrixf(mouseView.getModelView()->data());
 
         draw();
-
 
         glPopMatrix();
 

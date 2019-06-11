@@ -10,15 +10,15 @@ class MouseView3D
     MouseView3D();
 
     //4x4 matrix in col-major format
-    const float *getModelView() const
+    const Eigen::Matrix4f *getModelView() const
     {
-        return m_modelView;
+        return &m_modelView;
     }
 
     //4x4 matrix in col-major format
-    const float *getProjection() const
+    const Eigen::Matrix4f *getProjection() const
     {
-        return m_projection;
+        return &m_projection;
     }
 
     const float *getEye() const {
@@ -71,20 +71,9 @@ class MouseView3D
     GLFWwindow*     window;
     tk::common::Vector2<float>  screenPos;
 
-    void requestPoseInsert() {
-        m_request_pose_insert = true;
-        tk::common::Vector3<float> C = getPointOnGround();
-        req_pose0 = C;
-        req_pose1 = C;
-    }
-    bool isRequestPoseInsert() {
-        return m_request_pose_insert;
-    }
-    tk::common::Vector3<float> req_pose0, req_pose1;
-
   private:
-    float m_modelView[16];
-    float m_projection[16];
+    Eigen::Matrix4f m_modelView;
+    Eigen::Matrix4f m_projection;
 
     float m_windowAspect; // width/height
     float m_fovRads;

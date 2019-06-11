@@ -324,4 +324,53 @@ namespace tk { namespace common {
         return out;
     }
 
+    inline Eigen::Vector3f unproj_3d(Eigen::Matrix4f p_mat, Eigen::Matrix4f v_mat,
+                                     float screenW, float screenH, Eigen::Vector3f pos) {
+
+        Eigen::Matrix4f invProjView = (p_mat*v_mat).inverse();
+        float viewX = 0, viewY = 0; // screen pos
+        float viewWidth  = screenW;
+        float viewHeight = screenH;
+
+        float x = pos(0);
+        float y = pos(1);
+        float z = pos(2);
+
+        x = x - viewX;
+        y = viewHeight - y - 1;
+        y = y - viewY;
+
+        Eigen::Vector4f in;
+        in(0) = (2 * x) / viewWidth - 1;
+        in(1) = (2 * y) / viewHeight - 1;
+        in(2) = 2 * z - 1;
+        in(3) = 1.0;
+
+        Eigen::Vector4f out = invProjView*in;
+
+        float w = 1.0 / out[3];
+        out(0) *= w;
+        out(1) *= w;
+        out(2) *= w;
+
+        pos << out(0), out(1), out(2);
+        return pos;
+    }
+
+
+    inline Eigen::Vector2f proj_2d(Eigen::Matrix4f p_mat, Eigen::Matrix4f v_mat,
+                                   float screenW, float screenH, Eigen::Vector4f pos) {
+
+        pos = v_mat*pos;
+        pos = p_mat*pos;
+
+        Eigen::Vector2f p;
+        p(0) = pos(0) / pos(3);
+        p(1) = -pos(1) / pos(3);
+        p(0) = (p(0) + 1) * screenW / 2;
+        p(1) = (p(1) + 1) * screenH / 2;
+        return p;
+    }
+
+
 }}

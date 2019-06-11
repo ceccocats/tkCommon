@@ -62,9 +62,6 @@ namespace tk { namespace gui {
 
         GLFWwindow*     window;
 
-        float mview[16];
-        float rig2world[16];
-
         static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
         static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
         static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
