@@ -78,17 +78,13 @@ Viewer::init() {
     glfwSetErrorCallback(errorCallback);
     glfwInit();
 
-    glDisable(GL_LIGHTING);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_DEPTH_TEST);
+
 
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(640, 480, windowName.c_str(), NULL, NULL);
     if (!window) {
         glfwTerminate();
     }
-
     mouseView.window = window;
 
     glfwSetScrollCallback(window, Viewer::scroll_callback);
@@ -98,9 +94,16 @@ Viewer::init() {
     glfwSetKeyCallback(window, keyCallback);
     glfwMakeContextCurrent(window);
     //gladLoadGL(glfwGetProcAddress);
-    glfwSwapInterval(1);
 
-    Mat4_identity(rig2world);        
+    //glfwSwapInterval(1);
+    Mat4_identity(rig2world);
+
+    // OPENGL confs
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+    //glDepthFunc(GL_GEQUAL);
 }
 
 
@@ -135,6 +138,8 @@ Viewer::run() {
     while (!glfwWindowShouldClose(window)) {
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(float(background.r)/255, float(background.g)/255, float(background.b)/255, float(background.a)/255);
 
         mouseView.setWindowAspect(float(width)/height);
 
@@ -147,10 +152,6 @@ Viewer::run() {
         glPushMatrix();
         glMultMatrixf(mouseView.getProjection());
         glMultMatrixf(mview);
-
-        /* Render here */
-        glClear(GL_COLOR_BUFFER_BIT);
-        glClearColor(float(background.r)/255, float(background.g)/255, float(background.b)/255, float(background.a)/255);
 
         draw();
 
