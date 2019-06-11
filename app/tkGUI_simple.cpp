@@ -2,17 +2,27 @@
 #include <thread>
 
 class MyViewer : public tk::gui::Viewer {
-    public:
+    private:
+        GLuint hipertTex;
+        object3D_t carObj;
+
         tk::common::Tfpose tf = tk::common::Tfpose::Identity();
         float angle;
         Eigen::MatrixXf *cloud = nullptr;
 
-
+    public:
         MyViewer() {}
         ~MyViewer() {}
 
         void init() {
             tk::gui::Viewer::init();
+
+            int err = 0;
+            err = err || tkLoadTexture("../data/HipertLab.png", hipertTex);
+            err = err || tkLoadOBJ("../data/levante", carObj);
+
+    pangolin::GetBoundWindow()->RemoveCurrent();
+
         }
 
         void draw() {
@@ -39,9 +49,27 @@ class MyViewer : public tk::gui::Viewer {
                 }
             } glPopMatrix();
 
+            // levante
+            glPushMatrix(); {        
+                glRotatef( (angle/10)*180/M_PI, 0, 0, 1);   
+                //glColor4f(1.0, 1.0, 1.0, 1.0);
+                tkDrawObject3D(&carObj, 1, false);
 
-            //tkDrawArrow(p, M_PI/4, 1.0);
+            } glPopMatrix();
 
+            // alpha blended object must be drawn at the end
+            // hipert logo as pavement
+            glPushMatrix(); {
+                glTranslatef(0, -4, 0);
+                glColor4f(1,1,1,1);
+                tkDrawTexture(hipertTex, 10);
+            } glPopMatrix();
+
+            // draw 2D
+            tkViewport2D(getWidth(), getHeight());
+            glLoadIdentity();
+            glTranslatef(0.8, -0.88, 0);
+            tkDrawTexture(hipertTex, 0.2);
         }
 
         void setCloud(Eigen::MatrixXf *cloud) { this->cloud = cloud; }
@@ -88,5 +116,6 @@ int main( int argc, char** argv){
     }
 
     render_loop.join();
+
     return 0;
 }

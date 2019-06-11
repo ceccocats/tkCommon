@@ -25,7 +25,7 @@ set(GUI_LIBS
 #-------------------------------------------------------------------------------
 # library
 #-------------------------------------------------------------------------------
-add_library(tkGUI SHARED src/gui/Viewer.cpp)
+add_library(tkGUI SHARED src/gui/lodepng.cpp src/gui/Viewer.cpp)
 target_link_libraries(tkGUI ${GUI_LIBS})
 
 add_library(tkCommon SHARED src/common.cpp)

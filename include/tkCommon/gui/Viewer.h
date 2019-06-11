@@ -4,6 +4,8 @@
 #include <thread>
 #include "tkCommon/common.h"
 #include "tkCommon/gui/Color.h"
+#include "tkCommon/gui/lodepng.h"
+#include "tkCommon/gui/OBJ_Loader.h"
 
 namespace tk { namespace gui {
 
@@ -30,6 +32,8 @@ namespace tk { namespace gui {
         void setWindowName(std::string name);
         void setBackground(tk::gui::Color_t c);
 
+        int getWidth()  {return width;};
+        int getHeight() {return height;};
         
         static int  tkLoadTexture(std::string filename, GLuint &tex);
         static int  tkLoadOBJ(std::string filename, object3D_t &obj);
@@ -45,10 +49,14 @@ namespace tk { namespace gui {
         static void tkDrawObject3D(object3D_t *obj, float size = 1.0, bool textured = false);
         static void tkDrawTexture(GLuint tex, float s);
 
+        static void tkViewport2D(int width, int height);
+
         bool isRunning() {return !pangolin::ShouldQuit();};
     
     private:
         std::string     windowName;
         Color_t         background;
+
+        int             width, height;
     };
 }}
