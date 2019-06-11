@@ -13,19 +13,23 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
-find_package(Pangolin REQUIRED)
+find_package(OpenGL REQUIRED)
+
+find_package(glfw3 3 REQUIRED)
 include_directories(
-    ${Pangolin_INCLUDE_DIRS}
+    ${OPENGL_INCLUDE_DIR}
 )
 
 set(GUI_LIBS
-    ${Pangolin_LIBRARIES}
+    ${OPENGL_gl_LIBRARY}
+    ${OPENGL_glu_LIBRARY}
+    glfw
 )
 
 #-------------------------------------------------------------------------------
 # library
 #-------------------------------------------------------------------------------
-add_library(tkGUI SHARED src/gui/lodepng.cpp src/gui/Viewer.cpp)
+add_library(tkGUI SHARED src/gui/lodepng.cpp src/gui/Viewer.cpp src/gui/MouseView3D.cpp src/gui/MathUtils.cpp)
 target_link_libraries(tkGUI ${GUI_LIBS})
 
 add_library(tkCommon SHARED src/common.cpp)

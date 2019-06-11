@@ -21,8 +21,6 @@ class MyViewer : public tk::gui::Viewer {
             err = err || tkLoadTexture("../data/HipertLab.png", hipertTex);
             err = err || tkLoadOBJ("../data/levante", carObj);
 
-    pangolin::GetBoundWindow()->RemoveCurrent();
-
         }
 
         void draw() {
@@ -37,7 +35,7 @@ class MyViewer : public tk::gui::Viewer {
             
             tkSetColor(tk::gui::color::PINK);
             tkDrawCircle(0, 0, 0, 8.0, 100);
-
+            
             // tornado cloud
             glPushMatrix(); {
                 tkApplyTf(tf);
@@ -65,8 +63,8 @@ class MyViewer : public tk::gui::Viewer {
                 tkDrawTexture(hipertTex, 10);
             } glPopMatrix();
 
-            // draw 2D
-            tkViewport2D(getWidth(), getHeight());
+            // draw 2D     
+            tkViewport2D(width, height);
             glLoadIdentity();
             glTranslatef(0.8, -0.88, 0);
             tkDrawTexture(hipertTex, 0.2);
@@ -102,9 +100,9 @@ int main( int argc, char** argv){
     viewer->setBackground(tk::gui::color::DARK_GRAY);
     viewer->init();
     viewer->setCloud(&cloud);
-
+    viewer->run();
     // use the context in a separate rendering thread
-    std::thread render_loop;
+    /*std::thread render_loop;
     render_loop = viewer->spawn();
 
     float angle = 0.0;
@@ -115,7 +113,7 @@ int main( int argc, char** argv){
         rate.wait();
     }
 
-    render_loop.join();
+    render_loop.join();*/
 
     return 0;
 }

@@ -1,6 +1,7 @@
 #include "tkCommon/gui/Viewer.h"
 
 using namespace tk::gui;
+MouseView3D     mouseView;
 
 Viewer::Viewer() {
 }
@@ -10,22 +11,96 @@ Viewer::~Viewer() {
 }
 
 
+inline void Mat4_identity(float M[16])
+{
+    memset(M, 0, 16*sizeof(float));
+    M[0] = 1.0f;
+    M[5] = 1.0f;
+    M[10] = 1.0f;
+    M[15] = 1.0f;
+}
+
+inline void Mat4_IsoInv(float res[16], const float A[16])
+{
+    //Transpose R
+    res[0 + 0 * 4] = A[0 + 0 * 4];
+    res[1 + 0 * 4] = A[0 + 1 * 4];
+    res[2 + 0 * 4] = A[0 + 2 * 4];
+
+    res[0 + 1 * 4] = A[1 + 0 * 4];
+    res[1 + 1 * 4] = A[1 + 1 * 4];
+    res[2 + 1 * 4] = A[1 + 2 * 4];
+
+    res[0 + 2 * 4] = A[2 + 0 * 4];
+    res[1 + 2 * 4] = A[2 + 1 * 4];
+    res[2 + 2 * 4] = A[2 + 2 * 4];
+
+    //ti = -Rt
+    const float tx = A[0 + 3 * 4];
+    const float ty = A[1 + 3 * 4];
+    const float tz = A[2 + 3 * 4];
+    res[0 + 3 * 4] = -(A[0 + 0 * 4] * tx + A[1 + 0 * 4] * ty + A[2 + 0 * 4] * tz);
+    res[1 + 3 * 4] = -(A[0 + 1 * 4] * tx + A[1 + 1 * 4] * ty + A[2 + 1 * 4] * tz);
+    res[2 + 3 * 4] = -(A[0 + 2 * 4] * tx + A[1 + 2 * 4] * ty + A[2 + 2 * 4] * tz);
+
+    //Empty row
+    res[3 + 0 * 4] = 0;
+    res[3 + 1 * 4] = 0;
+    res[3 + 2 * 4] = 0;
+    res[3 + 3 * 4] = 1;
+}
+
+inline void Mat4_AxB(float res[16], const float A[16], const float B[16])
+{
+    res[0 + 0 * 4] = A[0 + 0 * 4] * B[0 + 0 * 4] + A[0 + 1 * 4] * B[1 + 0 * 4] + A[0 + 2 * 4] * B[2 + 0 * 4] + A[0 + 3 * 4] * B[3 + 0 * 4];
+    res[1 + 0 * 4] = A[1 + 0 * 4] * B[0 + 0 * 4] + A[1 + 1 * 4] * B[1 + 0 * 4] + A[1 + 2 * 4] * B[2 + 0 * 4] + A[1 + 3 * 4] * B[3 + 0 * 4];
+    res[2 + 0 * 4] = A[2 + 0 * 4] * B[0 + 0 * 4] + A[2 + 1 * 4] * B[1 + 0 * 4] + A[2 + 2 * 4] * B[2 + 0 * 4] + A[2 + 3 * 4] * B[3 + 0 * 4];
+    res[3 + 0 * 4] = A[3 + 0 * 4] * B[0 + 0 * 4] + A[3 + 1 * 4] * B[1 + 0 * 4] + A[3 + 2 * 4] * B[2 + 0 * 4] + A[3 + 3 * 4] * B[3 + 0 * 4];
+
+    res[0 + 1 * 4] = A[0 + 0 * 4] * B[0 + 1 * 4] + A[0 + 1 * 4] * B[1 + 1 * 4] + A[0 + 2 * 4] * B[2 + 1 * 4] + A[0 + 3 * 4] * B[3 + 1 * 4];
+    res[1 + 1 * 4] = A[1 + 0 * 4] * B[0 + 1 * 4] + A[1 + 1 * 4] * B[1 + 1 * 4] + A[1 + 2 * 4] * B[2 + 1 * 4] + A[1 + 3 * 4] * B[3 + 1 * 4];
+    res[2 + 1 * 4] = A[2 + 0 * 4] * B[0 + 1 * 4] + A[2 + 1 * 4] * B[1 + 1 * 4] + A[2 + 2 * 4] * B[2 + 1 * 4] + A[2 + 3 * 4] * B[3 + 1 * 4];
+    res[3 + 1 * 4] = A[3 + 0 * 4] * B[0 + 1 * 4] + A[3 + 1 * 4] * B[1 + 1 * 4] + A[3 + 2 * 4] * B[2 + 1 * 4] + A[3 + 3 * 4] * B[3 + 1 * 4];
+
+    res[0 + 2 * 4] = A[0 + 0 * 4] * B[0 + 2 * 4] + A[0 + 1 * 4] * B[1 + 2 * 4] + A[0 + 2 * 4] * B[2 + 2 * 4] + A[0 + 3 * 4] * B[3 + 2 * 4];
+    res[1 + 2 * 4] = A[1 + 0 * 4] * B[0 + 2 * 4] + A[1 + 1 * 4] * B[1 + 2 * 4] + A[1 + 2 * 4] * B[2 + 2 * 4] + A[1 + 3 * 4] * B[3 + 2 * 4];
+    res[2 + 2 * 4] = A[2 + 0 * 4] * B[0 + 2 * 4] + A[2 + 1 * 4] * B[1 + 2 * 4] + A[2 + 2 * 4] * B[2 + 2 * 4] + A[2 + 3 * 4] * B[3 + 2 * 4];
+    res[3 + 2 * 4] = A[3 + 0 * 4] * B[0 + 2 * 4] + A[3 + 1 * 4] * B[1 + 2 * 4] + A[3 + 2 * 4] * B[2 + 2 * 4] + A[3 + 3 * 4] * B[3 + 2 * 4];
+
+    res[0 + 3 * 4] = A[0 + 0 * 4] * B[0 + 3 * 4] + A[0 + 1 * 4] * B[1 + 3 * 4] + A[0 + 2 * 4] * B[2 + 3 * 4] + A[0 + 3 * 4] * B[3 + 3 * 4];
+    res[1 + 3 * 4] = A[1 + 0 * 4] * B[0 + 3 * 4] + A[1 + 1 * 4] * B[1 + 3 * 4] + A[1 + 2 * 4] * B[2 + 3 * 4] + A[1 + 3 * 4] * B[3 + 3 * 4];
+    res[2 + 3 * 4] = A[2 + 0 * 4] * B[0 + 3 * 4] + A[2 + 1 * 4] * B[1 + 3 * 4] + A[2 + 2 * 4] * B[2 + 3 * 4] + A[2 + 3 * 4] * B[3 + 3 * 4];
+    res[3 + 3 * 4] = A[3 + 0 * 4] * B[0 + 3 * 4] + A[3 + 1 * 4] * B[1 + 3 * 4] + A[3 + 2 * 4] * B[2 + 3 * 4] + A[3 + 3 * 4] * B[3 + 3 * 4];
+}
+
 void 
 Viewer::init() {
-    // create a window and bind its context to the main thread
-    width   = 640;
-    height  = 480;
-
-    pangolin::CreateWindowAndBind(windowName, width, height);
+    glfwSetErrorCallback(errorCallback);
+    glfwInit();
 
     glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_MULTISAMPLE);
 
-    // unset the current context from the main thread
-    //pangolin::GetBoundWindow()->RemoveCurrent();
+    /* Create a windowed mode window and its OpenGL context */
+    window = glfwCreateWindow(640, 480, windowName.c_str(), NULL, NULL);
+    if (!window) {
+        glfwTerminate();
+    }
+
+    mouseView.window = window;
+
+    glfwSetScrollCallback(window, Viewer::scroll_callback);
+    glfwSetCursorPosCallback(window, Viewer::cursor_position_callback);
+    glfwSetMouseButtonCallback(window, Viewer::mouse_button_callback);
+
+    glfwSetKeyCallback(window, keyCallback);
+    glfwMakeContextCurrent(window);
+    //gladLoadGL(glfwGetProcAddress);
+    glfwSwapInterval(1);
+
+    Mat4_identity(rig2world);        
 }
 
 
@@ -33,49 +108,63 @@ void
 Viewer::draw() {
 }
 
+void Viewer::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) 
+{
+    mouseView.mouseWheel(xoffset, yoffset);
+}
+
+void Viewer::cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    mouseView.mouseMove(xpos, ypos);
+}
+
+void Viewer::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+
+    if (action == GLFW_PRESS)
+        mouseView.mouseDown(button, xpos, ypos);
+    if (action == GLFW_RELEASE)
+        mouseView.mouseUp(button, xpos, ypos);
+}
 
 void 
 Viewer::run() {
-    // fetch the context and bind it to this thread
-    pangolin::BindToContext(windowName);
 
-    // we manually need to restore the properties of the context
-    glDisable(GL_LIGHTING);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_DEPTH_TEST);
+    while (!glfwWindowShouldClose(window)) {
+        glfwGetFramebufferSize(window, &width, &height);
+        glViewport(0, 0, width, height);
 
-    // Define Projection and initial ModelView matrix
-    pangolin::OpenGlRenderState s_cam(
-        pangolin::ProjectionMatrix(640,480,420,420,320,240,0.2,100),
-        pangolin::ModelViewLookAt(-2,2,-2, 0,0,0, pangolin::AxisZ)
-    );
+        mouseView.setWindowAspect(float(width)/height);
 
-    // Create Interactive View in window
-    pangolin::Handler3D handler(s_cam);
-    pangolin::View& d_cam = pangolin::CreateDisplay()
-            .SetBounds(0.0, 1.0, 0.0, 1.0, -640.0f/480.0f)
-            .SetHandler(&handler);
+        float tmp[16];
+        memcpy(tmp, mouseView.getModelView(), 16 * sizeof(float));
+        float pi[16];
+        Mat4_IsoInv(pi, rig2world);
+        Mat4_AxB(mview, tmp, pi);
 
-    while(!pangolin::ShouldQuit()) {
-        // Clear screen and activate view to render into
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glPushMatrix();
+        glMultMatrixf(mouseView.getProjection());
+        glMultMatrixf(mview);
+
+        /* Render here */
+        glClear(GL_COLOR_BUFFER_BIT);
         glClearColor(float(background.r)/255, float(background.g)/255, float(background.b)/255, float(background.a)/255);
-        d_cam.Activate(s_cam);
 
-        if (pangolin::HasResized()){
-            width   = d_cam.GetBounds().w;
-            height  = d_cam.GetBounds().h;
-        }
-        
         draw();
 
-        // Swap frames and Process Events
-        pangolin::FinishFrame();
-    }
 
-    // unset the current context from the main thread
-    pangolin::GetBoundWindow()->RemoveCurrent();
+        glPopMatrix();
+
+        /* Swap front and back buffers */
+        glfwSwapBuffers(window);
+
+        /* Poll for and process events */
+        glfwPollEvents();
+    }
+    glfwDestroyWindow(window);
+    glfwTerminate();
 }
 
 
@@ -236,7 +325,8 @@ Viewer::tkDrawCloud(Eigen::MatrixXf *points) {
 
 void 
 Viewer::tkDrawArrow(float length, float radius, int nbSubdivisions) {
-    static GLUquadric *quadric = gluNewQuadric();
+    
+    /*static GLUquadric *quadric = gluNewQuadric();
 
     if (radius < 0.0)
         radius = 0.05 * length;
@@ -249,7 +339,7 @@ Viewer::tkDrawArrow(float length, float radius, int nbSubdivisions) {
     glTranslated(0.0, 0.0, length * (1.0 - head));
     gluCylinder(quadric, coneRadiusCoef * radius, 0.0, head * length,
                 nbSubdivisions, 1);
-    glTranslated(0.0, 0.0, -length * (1.0 - head));
+    glTranslated(0.0, 0.0, -length * (1.0 - head));*/
 }
 
 void 
@@ -387,6 +477,17 @@ void Viewer::tkViewport2D(int width, int height) {
     //Back to the modelview so we can draw stuff 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+}
+
+void 
+Viewer::errorCallback(int error, const char* description) {
+    fprintf(stderr, "Error: %s\n", description);
+}
+
+void
+Viewer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
 }
 
 
