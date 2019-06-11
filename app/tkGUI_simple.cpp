@@ -1,112 +1,58 @@
-#include <iostream>
-#include <signal.h>
-#include <qapplication.h>
 #include "tkCommon/gui/Viewer.h"
-bool gRun;
+#include <thread>
 
 class MyViewer : public tk::gui::Viewer {
+    public:
+        tk::common::Tfpose tf = tk::common::Tfpose::Identity();
+        float angle;
+        Eigen::MatrixXf *cloud = nullptr;
 
-private:
-    GLuint hipertTex;
-    object3D_t carObj;
-    tk::common::Tfpose tf = tk::common::Tfpose::Identity();
-    float angle;
-    Eigen::MatrixXf *cloud = nullptr;
 
-public:
-    MyViewer(QWidget *parent = nullptr) {}
+        MyViewer() {}
+        ~MyViewer() {}
 
-    void setCloud(Eigen::MatrixXf *cloud) { this->cloud = cloud; }
-    void setAngle(float angle) { this->angle = angle; tf = tk::common::odom2tf(0, 0, angle); update(); }
+        void init() {
+            tk::gui::Viewer::init();
+        }
 
-protected:
-    void init() {
-        tk::gui::Viewer::init();
-        int err = 0;
-        err = err || tkLoadTexture("../data/HipertLab.png", hipertTex);
-        err = err || tkLoadOBJ("../data/levante", carObj);
+        void draw() {
+            tk::gui::Viewer::draw();
 
-        //Turn on wireframe mode
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        // Turn off
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            tkDrawAxis();
 
-    }
+            tk::common::Vector3<float>p(0.0, 0.0, 1.0);
+            tk::common::Vector3<float>s(3.0, 3.0, 2.0);
+            tkSetColor(tk::gui::color::LIME);
+            tkDrawCube(p, s, false);
+            
+            tkSetColor(tk::gui::color::PINK);
+            tkDrawCircle(0, 0, 0, 8.0, 100);
 
-    void draw() {
-        tk::gui::Viewer::draw();
+            // tornado cloud
+            glPushMatrix(); {
+                tkApplyTf(tf);
+                if(cloud != nullptr) {
+                    tkSetColor(tk::gui::color::ORANGE);
+                    glPointSize(1.0f);
 
-        tkDrawAxis(1);
+                    tkDrawCloud(cloud);
+                }
+            } glPopMatrix();
 
-        tk::common::Vector3<float>p(0.0, 0.0, 1.0);
-        tk::common::Vector3<float>s(3.0, 3.0, 2.0);
-        tkDrawCube(p, s, false);
-        
-        glColor4f(1.0, 0.0, 0.0, 1.0);
-        tkDrawCircle(0, 0, 0, 8.0, 100);
 
-        // tornado cloud
-        glPushMatrix(); {
-            tkApplyTf(tf);
-            if(cloud != nullptr) {
-                glColor4f(1.0, 0, 0, 1.0);
-                glPointSize(1.0f);
+            //tkDrawArrow(p, M_PI/4, 1.0);
 
-                Zcol_t zcol;
-                zcol.min = 0; 
-                zcol.max = 10;
-                tkDrawCloud(cloud, &zcol);
-            }
-        } glPopMatrix();
+        }
 
-        // levante
-        glPushMatrix(); {        
-            glRotatef( (angle/10)*180/M_PI, 0, 0, 1);   
-            glColor4f(1.0, 1.0, 1.0, 1.0);
-            tkDrawObject3D(&carObj, 1, false);
-
-        } glPopMatrix();
-
-        // alpha blended object must be drawn at the end
-        // hipert logo as pavement
-        glPushMatrix(); {
-            glTranslatef(0, -4, 0);
-            glColor4f(1.0, 1.0, 1.0, 1.0);
-            tkDrawTexture(hipertTex, 10);
-        } glPopMatrix();
-
-        // draw 2D
-        tkViewport2D(width(), height());
-        glLoadIdentity();
-        glTranslatef(0.8, -0.88, 0);
-        tkDrawTexture(hipertTex, 0.2);
-    }
+        void setCloud(Eigen::MatrixXf *cloud) { this->cloud = cloud; }
+        void setAngle(float angle) { this->angle = angle; tf = tk::common::odom2tf(0, 0, angle); }
 
 };
 
 MyViewer *viewer = nullptr;
+bool gRun = true;
 
-void sig_handler(int signo) {
-    std::cout<<"request gateway stop\n";
-    gRun = false;
-}
-
-void *update_th(void *data) {
-
-    float angle = 0;
-
-    LoopRate rate(10000, "UPDATE");
-    while(gRun){
-        angle += M_PI/100;
-        viewer->setAngle(angle);
-        rate.wait();
-    }
-}
-
-int main(int argc, char *argv[]) {
-
-    signal(SIGINT, sig_handler);
-    gRun = true;
+int main( int argc, char** argv){
 
     // TEST CLOUD
     int h_n = 100;
@@ -123,19 +69,24 @@ int main(int argc, char *argv[]) {
         cloud(3,i) = 1;
     }
 
-    // viz
-    QApplication application(argc, argv);
     viewer = new MyViewer();
-    viewer->setWindowTitle("Tornado");
-    viewer->show();
+    viewer->setWindowName("test");
+    viewer->setBackground(tk::gui::color::DARK_GRAY);
+    viewer->init();
     viewer->setCloud(&cloud);
 
-    // update thread
-    pthread_t       t0;
-    pthread_create(&t0, NULL, update_th, NULL);
+    // use the context in a separate rendering thread
+    std::thread render_loop;
+    render_loop = viewer->spawn();
 
-    application.exec();
-    gRun = false;
+    float angle = 0.0;
+    LoopRate rate(10000, "UPDATE");
+    while(viewer->isRunning()){
+        angle += M_PI/100;
+        viewer->setAngle(angle);
+        rate.wait();
+    }
 
-    pthread_join(t0, NULL);
+    render_loop.join();
+    return 0;
 }

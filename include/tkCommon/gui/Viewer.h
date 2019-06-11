@@ -1,44 +1,54 @@
 #pragma once
 
-#include <QGLViewer/qglviewer.h>
-#include <QMouseEvent>
-#include "lodepng.h"
-#include "../common.h"
+#include <pangolin/pangolin.h>
+#include <thread>
+#include "tkCommon/common.h"
+#include "tkCommon/gui/Color.h"
 
 namespace tk { namespace gui {
 
-    class Viewer : public QGLViewer {
-
-    protected:
-        virtual void draw();
-        virtual void init();
-        void wheelEvent(QWheelEvent *event) override;
+    class Viewer {
 
     public:
-        Viewer(QWidget *parent = nullptr);
-
-        struct Zcol_t {
-            float min, max;
-        };
+        Viewer();
+        ~Viewer();
 
         struct object3D_t {
             GLuint tex;
             std::vector<Eigen::MatrixXf> triangles;
             std::vector<tk::common::Vector3<float>> colors;
         };
+        
+        virtual void init();
+        virtual void draw();
+        
+        void run();
+        std::thread spawn() {
+            return std::thread(&Viewer::run, this);
+        }
 
-    public:
-        static void tkApplyTf(tk::common::Tfpose tf);
-        static void tkDrawAxis(float s = 2.0);
-        static void tkDrawTexture(GLuint tex, float s);
+        void setWindowName(std::string name);
+        void setBackground(tk::gui::Color_t c);
+
+        
         static int  tkLoadTexture(std::string filename, GLuint &tex);
         static int  tkLoadOBJ(std::string filename, object3D_t &obj);
-        static void tkDrawObject3D(object3D_t *obj, float size = 1.0, bool textured = false);
+        
+        static void tkSetColor(tk::gui::Color_t c);
+        static void tkApplyTf(tk::common::Tfpose tf);
+        static void tkDrawAxis(float s = 2.0);
         static void tkDrawCircle(float x, float y, float z, float r, int res = 20);
-        static void tkDrawCloud(Eigen::MatrixXf *data, Zcol_t *col = nullptr);
-        static void tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght);
+        static void tkDrawCloud(Eigen::MatrixXf *data);
+        static void tkDrawArrow(float length = 1.0, float radius = -1.0, int nbSubdivisions = 12);
+        static void tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght, float radius = -1.0, int nbSubdivisions = 12);
         static void tkDrawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
-        static void tkRainbowColor(float hue);
-        static void tkViewport2D(int width, int height);
+        static void tkDrawObject3D(object3D_t *obj, float size = 1.0, bool textured = false);
+        static void tkDrawTexture(GLuint tex, float s);
+
+        bool isRunning() {return !pangolin::ShouldQuit();};
+    
+    private:
+        std::string     windowName;
+        Color_t         background;
     };
 }}
