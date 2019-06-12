@@ -30,10 +30,11 @@ class MyViewer : public tk::gui::Viewer {
         void draw() {
             tk::gui::Viewer::draw();
 
+            // Arrow
             tkSetColor(tk::gui::color::RED);
-            tkDrawArrow(tk::common::Vector3<float>{0.0, 0.0, 3.0}, angle+M_PI/2, 2.0);
+            tkDrawArrow(tk::common::Vector3<float>{0.0, 0.0, 3.0}, angle, 2.0);
 
-
+            // Cube
             tk::common::Vector3<float>p(0.0, 4.0, 1.0);
             tk::common::Vector3<float>s(4.0, 2.0, 2.0);
             tk::gui::Color_t col = tk::gui::color::PINK;
@@ -43,17 +44,28 @@ class MyViewer : public tk::gui::Viewer {
             tkSetColor(col);
             tkDrawCube(p, s, true);
 
+            // Circle
             tkSetColor(tk::gui::color::PINK);
-            tkDrawCircle(0, 0, 0, 8.0, 100);
+            tkDrawCircle(tk::common::Vector3<float>{0.0, 0.0, 0.0}, 8.0, 100);
             
             // tornado cloud
             glPushMatrix(); {
                 tkApplyTf(tf);
+                glTranslatef(8, 0, 0);
+
                 if(cloud != nullptr) {
                     tkSetColor(tk::gui::color::ORANGE);
                     glPointSize(1.0f);
 
                     tkDrawCloud(cloud);
+
+                    // Sphere
+                    col = tk::gui::color::CYAN;
+                    tkSetColor(col);
+                    tkDrawSphere(tk::common::Vector3<float>{0.0, 0.0, 13.0}, 5.0, 16, false);
+                    col.a /= 4;
+                    tkSetColor(col);
+                    tkDrawSphere(tk::common::Vector3<float>{0.0, 0.0, 13.0}, 5.0, 16, true);
                 }
             } glPopMatrix();
 
@@ -142,9 +154,11 @@ int main( int argc, char** argv){
     for(int i=0; i<N; i++) {
         int h_idx = i/360;
         double ang = double(i % 360)/180.0*M_PI;
-        cloud(0,i) = cos(ang)*(d/h_idx);
-        cloud(1,i) = sin(ang)*(d/h_idx) + 8;
-        cloud(2,i) = h_d*(N/360) - h_d*h_idx;
+        double z = h_d*(N/360) - h_d*h_idx;
+        double r = (z/5)*(z/5);
+        cloud(0,i) = cos(ang)*(r);
+        cloud(1,i) = sin(ang)*(r);
+        cloud(2,i) = z;
         cloud(3,i) = 1;
     }
 

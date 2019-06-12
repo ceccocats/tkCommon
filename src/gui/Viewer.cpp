@@ -2,7 +2,8 @@
 #include "tkCommon/gui/OBJ_Loader.h"
 
 using namespace tk::gui;
-MouseView3D     mouseView;
+MouseView3D     Viewer::mouseView;
+GLUquadric*     Viewer::quadric;
 
 Viewer::Viewer() {
 }
@@ -13,6 +14,8 @@ Viewer::~Viewer() {
 
 void 
 Viewer::init() {
+    Viewer::quadric = gluNewQuadric();
+
     glfwSetErrorCallback(errorCallback);
     glfwInit();
 
@@ -21,7 +24,7 @@ Viewer::init() {
     if (!window) {
         glfwTerminate();
     }
-    mouseView.window = window;
+    Viewer::mouseView.window = window;
 
     glfwSetScrollCallback(window, Viewer::scroll_callback);
     glfwSetCursorPosCallback(window, Viewer::cursor_position_callback);
@@ -69,13 +72,13 @@ Viewer::draw() {
     tk::common::Vector3<float> s = { 1, 1, 1 };
     tk::gui::Color_t col = tk::gui::color::LIGHT_BLUE;
     tkSetColor(col);
-    tkDrawRectangle(mouseView.getPointOnGround(), s, false);
+    tkDrawRectangle(Viewer::mouseView.getPointOnGround(), s, false);
     col.a /= 4;
     tkSetColor(col);
-    tkDrawRectangle(mouseView.getPointOnGround(), s, true);
+    tkDrawRectangle(Viewer::mouseView.getPointOnGround(), s, true);
 
     glPushMatrix();
-    tk::common::Vector3<float> p = mouseView.getWorldPos();
+    tk::common::Vector3<float> p = Viewer::mouseView.getWorldPos();
     tkApplyTf(tk::common::odom2tf(p.x, p.y, 0));
     tkDrawAxis();
     glPopMatrix();
@@ -83,12 +86,12 @@ Viewer::draw() {
 
 void Viewer::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) 
 {
-    mouseView.mouseWheel(xoffset, yoffset);
+    Viewer::mouseView.mouseWheel(xoffset, yoffset);
 }
 
 void Viewer::cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
-    mouseView.mouseMove(xpos, ypos);
+    Viewer::mouseView.mouseMove(xpos, ypos);
 }
 
 void Viewer::mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
@@ -97,9 +100,9 @@ void Viewer::mouse_button_callback(GLFWwindow* window, int button, int action, i
     glfwGetCursorPos(window, &xpos, &ypos);
 
     if (action == GLFW_PRESS)
-        mouseView.mouseDown(button, xpos, ypos);
+        Viewer::mouseView.mouseDown(button, xpos, ypos);
     if (action == GLFW_RELEASE)
-        mouseView.mouseUp(button, xpos, ypos);
+        Viewer::mouseView.mouseUp(button, xpos, ypos);
 }
 
 void 
@@ -110,21 +113,21 @@ Viewer::run() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        mouseView.mouseOnGUI = ImGui::IsMouseHoveringAnyWindow(); 
+        Viewer::mouseView.mouseOnGUI = ImGui::IsMouseHoveringAnyWindow(); 
             
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(float(background.r)/255, float(background.g)/255, float(background.b)/255, float(background.a)/255);
 
-        mouseView.setWindowAspect(float(width)/height);
+        Viewer::mouseView.setWindowAspect(float(width)/height);
 
 
         glPushMatrix();
 
         // apply matrix
-        glMultMatrixf(mouseView.getProjection()->data());
-        glMultMatrixf(mouseView.getModelView()->data());
+        glMultMatrixf(Viewer::mouseView.getProjection()->data());
+        glMultMatrixf(Viewer::mouseView.getModelView()->data());
 
         draw();
 
@@ -283,15 +286,28 @@ Viewer::tkDrawAxis(float s) {
 }
 
 void 
-Viewer::tkDrawCircle(float x, float y, float z, float r, int res) {
+Viewer::tkDrawCircle(tk::common::Vector3<float> pose, float r, int res) {
     glBegin(GL_LINE_LOOP);
     for (int j = 0; j < res; j++)   {
         float theta = 2.0f * 3.1415926f * float(j) / float(res);//get the current angle 
         float xr = r * cosf(theta);//calculate the x component 
         float yr = r * sinf(theta);//calculate the y component 
-        glVertex3f(x + xr, y + yr, z);//output vertex
+        glVertex3f(pose.x + xr, pose.y + yr, pose.z);//output vertex
     }
     glEnd(); 
+}
+
+void 
+Viewer::tkDrawSphere(tk::common::Vector3<float> pose, float r, int res, bool filled) {
+    if (!filled)
+        glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
+    glPushMatrix();
+    glTranslatef(pose.x, pose.y, pose.z);
+    gluSphere(Viewer::quadric, r, res, res);
+    glPopMatrix();
+
+    if (!filled)
+        glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
 }
 
 void 
@@ -306,20 +322,15 @@ Viewer::tkDrawCloud(Eigen::MatrixXf *points) {
 
 void 
 Viewer::tkDrawArrow(float length, float radius, int nbSubdivisions) {
-    
-    static GLUquadric *quadric = gluNewQuadric();
-
     if (radius < 0.0)
         radius = 0.05 * length;
 
     const float head = 2.5 * (radius / length) + 0.1;
     const float coneRadiusCoef = 4.0 - 5.0 * head;
 
-    gluCylinder(quadric, radius, radius, length * (1.0 - head / coneRadiusCoef),
-                nbSubdivisions, 1);
+    gluCylinder(Viewer::quadric, radius, radius, length * (1.0 - head / coneRadiusCoef), nbSubdivisions, 1);
     glTranslated(0.0, 0.0, length * (1.0 - head));
-    gluCylinder(quadric, coneRadiusCoef * radius, 0.0, head * length,
-                nbSubdivisions, 1);
+    gluCylinder(Viewer::quadric, coneRadiusCoef * radius, 0.0, head * length, nbSubdivisions, 1);
     glTranslated(0.0, 0.0, -length * (1.0 - head));
 }
 

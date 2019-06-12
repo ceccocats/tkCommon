@@ -43,7 +43,8 @@ namespace tk { namespace gui {
         static void tkSetColor(tk::gui::Color_t c);
         static void tkApplyTf(tk::common::Tfpose tf);
         static void tkDrawAxis(float s = 2.0);
-        static void tkDrawCircle(float x, float y, float z, float r, int res = 20);
+        static void tkDrawCircle(tk::common::Vector3<float> pose, float r, int res = 20);
+        static void tkDrawSphere(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = true);
         static void tkDrawCloud(Eigen::MatrixXf *data);
         static void tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght, float radius = -1.0, int nbSubdivisions = 12);
         static void tkDrawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
@@ -58,15 +59,17 @@ namespace tk { namespace gui {
 
         bool isRunning() {return !glfwWindowShouldClose(window);};
     
-        int width, height;
+        int                     width, height;
 
     private:
         std::string     windowName;
         Color_t         background = tk::gui::color::DARK_GRAY;
 
-        GLFWwindow*     window;
+        GLFWwindow*              window;
+        static MouseView3D       mouseView;
+        static GLUquadric*       quadric;
 
-        const char* glsl_version = "#version 130";
+        const char*     glsl_version = "#version 130";
 
         static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
         static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
