@@ -15,9 +15,7 @@ Viewer::init() {
     glfwSetErrorCallback(errorCallback);
     glfwInit();
 
-
-
-    /* Create a windowed mode window and its OpenGL context */
+    // Create a windowed mode window and its OpenGL context
     window = glfwCreateWindow(640, 480, windowName.c_str(), NULL, NULL);
     if (!window) {
         glfwTerminate();
@@ -31,7 +29,42 @@ Viewer::init() {
     glfwSetKeyCallback(window, keyCallback);
     glfwMakeContextCurrent(window);
     //gladLoadGL(glfwGetProcAddress);
-    //glfwSwapInterval(1);
+    glfwSwapInterval(1);
+
+
+
+    // Initialize OpenGL loader
+#if defined(IMGUI_IMPL_OPENGL_LOADER_GL3W)
+    bool err = gl3wInit() != 0;
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLEW)
+    bool err = glewInit() != GLEW_OK;
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_GLAD)
+    bool err = gladLoadGL() == 0;
+#else
+    bool err = false; // If you use IMGUI_IMPL_OPENGL_LOADER_CUSTOM, your loader is likely to requires some form of initialization.
+#endif
+    if (err) {
+        fprintf(stderr, "Failed to initialize OpenGL loader!\n");
+        exit(-1);
+    }
+
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
+
+    // Setup Platform/Renderer bindings
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
+
+
+
 
     // OPENGL confs
     glDisable(GL_LIGHTING);
@@ -45,8 +78,12 @@ Viewer::init() {
 void 
 Viewer::draw() {
 
-    tk::common::Vector3<float> s = { 1, 1, 1 };
-    tkSetColor(tk::gui::color::RED);
+    tk::common::Vector3<float> s = { 1, 1, 0 };
+    tk::gui::Color_t col = tk::gui::color::LIGHT_BLUE;
+    tkSetColor(col);
+    tkDrawCube(mouseView.getPointOnGround(), s, false);
+    col.a /= 4;
+    tkSetColor(col);
     tkDrawCube(mouseView.getPointOnGround(), s, true);
 
     glPushMatrix();
@@ -79,8 +116,18 @@ void Viewer::mouse_button_callback(GLFWwindow* window, int button, int action, i
 
 void 
 Viewer::run() {
-
+    bool show_demo_window = true;
+    LoopRate rate((1e6/60), "VIZ_UPDATE");
     while (!glfwWindowShouldClose(window)) {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+        if (show_demo_window)
+            ImGui::ShowDemoWindow(&show_demo_window);
+
+        ImGui::Render();
         glfwGetFramebufferSize(window, &width, &height);
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -99,12 +146,20 @@ Viewer::run() {
 
         glPopMatrix();
 
+
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
         /* Poll for and process events */
         glfwPollEvents();
+        rate.wait();
     }
+    
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();  
+    ImGui::DestroyContext();
+
     glfwDestroyWindow(window);
     glfwTerminate();
 }

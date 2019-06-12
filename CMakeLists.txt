@@ -15,21 +15,36 @@ include_directories(${EIGEN3_INCLUDE_DIR})
 
 find_package(OpenGL REQUIRED)
 
+find_package(GLEW REQUIRED)
+
 find_package(glfw3 3 REQUIRED)
 include_directories(
     ${OPENGL_INCLUDE_DIR}
+    ${GLEW_INCLUDE_DIRS}
 )
 
 set(GUI_LIBS
     ${OPENGL_gl_LIBRARY}
     ${OPENGL_glu_LIBRARY}
+    ${GLEW_LIBRARY}    
     glfw
 )
 
 #-------------------------------------------------------------------------------
 # library
 #-------------------------------------------------------------------------------
-add_library(tkGUI SHARED src/gui/lodepng.cpp src/gui/Viewer.cpp src/gui/MouseView3D.cpp src/gui/MathUtils.cpp)
+add_library(tkGUI SHARED 
+    src/gui/Viewer.cpp
+    src/gui/lodepng.cpp  
+    src/gui/MouseView3D.cpp 
+    src/gui/MathUtils.cpp
+    src/gui/imgui_demo.cpp
+    src/gui/imgui_draw.cpp
+    src/gui/imgui_widgets.cpp
+    src/gui/imgui.cpp
+    src/gui/imgui_impl_glfw.cpp
+    src/gui/imgui_impl_opengl3.cpp
+)
 target_link_libraries(tkGUI ${GUI_LIBS})
 
 add_library(tkCommon SHARED src/common.cpp)

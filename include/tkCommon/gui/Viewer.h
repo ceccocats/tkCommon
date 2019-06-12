@@ -1,15 +1,20 @@
 #pragma once
-
-#include <GLFW/glfw3.h>
-
-#include <stdlib.h>
-#include <stdio.h>
-
+#include <GL/glew.h> 
 #include "tkCommon/common.h"
 #include "tkCommon/gui/MouseView3D.h"
 #include "tkCommon/gui/Color.h"
 #include "tkCommon/gui/lodepng.h"
 #include "tkCommon/gui/OBJ_Loader.h"
+#include "tkCommon/gui/imgui.h"
+#include "tkCommon/gui/imgui_impl_glfw.h"
+#include "tkCommon/gui/imgui_impl_opengl3.h"
+
+ 
+#include <GLFW/glfw3.h>
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <signal.h>
 
 namespace tk { namespace gui {
 
@@ -61,6 +66,8 @@ namespace tk { namespace gui {
         Color_t         background;
 
         GLFWwindow*     window;
+
+        const char* glsl_version = "#version 130";
 
         static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
         static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
