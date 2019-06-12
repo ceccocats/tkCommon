@@ -63,7 +63,7 @@ namespace tk { namespace gui {
 
     private:
         std::string     windowName;
-        Color_t         background;
+        Color_t         background = tk::gui::color::DARK_GRAY;
 
         GLFWwindow*     window;
 
