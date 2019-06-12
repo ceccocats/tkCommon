@@ -4,15 +4,20 @@ set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} --std=c++11 -fPIC -fopenmp")
 
 find_package(Eigen3 REQUIRED)
 find_package(yaml-cpp REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(glfw3 3 REQUIRED)
 
-# compile GUI only if QGLViewer is installed
-find_package(Pangolin REQUIRED)
-include_directories(
-    ${Pangolin_INCLUDE_DIRS}
+set(GUI_INCLUDES
+    ${OPENGL_INCLUDE_DIR}
+    ${GLEW_INCLUDE_DIRS}
 )
 
 set(GUI_LIBS
-    ${Pangolin_LIBRARIES}
+    ${OPENGL_gl_LIBRARY}
+    ${OPENGL_glu_LIBRARY}
+    ${GLEW_LIBRARY}    
+    glfw
 )
 
 set(tkCommon_INCLUDE_DIRS
@@ -26,5 +31,4 @@ set(tkCommon_LIBRARIES
     tkGUI
 )
 
-# This causes catkin_simple to link against these libraries
 set(tkCommon_FOUND true)

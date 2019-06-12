@@ -43,6 +43,9 @@ void MouseView3D::updateEye()
 
 void MouseView3D::mouseDown(int button, float x, float y)
 {
+    if(mouseOnGUI)
+        return;
+
     m_currentPos[0] = x;
     m_currentPos[1] = y;
 
@@ -56,9 +59,6 @@ void MouseView3D::mouseDown(int button, float x, float y)
 
     m_mouseLeft  = (button == 0);
     m_mouseRight = (button == 1);
-
-    if(m_request_pose_insert && m_mouseLeft)
-        m_request_pose_insert = false;
 }
 
 void MouseView3D::mouseUp(int button, float x, float y)
@@ -69,6 +69,9 @@ void MouseView3D::mouseUp(int button, float x, float y)
 
 void MouseView3D::mouseMove(float x, float y)
 {
+    if(mouseOnGUI)
+        return;
+
     float pos[] = {x, y};
     screenPos = {x,y};
 
@@ -100,6 +103,9 @@ void MouseView3D::mouseMove(float x, float y)
 
 void MouseView3D::mouseWheel(float dx, float dy)
 {
+    if(mouseOnGUI)
+        return;
+
     float tmpRadius = m_radius - dy * 1.5f;
 
     if (tmpRadius > 0.0f) {

@@ -71,6 +71,8 @@ class MouseView3D
     GLFWwindow*     window;
     tk::common::Vector2<float>  screenPos;
 
+    bool mouseOnGUI;
+
   private:
     Eigen::Matrix4f m_modelView;
     Eigen::Matrix4f m_projection;
@@ -97,8 +99,6 @@ class MouseView3D
 
     void updateEye();
     void updateMatrices();
-
-    bool m_request_pose_insert = false;
 };
 
 }}

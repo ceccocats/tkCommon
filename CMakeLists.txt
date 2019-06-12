@@ -59,13 +59,13 @@ target_link_libraries(tkGUI_simple tkCommon ${GUI_LIBS})
 #-------------------------------------------------------------------------------
 # install
 #-------------------------------------------------------------------------------
-#install(TARGETS tkGUI DESTINATION lib)
-#install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" # source directory
-#        DESTINATION "include/"
-#)
-#install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" # source directory
-#        DESTINATION "share/tkCommon/cmake/" # target directory
-#)
+install(TARGETS tkGUI DESTINATION lib)
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" # source directory
+        DESTINATION "include/"
+)
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" # source directory
+        DESTINATION "share/tkCommon/cmake/" # target directory
+)
 
 
 
