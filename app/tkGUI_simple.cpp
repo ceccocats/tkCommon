@@ -90,9 +90,22 @@ class MyViewer : public tk::gui::Viewer {
 
             // draw 2D HUD
             tkViewport2D(width, height);
-            glTranslatef(0.7, -0.85, 0);
-            tkDrawTexture(hipertTex, 0.5);
-        
+
+            glPushMatrix(); {
+                glTranslatef(0.7, -0.85, 0);
+                tkDrawTexture(hipertTex, 0.5);
+            } glPopMatrix();
+           
+
+            glPushMatrix(); {
+                tkSetColor(tk::gui::color::LIME);
+                char fps_str[256];
+                sprintf(fps_str, "FPS: %.2f", ImGui::GetIO().Framerate);
+                tkDrawText(fps_str, tk::common::Vector3<float>{0.75, +0.9, 0}, 
+                                    tk::common::Vector3<float>{0, 0, 0},
+                                    tk::common::Vector3<float>{0.02, 0.02, 0.0});
+            } glPopMatrix();
+           
             // draw 2d GUI 1
             if (show_demo_window)
                 ImGui::ShowDemoWindow(&show_demo_window);
