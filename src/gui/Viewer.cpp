@@ -307,7 +307,7 @@ Viewer::tkDrawCloud(Eigen::MatrixXf *points) {
 void 
 Viewer::tkDrawArrow(float length, float radius, int nbSubdivisions) {
     
-    /*static GLUquadric *quadric = gluNewQuadric();
+    static GLUquadric *quadric = gluNewQuadric();
 
     if (radius < 0.0)
         radius = 0.05 * length;
@@ -320,15 +320,15 @@ Viewer::tkDrawArrow(float length, float radius, int nbSubdivisions) {
     glTranslated(0.0, 0.0, length * (1.0 - head));
     gluCylinder(quadric, coneRadiusCoef * radius, 0.0, head * length,
                 nbSubdivisions, 1);
-    glTranslated(0.0, 0.0, -length * (1.0 - head));*/
+    glTranslated(0.0, 0.0, -length * (1.0 - head));
 }
 
 void 
 Viewer::tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght, float radius, int nbSubdivisions) {
     glPushMatrix();
+    glTranslatef(pose.x, pose.y, pose.z);
     glRotatef(90.0, 1.0, 0.0, 0.0);
     glRotatef(90.0 + yaw*180/M_PI, 0.0, 1.0, 0.0);
-    glTranslatef(pose.x, pose.y, pose.z);
     tkDrawArrow(lenght, radius, nbSubdivisions);
     glPopMatrix();
 }
