@@ -1,4 +1,5 @@
 #include "tkCommon/gui/Viewer.h"
+#include "tkCommon/gui/OBJ_Loader.h"
 
 using namespace tk::gui;
 MouseView3D     mouseView;
