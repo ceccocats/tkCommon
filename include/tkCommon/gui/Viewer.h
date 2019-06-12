@@ -45,9 +45,9 @@ namespace tk { namespace gui {
         static void tkDrawAxis(float s = 2.0);
         static void tkDrawCircle(float x, float y, float z, float r, int res = 20);
         static void tkDrawCloud(Eigen::MatrixXf *data);
-        static void tkDrawArrow(float length = 1.0, float radius = -1.0, int nbSubdivisions = 12);
         static void tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght, float radius = -1.0, int nbSubdivisions = 12);
         static void tkDrawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
+        static void tkDrawRectangle(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
         static void tkDrawObject3D(object3D_t *obj, float size = 1.0, bool textured = false);
         static void tkDrawTexture(GLuint tex, float s);
 
@@ -72,5 +72,6 @@ namespace tk { namespace gui {
         static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
         static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
+        static void tkDrawArrow(float length = 1.0, float radius = -1.0, int nbSubdivisions = 12);
     };
 }}

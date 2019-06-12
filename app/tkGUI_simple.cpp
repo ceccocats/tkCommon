@@ -31,7 +31,7 @@ class MyViewer : public tk::gui::Viewer {
             tk::gui::Viewer::draw();
 
             tkSetColor(tk::gui::color::RED);
-            tkDrawArrow(tk::common::Vector3<float>{2.0, 2.0, 0.0}, 0.0, 1.0);
+            tkDrawArrow(tk::common::Vector3<float>{0.0, 0.0, 3.0}, angle+M_PI/2, 2.0);
 
 
             tk::common::Vector3<float>p(0.0, 4.0, 1.0);

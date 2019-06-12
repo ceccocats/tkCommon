@@ -66,13 +66,13 @@ Viewer::init() {
 void 
 Viewer::draw() {
 
-    tk::common::Vector3<float> s = { 1, 1, 0 };
+    tk::common::Vector3<float> s = { 1, 1, 1 };
     tk::gui::Color_t col = tk::gui::color::LIGHT_BLUE;
     tkSetColor(col);
-    tkDrawCube(mouseView.getPointOnGround(), s, false);
+    tkDrawRectangle(mouseView.getPointOnGround(), s, false);
     col.a /= 4;
     tkSetColor(col);
-    tkDrawCube(mouseView.getPointOnGround(), s, true);
+    tkDrawRectangle(mouseView.getPointOnGround(), s, true);
 
     glPushMatrix();
     tk::common::Vector3<float> p = mouseView.getWorldPos();
@@ -380,6 +380,28 @@ Viewer::tkDrawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> s
     glVertex3f(  0.5, -0.5,  0.5 );
     glVertex3f( -0.5, -0.5,  0.5 );
     glVertex3f( -0.5, -0.5, -0.5 );
+    glEnd();
+
+    glPopMatrix();
+
+    if (!filled)
+        glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
+}
+
+void 
+Viewer::tkDrawRectangle(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled) {
+    if (!filled)
+        glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
+
+    glPushMatrix();
+    glTranslatef(pose.x, pose.y, pose.z);
+    glScalef(size.x, size.y, size.z);
+
+    glBegin(GL_POLYGON);
+    glVertex3f(  0.5, -0.5, 0 );
+    glVertex3f(  0.5,  0.5, 0 );
+    glVertex3f( -0.5,  0.5, 0 );
+    glVertex3f( -0.5, -0.5, 0 );
     glEnd();
 
     glPopMatrix();
