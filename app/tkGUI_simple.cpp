@@ -29,7 +29,7 @@ class MyViewer : public tk::gui::Viewer {
 
         void draw() {
             tk::gui::Viewer::draw();
-
+ 
             // Arrow
             tkSetColor(tk::gui::color::RED);
             tkDrawArrow(tk::common::Vector3<float>{0.0, 0.0, 3.0}, angle, 2.0);
@@ -47,7 +47,13 @@ class MyViewer : public tk::gui::Viewer {
             // Circle
             tkSetColor(tk::gui::color::PINK);
             tkDrawCircle(tk::common::Vector3<float>{0.0, 0.0, 0.0}, 8.0, 100);
-            
+   
+            // text
+            tkSetColor(tk::gui::color::LIME);
+            tkDrawText("tkGUI", tk::common::Vector3<float>{-5*2.2, 10.0, 0.0}, 
+                                tk::common::Vector3<float>{M_PI/2, 0, 0},
+                                tk::common::Vector3<float>{5.0, 5.0, 5.0});
+
             // tornado cloud
             glPushMatrix(); {
                 tkApplyTf(tf);

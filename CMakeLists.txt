@@ -18,6 +18,7 @@ find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 
 find_package(glfw3 3 REQUIRED)
+
 include_directories(
     ${OPENGL_INCLUDE_DIR}
     ${GLEW_INCLUDE_DIRS}
@@ -26,8 +27,9 @@ include_directories(
 set(GUI_LIBS
     ${OPENGL_gl_LIBRARY}
     ${OPENGL_glu_LIBRARY}
-    ${GLEW_LIBRARY}    
+    ${GLEW_LIBRARY}  
     glfw
+    glut
 )
 
 #-------------------------------------------------------------------------------

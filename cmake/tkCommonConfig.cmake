@@ -16,8 +16,9 @@ set(GUI_INCLUDES
 set(GUI_LIBS
     ${OPENGL_gl_LIBRARY}
     ${OPENGL_glu_LIBRARY}
-    ${GLEW_LIBRARY}    
+    ${GLEW_LIBRARY}
     glfw
+    glut
 )
 
 set(tkCommon_INCLUDE_DIRS

@@ -56,6 +56,13 @@ Viewer::init() {
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init(glsl_version);
     }
+
+    // font
+    {
+        int foo = 1;
+        char* bar[1] = {" "}; 
+        glutInit(&foo, bar);
+    }
     
     // OPENGL confs
     glDisable(GL_LIGHTING);
@@ -63,6 +70,7 @@ Viewer::init() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
     //glDepthFunc(GL_GEQUAL);
+    //glEnable(GL_LINE_SMOOTH);
 }
 
 
@@ -472,8 +480,25 @@ void Viewer::tkDrawTexture(GLuint tex, float s) {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void
+Viewer::tkDrawText(std::string text, tk::common::Vector3<float> pose, tk::common::Vector3<float> rot, tk::common::Vector3<float> size) {
+    
+    float corectRatio = 1.0/70;
+    
+    glPushMatrix();
+    glTranslatef(pose.x, pose.y, pose.z);
+    glRotatef(rot.x*180.0/M_PI, 1, 0, 0);
+    glRotatef(rot.y*180.0/M_PI, 0, 1, 0);
+    glRotatef(rot.z*180.0/M_PI, 0, 0, 1);    
+    glScalef(size.x*corectRatio, size.y*corectRatio, size.z*corectRatio);
+    
+    glutStrokeString(GLUT_STROKE_ROMAN, (unsigned char*) text.c_str());
+    
+    glPopMatrix();
+}
 
-void Viewer::tkViewport2D(int width, int height) {
+void 
+Viewer::tkViewport2D(int width, int height) {
     glViewport(0, 0, width, height);
     glOrtho(0, width, 0, height, -1, 1);
     glLoadIdentity();
