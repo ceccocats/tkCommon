@@ -429,6 +429,20 @@ Viewer::tkDrawRectangle(tk::common::Vector3<float> pose, tk::common::Vector3<flo
         glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
 }
 
+void Viewer::tkDrawLine(tk::common::Vector3<float> p0, tk::common::Vector3<float> p1) {
+    glBegin(GL_LINE);
+    glVertex3f(p0.x, p0.y, p0.z);
+    glVertex3f(p1.x, p1.y, p1.z);
+    glEnd();
+}
+void Viewer::tkDrawLine(std::vector<tk::common::Vector3<float>> poses) {
+    glBegin(GL_LINE_STRIP);
+    for(unsigned int i=0; i<poses.size(); i++) {
+        glVertex3f(poses[i].x, poses[i].y, poses[i].z);
+    }
+    glEnd();
+}
+
 void 
 Viewer::tkDrawObject3D(object3D_t *obj, float size, bool textured) {
 
@@ -498,8 +512,8 @@ Viewer::tkDrawText(std::string text, tk::common::Vector3<float> pose, tk::common
 }
 
 void 
-Viewer::tkViewport2D(int width, int height) {
-    glViewport(0, 0, width, height);
+Viewer::tkViewport2D(int width, int height, int x, int y) {
+    glViewport(x, y, width, height);
     glOrtho(0, width, 0, height, -1, 1);
     glLoadIdentity();
  }

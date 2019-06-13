@@ -49,13 +49,15 @@ namespace tk { namespace gui {
         static void tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght, float radius = -1.0, int nbSubdivisions = 12);
         static void tkDrawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
         static void tkDrawRectangle(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
+        static void tkDrawLine(tk::common::Vector3<float> p0, tk::common::Vector3<float> p1);
+        static void tkDrawLine(std::vector<tk::common::Vector3<float>> poses);
         static void tkDrawObject3D(object3D_t *obj, float size = 1.0, bool textured = false);
         static void tkDrawTexture(GLuint tex, float s);
         static void tkDrawText(std::string text, tk::common::Vector3<float> pose, 
                                tk::common::Vector3<float> rot = tk::common::Vector3<float>{0.0, 0.0, 0.0}, 
                                tk::common::Vector3<float> scale = tk::common::Vector3<float>{1.0, 1.0, 1.0});
 
-        static void tkViewport2D(int width, int height);
+        static void tkViewport2D(int width, int height, int x=0, int y=0);
 
         static void errorCallback(int error, const char* description);
         static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
