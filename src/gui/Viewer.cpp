@@ -20,7 +20,7 @@ Viewer::init() {
     glfwInit();
 
     // Create a windowed mode window and its OpenGL context
-    window = glfwCreateWindow(640, 480, windowName.c_str(), NULL, NULL);
+    window = glfwCreateWindow(1280, 720, windowName.c_str(), NULL, NULL);
     if (!window) {
         glfwTerminate();
     }
