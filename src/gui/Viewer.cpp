@@ -430,7 +430,7 @@ Viewer::tkDrawRectangle(tk::common::Vector3<float> pose, tk::common::Vector3<flo
 }
 
 void Viewer::tkDrawLine(tk::common::Vector3<float> p0, tk::common::Vector3<float> p1) {
-    glBegin(GL_LINE);
+    glBegin(GL_LINES);
     glVertex3f(p0.x, p0.y, p0.z);
     glVertex3f(p1.x, p1.y, p1.z);
     glEnd();
