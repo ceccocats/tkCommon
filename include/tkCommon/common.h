@@ -225,6 +225,24 @@ namespace tk { namespace common {
     }
 
     /**
+     * Convert odometry to TfPose
+     * @param x   translation forward
+     * @param y   translation sideways
+     * @param yaw rotation
+     * @return transform
+     */
+    inline Tfpose odom2tf(float x, float y, float z, float yaw) {
+        Eigen::Quaternionf quat = 
+            Eigen::AngleAxisf(0, Eigen::Vector3f::UnitX())*
+            Eigen::AngleAxisf(0, Eigen::Vector3f::UnitY())*
+            Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ());
+        Tfpose isometry = Eigen::Isometry3f::Identity();
+        isometry.linear() = quat.toRotationMatrix();
+        isometry.translation() = Eigen::Vector3f(x, y, z) ;
+        return isometry;
+    }
+
+    /**
      * Read odometry from ifstream as a TfPose
      * Format:
      * x y yaw stamp
