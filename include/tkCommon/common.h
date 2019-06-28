@@ -12,6 +12,33 @@
 namespace tk { namespace common {
 
     /**
+     *  RotoTranslation transform
+     *  it is implemented as a matrix 4x4
+     *      r r r x
+     *      r r r y
+     *      r r r z
+     *      0 0 0 1
+     *  [ r ]    : 3d rotation matrix
+     *  [x y z ] : 3d translation
+     */
+    typedef Eigen::Isometry3f Tfpose;
+
+    /**
+     * Vector of 3x3 Matrix
+     * used by GICP
+     */
+    typedef std::vector< Eigen::Matrix3d, Eigen::aligned_allocator<Eigen::Matrix3d> > MatricesVector;
+
+    typedef Eigen::Matrix<uint8_t, Eigen::Dynamic, Eigen::Dynamic> MatrixXu8;
+
+    /**
+     * Timestamp value
+     * espessed in microseconds from epoch
+     */
+    typedef uint64_t TimeStamp;
+
+
+    /**
      * Rect [ x y w h ]
      * @tparam T
      */
@@ -181,33 +208,6 @@ namespace tk { namespace common {
                 return os;
             }  
     };
-
-    /**
-     *  RotoTranslation transform
-     *  it is implemented as a matrix 4x4
-     *      r r r x
-     *      r r r y
-     *      r r r z
-     *      0 0 0 1
-     *  [ r ]    : 3d rotation matrix
-     *  [x y z ] : 3d translation
-     */
-    typedef Eigen::Isometry3f Tfpose;
-
-    /**
-     * Vector of 3x3 Matrix
-     * used by GICP
-     */
-    typedef std::vector< Eigen::Matrix3d, Eigen::aligned_allocator<Eigen::Matrix3d> > MatricesVector;
-
-    typedef Eigen::Matrix<uint8_t, Eigen::Dynamic, Eigen::Dynamic> MatrixXu8;
-
-    
-    /**
-     * Timestamp value
-     * espessed in microseconds from epoch
-     */
-    typedef uint64_t TimeStamp;
 
     /**
      * Convert odometry to TfPose

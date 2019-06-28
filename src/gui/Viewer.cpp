@@ -328,6 +328,18 @@ Viewer::tkDrawCloud(Eigen::MatrixXf *points) {
     glEnd();
 }
 
+void
+Viewer::tkDrawCloudFeatures(Eigen::MatrixXf *points, tk::common::MatrixXu8 *features, int idx) {
+    glBegin(GL_POINTS);
+    for (int p = 0; p < points->cols(); p++) {
+        if(features->coeff(idx, p) != 0) {
+            Eigen::Vector4f v = points->col(p);
+            glVertex3f(v(0), v(1), v(2));
+        }
+    }
+    glEnd();
+}
+
 void 
 Viewer::tkDrawArrow(float length, float radius, int nbSubdivisions) {
     if (radius < 0.0)
