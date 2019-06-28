@@ -8,27 +8,19 @@ find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glfw3 3 REQUIRED)
 
-set(GUI_INCLUDES
+set(tkCommon_INCLUDE_DIRS
     ${OPENGL_INCLUDE_DIR}
     ${GLEW_INCLUDE_DIRS}
+    ${EIGEN3_INCLUDE_DIR}
 )
 
-set(GUI_LIBS
+set(tkCommon_LIBRARIES 
+    yaml-cpp
     ${OPENGL_gl_LIBRARY}
     ${OPENGL_glu_LIBRARY}
     ${GLEW_LIBRARY}
     glfw
     glut
-)
-
-set(tkCommon_INCLUDE_DIRS
-    ${EIGEN3_INCLUDE_DIR}
-    ${GUI_INCLUDES}
-)
-
-set(tkCommon_LIBRARIES 
-    yaml-cpp
-    ${GUI_LIBS}
     tkGUI
 )
 
