@@ -200,6 +200,9 @@ namespace tk { namespace common {
      */
     typedef std::vector< Eigen::Matrix3d, Eigen::aligned_allocator<Eigen::Matrix3d> > MatricesVector;
 
+    typedef Eigen::Matrix<uint8_t, Eigen::Dynamic, Eigen::Dynamic> MatrixXu8;
+
+    
     /**
      * Timestamp value
      * espessed in microseconds from epoch
