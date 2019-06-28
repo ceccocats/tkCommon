@@ -332,10 +332,13 @@ void
 Viewer::tkDrawCloudFeatures(Eigen::MatrixXf *points, tk::common::MatrixXu8 *features, int idx) {
     glBegin(GL_POINTS);
     for (int p = 0; p < points->cols(); p++) {
-        if(features->coeff(idx, p) != 0) {
-            Eigen::Vector4f v = points->col(p);
-            glVertex3f(v(0), v(1), v(2));
-        }
+        if(features->coeff(idx, p) == 0)
+            glColor3f(1, 1, 1);
+        else
+            glColor3f(1, 0, 0);
+
+        Eigen::Vector4f v = points->col(p);
+        glVertex3f(v(0), v(1), v(2));
     }
     glEnd();
 }
