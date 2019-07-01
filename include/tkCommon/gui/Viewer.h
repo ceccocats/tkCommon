@@ -66,13 +66,13 @@ namespace tk { namespace gui {
         bool isRunning() {return !glfwWindowShouldClose(window);};
     
         int                     width, height;
+        static MouseView3D      mouseView;
 
     private:
         std::string             windowName;
         Color_t                 background = tk::gui::color::DARK_GRAY;
 
         GLFWwindow*             window;
-        static MouseView3D      mouseView;
         static GLUquadric*      quadric;
 
         // font

@@ -266,12 +266,7 @@ Viewer::tkSetColor(tk::gui::Color_t c) {
 void 
 Viewer::tkApplyTf(tk::common::Tfpose tf) {
     // apply roto translation
-    tk::common::Vector3<float> p = tk::common::tf2pose(tf);
-    tk::common::Vector3<float> r = tk::common::tf2rot (tf);
-    glTranslatef(p.x, p.y, p.z);
-    glRotatef(r.x*180.0/M_PI, 1, 0, 0);
-    glRotatef(r.y*180.0/M_PI, 0, 1, 0);
-    glRotatef(r.z*180.0/M_PI, 0, 0, 1);
+    glMultMatrixf(tf.matrix().data());
 }  
 
 void 
