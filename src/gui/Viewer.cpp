@@ -5,6 +5,11 @@ using namespace tk::gui;
 MouseView3D     Viewer::mouseView;
 GLUquadric*     Viewer::quadric;
 
+std::vector<Color_t> tk::gui::Viewer::colors = std::vector<Color_t>{color::RED, color::PINK, 
+                                                                    color::BLUE, color::YELLOW, 
+                                                                    color::WHITE, color::ORANGE
+                                                                    };
+
 Viewer::Viewer() {
 }
 
@@ -540,6 +545,36 @@ Viewer::tkDrawText(std::string text, tk::common::Vector3<float> pose, tk::common
     glutStrokeString(GLUT_STROKE_ROMAN, (unsigned char*) text.c_str());
     
     glPopMatrix();
+}
+
+void 
+Viewer::tkDrawRadarData(tk::data::RadarData_t data, bool enable_near, bool enable_far) {
+    if (enable_near) {
+        tk::common::Vector3<float> pose;
+        for (int i = 0; i < N_RADAR; i++) {
+            tkSetColor(colors[i]);
+            for (int j = 0; j < data.near_n_points[i]; j++) {
+                pose.x = data.near_points[i](j, 0);
+                pose.y = data.near_points[i](j, 1);
+                pose.z = data.near_points[i](j, 2);
+
+                tkDrawCircle(pose, 0.1);     
+            }       
+        }
+    }
+    if (enable_far) {
+        tk::common::Vector3<float> pose;
+        for (int i = 0; i < N_RADAR; i++) {
+            tkSetColor(colors[i]);
+            for (int j = 0; j < data.far_n_points[i]; j++) {
+                pose.x = data.far_points[i](j, 0);
+                pose.y = data.far_points[i](j, 1);
+                pose.z = data.far_points[i](j, 2);
+
+                tkDrawCircle(pose, 0.1);     
+            }       
+        }    
+    }
 }
 
 void 
