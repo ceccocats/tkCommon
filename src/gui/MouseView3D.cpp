@@ -106,7 +106,7 @@ void MouseView3D::mouseWheel(float dx, float dy)
     if(mouseOnGUI)
         return;
 
-    float tmpRadius = m_radius - dy * 1.5f;
+    float tmpRadius = m_radius - dy * 10.0f;
 
     if (tmpRadius > 0.0f) {
         m_radius = tmpRadius;
