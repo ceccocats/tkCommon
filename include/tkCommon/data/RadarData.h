@@ -8,6 +8,7 @@ namespace tk { namespace data {
 
     #pragma pack(push, 1)
     struct RadarData_t {
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
         tk::common::TimeStamp   near_stamp[N_RADAR];
         tk::common::TimeStamp   far_stamp[N_RADAR];
         int                     near_n_points[N_RADAR];

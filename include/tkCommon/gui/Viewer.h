@@ -61,7 +61,7 @@ namespace tk { namespace gui {
                                tk::common::Vector3<float> scale = tk::common::Vector3<float>{1.0, 1.0, 1.0});
 
         // data 
-        static void tkDrawRadarData(tk::data::RadarData_t data, bool enable_near, bool enable_far);
+        static void tkDrawRadarData(tk::data::RadarData_t *data, bool enable_near, bool enable_far);
 
         static void tkRainbowColor(float hue);
 
