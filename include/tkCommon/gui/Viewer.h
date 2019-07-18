@@ -13,6 +13,8 @@
 #include "tkCommon/gui/imgui_impl_glfw.h"
 #include "tkCommon/gui/imgui_impl_opengl3.h"
 
+#include "tkCommon/data/RadarData.h"
+
 
 
 namespace tk { namespace gui {
@@ -59,6 +61,8 @@ namespace tk { namespace gui {
                                tk::common::Vector3<float> scale = tk::common::Vector3<float>{1.0, 1.0, 1.0});
         static void tkRainbowColor(float hue, uint8_t &r, uint8_t &g, uint8_t &b);
         static void tkSetRainbowColor(float hue);
+        // data 
+        static void tkDrawRadarData(tk::data::RadarData_t data, bool enable_near, bool enable_far);
 
         static void tkViewport2D(int width, int height, int x=0, int y=0);
 
@@ -69,6 +73,7 @@ namespace tk { namespace gui {
     
         int                     width, height;
         static MouseView3D      mouseView;
+        static std::vector<tk::gui::Color_t> colors;
 
     private:
         std::string             windowName;
