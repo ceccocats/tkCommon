@@ -1,6 +1,4 @@
-#ifndef CSPLINE2D_H_
-#define CSPLINE2D_H_
-
+#pragma once
 #include "CSpline.h"
 
 #undef Success  // stupid X11
@@ -49,4 +47,3 @@ private:
 };
 
 }}
-#endif /* CSPLINE2D_H_ */

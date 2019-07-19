@@ -53,7 +53,7 @@ target_link_libraries(tkGUI ${GUI_LIBS})
 add_library(tkCommon SHARED src/common.cpp)
 target_link_libraries(tkCommon tkGUI yaml-cpp)
 
-add_library(tkMath SHARED src/math/CSpline.cpp src/math/CSpline2D.cpp)
+add_library(tkMath SHARED src/math/CSpline.cpp src/math/CSpline2D.cpp src/math/CSpline3D.cpp)
 
 #-------------------------------------------------------------------------------
 # Build apps

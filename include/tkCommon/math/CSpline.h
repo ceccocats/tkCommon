@@ -1,6 +1,4 @@
-#ifndef CSPLINE_H_
-#define CSPLINE_H_
-
+#pragma once
 #undef Success  // stupid X11
 #include "Eigen/Dense"
 using namespace Eigen;
@@ -68,5 +66,3 @@ private:
 };
 
 }}
-
-#endif /* CSPLINE_H_ */
