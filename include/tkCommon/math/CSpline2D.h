@@ -1,0 +1,52 @@
+#ifndef CSPLINE2D_H_
+#define CSPLINE2D_H_
+
+#include "CSpline.h"
+
+#undef Success  // stupid X11
+#include "Eigen/Dense"
+using namespace Eigen;
+
+namespace tk { namespace  math {
+
+/**
+    Cubic Spline2D class
+*/
+class CSpline2D {
+
+public:
+
+    // waypoints
+    VectorXd x, y;
+    int nx;
+
+    VectorXd s;
+    CSpline sx, sy;
+    double s_start, s_end;
+
+
+    CSpline2D();
+
+    virtual ~CSpline2D();
+
+    /**
+        init
+        @param waypoints x, y
+    */
+    bool init(std::vector<Vector2f> waypoints);
+
+    Vector2f calc_position(double s);
+
+    double calc_curvature(double s);
+
+    double calc_yaw(double s);
+
+private:
+    /**
+        calc s
+    */
+    VectorXd calc_s();
+};
+
+}}
+#endif /* CSPLINE2D_H_ */

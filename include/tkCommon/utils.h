@@ -6,6 +6,10 @@
 #include <sys/time.h>
 #include "yaml-cpp/yaml.h" 
 
+/**
+ * Timestamp value
+ * espessed in microseconds from epoch
+ */
 typedef uint64_t timeStamp_t;
 
 /**
