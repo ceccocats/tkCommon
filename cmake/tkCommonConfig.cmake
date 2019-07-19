@@ -22,6 +22,7 @@ set(tkCommon_LIBRARIES
     glfw
     glut
     tkGUI
+    tkMath
 )
 
 set(tkCommon_FOUND true)
