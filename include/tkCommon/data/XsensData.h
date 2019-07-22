@@ -6,56 +6,56 @@ namespace tk { namespace common {
     struct XsensData_t {
         
     /**GPS data*////////////////////////
-    float64_t   latitude;
-    float64_t   longitude;
-    float64_t   altitude;
+    double      latitude;
+    double      longitude;
+    double      altitude;
     timeStamp_t GPStimestamp;
     ////////////////////////////////////
 
 
     /**Mag X*///////////////////////////
-    float64_t   magX;
-    float64_t   magY;
-    float64_t   magZ;
+    double      magX;
+    double      magY;
+    double      magZ;
     timeStamp_t MAGtimestamp;
     ////////////////////////////////////
 
 
     /**Accelerometer data*///////////////
-    float64_t   accX;
-    float64_t   accY;
-    float64_t   accZ;
+    double      accX;
+    double      accY;
+    double      accZ;
     timeStamp_t ACCtimestamp;
     ////////////////////////////////////
 
 
     /**Gyroscope data */////////////////
-    float64_t   gyrX;
-    float64_t   gyrY;
-    float64_t   gyrZ;
+    double      gyrX;
+    double      gyrY;
+    double      gyrZ;
     timeStamp_t GYRtimestamp;
     ////////////////////////////////////
 
 
     /**IMU data*////////////////////////
-    float64_t   yaw;
-    float64_t   pitch;
-    float64_t   roll;
+    double      yaw;
+    double      pitch;
+    double      roll;
     timeStamp_t IMUtimestamp;
     ////////////////////////////////////
 
 
     /**Environment*/////////////////////
-    float64_t   temperature;
-    float64_t   pressure;
+    double      temperature;
+    double      pressure;
     timeStamp_t ENVtimestamp;
     ////////////////////////////////////
 
 
     /**Velocity data*///////////////////
-    float64_t   velocity_x;
-    float64_t   velocity_y;
-    float64_t   velocity_z;
+    double      velocity_x;
+    double      velocity_y;
+    double      velocity_z;
     timeStamp_t VELtimestamp;
     ////////////////////////////////////
 
@@ -84,18 +84,18 @@ namespace tk { namespace common {
      * 
      * @param xsens Reference to XsensData_t struct
      */
-    void consolePrint(XsensData_t& xsens){
+    void consolePrint(){
 
-        std::cout<<"TIME\t"<<xsens.day<<"/"<<xsens.month<<"/"<<xsens.year<<"\t"<<xsens.hour<<":"<<xsens.min<<":"<<xsens.sec<<"\n";
-        std::cout<<"GPS\tlat: "<<xsens.latitude<<" lon: "<<xsens.longitude<<" alt: "<<xsens.altitude<<" timestamp: "<<xsens.GPStimestamp<<"\n";
-        std::cout<<"MAG\tx: "<<xsens.magX<<" y: "<<xsens.magY<<" z: "<<xsens.magZ<<" timestamp: "<<xsens.MAGtimestamp<<"\n";
-        std::cout<<"ACC\tx: "<<xsens.accX<<" y: "<<xsens.accY<<" z: "<<xsens.accZ<<" timestamp: "<<xsens.ACCtimestamp<<"\n";
-        std::cout<<"GYR\tx: "<<xsens.gyrX<<" y: "<<xsens.gyrY<<" z: "<<xsens.gyrZ<<" timestamp: "<<xsens.GYRtimestamp<<"\n";
-        std::cout<<"IMU\tyaw: "<<xsens.yaw<<" pitch: "<<xsens.pitch<<" roll: "<<xsens.roll<<" timestamp: "<<xsens.IMUtimestamp<<"\n";
-        std::cout<<"ENV\ttemperature: "<<xsens.temperature<<" pressure: "<<xsens.pressure<<" timestamp: "<<xsens.ENVtimestamp<<"\n";
-        std::cout<<"VEL\tx: "<<xsens.velocity_x<<" y: "<<xsens.velocity_y<<" z: "<<xsens.velocity_z<<" timestamp: "<<xsens.VELtimestamp<<"\n";
-        std::cout<<"GNSS\tsat: "<<xsens.satellitiesNumber<<" gDOP: "<<xsens.geometricDOP<<" pDOP: "<<xsens.positionDOP<<" tDOP: "<<xsens.timeDOP
-                 <<" vDOP: "<<xsens.verticalDOP<<" hDOP: "<<xsens.horizzontalDOP<<" nDOP: "<<xsens.northingDOP<<" eDOP: "<<xsens.esatingDOP<<" timestamp: "<<xsens.GNSStimestamp<<"\n";
+        std::cout<<"TIME\t"<<(int)this->day<<"/"<<(int)this->month<<"/"<<(int)this->year<<"\t"<<(int)this->hour<<":"<<(int)this->min<<":"<<(int)this->sec<<"\n";
+        std::cout<<"GPS\tlat: "<<this->latitude<<" lon: "<<this->longitude<<" alt: "<<this->altitude<<" timestamp: "<<this->GPStimestamp<<"\n";
+        std::cout<<"MAG\tx: "<<this->magX<<" y: "<<this->magY<<" z: "<<this->magZ<<" timestamp: "<<this->MAGtimestamp<<"\n";
+        std::cout<<"ACC\tx: "<<this->accX<<" y: "<<this->accY<<" z: "<<this->accZ<<" timestamp: "<<this->ACCtimestamp<<"\n";
+        std::cout<<"GYR\tx: "<<this->gyrX<<" y: "<<this->gyrY<<" z: "<<this->gyrZ<<" timestamp: "<<this->GYRtimestamp<<"\n";
+        std::cout<<"IMU\tyaw: "<<this->yaw<<" pitch: "<<this->pitch<<" roll: "<<this->roll<<" timestamp: "<<this->IMUtimestamp<<"\n";
+        std::cout<<"ENV\ttemperature: "<<this->temperature<<" pressure: "<<this->pressure<<" timestamp: "<<this->ENVtimestamp<<"\n";
+        std::cout<<"VEL\tx: "<<this->velocity_x<<" y: "<<this->velocity_y<<" z: "<<this->velocity_z<<" timestamp: "<<this->VELtimestamp<<"\n";
+        std::cout<<"GNSS\tsat: "<<(int)this->satellitiesNumber<<" gDOP: "<<this->geometricDOP<<" pDOP: "<<this->positionDOP<<" tDOP: "<<this->timeDOP
+                 <<" vDOP: "<<this->verticalDOP<<" hDOP: "<<this->horizzontalDOP<<" nDOP: "<<this->northingDOP<<" eDOP: "<<this->esatingDOP<<" timestamp: "<<this->GNSStimestamp<<"\n";
     }
 
     /**
@@ -103,46 +103,46 @@ namespace tk { namespace common {
      * 
      * @param xsens Reference XsensData_t to struct
      */
-    void clearAll(XsensData_t& xsens){
+    void clearAll(){
 
-        xsens.latitude          = 0;
-        xsens.longitude         = 0;
-        xsens.altitude          = 0;
-        xsens.GPStimestamp      = 0;
-        xsens.accX              = 0;
-        xsens.accY              = 0;
-        xsens.accZ              = 0;
-        xsens.ACCtimestamp      = 0;
-        xsens.gyrX              = 0;
-        xsens.gyrY              = 0;
-        xsens.gyrZ              = 0;
-        xsens.GYRtimestamp      = 0;
-        xsens.yaw               = 0;
-        xsens.pitch             = 0;
-        xsens.roll              = 0;
-        xsens.IMUtimestamp      = 0;
-        xsens.temperature       = 0;
-        xsens.pressure          = 0;
-        xsens.ENVtimestamp      = 0;
-        xsens.velocity_x        = 0;
-        xsens.velocity_y        = 0;
-        xsens.velocity_z        = 0;
-        xsens.VELtimestamp      = 0;
-        xsens.year              = 0;
-        xsens.month             = 0;
-        xsens.day               = 0;
-        xsens.hour              = 0;
-        xsens.min               = 0;
-        xsens.sec               = 0;
-        xsens.satellitiesNumber = 0;
-        xsens.geometricDOP      = 0;
-        xsens.positionDOP       = 0;
-        xsens.timeDOP           = 0;
-        xsens.verticalDOP       = 0;
-        xsens.horizzontalDOP    = 0;
-        xsens.northingDOP       = 0;
-        xsens.esatingDOP        = 0;
-        xsens.GNSStimestamp     = 0;
+        this->latitude          = 0;
+        this->longitude         = 0;
+        this->altitude          = 0;
+        this->GPStimestamp      = 0;
+        this->accX              = 0;
+        this->accY              = 0;
+        this->accZ              = 0;
+        this->ACCtimestamp      = 0;
+        this->gyrX              = 0;
+        this->gyrY              = 0;
+        this->gyrZ              = 0;
+        this->GYRtimestamp      = 0;
+        this->yaw               = 0;
+        this->pitch             = 0;
+        this->roll              = 0;
+        this->IMUtimestamp      = 0;
+        this->temperature       = 0;
+        this->pressure          = 0;
+        this->ENVtimestamp      = 0;
+        this->velocity_x        = 0;
+        this->velocity_y        = 0;
+        this->velocity_z        = 0;
+        this->VELtimestamp      = 0;
+        this->year              = 0;
+        this->month             = 0;
+        this->day               = 0;
+        this->hour              = 0;
+        this->min               = 0;
+        this->sec               = 0;
+        this->satellitiesNumber = 0;
+        this->geometricDOP      = 0;
+        this->positionDOP       = 0;
+        this->timeDOP           = 0;
+        this->verticalDOP       = 0;
+        this->horizzontalDOP    = 0;
+        this->northingDOP       = 0;
+        this->esatingDOP        = 0;
+        this->GNSStimestamp     = 0;
     }
 
     };
