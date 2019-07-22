@@ -86,7 +86,7 @@ namespace tk { namespace common {
      */
     void consolePrint(XsensData_t& xsens){
 
-        std::cout<<"TIME\t"<<xsens.day"/"<<xsens.month<<"/"<<xsens.year<<"\t"<<xsens.hour<<":"<<xsens.min<<":"<<xsens.sec<<"\n";
+        std::cout<<"TIME\t"<<xsens.day<<"/"<<xsens.month<<"/"<<xsens.year<<"\t"<<xsens.hour<<":"<<xsens.min<<":"<<xsens.sec<<"\n";
         std::cout<<"GPS\tlat: "<<xsens.latitude<<" lon: "<<xsens.longitude<<" alt: "<<xsens.altitude<<" timestamp: "<<xsens.GPStimestamp<<"\n";
         std::cout<<"MAG\tx: "<<xsens.magX<<" y: "<<xsens.magY<<" z: "<<xsens.magZ<<" timestamp: "<<xsens.MAGtimestamp<<"\n";
         std::cout<<"ACC\tx: "<<xsens.accX<<" y: "<<xsens.accY<<" z: "<<xsens.accZ<<" timestamp: "<<xsens.ACCtimestamp<<"\n";
