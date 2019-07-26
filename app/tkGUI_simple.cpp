@@ -8,7 +8,8 @@ class MyViewer : public tk::gui::Viewer {
         object3D_t carObj;
 
         tk::common::Tfpose tf = tk::common::Tfpose::Identity();
-        float angle;
+        float   angle;
+        int     speedometer_speed = 5.0;
         Eigen::MatrixXf *cloud = nullptr;
 
         bool show_demo_window = true;
@@ -27,7 +28,7 @@ class MyViewer : public tk::gui::Viewer {
 
         void draw() {
             tk::gui::Viewer::draw();
- 
+
             // Arrow
             tkSetColor(tk::gui::color::RED);
             tkDrawArrow(tk::common::Vector3<float>{0.0, 0.0, 3.0}, angle, 2.0);
@@ -85,15 +86,17 @@ class MyViewer : public tk::gui::Viewer {
                 glColor4f(1,1,1,1);
                 tkDrawTexture(hipertTex, 10);
             } glPopMatrix();
-
+            
             // draw 2D HUD
             tkViewport2D(width, height);
 
+            tkDrawSpeedometer(tk::common::Vector2<float>(-0.75, -0.75), speedometer_speed, 0.2);
+            
             glPushMatrix(); {
                 glTranslatef(0.7, -0.85, 0);
                 tkDrawTexture(hipertTex, 0.5);
             } glPopMatrix();
-           
+            
 
             glPushMatrix(); {
                 tkSetColor(tk::gui::color::LIME);
@@ -103,7 +106,8 @@ class MyViewer : public tk::gui::Viewer {
                                     tk::common::Vector3<float>{0, 0, 0},
                                     tk::common::Vector3<float>{0.02, 0.02, 0.0});
             } glPopMatrix();
-           
+
+                       
             // draw 2d GUI 1
             ImGui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
             if (show_demo_window)

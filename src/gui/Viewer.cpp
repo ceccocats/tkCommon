@@ -25,7 +25,7 @@ Viewer::init() {
     glfwInit();
 
     // Create a windowed mode window and its OpenGL context
-    window = glfwCreateWindow(1280, 720, windowName.c_str(), NULL, NULL);
+    window = glfwCreateWindow(800, 800, windowName.c_str(), NULL, NULL);
     if (!window) {
         glfwTerminate();
     }
@@ -582,6 +582,110 @@ Viewer::tkDrawRadarData(tk::data::RadarData_t *data, bool enable_near, bool enab
             }       
         }    
     }
+    glPopMatrix();
+}
+
+void
+Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float radius) {
+    glPushMatrix(); 
+
+    float diff_radius = 0.03;
+    float outer_radius = radius;
+    float inner_radius = radius - diff_radius;
+    
+    tk::common::Vector2<float> indicator_a, indicator_b, indicator_c, indicator_d;
+    float indicator_angle = speed * 3.6; 
+
+    tkSetColor(tk::gui::color::WHITE);
+
+    float D2R = 0.0174532;
+    
+    // outer circle
+    glLineWidth(1);
+	glBegin(GL_LINE_LOOP);
+	for (float angle = 0; angle < 360; angle += 5) {
+		glVertex2f(outer_radius * cos(angle*D2R) + pose.x, outer_radius * sin(angle*D2R) + pose.y);
+	}
+	glEnd();
+
+    // inner circle
+	glBegin(GL_LINE_STRIP);
+	glVertex2f((inner_radius + 0.005) * cos(-70 * D2R) + pose.x, (inner_radius + 0.005) * sin(-70 * D2R) + pose.y);
+	glVertex2f((outer_radius) * cos(-70 * D2R) + pose.x, (outer_radius) * sin(-70 * D2R) + pose.y);
+	for (float angle = 0 - 70; angle <= 320 - 70; angle += 5) {
+		glVertex2f(inner_radius * cos(angle*D2R) + pose.x, inner_radius * sin(angle*D2R) + pose.y);
+	}
+	glVertex2f((inner_radius + 0.005) * cos(250 * D2R) + pose.x, (inner_radius + 0.005) * sin(250 * D2R) + pose.y);
+	glVertex2f((outer_radius) * cos(250 * D2R) + pose.x, (outer_radius) * sin(250 * D2R) + pose.y);
+	glEnd();
+
+    // speed text lines
+	glBegin(GL_LINES);
+	for (float angle = 0 - 70; angle <= 320 - 70; angle += 20) {
+		glVertex2f(inner_radius * cos(angle*D2R) + pose.x, inner_radius * sin(angle*D2R) + pose.y);
+		glVertex2f((inner_radius - 0.02) * cos(angle*D2R) + pose.x, (inner_radius - 0.02) * sin(angle*D2R) + pose.y);
+	}
+	glEnd();
+
+    // speed 
+
+
+    // danger zone
+    tkSetColor(tk::gui::color::RED);
+    glLineWidth(4);
+	glBegin(GL_LINE_STRIP);
+	for (float angle = 320 - 30; angle <= 320 + 30; angle += 5) {
+		glVertex2f((inner_radius - 0.01) * cos(angle*D2R) + pose.x, (inner_radius - 0.01) * sin(angle*D2R) + pose.y);
+	}
+	glEnd();
+
+    // indicator
+    indicator_a.x = inner_radius * cos((250 + -indicator_angle) * D2R) + pose.x;
+	indicator_a.y = inner_radius * sin((250 + -indicator_angle) * D2R) + pose.y;
+	indicator_b.x = 0.01875 * cos((150 + -indicator_angle) * D2R) + pose.x;
+	indicator_b.y = 0.01875 * sin((150 + -indicator_angle) * D2R) + pose.y;
+	indicator_c.x = 0.025 * cos((70 + -indicator_angle) * D2R) + pose.x;
+	indicator_c.y = 0.025 * sin((70 + -indicator_angle) * D2R) + pose.y;
+	indicator_d.x = 0.01875 * cos((-10 + -indicator_angle) * D2R) + pose.x;
+	indicator_d.y = 0.01875 * sin((-10 + -indicator_angle) * D2R) + pose.y;
+
+    glBegin(GL_QUADS);
+	glVertex2f(indicator_a.x, indicator_a.y);
+	glVertex2f(indicator_b.x, indicator_b.y);
+	glVertex2f(indicator_c.x, indicator_c.y);
+	glVertex2f(indicator_d.x, indicator_d.y);
+	glEnd();
+
+	glLineWidth(3);
+	glColor3f(0.5, 0, 0);
+	glBegin(GL_LINE_LOOP);
+	glVertex2f(indicator_a.x, indicator_a.y);
+	glVertex2f(indicator_b.x, indicator_b.y);
+	glVertex2f(indicator_c.x, indicator_c.y);
+	glVertex2f(indicator_d.x, indicator_d.y);
+	glEnd();
+
+    // speed arc
+    tkSetColor(tk::gui::color::GREEN);
+	if (indicator_angle > 260)
+		tkSetColor(tk::gui::color::RED);
+	glLineWidth(4);
+	glBegin(GL_LINE_STRIP);
+	glVertex2f((radius - 0.0075) * cos(250 * D2R) + pose.x, (radius - 0.0075) * sin(250 * D2R) + pose.y);
+	glVertex2f((radius - 0.0225) * cos(250 * D2R) + pose.x, (radius - 0.0225) * sin(250 * D2R) + pose.y);
+	for (float a = 0; a <= indicator_angle; a += 5) {
+		glVertex2f((radius - 0.0225) * cos((250 + -a)*D2R) + pose.x, (radius - 0.0225) * sin((250 + -a)*D2R) + pose.y);
+	}
+	glVertex2f((radius - 0.0225) * cos((250 + -indicator_angle) * D2R) + pose.x, (radius - 0.0225) * sin((250 + -indicator_angle) * D2R) + pose.y);
+	glVertex2f((radius - 0.0075) * cos((250 + -indicator_angle) * D2R) + pose.x, (radius - 0.0075) * sin((250 + -indicator_angle) * D2R) + pose.y);
+	glEnd();
+	glBegin(GL_LINE_STRIP);
+	for (float a = 0; a <= indicator_angle; a++) {
+		glVertex2f((radius - 0.0075) * cos((250 + -a)*D2R) + pose.x, (radius - 0.0075) * sin((250 + -a)*D2R) + pose.y);
+	}
+	glEnd();
+
+
     glPopMatrix();
 }
 
