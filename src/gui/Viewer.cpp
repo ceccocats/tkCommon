@@ -294,15 +294,25 @@ Viewer::tkDrawAxis(float s) {
 }
 
 void 
-Viewer::tkDrawCircle(tk::common::Vector3<float> pose, float r, int res) {
-    glBegin(GL_LINE_LOOP);
-    for (int j = 0; j < res; j++)   {
+Viewer::tkDrawCircle(tk::common::Vector3<float> pose, float r, int res, bool filled) {
+
+    int res_1 = res;
+
+    if(filled) {
+        glBegin(GL_TRIANGLE_FAN);
+        glVertex3f(pose.x, pose.y, pose.z);
+        res_1++;
+    } else {
+        glBegin(GL_LINE_LOOP);
+    }
+    for (int j = 0; j < res_1; j++)   {
         float theta = 2.0f * 3.1415926f * float(j) / float(res);//get the current angle 
         float xr = r * cosf(theta);//calculate the x component 
-        float yr = r * sinf(theta);//calculate the y component 
+        float yr = r * sinf(theta);//calculate the y component
+
         glVertex3f(pose.x + xr, pose.y + yr, pose.z);//output vertex
     }
-    glEnd(); 
+    glEnd();
 }
 
 void 
@@ -605,7 +615,11 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
     
 
     float D2R = 0.0174532;
-    
+
+    Color_t col = tk::gui::color::DARK_GRAY; col.a = 185;
+    tkSetColor(col);
+    tkDrawCircle(tk::common::Vector3<float>{pose.x, pose.y, +0.2}, radius, 72, true);
+
     // outer circle
     tkSetColor(tk::gui::color::WHITE);
     glLineWidth(1);
@@ -721,6 +735,7 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
 
 
     glPopMatrix();
+    glLineWidth(1);
 }
 
 void 

@@ -45,7 +45,7 @@ namespace tk { namespace gui {
         static void tkSetColor(tk::gui::Color_t c);
         static void tkApplyTf(tk::common::Tfpose tf);
         static void tkDrawAxis(float s = 1.0);
-        static void tkDrawCircle(tk::common::Vector3<float> pose, float r, int res = 20);
+        static void tkDrawCircle(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = false);
         static void tkDrawSphere(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = true);
         static void tkDrawCloud(Eigen::MatrixXf *data);
         static void tkDrawCloudFeatures(Eigen::MatrixXf *points, tk::common::MatrixXu8 *features, int idx);
