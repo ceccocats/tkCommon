@@ -594,13 +594,14 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
     float inner_radius = radius - diff_radius;
     
     tk::common::Vector2<float> indicator_a, indicator_b, indicator_c, indicator_d;
-    float indicator_angle = speed * 3.6; 
+    int indicator_angle = int(speed * 3.6); 
 
-    tkSetColor(tk::gui::color::WHITE);
+    
 
     float D2R = 0.0174532;
     
     // outer circle
+    tkSetColor(tk::gui::color::WHITE);
     glLineWidth(1);
 	glBegin(GL_LINE_LOOP);
 	for (float angle = 0; angle < 360; angle += 5) {
@@ -609,6 +610,7 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
 	glEnd();
 
     // inner circle
+    tkSetColor(tk::gui::color::WHITE);
 	glBegin(GL_LINE_STRIP);
 	glVertex2f((inner_radius + 0.005) * cos(-70 * D2R) + pose.x, (inner_radius + 0.005) * sin(-70 * D2R) + pose.y);
 	glVertex2f((outer_radius) * cos(-70 * D2R) + pose.x, (outer_radius) * sin(-70 * D2R) + pose.y);
@@ -620,6 +622,7 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
 	glEnd();
 
     // speed text lines
+    tkSetColor(tk::gui::color::WHITE);
 	glBegin(GL_LINES);
 	for (float angle = 0 - 70; angle <= 320 - 70; angle += 20) {
 		glVertex2f(inner_radius * cos(angle*D2R) + pose.x, inner_radius * sin(angle*D2R) + pose.y);
@@ -627,8 +630,30 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
 	}
 	glEnd();
 
-    // speed 
+    // speed text
+    /*
+    std::string speedText;
+    for (float angle = 0 - 70; angle <= 320 - 70; angle += 20) {
+        float x, y, z;
 
+        x = (radius - 0.36) * cos(angle*D2R) + pose.x;
+        y = (radius - 0.36) * sin(angle*D2R) + pose.y;
+        z = 0;
+        speedText = std::to_string(int(-1 * (angle - 250)));
+        tkDrawText(speedText, tk::common::Vector3<float>{x, y, z},
+                              tk::common::Vector3<float>{0, 0, 0},
+                              tk::common::Vector3<float>{0.02, 0.02, 0.0});
+	}
+    */
+    tkSetColor(tk::gui::color::YELLOW);
+    char speedStr[256];
+    sprintf(speedStr, "%.2f", speed);
+    tkDrawText(speedStr, tk::common::Vector3<float>{pose.x, pose.y - 0.08, 0},
+                         tk::common::Vector3<float>{0, 0, 0},
+                         tk::common::Vector3<float>{0.02, 0.02, 0.0});
+    tkDrawText("m/s", tk::common::Vector3<float>{pose.x, pose.y - 0.12, 0},
+                      tk::common::Vector3<float>{0, 0, 0},
+                      tk::common::Vector3<float>{0.02, 0.02, 0.0});
 
     // danger zone
     tkSetColor(tk::gui::color::RED);
@@ -664,6 +689,9 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
 	glVertex2f(indicator_c.x, indicator_c.y);
 	glVertex2f(indicator_d.x, indicator_d.y);
 	glEnd();
+
+    tkSetColor(tk::gui::color::BLACK);
+    tkDrawSphere(tk::common::Vector3<float>{pose.x, pose.y, 0}, 0.01);
 
     // speed arc
     tkSetColor(tk::gui::color::GREEN);

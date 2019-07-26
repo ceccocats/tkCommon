@@ -93,6 +93,7 @@ class MyViewer : public tk::gui::Viewer {
             tkDrawSpeedometer(tk::common::Vector2<float>(-0.75, -0.75), speedometer_speed, 0.2);
             
             glPushMatrix(); {
+                tkSetColor(tk::gui::color::WHITE);
                 glTranslatef(0.7, -0.85, 0);
                 tkDrawTexture(hipertTex, 0.5);
             } glPopMatrix();
@@ -118,6 +119,7 @@ class MyViewer : public tk::gui::Viewer {
 
         void setCloud(Eigen::MatrixXf *cloud) { this->cloud = cloud; }
         void setAngle(float angle) { this->angle = angle; tf = tk::common::odom2tf(0, 0, angle); }
+        void setSpeed(float speed) { this->speedometer_speed = speed; }
 
 };
 
@@ -133,11 +135,25 @@ void sig_handler(int signo) {
 void *update_th(void *data) {
 
     float angle = 0;
+    float speed = 0;
+    bool  speedUP = true;
 
     LoopRate rate(10000, "UPDATE");
     while(gRun){
         angle += M_PI/100;
+
+        if (speedUP) {
+            speed += 0.5;
+            if (speed >= 88.0)
+                speedUP = false;
+        } else {
+            speed -= 0.5;
+            if (speed <= 0)
+                speedUP = true;
+        }
+
         viewer->setAngle(angle);
+        viewer->setSpeed(speed);
         rate.wait();
     }
 }
