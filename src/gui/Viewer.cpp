@@ -553,6 +553,12 @@ Viewer::tkDrawText(std::string text, tk::common::Vector3<float> pose, tk::common
     glPopMatrix();
 }
 
+void
+Viewer::tkDrawText(std::string text, void* font, tk::common::Vector3<float> pose) {
+    
+    
+}
+
 void 
 Viewer::tkDrawRadarData(tk::data::RadarData_t *data, bool enable_near, bool enable_far) {
     glPushMatrix(); 
@@ -594,7 +600,7 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
     float inner_radius = radius - diff_radius;
     
     tk::common::Vector2<float> indicator_a, indicator_b, indicator_c, indicator_d;
-    int indicator_angle = int(speed * 3.6); 
+    float indicator_angle = float(speed * 3.6); 
 
     
 

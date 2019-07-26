@@ -9,7 +9,7 @@ class MyViewer : public tk::gui::Viewer {
 
         tk::common::Tfpose tf = tk::common::Tfpose::Identity();
         float   angle;
-        int     speedometer_speed = 5.0;
+        float   speedometer_speed = 5.0;
         Eigen::MatrixXf *cloud = nullptr;
 
         bool show_demo_window = true;
@@ -143,11 +143,11 @@ void *update_th(void *data) {
         angle += M_PI/100;
 
         if (speedUP) {
-            speed += 0.5;
+            speed += 0.01;
             if (speed >= 88.0)
                 speedUP = false;
         } else {
-            speed -= 0.5;
+            speed -= 0.01;
             if (speed <= 0)
                 speedUP = true;
         }
