@@ -2,6 +2,7 @@
 #include "tkCommon/gui/OBJ_Loader.h"
 
 using namespace tk::gui;
+bool            Viewer::keys[MAX_KEYS];
 MouseView3D     Viewer::mouseView;
 GLUquadric*     Viewer::quadric;
 
@@ -19,6 +20,9 @@ Viewer::~Viewer() {
 
 void 
 Viewer::init() {
+    for(int i=0; i<MAX_KEYS; i++)
+        Viewer::keys[i] = false;
+
     Viewer::quadric = gluNewQuadric();
 
     glfwSetErrorCallback(errorCallback);
@@ -760,6 +764,13 @@ void
 Viewer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    if (key < MAX_KEYS) {
+        if(action == GLFW_PRESS)
+            keys[key] = true;
+        if(action == GLFW_RELEASE)
+            keys[key] = false;
+    }
 }
 
 

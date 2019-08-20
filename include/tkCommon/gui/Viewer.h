@@ -76,6 +76,8 @@ namespace tk { namespace gui {
     
         int                     width, height;
         static MouseView3D      mouseView;
+        static const int        MAX_KEYS = 1024;
+        static bool             keys[MAX_KEYS];
         static std::vector<tk::gui::Color_t> colors;
 
     private:
