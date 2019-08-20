@@ -31,9 +31,9 @@ public:
         init
         @param waypoints x, y
     */
-    bool init(std::vector<Vector2f> waypoints);
+    bool init(std::vector<tk::common::Vector2<float>> waypoints);
 
-    Vector2f calc_position(double s);
+    tk::common::Vector2<float> calc_position(double s);
 
     double calc_curvature(double s);
 

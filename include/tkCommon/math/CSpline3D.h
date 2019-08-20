@@ -27,9 +27,9 @@ public:
         init
         @param waypoints x, y, z
     */
-    bool init(std::vector<Vector3f> waypoints);
+    bool init(std::vector<tk::common::Vector3<float>> waypoints);
 
-    Vector3f calc_position(double s);
+    tk::common::Vector3<float> calc_position(double s);
 
 private:
     /**

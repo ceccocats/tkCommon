@@ -2,6 +2,7 @@
 #undef Success  // stupid X11
 #include "Eigen/Dense"
 using namespace Eigen;
+#include "tkCommon/common.h"
 
 namespace tk { namespace  math {
 
@@ -17,7 +18,7 @@ public:
 
     int nx;     // number of x waypoints
     VectorXd h; // diff beetween consecutive x
-    VectorXd a, b, c, d, w;
+    VectorXd a, b, c, d;
     MatrixXd A;
     VectorXd B;
 

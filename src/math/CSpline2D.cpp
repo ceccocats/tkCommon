@@ -7,7 +7,7 @@ CSpline2D::CSpline2D() {}
 
 CSpline2D::~CSpline2D() {}
 
-bool CSpline2D::init(std::vector<Vector2f> waypoints) {
+bool CSpline2D::init(std::vector<tk::common::Vector2<float>> waypoints) {
 
     // number of x waypoints
     nx = waypoints.size();
@@ -15,8 +15,8 @@ bool CSpline2D::init(std::vector<Vector2f> waypoints) {
     x = VectorXd(nx);
     y = VectorXd(nx);
     for (int i = 0; i < nx; i++) {
-        x(i) = waypoints[i].x();
-        y(i) = waypoints[i].y();
+        x(i) = waypoints[i].x;
+        y(i) = waypoints[i].y;
     }
 
     s = calc_s();
@@ -54,11 +54,11 @@ VectorXd CSpline2D::calc_s() {
 }
 
 
-Vector2f CSpline2D::calc_position(double s) {
+tk::common::Vector2<float> CSpline2D::calc_position(double s) {
 
-    Vector2f p;
-    p.x() = sx.calc(s);
-    p.y() = sy.calc(s);
+    tk::common::Vector2<float> p;
+    p.x = sx.calc(s);
+    p.y = sy.calc(s);
     return p;
 }
 

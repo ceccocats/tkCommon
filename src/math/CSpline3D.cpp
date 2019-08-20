@@ -7,7 +7,7 @@ CSpline3D::CSpline3D() {}
 
 CSpline3D::~CSpline3D() {}
 
-bool CSpline3D::init(std::vector<Vector3f> waypoints) {
+bool CSpline3D::init(std::vector<tk::common::Vector3<float>> waypoints) {
 
     // number of x waypoints
     nx = waypoints.size();
@@ -16,9 +16,9 @@ bool CSpline3D::init(std::vector<Vector3f> waypoints) {
     y = VectorXd(nx);
     z = VectorXd(nx);
     for (int i = 0; i < nx; i++) {
-        x(i) = waypoints[i].x();
-        y(i) = waypoints[i].y();
-        z(i) = waypoints[i].z();
+        x(i) = waypoints[i].x;
+        y(i) = waypoints[i].y;
+        z(i) = waypoints[i].z;
     }
 
     s = calc_s();
@@ -62,12 +62,12 @@ VectorXd CSpline3D::calc_s() {
     return s;
 }
 
-Vector3f CSpline3D::calc_position(double s) {
+tk::common::Vector3<float> CSpline3D::calc_position(double s) {
 
-    Vector3f p;
-    p.x() = sx.calc(s);
-    p.y() = sy.calc(s);
-    p.z() = sz.calc(s);
+    tk::common::Vector3<float> p;
+    p.x = sx.calc(s);
+    p.y = sy.calc(s);
+    p.z = sz.calc(s);
     return p;
 }
 
