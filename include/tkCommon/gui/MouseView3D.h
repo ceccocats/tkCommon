@@ -73,6 +73,14 @@ class MouseView3D
 
     bool mouseOnGUI;
 
+
+    bool getMouseLeft() {
+        return m_mouseLeft;
+    }
+    bool getMouseRight() {
+        return m_mouseRight;
+    }
+
   private:
     Eigen::Matrix4f m_modelView;
     Eigen::Matrix4f m_projection;

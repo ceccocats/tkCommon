@@ -495,6 +495,12 @@ void Viewer::tkDrawLine(std::vector<tk::common::Vector3<float>> poses) {
     glEnd();
 }
 
+void Viewer::tkDrawPoses(std::vector<tk::common::Vector3<float>> poses, tk::common::Vector3<float> size) {
+    for(unsigned int i=0; i<poses.size(); i++) {
+        tkDrawCube(poses[i], size);
+    }
+}
+
 void 
 Viewer::tkDrawObject3D(object3D_t *obj, float size, bool textured) {
 

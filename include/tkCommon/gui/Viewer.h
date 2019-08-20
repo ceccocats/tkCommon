@@ -54,6 +54,7 @@ namespace tk { namespace gui {
         static void tkDrawRectangle(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
         static void tkDrawLine(tk::common::Vector3<float> p0, tk::common::Vector3<float> p1);
         static void tkDrawLine(std::vector<tk::common::Vector3<float>> poses);
+        static void tkDrawPoses(std::vector<tk::common::Vector3<float>> poses, tk::common::Vector3<float> size = tk::common::Vector3<float>{0.2, 0.2, 0.2});
         static void tkDrawObject3D(object3D_t *obj, float size = 1.0, bool textured = false);
         static void tkDrawTexture(GLuint tex, float s);
         static void tkDrawText(std::string text, tk::common::Vector3<float> pose, 
