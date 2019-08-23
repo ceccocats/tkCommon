@@ -151,6 +151,13 @@ namespace tk { namespace common {
 
             ~Vector3() {}
 
+            T dist(Vector3<T> v) {
+                T dx = x-v.x;
+                T dy = y-v.y;
+                T dz = z-v.z;
+                return sqrt(dx*dx + dy*dy + dz*dz);
+            }
+
             /**
              * override ostream for a nice print
              * @param os
