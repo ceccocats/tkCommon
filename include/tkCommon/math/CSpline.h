@@ -16,11 +16,10 @@ public:
     // waypoints
     VectorXd x, y;
 
-    int nx;     // number of x waypoints
+    int n;      // number of x waypoints
     VectorXd h; // diff beetween consecutive x
     VectorXd a, b, c, d;
-    MatrixXd A;
-    VectorXd B;
+
 
     CSpline();
 

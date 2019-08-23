@@ -12,26 +12,61 @@ namespace tk { namespace  math {
         y = _y;
 
         // number of x waypoints
-        nx = x.size();
+        n = x.size();
 
-        // build diff vector
-        h = VectorXd(nx - 1);
-        for (int i = 0; i < nx - 1; i++)
-            h(i) = x(i + 1) - x(i);
+        // init coeffs
+        h = VectorXd(n - 1);
+        a = VectorXd(n - 1);
+        b = VectorXd(n - 1);
+        c = VectorXd(n - 1);
+        d = VectorXd(n - 1);
 
-        // calc coefficient c
-        a = y;
-        A = calc_A(h);
-        B = calc_B(h);
-        c = A.colPivHouseholderQr().solve(B);
+        VectorXd F = VectorXd(n);
+        MatrixXd m = MatrixXd::Zero(n, n);
+        VectorXd s = VectorXd::Zero(n);
+
+        for(int i=n-1; i>0; i--){
+            h(i-1) = x(i)-x(i-1);
+
+            // avoid NAN
+            if(h(i-1) == 0)
+                F(i) = 0;
+            else
+                F(i)  = (y(i)-y(i-1))/(h(i-1));
+        }
+
+        // formation of h, s , f matrix
+        for(int i=1; i<n-1; i++){
+            m(i,i) = 2*(h(i-1)+h(i));
+            if(i!=1){
+                m(i,  i-1) = h(i-1);
+                m(i-1,i  ) = h(i-1);
+            }
+            m(i,n-1) = 6*(F(i+1)-F(i));
+        }
+
+        // forward elimination
+        for(int i=1; i<n-2; i++){
+            double temp = (m(i+1, i)/m(i,i));
+            for(int j=1; j<=n-1; j++)
+                m(i+1,j) -= temp*m(i,j);
+        }
+
+        // backward substitution
+        for(int i=n-2; i>0; i--){
+            double accum =0;
+            for(int j=i; j<=n-2; j++) {
+                accum += m(i, j) * s(j);
+            }
+            s(i)=(m(i,n-1)-accum)/m(i,i);
+        }
 
         // calc spline coefficient b and d
-        d = VectorXd(nx - 1);
-        b = VectorXd(nx - 1);
-        for (int i = 0; i < nx - 1; i++) {
-            d(i) = (c(i + 1) - c(i)) / (3.0 * h(i));
-            double tb = (a(i + 1) - a(i)) / h(i) - h(i) * (c(i + 1) + 2.0 * c(i)) / 3.0;
-            b(i) = tb;
+        for (int i = 0; i < n - 1; i++) {
+            d(i) = (s(i+1)-s(i))/(6*h(i));
+            c(i) = s(i)/2;
+            b(i) = (y(i+1)-y(i))/h(i)-(2*h(i)*s(i)+s(i+1)*h(i))/6;
+            a(i) = y(i);
         }
 
         return true;
@@ -63,39 +98,14 @@ namespace tk { namespace  math {
 
     int CSpline::search_index(double sx) {
 
-        for (int i = 1; i < nx - 1; i++) {
+        for (int i = 1; i < n - 1; i++) {
             if (sx < x(i))
                 return i - 1;
         }
-        if (nx > 1)
-            return nx - 2;
+        if (n > 1)
+            return n - 2;
         return 0;
     }
 
-    MatrixXd CSpline::calc_A(VectorXd h) {
-
-        A = MatrixXd::Zero(nx, nx);
-        A(0, 0) = 1.0;
-        for (int i = 0; i < nx - 1; i++) {
-            if (i != nx - 2)
-                A(i + 1, i + 1) = 2.0 * (h(i) + h(i + 1));
-            A(i + 1, i) = h(i);
-            A(i, i + 1) = h(i);
-        }
-
-        A(0, 1) = 0.0;
-        A(nx - 1, nx - 2) = 0.0;
-        A(nx - 1, nx - 1) = 1.0;
-        return A;
-    }
-
-    VectorXd CSpline::calc_B(VectorXd h) {
-
-        B = VectorXd::Zero(nx);
-        for (int i = 0; i < nx - 2; i++) {
-            B(i + 1) = 3.0 * (a(i + 2) - a(i + 1)) / h(i + 1) - 3.0 * (a(i + 1) - a(i)) / h(i);
-        }
-        return B;
-    }
 
 }}
