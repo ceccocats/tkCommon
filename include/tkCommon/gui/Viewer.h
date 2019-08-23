@@ -74,7 +74,7 @@ namespace tk { namespace gui {
 
         bool isRunning() {return !glfwWindowShouldClose(window);};
     
-        int                     width, height;
+        int                     width = 800, height = 800;
         static MouseView3D      mouseView;
         static const int        MAX_KEYS = 1024;
         static bool             keys[MAX_KEYS];
