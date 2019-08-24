@@ -504,24 +504,25 @@ namespace tk { namespace common {
         return os;
     }
 
-    inline bool serializeMatrix(Eigen::MatrixXf &m, std::ofstream &os) {
+    template <class T>
+    inline bool serializeMatrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &m, std::ofstream &os) {
         int size[2];
         size[0] = m.rows();
         size[1] = m.cols();
         std::cout<<"Matrix serialize: ("<<size[0]<<"x"<<size[1]<<")";
 
         os.write((char *)size, 2*sizeof(int));
-        os.write((char *)m.data(), m.size() * sizeof(float));
+        os.write((char *)m.data(), m.size() * sizeof(T));
         return os.is_open();
     }
 
-
-    inline bool deserializeMatrix(Eigen::MatrixXf &m, std::ifstream &is) {
+    template <class T>
+    inline bool deserializeMatrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &m, std::ifstream &is) {
         int size[2] = { 0, 0 };
         is.read((char*)size, 2*sizeof(int));
         std::cout<<"Matrix deserialize: ("<<size[0]<<"x"<<size[1]<<")";
         m.resize(size[0], size[1]);
-        is.read((char *)m.data(), m.size() * sizeof(float));
+        is.read((char *)m.data(), m.size() * sizeof(T));
         return is.is_open();
     }
 
