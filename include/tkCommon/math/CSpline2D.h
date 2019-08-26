@@ -33,7 +33,7 @@ public:
     */
     bool init(std::vector<tk::common::Vector2<float>> waypoints);
 
-    tk::common::Vector2<float> calc_position(double s);
+    tk::common::Vector2<float> calc_position(double s, double d=0);
 
     double calc_curvature(double s);
 

@@ -29,7 +29,7 @@ public:
     */
     bool init(std::vector<tk::common::Vector3<float>> waypoints);
 
-    tk::common::Vector3<float> calc_position(double s);
+    tk::common::Vector3<float> calc_position(double s, double d=0);
 
 private:
     /**

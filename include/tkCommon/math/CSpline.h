@@ -52,17 +52,6 @@ public:
         search data segment index
     */
     int search_index(double x);
-
-private:
-    /**
-        calc matrix A for spline coefficient c
-    */
-    MatrixXd calc_A(VectorXd h);
-
-    /**
-        calc matrix B for spline coefficient c
-    */
-    VectorXd calc_B(VectorXd h);
 };
 
 }}

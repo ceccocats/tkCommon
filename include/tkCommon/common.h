@@ -504,8 +504,8 @@ namespace tk { namespace common {
         return os;
     }
 
-    template <class T>
-    inline bool serializeMatrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &m, std::ofstream &os) {
+    template <class T, int R=-1, int C=-1>
+    inline bool serializeMatrix(Eigen::Matrix<T, R, C> &m, std::ofstream &os) {
         int size[2];
         size[0] = m.rows();
         size[1] = m.cols();
@@ -516,8 +516,8 @@ namespace tk { namespace common {
         return os.is_open();
     }
 
-    template <class T>
-    inline bool deserializeMatrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> &m, std::ifstream &is) {
+    template <class T, int R=-1, int C=-1>
+    inline bool deserializeMatrix(Eigen::Matrix<T, R, C> &m, std::ifstream &is) {
         int size[2] = { 0, 0 };
         is.read((char*)size, 2*sizeof(int));
         std::cout<<"Matrix deserialize: ("<<size[0]<<"x"<<size[1]<<")";

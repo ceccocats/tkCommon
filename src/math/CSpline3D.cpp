@@ -62,12 +62,24 @@ VectorXd CSpline3D::calc_s() {
     return s;
 }
 
-tk::common::Vector3<float> CSpline3D::calc_position(double s) {
+tk::common::Vector3<float> CSpline3D::calc_position(double s, double d) {
 
     tk::common::Vector3<float> p;
-    p.x = sx.calc(s);
-    p.y = sy.calc(s);
-    p.z = sz.calc(s);
+
+    if(d!=0) {
+        double yaw = calc_yaw(s);
+        double sin_yaw = sin(yaw);
+        double cos_yaw = cos(yaw);
+        double x = 0;
+        double y = d;
+        p.x = x*cos_yaw - y*sin_yaw;
+        p.y = x*sin_yaw + y*cos_yaw;
+        p.z = 0;
+    }
+
+    p.x += sx.calc(s);
+    p.y += sy.calc(s);
+    p.z += sz.calc(s);
     return p;
 }
 
