@@ -63,7 +63,7 @@ tk::common::Vector2<float> CSpline2D::calc_position(double s, double d) {
         double sin_yaw = sin(yaw);
         double cos_yaw = cos(yaw);
         double x = 0;
-        double y = d;
+        double y = -d;
         p.x = x*cos_yaw - y*sin_yaw;
         p.y = x*sin_yaw + y*cos_yaw;
     }

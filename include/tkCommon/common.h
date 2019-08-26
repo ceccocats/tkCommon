@@ -151,6 +151,13 @@ namespace tk { namespace common {
 
             ~Vector3() {}
 
+            T dist2(Vector3<T> v) {
+                T dx = x-v.x;
+                T dy = y-v.y;
+                T dz = z-v.z;
+                return dx*dx + dy*dy + dz*dz;
+            }
+
             T dist(Vector3<T> v) {
                 T dx = x-v.x;
                 T dy = y-v.y;
