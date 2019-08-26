@@ -411,6 +411,15 @@ namespace tk { namespace common {
         return out;
     }
 
+    /**
+     * project 2d point to 3d point
+     * @param p_mat projection matrix
+     * @param v_mat model view matrix
+     * @param screenW
+     * @param screenH
+     * @param pos expressed as (x, y, zplane)
+     * @return 3d point
+     */
     inline Eigen::Vector3f unproj_3d(Eigen::Matrix4f p_mat, Eigen::Matrix4f v_mat,
                                      float screenW, float screenH, Eigen::Vector3f pos) {
 
@@ -445,6 +454,15 @@ namespace tk { namespace common {
     }
 
 
+    /**
+     * Project 3d point to 2d screen coordinate
+     * @param p_mat projection matrix
+     * @param v_mat model view matrix
+     * @param screenW
+     * @param screenH
+     * @param pos expressed as (x, y, z, 1)
+     * @return 2d screen position
+     */
     inline Eigen::Vector2f proj_2d(Eigen::Matrix4f p_mat, Eigen::Matrix4f v_mat,
                                    float screenW, float screenH, Eigen::Vector4f pos) {
 
@@ -460,6 +478,14 @@ namespace tk { namespace common {
     }
 
 
+    /**
+     * dump memory as hexdump
+     * @param os
+     * @param buffer
+     * @param bufsize
+     * @param showPrintableChars
+     * @return
+     */
     inline std::ostream& hex_dump(std::ostream& os, const void *buffer,
                                   std::size_t bufsize, bool showPrintableChars = true) {
         if (buffer == nullptr) {
@@ -504,6 +530,15 @@ namespace tk { namespace common {
         return os;
     }
 
+    /**
+     * Serialize an eigen matrix in binary
+     * @tparam T data type
+     * @tparam R number of rows (-1 is dynamic)
+     * @tparam C number of cols (-1 is dynamic)
+     * @param m
+     * @param os
+     * @return
+     */
     template <class T, int R=-1, int C=-1>
     inline bool serializeMatrix(Eigen::Matrix<T, R, C> &m, std::ofstream &os) {
         int size[2];
@@ -516,6 +551,15 @@ namespace tk { namespace common {
         return os.is_open();
     }
 
+    /**
+     * Deserialize an eigen matrix in binary
+     * @tparam T data type
+     * @tparam R number of rows (-1 is dynamic)
+     * @tparam C number of cols (-1 is dynamic)
+     * @param m
+     * @param os
+     * @return
+     */
     template <class T, int R=-1, int C=-1>
     inline bool deserializeMatrix(Eigen::Matrix<T, R, C> &m, std::ifstream &is) {
         int size[2] = { 0, 0 };
@@ -526,4 +570,30 @@ namespace tk { namespace common {
         return is.is_open();
     }
 
+    /**
+     * Tell if point c is on the left side respect to the segment a - b
+     * @tparam T
+     * @param a
+     * @param b
+     * @param c
+     * @return
+     */
+    template <class T>
+    bool pointIsleft(tk::common::Vector2<T> a, tk::common::Vector2<T> b, tk::common::Vector2<T> c) {
+        return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
+    }
+
+    /**
+     * Tell if point c is on the left side respect to the segment a - b
+     * It is a 2d computation even with vector3
+     * @tparam T
+     * @param a
+     * @param b
+     * @param c
+     * @return
+     */
+    template <class T>
+    bool pointIsleft(tk::common::Vector3<T> a, tk::common::Vector3<T> b, tk::common::Vector3<T> c) {
+        return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
+    }
 }}
