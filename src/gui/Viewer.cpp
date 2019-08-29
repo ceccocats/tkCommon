@@ -223,7 +223,7 @@ int
 Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
 
     int error = 0;
-    std::cout<<"loading "<<filename<<".obj    ";
+    std::cout<<"loading "<<filename<<".obj";
     
     // correct locale dependent stof
     std::setlocale(LC_ALL, "C");
