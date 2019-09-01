@@ -81,6 +81,8 @@ namespace tk { namespace gui {
         static std::vector<tk::gui::Color_t> colors;
 
         // font
+        static int TK_FONT_SIZE;
+        std::string fontPath = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf";
         struct dtx_font *font;
 
     private:

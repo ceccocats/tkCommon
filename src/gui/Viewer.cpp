@@ -10,10 +10,7 @@ std::vector<Color_t> tk::gui::Viewer::colors = std::vector<Color_t>{color::RED, 
                                                                     color::BLUE, color::YELLOW, 
                                                                     color::WHITE, color::ORANGE
                                                                     };
-
-const int TK_FONT_SIZE = 256;
-const char TK_DEFAULT_FONT[] = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf";
-
+int Viewer::TK_FONT_SIZE = 256;
 
 Viewer::Viewer() {
 }
@@ -78,8 +75,8 @@ Viewer::init() {
 
 
         /* XXX dtx_open_font opens a font file and returns a pointer to dtx_font */
-        if(!(font = dtx_open_font(TK_DEFAULT_FONT, TK_FONT_SIZE))) {
-            std::cout<<"failed to open font: "<<TK_DEFAULT_FONT<<"\n";
+        if(!(font = dtx_open_font(fontPath.c_str(), TK_FONT_SIZE))) {
+            std::cout<<"failed to open font: "<<fontPath<<"\n";
             exit(1);
         }
         /* XXX select the font and size to render with by calling dtx_use_font
