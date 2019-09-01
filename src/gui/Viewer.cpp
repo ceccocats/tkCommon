@@ -551,18 +551,18 @@ Viewer::tkDrawObject3D(object3D_t *obj, float size, bool textured) {
 
 void Viewer::tkDrawTexture(GLuint tex, float sx, float sy) {
 
-    float i = -sy/2;
-    float j = +sx/2;
+    float i = -1;
+    float j = +1;
 
     glBindTexture(GL_TEXTURE_2D, tex);
     glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
 
     // 2d draw
-    glTexCoord2f(0, 1); glVertex3f(i, i, 0);
-    glTexCoord2f(0, 0); glVertex3f(i, j, 0);
-    glTexCoord2f(1, 0); glVertex3f(j, j, 0);
-    glTexCoord2f(1, 1); glVertex3f(j, i, 0);
+    glTexCoord2f(0, 1); glVertex3f(i*(sy/2), i*(sx/2), 0);
+    glTexCoord2f(0, 0); glVertex3f(i*(sy/2), j*(sx/2), 0);
+    glTexCoord2f(1, 0); glVertex3f(j*(sy/2), j*(sx/2), 0);
+    glTexCoord2f(1, 1); glVertex3f(j*(sy/2), i*(sx/2), 0);
 
 
     glEnd();
