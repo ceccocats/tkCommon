@@ -551,8 +551,8 @@ Viewer::tkDrawObject3D(object3D_t *obj, float size, bool textured) {
 
 void Viewer::tkDrawTexture(GLuint tex, float sx, float sy) {
 
-    float i = -sx/2;
-    float j = +sy/2;
+    float i = -sy/2;
+    float j = +sx/2;
 
     glBindTexture(GL_TEXTURE_2D, tex);
     glEnable(GL_TEXTURE_2D);
