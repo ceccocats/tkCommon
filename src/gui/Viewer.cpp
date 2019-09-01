@@ -549,10 +549,10 @@ Viewer::tkDrawObject3D(object3D_t *obj, float size, bool textured) {
     glPopMatrix();
 }
 
-void Viewer::tkDrawTexture(GLuint tex, float s) {
+void Viewer::tkDrawTexture(GLuint tex, float sx, float sy) {
 
-    float i = -s/2;
-    float j = +s/2;
+    float i = -sx/2;
+    float j = +sy/2;
 
     glBindTexture(GL_TEXTURE_2D, tex);
     glEnable(GL_TEXTURE_2D);

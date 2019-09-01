@@ -84,7 +84,7 @@ class MyViewer : public tk::gui::Viewer {
             glPushMatrix(); {
                 glTranslatef(0, -4, 0);
                 glColor4f(1,1,1,1);
-                tkDrawTexture(hipertTex, 10);
+                tkDrawTexture(hipertTex, 10, 10);
             } glPopMatrix();
             
             // draw 2D HUD
@@ -95,7 +95,7 @@ class MyViewer : public tk::gui::Viewer {
             glPushMatrix(); {
                 tkSetColor(tk::gui::color::WHITE);
                 glTranslatef(0.7, -0.85, 0);
-                tkDrawTexture(hipertTex, 0.5);
+                tkDrawTexture(hipertTex, 0.5, 0.5);
             } glPopMatrix();
             
 
