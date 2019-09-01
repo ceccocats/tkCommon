@@ -15,6 +15,7 @@
 
 #include "tkCommon/data/RadarData.h"
 
+#include "tkCommon/gui/libdrawtext/drawtext.h"
 
 
 namespace tk { namespace gui {
@@ -57,10 +58,9 @@ namespace tk { namespace gui {
         static void tkDrawPoses(std::vector<tk::common::Vector3<float>> poses, tk::common::Vector3<float> size = tk::common::Vector3<float>{0.2, 0.2, 0.2});
         static void tkDrawObject3D(object3D_t *obj, float size = 1.0, bool textured = false);
         static void tkDrawTexture(GLuint tex, float s);
-        static void tkDrawText(std::string text, tk::common::Vector3<float> pose, 
-                               tk::common::Vector3<float> rot = tk::common::Vector3<float>{0.0, 0.0, 0.0}, 
-                               tk::common::Vector3<float> scale = tk::common::Vector3<float>{1.0, 1.0, 1.0});
-        static void tkDrawText(std::string text, void* font, tk::common::Vector3<float> pose);
+        static void tkDrawText(std::string text, tk::common::Vector3<float> pose,
+                           tk::common::Vector3<float> rot = tk::common::Vector3<float>{0.0, 0.0, 0.0},
+                           tk::common::Vector3<float> scale = tk::common::Vector3<float>{1.0, 1.0, 1.0});
         static void tkRainbowColor(float hue, uint8_t &r, uint8_t &g, uint8_t &b);
         static void tkSetRainbowColor(float hue);
         static void tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float radius);
@@ -80,6 +80,9 @@ namespace tk { namespace gui {
         static bool             keys[MAX_KEYS];
         static std::vector<tk::gui::Color_t> colors;
 
+        // font
+        struct dtx_font *font;
+
     private:
         std::string             windowName;
         Color_t                 background = tk::gui::color::DARK_GRAY;
@@ -87,7 +90,6 @@ namespace tk { namespace gui {
         GLFWwindow*             window;
         static GLUquadric*      quadric;
 
-        // font
 
         const char*             glsl_version = "#version 130";
 
