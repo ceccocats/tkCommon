@@ -138,7 +138,8 @@ void Viewer::mouse_button_callback(GLFWwindow* window, int button, int action, i
 
 void 
 Viewer::run() {
-    LoopRate rate((1e6/30), "VIZ_UPDATE");
+    timeStamp_t VIZ_DT_US = dt*1e6;
+    LoopRate rate((VIZ_DT_US), "VIZ_UPDATE");
     while (!glfwWindowShouldClose(window)) {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

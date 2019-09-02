@@ -80,6 +80,8 @@ namespace tk { namespace gui {
         static bool             keys[MAX_KEYS];
         static std::vector<tk::gui::Color_t> colors;
 
+        double dt = 1.0/30;
+
         // font
         static int TK_FONT_SIZE;
         std::string fontPath = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf";
