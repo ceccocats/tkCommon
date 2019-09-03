@@ -49,7 +49,7 @@ class MyViewer : public tk::gui::Viewer {
    
             // text
             tkSetColor(tk::gui::color::LIME);
-            tkDrawText("tkGUI", tk::common::Vector3<float>{-5*2.2, 10.0, 0.0}, 
+            tkDrawText("tkGUI", tk::common::Vector3<float>{-5, 10.0, 0.0},
                                 tk::common::Vector3<float>{M_PI/2, 0, 0},
                                 tk::common::Vector3<float>{5.0, 5.0, 5.0});
 
@@ -84,7 +84,7 @@ class MyViewer : public tk::gui::Viewer {
             glPushMatrix(); {
                 glTranslatef(0, -4, 0);
                 glColor4f(1,1,1,1);
-                tkDrawTexture(hipertTex, 10);
+                tkDrawTexture(hipertTex, 10, 10);
             } glPopMatrix();
             
             // draw 2D HUD
@@ -95,7 +95,7 @@ class MyViewer : public tk::gui::Viewer {
             glPushMatrix(); {
                 tkSetColor(tk::gui::color::WHITE);
                 glTranslatef(0.7, -0.85, 0);
-                tkDrawTexture(hipertTex, 0.5);
+                tkDrawTexture(hipertTex, 0.5, 0.5);
             } glPopMatrix();
             
 
@@ -103,9 +103,9 @@ class MyViewer : public tk::gui::Viewer {
                 tkSetColor(tk::gui::color::LIME);
                 char fps_str[256];
                 sprintf(fps_str, "FPS: %.2f", ImGui::GetIO().Framerate);
-                tkDrawText(fps_str, tk::common::Vector3<float>{0.75, +0.9, 0}, 
+                tkDrawText(fps_str, tk::common::Vector3<float>{0.62, +0.9, 0},
                                     tk::common::Vector3<float>{0, 0, 0},
-                                    tk::common::Vector3<float>{0.02, 0.02, 0.0});
+                                    tk::common::Vector3<float>{0.06, 0.06, 0.0});
             } glPopMatrix();
 
                        

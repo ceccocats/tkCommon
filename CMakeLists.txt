@@ -24,18 +24,31 @@ include_directories(${GLEW_INCLUDE_DIRS})
 
 find_package(glfw3 3 REQUIRED)
 
+find_package(Freetype REQUIRED)
+include_directories(${FREETYPE_INCLUDE_DIRS})
+
 set(GUI_LIBS
     ${OPENGL_gl_LIBRARY}
     ${OPENGL_glu_LIBRARY}
     ${GLEW_LIBRARY}  
     glfw
     glut
+    ${FREETYPE_LIBRARIES}
 )
 
 
 #-------------------------------------------------------------------------------
 # Build Libraries
 #-------------------------------------------------------------------------------
+add_library(tklibDrawText SHARED
+    src/gui/libdrawtext/draw.c
+    src/gui/libdrawtext/drawgl.c
+    src/gui/libdrawtext/drawrast.c
+    src/gui/libdrawtext/font.c
+    src/gui/libdrawtext/tpool.c
+    src/gui/libdrawtext/utf8.c
+)
+
 add_library(tkGUI SHARED 
     src/gui/Viewer.cpp
     src/gui/lodepng.cpp  
@@ -48,7 +61,7 @@ add_library(tkGUI SHARED
     src/gui/imgui_impl_glfw.cpp
     src/gui/imgui_impl_opengl3.cpp
 )
-target_link_libraries(tkGUI ${GUI_LIBS})
+target_link_libraries(tkGUI tklibDrawText ${GUI_LIBS})
 
 add_library(tkCommon SHARED src/common.cpp)
 target_link_libraries(tkCommon tkGUI yaml-cpp)
@@ -65,7 +78,7 @@ target_link_libraries(tkGUI_simple tkCommon ${GUI_LIBS})
 #-------------------------------------------------------------------------------
 # Install
 #-------------------------------------------------------------------------------
-install(TARGETS tkGUI tkMath DESTINATION lib)
+install(TARGETS tkGUI tkMath tklibDrawText DESTINATION lib)
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" # source directory
         DESTINATION "include/"
 )

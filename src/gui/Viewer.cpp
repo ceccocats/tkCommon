@@ -10,6 +10,7 @@ std::vector<Color_t> tk::gui::Viewer::colors = std::vector<Color_t>{color::RED, 
                                                                     color::BLUE, color::YELLOW, 
                                                                     color::WHITE, color::ORANGE
                                                                     };
+int Viewer::TK_FONT_SIZE = 256;
 
 Viewer::Viewer() {
 }
@@ -71,6 +72,19 @@ Viewer::init() {
         int foo = 1;
         char* bar[1] = {" "}; 
         glutInit(&foo, bar);
+
+
+        /* XXX dtx_open_font opens a font file and returns a pointer to dtx_font */
+        if(!(font = dtx_open_font(fontPath.c_str(), TK_FONT_SIZE))) {
+            std::cout<<"failed to open font: "<<fontPath<<"\n";
+            exit(1);
+        }
+        /* XXX select the font and size to render with by calling dtx_use_font
+         * if you want to use a different font size, you must first call:
+         * dtx_prepare(font, size) once.
+         */
+        dtx_use_font(font, TK_FONT_SIZE);
+
     }
     
     // OPENGL confs
@@ -124,7 +138,8 @@ void Viewer::mouse_button_callback(GLFWwindow* window, int button, int action, i
 
 void 
 Viewer::run() {
-    LoopRate rate((1e6/30), "VIZ_UPDATE");
+    timeStamp_t VIZ_DT_US = dt*1e6;
+    LoopRate rate((VIZ_DT_US), "VIZ_UPDATE");
     while (!glfwWindowShouldClose(window)) {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -535,20 +550,20 @@ Viewer::tkDrawObject3D(object3D_t *obj, float size, bool textured) {
     glPopMatrix();
 }
 
-void Viewer::tkDrawTexture(GLuint tex, float s) {
+void Viewer::tkDrawTexture(GLuint tex, float sx, float sy) {
 
-    float i = -s/2;
-    float j = +s/2;
+    float i = -1;
+    float j = +1;
 
     glBindTexture(GL_TEXTURE_2D, tex);
     glEnable(GL_TEXTURE_2D);
     glBegin(GL_QUADS);
 
     // 2d draw
-    glTexCoord2f(0, 1); glVertex3f(i, i, 0);
-    glTexCoord2f(0, 0); glVertex3f(i, j, 0);
-    glTexCoord2f(1, 0); glVertex3f(j, j, 0);
-    glTexCoord2f(1, 1); glVertex3f(j, i, 0);
+    glTexCoord2f(0, 1); glVertex3f(i*(sy/2), i*(sx/2), 0);
+    glTexCoord2f(0, 0); glVertex3f(i*(sy/2), j*(sx/2), 0);
+    glTexCoord2f(1, 0); glVertex3f(j*(sy/2), j*(sx/2), 0);
+    glTexCoord2f(1, 1); glVertex3f(j*(sy/2), i*(sx/2), 0);
 
 
     glEnd();
@@ -558,8 +573,8 @@ void Viewer::tkDrawTexture(GLuint tex, float s) {
 
 void
 Viewer::tkDrawText(std::string text, tk::common::Vector3<float> pose, tk::common::Vector3<float> rot, tk::common::Vector3<float> size) {
-    
-    float corectRatio = 1.0/70;
+
+    float corectRatio = 1.0/TK_FONT_SIZE;
     
     glPushMatrix();
     glTranslatef(pose.x, pose.y, pose.z);
@@ -567,16 +582,11 @@ Viewer::tkDrawText(std::string text, tk::common::Vector3<float> pose, tk::common
     glRotatef(rot.y*180.0/M_PI, 0, 1, 0);
     glRotatef(rot.z*180.0/M_PI, 0, 0, 1);    
     glScalef(size.x*corectRatio, size.y*corectRatio, size.z*corectRatio);
-    
-    glutStrokeString(GLUT_STROKE_ROMAN, (unsigned char*) text.c_str());
+
+    dtx_string(text.c_str());
+    //glutStrokeString(GLUT_STROKE_ROMAN, (unsigned char*) text.c_str());
     
     glPopMatrix();
-}
-
-void
-Viewer::tkDrawText(std::string text, void* font, tk::common::Vector3<float> pose) {
-    
-    
 }
 
 void 
@@ -677,13 +687,13 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
     */
     tkSetColor(tk::gui::color::YELLOW);
     char speedStr[256];
-    sprintf(speedStr, "%.2f", speed);
+    sprintf(speedStr, "%.2f", speed/3.6);
     tkDrawText(speedStr, tk::common::Vector3<float>{pose.x, pose.y - 0.08, 0},
                          tk::common::Vector3<float>{0, 0, 0},
-                         tk::common::Vector3<float>{0.02, 0.02, 0.0});
-    tkDrawText("m/s", tk::common::Vector3<float>{pose.x, pose.y - 0.12, 0},
-                      tk::common::Vector3<float>{0, 0, 0},
-                      tk::common::Vector3<float>{0.02, 0.02, 0.0});
+                         tk::common::Vector3<float>{0.05, 0.05, 0.0});
+    tkDrawText("km/h", tk::common::Vector3<float>{pose.x, pose.y - 0.12, 0},
+                       tk::common::Vector3<float>{0, 0, 0},
+                       tk::common::Vector3<float>{0.03, 0.03, 0.0});
 
     // danger zone
     tkSetColor(tk::gui::color::RED);
