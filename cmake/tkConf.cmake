@@ -1,5 +1,4 @@
 include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/../install/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../install/include/xspublic/
+    ${CMAKE_INSTALL_PREFIX}/include
 )
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../install/lib)
+link_directories(${CMAKE_INSTALL_PREFIX}/lib)
