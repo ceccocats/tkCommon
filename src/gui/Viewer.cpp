@@ -94,6 +94,10 @@ Viewer::init() {
     glEnable(GL_DEPTH_TEST);
     //glDepthFunc(GL_GEQUAL);
     //glEnable(GL_LINE_SMOOTH);
+
+    std::cout<<"OPENGL running on:\n";
+    std::cout<<glGetString(GL_VERSION) << std::endl;
+    std::cout<<glGetString(GL_RENDERER)<< std::endl;
 }
 
 
