@@ -75,6 +75,10 @@ namespace tk { namespace gui {
         bool isRunning() {return !glfwWindowShouldClose(window);};
     
         int                     width = 800, height = 800;
+        float                   aspectRatio = 1;
+        float                   xLim = 1.0; /**< 2d x coord screen limit (1.0 if quad) */  
+        float                   yLim = 1.0; /**< 2d y coord screen limit (fixed to 1.0) */
+
         static MouseView3D      mouseView;
         static const int        MAX_KEYS = 1024;
         static bool             keys[MAX_KEYS];

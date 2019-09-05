@@ -152,7 +152,17 @@ Viewer::run() {
         Viewer::mouseView.mouseOnGUI = ImGui::IsMouseHoveringAnyWindow(); 
             
         glfwGetFramebufferSize(window, &width, &height);
+        aspectRatio = (float)width / (float)height;
+        xLim = aspectRatio;
+        yLim = 1.0;
+
         glViewport(0, 0, width, height);
+
+        glMatrixMode( GL_PROJECTION );
+        glLoadIdentity();
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity() ;
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(float(background.r)/255, float(background.g)/255, float(background.b)/255, float(background.a)/255);
 
@@ -642,7 +652,7 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
 
     Color_t col = tk::gui::color::DARK_GRAY; col.a = 185;
     tkSetColor(col);
-    tkDrawCircle(tk::common::Vector3<float>{pose.x, pose.y, +0.2}, radius, 72, true);
+    tkDrawCircle(tk::common::Vector3<float>{pose.x, pose.y, 0.2}, radius, 72, true);
 
     // outer circle
     tkSetColor(tk::gui::color::WHITE);
@@ -764,10 +774,20 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
 
 void 
 Viewer::tkViewport2D(int width, int height, int x, int y) {
-    glViewport(x, y, width, height);
-    glOrtho(0, width, 0, height, -1, 1);
+    float ar = (float)width / (float)height;
+
+    //glViewport(x, y, width, height);
+    //glOrtho(0, width, 0, height, -1, 1);
+    //glLoadIdentity();
+    
+    glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
- }
+
+    glOrtho(-ar, ar, -1, 1, 1, -1);
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+}
 
 void 
 Viewer::errorCallback(int error, const char* description) {
