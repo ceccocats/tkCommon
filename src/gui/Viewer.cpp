@@ -297,8 +297,8 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
 }
 
 void 
-Viewer::tkSetColor(tk::gui::Color_t c) {
-    glColor4ub(c.r, c.g, c.b, c.a);
+Viewer::tkSetColor(tk::gui::Color_t c, float alpha) {
+    glColor4ub(c.r, c.g, c.b, alpha*255);
 }
 
 void 
