@@ -21,8 +21,8 @@ class MyViewer : public tk::gui::Viewer {
             tk::gui::Viewer::init();
 
             int err = 0;
-            err = err || tkLoadTexture("../data/HipertLab.png", hipertTex);
-            err = err || tkLoadOBJ("../data/levante", carObj);
+            err = err || tkLoadTexture(std::string(TKPROJ_PATH) + "data/HipertLab.png", hipertTex);
+            err = err || tkLoadOBJ(std::string(TKPROJ_PATH) + "data/levante", carObj);
 
         }
 
