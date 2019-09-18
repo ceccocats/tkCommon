@@ -27,8 +27,6 @@ set(tkCommon_LIBRARIES
     tkMath
     ${FREETYPE_LIBRARIES}
     tklibDrawText
-    tkCommon
-    tkCommonUDP
 )
 
 set(tkCommon_FOUND true)

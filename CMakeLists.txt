@@ -63,16 +63,8 @@ add_library(tkGUI SHARED
 )
 target_link_libraries(tkGUI tklibDrawText ${GUI_LIBS})
 
-add_library(tkCommonUDP SHARED 
-    src/udp/buffer_defines_hton.c  
-    src/udp/udp_C_class.c
-    src/udp/buffer_defines_ntoh.c  
-    src/udp/udp_defines.c
-    src/udp/udp_class.cc
-)
-
 add_library(tkCommon SHARED src/common.cpp)
-target_link_libraries(tkCommon tkGUI yaml-cpp tkCommonUDP)
+target_link_libraries(tkCommon tkGUI yaml-cpp)
 
 add_library(tkMath SHARED src/math/CSpline.cpp src/math/CSpline2D.cpp src/math/CSpline3D.cpp)
 
@@ -86,7 +78,7 @@ target_link_libraries(tkGUI_simple tkCommon ${GUI_LIBS})
 #-------------------------------------------------------------------------------
 # Install
 #-------------------------------------------------------------------------------
-install(TARGETS tkCommon tkCommonUDP tkGUI tkMath tklibDrawText DESTINATION lib)
+install(TARGETS tkGUI tkMath tklibDrawText DESTINATION lib)
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" # source directory
         DESTINATION "include/"
 )
