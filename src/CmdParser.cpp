@@ -112,13 +112,16 @@ void CmdParser::print() {
         }
         if(!found) {
             std::cout<<"ERROR: flag not valid: -"<<flag<<"\n";
+            printUsage(cmdl[0]);
             exit(1);
         }
     }
 
+    // print exec info if avaible
     if (!generalInfo.empty()) {
         std::cout << generalInfo << "\n";
     }
+
     if (cmdl["-h"]) {
         printUsage(cmdl[0]);
         exit(1);
