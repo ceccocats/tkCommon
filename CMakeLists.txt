@@ -78,7 +78,7 @@ target_link_libraries(tkGUI_simple tkCommon ${GUI_LIBS})
 #-------------------------------------------------------------------------------
 # Install
 #-------------------------------------------------------------------------------
-install(TARGETS tkGUI tkMath tklibDrawText DESTINATION lib)
+install(TARGETS tkCommon tkGUI tkMath tklibDrawText DESTINATION lib)
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" # source directory
         DESTINATION "include/"
 )
