@@ -81,7 +81,7 @@ void CmdParser::printUsage(std::string name) {
         std::cout << std::left << std::setw(DEFAULTW+5) << def_str;
         std::cout << args[i].info << "\n";
     }
-    std::cout << "Ops:\n";
+    std::cout << "Opts:\n";
     for (int i = 0; i < opts.size(); i++) {
         std::string def_str = std::string(opts[i].isbool ? std::to_string(opts[i].default_val_bool) :
                                           opts[i].default_val_str);
@@ -115,10 +115,6 @@ void CmdParser::print() {
             exit(1);
         }
     }
-    /*
-    std::cout << "\nParameters:\n";
-        std::cout << '\t' << param.first << " : " << param.second << '\n';
-*/
 
     if (!generalInfo.empty()) {
         std::cout << generalInfo << "\n";
