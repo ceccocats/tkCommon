@@ -63,7 +63,7 @@ add_library(tkGUI SHARED
 )
 target_link_libraries(tkGUI tklibDrawText ${GUI_LIBS})
 
-add_library(tkCommon SHARED src/common.cpp)
+add_library(tkCommon SHARED src/common.cpp src/CmdParser.cpp)
 target_link_libraries(tkCommon tkGUI yaml-cpp)
 
 add_library(tkMath SHARED src/math/CSpline.cpp src/math/CSpline2D.cpp src/math/CSpline3D.cpp)

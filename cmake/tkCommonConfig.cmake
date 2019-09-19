@@ -23,6 +23,7 @@ set(tkCommon_LIBRARIES
     ${GLEW_LIBRARY}
     glfw
     glut
+    tkCommon
     tkGUI
     tkMath
     ${FREETYPE_LIBRARIES}

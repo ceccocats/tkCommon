@@ -9,6 +9,7 @@
 #include "timer.h"
 #include "Eigen/Dense"
 #include "geodetic_conv.h"
+#include "CmdParser.h"
 
 namespace tk { namespace common {
 
