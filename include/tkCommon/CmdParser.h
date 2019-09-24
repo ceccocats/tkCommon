@@ -28,9 +28,8 @@ namespace tk { namespace common {
         struct Opt {
             std::string name;
             std::string info;
-            bool isbool;
+            std::string optType;
 
-            bool        default_val_bool;
             std::string default_val_str;
         };
 
@@ -81,6 +80,25 @@ namespace tk { namespace common {
          * @return
          */
         std::string addOpt(std::string opt, std::string default_val = "", std::string info = "");
+
+        /**
+         * Add Float option
+         * @param opt
+         * @param default_val
+         * @param info
+         * @return
+         */
+        float addFloatOpt(std::string opt, float default_val = 0, std::string info = "");
+
+        /**
+         * Add Integer option
+         * @param opt
+         * @param default_val
+         * @param info
+         * @return
+         */
+        int addIntOpt(std::string opt, int default_val = 0, std::string info = "");
+
 
         /**
          * print nice report

@@ -43,10 +43,10 @@ bool CmdParser::addBoolOpt(std::string opt, std::string info) {
     Opt o;
     o.name = opt;
     o.info = info;
-    o.default_val_bool = cmdl[opt];
-    o.isbool = true;
+    o.default_val_str = std::to_string(cmdl[opt]);
+    o.optType = "b";
     opts.push_back(o);
-    return o.default_val_bool;
+    return cmdl[opt];
 }
 
 std::string CmdParser::addOpt(std::string opt, std::string default_val, std::string info) {
@@ -60,9 +60,21 @@ std::string CmdParser::addOpt(std::string opt, std::string default_val, std::str
     o.name = opt;
     o.info = info;
     o.default_val_str = cmdl(opt).str().empty() ? default_val : cmdl(opt).str();
-    o.isbool = false;
+    o.optType = "s";
     opts.push_back(o);
     return o.default_val_str;
+}
+
+float CmdParser::addFloatOpt(std::string opt, float default_val, std::string info) {
+    std::string val = addOpt(opt, std::to_string(default_val), info);
+    opts[opts.size()-1].optType = "f";
+    return atof(val.c_str());
+}
+
+int CmdParser::addIntOpt(std::string opt, int default_val, std::string info) {
+    std::string val = addOpt(opt, std::to_string(default_val), info);
+    opts[opts.size()-1].optType = "i";
+    return atoi(val.c_str());
 }
 
 void CmdParser::printUsage(std::string name) {
@@ -83,8 +95,7 @@ void CmdParser::printUsage(std::string name) {
     }
     std::cout << "Opts:\n";
     for (int i = 0; i < opts.size(); i++) {
-        std::string def_str = std::string(opts[i].isbool ? std::to_string(opts[i].default_val_bool) :
-                                          opts[i].default_val_str);
+        std::string def_str = "(" + opts[i].optType + ") " + opts[i].default_val_str;
         if(def_str.size() > DEFAULTW)
             def_str = def_str.substr(def_str.size()-DEFAULTW,def_str.size());
         def_str = "[ " + def_str + " ]";
