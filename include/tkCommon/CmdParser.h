@@ -9,7 +9,7 @@ namespace tk { namespace common {
      *      tk::common::CmdParser cmd(argv, "general optional info");
      *      std::string mappath  = cmd.addArg("mappath/", "map/", "path of the map to load");
      *      std::string datapath = cmd.addArg("datapath/", "", "path of the odom data to replay");
-     *      bool verbose         = cmd.addBoolOpt("-v", false, "enable verbose");
+     *      bool verbose         = cmd.addBoolOpt("-v", "enable verbose");
      *      std::string confpath = cmd.addOpt("-conf", "conf.yaml", "configuration yaml file");
      *      cmd.print();
      */
