@@ -401,7 +401,7 @@ void Viewer::tkSetRainbowColor(float hue) {
 
 
 void
-Viewer::tkDrawCloudFeatures(Eigen::MatrixXf *points, tk::common::MatrixXu8 *features, int idx) {
+Viewer::tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx) {
     glBegin(GL_POINTS);
     for (int p = 0; p < points->cols(); p++) {
         float i = float(features->coeff(idx, p))/255.0;
