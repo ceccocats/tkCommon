@@ -11,7 +11,8 @@ namespace tk { namespace data {
                               FALSE_DET     = 1,
                               RANGE_VAR     = 2,
                               VELOCITY_VAR  = 3,
-                              ANGLE_VAR     = 4
+                              ANGLE_VAR     = 4,
+                              RCS           = 5
                             };
 
     struct RadarData_t {
