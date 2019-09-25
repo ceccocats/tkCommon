@@ -609,12 +609,8 @@ Viewer::tkDrawRadarData(tk::data::RadarData_t *data, bool enable_near, bool enab
     if (enable_near) {
         tk::common::Vector3<float> pose;
         for (int i = 0; i < N_RADAR; i++) {
-            //tkSetColor(colors[i]);
             for (int j = 0; j < data->near_n_points[i]; j++) {
                 float rcs = data->near_features[i](tk::data::RadarFeatureType_t::RCS, j);
-
-                if (rcs < -30)
-                    continue;
 
                 //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
                 float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
@@ -631,8 +627,13 @@ Viewer::tkDrawRadarData(tk::data::RadarData_t *data, bool enable_near, bool enab
     if (enable_far) {
         tk::common::Vector3<float> pose;
         for (int i = 0; i < N_RADAR; i++) {
-            tkSetColor(colors[i]);
             for (int j = 0; j < data->far_n_points[i]; j++) {
+                float rcs = data->far_features[i](tk::data::RadarFeatureType_t::RCS, j);
+
+                //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+                float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
+                tkSetRainbowColor(hue);
+
                 pose.x = data->far_points[i](0, j);
                 pose.y = data->far_points[i](1, j);
                 pose.z = data->far_points[i](2, j);
