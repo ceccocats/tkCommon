@@ -5,6 +5,8 @@
 #include <math.h>
 #include <fstream>
 #include <iomanip>
+#include <csignal>
+
 #include "utils.h"
 #include "timer.h"
 #include "Eigen/Dense"
