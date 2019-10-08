@@ -86,7 +86,9 @@ Viewer::init() {
         dtx_use_font(font, TK_FONT_SIZE);
 
     }
-    
+
+    plotManger = new PlotManager();
+
     // OPENGL confs
     glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);
@@ -175,7 +177,11 @@ Viewer::run() {
         glMultMatrixf(Viewer::mouseView.getProjection()->data());
         glMultMatrixf(Viewer::mouseView.getModelView()->data());
 
+        plotManger->drawPlots();
+
         draw();
+
+        plotManger->drawLegend();
 
         glPopMatrix();
 
@@ -186,7 +192,7 @@ Viewer::run() {
 
         /* Poll for and process events */
         glfwPollEvents();
-        rate.wait();
+        rate.wait(false);
     }
     
     ImGui_ImplOpenGL3_Shutdown();
@@ -298,7 +304,10 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
 
 void 
 Viewer::tkSetColor(tk::gui::Color_t c, float alpha) {
-    glColor4ub(c.r, c.g, c.b, alpha*255);
+    if(alpha >= 0)
+        glColor4ub(c.r, c.g, c.b, alpha*255);
+    else
+        glColor4ub(c.r, c.g, c.b, c.a);
 }
 
 void 

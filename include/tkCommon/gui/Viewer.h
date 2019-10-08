@@ -20,6 +20,8 @@
 
 namespace tk { namespace gui {
 
+    class PlotManager;
+
     class Viewer {
 
     public:
@@ -43,7 +45,7 @@ namespace tk { namespace gui {
         static int  tkLoadTexture(std::string filename, GLuint &tex);
         static int  tkLoadOBJ(std::string filename, object3D_t &obj);
         
-        static void tkSetColor(tk::gui::Color_t c, float alpha = 1.0);
+        static void tkSetColor(tk::gui::Color_t c, float alpha = -1);
         static void tkApplyTf(tk::common::Tfpose tf);
         static void tkDrawAxis(float s = 1.0);
         static void tkDrawCircle(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = false);
@@ -86,6 +88,8 @@ namespace tk { namespace gui {
 
         double dt = 1.0/30;
 
+        PlotManager *plotManger;
+
         // font
         static int TK_FONT_SIZE;
         std::string fontPath = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf";
@@ -107,4 +111,6 @@ namespace tk { namespace gui {
 
         static void tkDrawArrow(float length = 1.0, float radius = -1.0, int nbSubdivisions = 12);
     };
+
 }}
+#include "tkCommon/gui/PlotManager.h"

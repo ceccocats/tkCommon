@@ -574,7 +574,7 @@ namespace tk { namespace common {
     inline bool deserializeMatrix(Eigen::Matrix<T, R, C> &m, std::ifstream &is) {
         int size[2] = { 0, 0 };
         is.read((char*)size, 2*sizeof(int));
-        std::cout<<"Matrix deserialize: ("<<size[0]<<"x"<<size[1]<<")";
+        std::cout<<"Matrix deserialize: ("<<size[0]<<"x"<<size[1]<<")\n";
         m.resize(size[0], size[1]);
         is.read((char *)m.data(), m.size() * sizeof(T));
         return is.is_open();

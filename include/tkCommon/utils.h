@@ -100,14 +100,15 @@ struct LoopRate {
      * Wait remaining time
      * it will print a warning on deadline miss
      */
-    void wait() {
+    void wait(bool print = true) {
         T = getTimeStamp();
 
         timeStamp_t delta = T - lastT;
         if(delta >= 0 && delta < dt) {
             usleep(dt - delta);
         } else if(lastT > 0) {
-            std::cout<<"LOOPRATE "<<name<<" exceeded: "<<delta<<" of "<<dt<<" ms\n";
+            if(print)
+                std::cout<<"LOOPRATE "<<name<<" exceeded: "<<delta<<" of "<<dt<<" ms\n";
         }
 
         lastT = getTimeStamp();
@@ -136,6 +137,10 @@ struct CircularArray {
         position = 0;
     }
 
+    void clear() {
+        position = 0;
+    }
+
     /**
      * set array dimension
      * @param _dim
@@ -158,7 +163,7 @@ struct CircularArray {
     }
 
     /**
-     * pop element from array head
+     * get element from array head
      * @param n
      * @return
      */

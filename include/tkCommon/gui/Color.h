@@ -1,9 +1,16 @@
 #pragma once
 
 namespace tk { namespace gui {
+
     struct Color_t{
         uint8_t r,  g,  b,  a;
     };
+
+
+    inline Color_t color4f(float r, float g, float b, float a) {
+        return Color_t { uint8_t(r*255), uint8_t(g*255), uint8_t(b*255), uint8_t(a*255) };
+    }
+
 
     namespace color {
         static Color_t RED          = {244, 67, 54, 255};

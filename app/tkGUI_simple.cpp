@@ -24,6 +24,7 @@ class MyViewer : public tk::gui::Viewer {
             err = err || tkLoadTexture(std::string(TKPROJ_PATH) + "data/HipertLab.png", hipertTex);
             err = err || tkLoadOBJ(std::string(TKPROJ_PATH) + "data/levante", carObj);
 
+            plotManger->addLinePlot("test", tk::gui::color::WHITE, 1);
         }
 
         void draw() {
@@ -154,6 +155,10 @@ void *update_th(void *data) {
 
         viewer->setAngle(angle);
         viewer->setSpeed(speed);
+
+        viewer->plotManger->addPoint("test", tk::common::Vector3<float>{3.0f*cos(angle), 3.0f*sin(angle), 0});
+
+
         rate.wait();
     }
 }
