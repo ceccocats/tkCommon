@@ -1,13 +1,13 @@
 image: ceccocats/tk:latest
 
 before_script:
-    # Install build dependencies
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@git.hipert.unimore.it/".insteadOf "gitlab@git.hipert.unimore.it:"
+    - git clone --recurse-submodules https://gitlab-ci-token:${CI_JOB_TOKEN}@git.hipert.unimore.it/tk/tk
+    - cd tk
+    - mkdir build; cd build; cmake .. -DTEST_DATA=False -DCMAKE_BUILD_TYPE=RelWithDebInfo
 
 build:
     # Build the application
     stage: build
     script:
-        - mkdir build
-        - cd build
-        - cmake ..
-        - make
+        - cmake --build tkCommon
