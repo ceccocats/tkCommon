@@ -399,7 +399,9 @@ namespace tk { namespace common {
      * @return
      */
     template <class T>
-    bool pointIsleft(tk::common::Vector2<T> a, tk::common::Vector2<T> b, tk::common::Vector2<T> c);
+    bool pointIsleft(tk::common::Vector2<T> a, tk::common::Vector2<T> b, tk::common::Vector2<T> c) {
+        return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
+    }
 
     /**
      * Tell if point c is on the left side respect to the segment a - b
@@ -411,7 +413,9 @@ namespace tk { namespace common {
      * @return
      */
     template <class T>
-    bool pointIsleft(tk::common::Vector3<T> a, tk::common::Vector3<T> b, tk::common::Vector3<T> c);
+    bool pointIsleft(tk::common::Vector3<T> a, tk::common::Vector3<T> b, tk::common::Vector3<T> c) {
+        return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
+    }
 
     /**
      * Calculate tf from plane coeffs

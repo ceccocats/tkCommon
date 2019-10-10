@@ -222,16 +222,6 @@ namespace tk { namespace common {
         return os;
     }
 
-    template <class T>
-    bool pointIsleft(tk::common::Vector2<T> a, tk::common::Vector2<T> b, tk::common::Vector2<T> c) {
-        return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
-    }
-
-    template <class T>
-    bool pointIsleft(tk::common::Vector3<T> a, tk::common::Vector3<T> b, tk::common::Vector3<T> c) {
-        return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
-    }
-
     tk::common::Tfpose planeCoeffs2tf(Eigen::VectorXf coeffs) {
         if(coeffs.size() != 4)
             return tk::common::Tfpose::Identity();
