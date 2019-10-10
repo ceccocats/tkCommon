@@ -222,28 +222,6 @@ namespace tk { namespace common {
         return os;
     }
 
-    template <class T, int R, int C>
-    bool serializeMatrix(Eigen::Matrix<T, R, C> &m, std::ofstream &os) {
-        int size[2];
-        size[0] = m.rows();
-        size[1] = m.cols();
-        std::cout<<"Matrix serialize: ("<<size[0]<<"x"<<size[1]<<")";
-
-        os.write((char *)size, 2*sizeof(int));
-        os.write((char *)m.data(), m.size() * sizeof(T));
-        return os.is_open();
-    }
-
-    template <class T, int R, int C>
-    bool deserializeMatrix(Eigen::Matrix<T, R, C> &m, std::ifstream &is) {
-        int size[2] = { 0, 0 };
-        is.read((char*)size, 2*sizeof(int));
-        std::cout<<"Matrix deserialize: ("<<size[0]<<"x"<<size[1]<<")\n";
-        m.resize(size[0], size[1]);
-        is.read((char *)m.data(), m.size() * sizeof(T));
-        return is.is_open();
-    }
-
     template <class T>
     bool pointIsleft(tk::common::Vector2<T> a, tk::common::Vector2<T> b, tk::common::Vector2<T> c) {
         return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
