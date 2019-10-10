@@ -49,10 +49,10 @@ add_library(tklibDrawText SHARED
     src/gui/libdrawtext/utf8.c
 )
 
-add_library(tkGUI SHARED 
+add_library(tkGUI SHARED
     src/gui/Viewer.cpp
-    src/gui/lodepng.cpp  
-    src/gui/MouseView3D.cpp 
+    src/gui/lodepng.cpp
+    src/gui/MouseView3D.cpp
     src/gui/MathUtils.cpp
     src/gui/imgui_demo.cpp
     src/gui/imgui_draw.cpp
@@ -60,6 +60,7 @@ add_library(tkGUI SHARED
     src/gui/imgui.cpp
     src/gui/imgui_impl_glfw.cpp
     src/gui/imgui_impl_opengl3.cpp
+    src/common.cpp
 )
 target_link_libraries(tkGUI tklibDrawText ${GUI_LIBS})
 
