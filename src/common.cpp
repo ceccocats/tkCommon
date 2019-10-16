@@ -1,5 +1,3 @@
-#pragma once
-
 #include <tkCommon/common.h>
 
 namespace tk { namespace common {
