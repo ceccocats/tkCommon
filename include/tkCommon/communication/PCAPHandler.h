@@ -2,6 +2,7 @@
 
 #include "tkCommon/common.h"
 #include "tkCommon/utils.h"
+#include <pcap.h>
 
 namespace tk { namespace communication {
     class PCAPHandler {
@@ -13,9 +14,14 @@ namespace tk { namespace communication {
         bool initRecord(const std::string fileName, const std::string filter);
 
         void record();
+        void recordStat(struct pcap_stat& stat);
         int getPacket(u_int8_t& buffer, timeStamp_t& stamp);
 
         bool close();
     private:
+        bool            replayMode;
+        pcap_dumper_t   *pcapDumper;
+        pcap_t      	*pcapFile;
+
     };
 }}

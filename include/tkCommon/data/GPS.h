@@ -15,16 +15,6 @@ namespace tk { namespace common {
     ////////////////////////////////////
 
 
-    /**Mag X*///////////////////////////
-    double      magX;
-    double      magY;
-    double      magZ;
-    timeStamp_t magTimestamp;
-    //
-    bool        magFilled;
-    ////////////////////////////////////
-
-
     /**Accelerometer data*///////////////
     double      accX;
     double      accY;
@@ -34,6 +24,10 @@ namespace tk { namespace common {
     bool        accFilled;
     ////////////////////////////////////
 
+//angle
+//angleRate
+//acc
+//velocity
 
     /**Gyroscope data */////////////////
     double      gyrX;
@@ -45,7 +39,7 @@ namespace tk { namespace common {
     ////////////////////////////////////
 
 
-    /**IMU data*////////////////////////
+    /**IMU data*////////////////////////angle
     double      yaw;
     double      pitch;
     double      roll;
@@ -65,7 +59,7 @@ namespace tk { namespace common {
     ////////////////////////////////////
 
 
-    /**GNSS data*///////////////////////
+    /**GNSS data*///////////////////////covarianza
     uint16_t    year;
     uint8_t     month;
     uint8_t     day;
