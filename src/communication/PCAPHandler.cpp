@@ -3,6 +3,7 @@
 
 bool tk::communication::PCAPHandler::initReplay(const std::string fileName, const std::string filter){
 
+    replayMode = true;
     char errbuff[PCAP_ERRBUF_SIZE];
     struct bpf_program fp;
 
@@ -60,15 +61,24 @@ bool tk::communication::PCAPHandler::initRecord(const std::string fileName, cons
 
 void tk::communication::PCAPHandler::record(){
 
-    pcap_loop(pcapFile, 0, pcap_dump, (u_char *)pcapDumper);
+    if(!replayMode){
+        pcap_loop(pcapFile, 0, pcap_dump, (u_char *)pcapDumper);
+    }
 }
 
 void tk::communication::PCAPHandler::recordStat(struct pcap_stat& stat){
 
-    pcap_stats(pcapFile, &stat);
+    if(!replayMode){
+        pcap_stats(pcapFile, &stat);
+    }
 }
 
 int tk::communication::PCAPHandler::getPacket(u_int8_t& buffer, timeStamp_t& stamp){
+
+    if(!replayMode){
+        fprintf(stderr, "PCAPHandler: you are in recorder mode.");
+        return -1;
+    }
 
     if (!pcapFile){
         fprintf(stderr, "PCAPHandler: error pcap.");
