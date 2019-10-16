@@ -28,6 +28,7 @@ set(tkCommon_LIBRARIES
     tkMath
     ${FREETYPE_LIBRARIES}
     tklibDrawText
+    matio
 )
 
 set(tkCommon_FOUND true)
