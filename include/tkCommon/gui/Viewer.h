@@ -75,6 +75,7 @@ namespace tk { namespace gui {
         static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
         bool isRunning() {return !glfwWindowShouldClose(window);};
+        void close() { glfwSetWindowShouldClose(window, true); }
     
         int                     width = 800, height = 800;
         float                   aspectRatio = 1;
