@@ -13,15 +13,18 @@ bool tk::communication::PCAPHandler::initReplay(const std::string fileName, cons
         return false;
     }
 
-    if (pcap_compile(pcapFile, &fp, filter.c_str(), 0, PCAP_NETMASK_UNKNOWN) == -1){
+    if(filter != "") {
 
-        fprintf(stderr, "PCAPHandler: couldn't parse filter %s: %s\n", filter.c_str(), pcap_geterr(pcapFile));
-        return false;
-    }
+        if (pcap_compile(pcapFile, &fp, filter.c_str(), 0, PCAP_NETMASK_UNKNOWN) == -1) {
 
-    if (pcap_setfilter(pcapFile, &fp) == -1) {
-        fprintf(stderr, "PCAPHandler: couldn't install filter %s: %s\n", filter.c_str(), pcap_geterr(pcapFile));
-        return false;
+            fprintf(stderr, "PCAPHandler: couldn't parse filter %s: %s\n", filter.c_str(), pcap_geterr(pcapFile));
+            return false;
+        }
+
+        if (pcap_setfilter(pcapFile, &fp) == -1) {
+            fprintf(stderr, "PCAPHandler: couldn't install filter %s: %s\n", filter.c_str(), pcap_geterr(pcapFile));
+            return false;
+        }
     }
 
     return true;
@@ -46,14 +49,18 @@ bool tk::communication::PCAPHandler::initRecord(const std::string fileName, cons
         return false;
     }
 
-    if (pcap_compile(pcapFile, &fp, filter.c_str(), 0, net) == -1) {
-        fprintf(stderr, "PCAPHandler: couldn't parse filter %s: %s\n", filter.c_str(), pcap_geterr(pcapFile));
-        return false;
-    }
+    if(filter != "") {
 
-    if (pcap_setfilter(pcapFile, &fp) == -1) {
-        fprintf(stderr, "PCAPHandler: couldn't install filter %s: %s\n", filter.c_str(), pcap_geterr(pcapFile));
-        return false;
+        if (pcap_compile(pcapFile, &fp, filter.c_str(), 0, PCAP_NETMASK_UNKNOWN) == -1) {
+
+            fprintf(stderr, "PCAPHandler: couldn't parse filter %s: %s\n", filter.c_str(), pcap_geterr(pcapFile));
+            return false;
+        }
+
+        if (pcap_setfilter(pcapFile, &fp) == -1) {
+            fprintf(stderr, "PCAPHandler: couldn't install filter %s: %s\n", filter.c_str(), pcap_geterr(pcapFile));
+            return false;
+        }
     }
 
     return true;
