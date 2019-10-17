@@ -10,13 +10,48 @@ namespace tk { namespace communication {
         PCAPHandler();
         ~PCAPHandler();
 
-        bool initReplay(const std::string fileName, const std::string filter);
-        bool initRecord(const std::string fileName, const std::string filter);
-
-        void record();
-        void recordStat(struct pcap_stat& stat);
+        //Replay
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /**
+         * Method that init the pcap replay from a file
+         * @param fileName  File you want to read
+         * @param filter    Filter on a file, default empty
+         * @return          Success
+         */
+        bool initReplay(const std::string fileName, const std::string filter="");
+        /**
+         * Method that return a packet
+         * @param buffer    Packet data
+         * @param stamp     Packet timestamp
+         * @return          Packet lenght
+         */
         int getPacket(u_int8_t& buffer, timeStamp_t& stamp);
 
+        //Recording
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /**
+         * Method that init pcap ethernet record
+         * @param fileName  Saving file name
+         * @param filter    Filter on recorder, default empty
+         * @return          Success
+         */
+        bool initRecord(const std::string fileName, const std::string filter="");
+        /**
+         * Method that record the ethernet messages (blocking)
+         */
+        void record();
+        /**
+         * Method that return the recording statistics
+         * @param stat      Statistic pcap struct
+         */
+        void recordStat(struct pcap_stat& stat);
+
+        //Closing
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /**
+         * Method that stop the recorder or close the replay file
+         * @return          Success
+         */
         bool close();
     private:
         bool            replayMode;
