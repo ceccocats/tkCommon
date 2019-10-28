@@ -4,6 +4,7 @@
 #include <string>
 #include <mutex>
 #include <sys/time.h>
+#include <unistd.h>
 #include "yaml-cpp/yaml.h" 
 
 /**
