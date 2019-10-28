@@ -67,7 +67,7 @@ target_link_libraries(tkGUI tklibDrawText ${GUI_LIBS})
 add_library(tkCommon SHARED
     src/common.cpp
     src/CmdParser.cpp
-    src/communication/UDPSocket.cpp
+    src/communication/ethernet/UDPSocket.cpp
 )
 target_link_libraries(tkCommon tkGUI yaml-cpp matio)
 
