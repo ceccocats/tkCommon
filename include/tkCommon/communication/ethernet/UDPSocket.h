@@ -71,7 +71,7 @@ namespace tk{ namespace communication {
     private:
         int             sock_fd;
         int             port;
-        std::string     mode;
+        bool            reciver;
         std::string     ip;
         sockaddr_in     sock_addr;
     };

@@ -14,7 +14,12 @@ namespace tk { namespace communication {
 
     bool
     UDPSocket::initReceiver(const int port, const std::string ip) {
-        initSender(port, ip);
+        
+        bool status = initSender(port, ip);
+
+        if(status == false){
+            return false;
+        }
 
         // Bind the socket with the sender address
         int r = bind(this->sock_fd, (const struct sockaddr *)&this->sock_addr,  sizeof(this->sock_addr));
@@ -38,7 +43,7 @@ namespace tk { namespace communication {
                 std::cout << "[UDPSocket] IP "<<ip<<" is not a multicast IP.\n";
         }
 
-        mode = "receiver";
+        reciver = true;
         return true;
     }
 
@@ -70,14 +75,14 @@ namespace tk { namespace communication {
                 std::cout << "[SocketUDP] IP "<<ip<<" is not a multicast IP.\n";
         }
 
-        mode = "sender";
+        reciver = false;
         return true;
     }
 
 
     int
     UDPSocket::receive(uint8_t *buffer, int length) {
-        if (mode == "receiver")
+        if (reciver == true)
             return recvfrom(this->sock_fd, buffer, (size_t) length, MSG_WAITALL, nullptr, nullptr);
         else
             return -1;
@@ -85,7 +90,7 @@ namespace tk { namespace communication {
 
     bool
     UDPSocket::send(uint8_t *buffer, int length) {
-        if (mode == "sender") {
+        if (reciver == false) {
             int r = sendto(this->sock_fd, buffer, (size_t) length, 0, (sockaddr *) &this->sock_addr,
                            sizeof(this->sock_addr));
             return r != -1;
