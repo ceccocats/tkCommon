@@ -68,8 +68,10 @@ add_library(tkCommon SHARED
     src/common.cpp
     src/CmdParser.cpp
     src/communication/ethernet/UDPSocket.cpp
+    src/communication/ethernet/PCAPHandler.cpp
+    src/communication/EthInterface.cpp
 )
-target_link_libraries(tkCommon tkGUI yaml-cpp matio)
+target_link_libraries(tkCommon tkGUI yaml-cpp matio pcap)
 
 add_library(tkMath SHARED src/math/CSpline.cpp src/math/CSpline2D.cpp src/math/CSpline3D.cpp)
 
@@ -81,6 +83,12 @@ target_link_libraries(tkGUI_simple tkCommon ${GUI_LIBS})
 
 add_executable(tkCommon_cmd app/tkCommon_cmd.cpp)
 target_link_libraries(tkCommon_cmd tkCommon)
+
+add_executable(tkCommon_eth_pcap app/tkCommon_eth_pcap.cpp)
+target_link_libraries(tkCommon_eth_pcap tkCommon)
+
+add_executable(tkCommon_eth_socket app/tkCommon_eth_socket.cpp)
+target_link_libraries(tkCommon_eth_socket tkCommon)
 
 #-------------------------------------------------------------------------------
 # Install

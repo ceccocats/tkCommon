@@ -27,7 +27,7 @@ namespace tk { namespace communication {
          * @param filter    Filter on recorder, default empty
          * @return          Success
          */
-        bool initPcap(const std::string fileName, const std::string filter="");
+        bool initPcapReplay(const std::string fileName, const std::string filter="");
 
 
 
@@ -40,7 +40,7 @@ namespace tk { namespace communication {
          * @param stamp     Packet timestamp
          * @return          Packet lenght
          */
-        int read(u_int8_t& buffer, timeStamp_t& stamp);
+        int read(uint8_t& buffer, timeStamp_t& stamp);
 
 
 
@@ -49,8 +49,11 @@ namespace tk { namespace communication {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /**
          * Method that record the ethernet messages (blocking)
+         * 
+         * @param fileName  Saving file name
+         * @param filter    Filter on recorder, default empty
          */
-        void record();
+        void record(const std::string fileName, const std::string iface, const std::string filter);
 
         /**
          * Method that return the recording statistics
@@ -77,8 +80,6 @@ namespace tk { namespace communication {
         PCAPHandler     pcap;
         UDPSocket       socket;
 
-        std::string     fileName;
-        std::string     filter;
         pcap_stat       stat;
     };
 }}

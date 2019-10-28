@@ -58,7 +58,7 @@ namespace tk{ namespace communication {
          * Method that close the socket
          *
          */
-        void close();
+        bool close();
 
         /**
          * Method that return if an ip is multicast

@@ -1,4 +1,7 @@
-#include "tkCommon/communication/PCAPHandler.h"
+#include "tkCommon/communication/ethernet/PCAPHandler.h"
+
+tk::communication::PCAPHandler::PCAPHandler() = default;
+tk::communication::PCAPHandler::~PCAPHandler() = default;
 
 
 bool tk::communication::PCAPHandler::initReplay(const std::string fileName, const std::string filter){
@@ -9,7 +12,7 @@ bool tk::communication::PCAPHandler::initReplay(const std::string fileName, cons
 
     pcapFile = pcap_open_offline(fileName.c_str(), errbuff);
     if (!pcapFile){
-        fprintf(stderr, "PCAPHandler: error from pcap_open_live(): %s\n", errbuf);
+        fprintf(stderr, "PCAPHandler: error from pcap_open_live(): %s\n", errbuff);
         return false;
     }
 
@@ -30,16 +33,15 @@ bool tk::communication::PCAPHandler::initReplay(const std::string fileName, cons
     return true;
 }
 
-bool tk::communication::PCAPHandler::initRecord(const std::string fileName, const std::string filter){
+bool tk::communication::PCAPHandler::initRecord(const std::string fileName, const std::string iface, const std::string filter){
 
     replayMode = false;
-    struct pcap_stat vmps_stat;
     bpf_u_int32 net;
     struct bpf_program fp;
     char errbuf[PCAP_ERRBUF_SIZE];
 
 
-    if ((pcapFile = pcap_open_live(vmps_interface.c_str(), BUFSIZ, 0, 1000, errbuf)) == NULL) {
+    if ((pcapFile = pcap_open_live(iface.c_str(), BUFSIZ, 0, 1000, errbuf)) == NULL) {
         fprintf(stderr, "PCAPHandler: error from pcap_open_live(): %s\n", errbuf);
         return false;
     }
@@ -80,7 +82,7 @@ void tk::communication::PCAPHandler::recordStat(struct pcap_stat& stat){
     }
 }
 
-int tk::communication::PCAPHandler::getPacket(u_int8_t& buffer, timeStamp_t& stamp){
+int tk::communication::PCAPHandler::getPacket(uint8_t& buffer, timeStamp_t& stamp){
 
     if(!replayMode){
         fprintf(stderr, "PCAPHandler: you are in recorder mode.");
@@ -93,14 +95,14 @@ int tk::communication::PCAPHandler::getPacket(u_int8_t& buffer, timeStamp_t& sta
     }
 
     struct pcap_pkthdr *header;
-    int returnValue = pcap_next_ex(pcapFile, &header, &buffer);
+    int returnValue = pcap_next_ex(this->pcapFile, &header, (const u_char**)&buffer);
 
     if (returnValue < 0){
         fprintf(stderr, "PCAPHandler: end of packet file.");
         return -1;
     }
 
-    stamp = header->ts;
+    stamp = header->ts.tv_usec;
     return header->len;
 }
 
