@@ -409,9 +409,10 @@ struct PoolQueue {
 
         gmtx.lock();
         int idx = last;
-        if(mtx[ idx%dim ].try_lock()) {
+        if(inserted > 0 && mtx[ idx%dim ].try_lock()) {
             out = array[ idx%dim ];
             locked++;
+            inserted = 0;
         } else {
             idx = -1;
         }    
