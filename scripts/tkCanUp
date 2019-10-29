@@ -1,0 +1,12 @@
+#!/bin/bash
+sudo ~/jetson_clocks.sh
+sudo modprobe can
+sudo modprobe can_raw
+sudo modprobe mttcan
+sudo ip link set can0 down
+sudo ip link set can1 down
+sudo ip link set can0 type can bitrate 500000
+sudo ip link set can1 type can bitrate 500000
+sudo ip link set can0 up
+sudo ip link set can1 up
+stty -F /dev/ttyACM0 9600

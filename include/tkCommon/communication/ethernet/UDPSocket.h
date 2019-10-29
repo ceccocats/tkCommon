@@ -58,7 +58,7 @@ namespace tk{ namespace communication {
          * Method that close the socket
          *
          */
-        void close();
+        bool close();
 
         /**
          * Method that return if an ip is multicast
@@ -71,7 +71,7 @@ namespace tk{ namespace communication {
     private:
         int             sock_fd;
         int             port;
-        std::string     mode;
+        bool            reciver;
         std::string     ip;
         sockaddr_in     sock_addr;
     };

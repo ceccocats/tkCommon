@@ -1,0 +1,99 @@
+#!/bin/bash
+
+set -e
+
+# Signal handler for nice shutdown
+handler()
+{
+  echo "Received signal, closing"
+  trap '' TERM INT # Ignore INT and TERM
+  kill 0   # Kill all processes spawned by this script
+  wait     # Wait until they finish
+  exit 0
+}
+
+pdk_install_path="/opt/pdk"
+
+# Configure trap handler to ensure clean shutdown
+trap handler TERM INT
+
+# Check the network config
+# Make a wild guess on the correct interface name
+vlan_if=$(ip link show | grep -oh '[a-z0-9]\+.101') || true
+if [ ! "$vlan_if" ]; then
+  echo "No interface with VLAN 101 found"
+  exit 1
+fi
+
+echo "Assuming VLAN interface ${vlan_if}"
+# See if the interface really exists
+if [ ! -d "/sys/class/net/$vlan_if" ]; then
+  echo "Device not found, ${vlan_if} might be incorrect"
+  exit 1
+else
+  echo "Interface exists"
+fi
+
+# Find the base interface
+base_if=$(basename "$(readlink /sys/class/net/"${vlan_if}"/lower_*)")
+
+echo "Found parent interface ${base_if}"
+if [ ! -d "/sys/class/net/$base_if" ]; then
+  echo "Device not found, ${base_if} might be incorrect"
+  exit 1
+else
+  echo "Interface exists"
+fi
+
+# Check the IP address
+if [ "$(ip address show "$base_if" | grep -c "10.2.0.81\/24")" -ne 1 ]; then
+  echo "IP address for interface ${base_if} might not be set correctly"
+  exit 1
+elif [ "$(ip address show "$vlan_if" | grep -c "10.1.0.81\/16")" -ne 1 ]; then
+  echo "IP address for interface ${vlan_if} might not be set correctly"
+  exit 1
+else
+  echo "IP configuration is ok"
+fi
+
+route_status=$(route | grep -c "^239.0.0.0.*255.0.0.0.*lo$" || true)
+if [ "$route_status" -ne 1 ]; then
+  echo "Please add the ecal route with \"sudo route add -net 239.0.0.0 netmask 255.0.0.0 dev lo\""
+  exit 1
+fi
+
+# Determine correct filepath to license File
+license_file_path=$(find ${pdk_install_path}/etc/ -name 'pdk_license*.bin' -print -quit)
+echo "Using license file: ${license_file_path}"
+
+echo "Starting pdk_someip_handler"
+${pdk_install_path}/bin/pdk_someip_handler -l "${license_file_path}" -i ${pdk_install_path}/etc/pdk_someip_handler.ini 2>&1 &
+
+pid=$!
+sleep 2
+kill -0 $pid &> /dev/null || exit 1
+
+#echo "Starting pdk_monitoring_tool"
+#${pdk_install_path}/bin/pdk_monitoring_tool -i ${pdk_install_path}/etc/#pdk_monitoring_tool.ini 2>&1 &
+
+# Start mounting parameters publisher if either pdk_radar_object_tracking or pdk_radar_sem is found
+if [ -f ${pdk_install_path}/bin/pdk_radar_object_tracking ] || [ -f ${pdk_install_path}/bin/pdk_radar_sem ]; then
+  echo "Starting Mounting parameters publisher"
+  ${pdk_install_path}/bin/pdk_mounting_parameters -i ${pdk_install_path}/etc/pdk_mounting_parameters.ini 2>&1 &
+fi
+
+# Start object tracking if executable is found
+if [ -f ${pdk_install_path}/bin/pdk_radar_object_tracking ]; then
+  echo "Starting Object tracking"
+  ${pdk_install_path}/bin/pdk_radar_object_tracking -l "${license_file_path}" -i ${pdk_install_path}/etc/pdk_radar_object_tracking.ini 2>&1 &
+fi
+
+# Start SEM if executable is found
+if [ -f ${pdk_install_path}/bin/pdk_radar_sem ]; then
+  echo "Starting SEM"
+  ${pdk_install_path}/bin/pdk_radar_sem -l "${license_file_path}" -i ${pdk_install_path}/etc/pdk_radar_sem.ini 2>&1 &
+fi
+
+while true; do
+  sleep 1
+done

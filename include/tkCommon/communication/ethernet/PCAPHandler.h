@@ -25,7 +25,7 @@ namespace tk { namespace communication {
          * @param stamp     Packet timestamp
          * @return          Packet lenght
          */
-        int getPacket(u_int8_t& buffer, timeStamp_t& stamp);
+        int getPacket(uint8_t& buffer, timeStamp_t& stamp);
 
         //Recording
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@ namespace tk { namespace communication {
          * @param filter    Filter on recorder, default empty
          * @return          Success
          */
-        bool initRecord(const std::string fileName, const std::string filter="");
+        bool initRecord(const std::string fileName, const std::string iface, const std::string filter="");
         /**
          * Method that record the ethernet messages (blocking)
          */

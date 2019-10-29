@@ -1,0 +1,7 @@
+#!/bin/bash
+
+#sudo ip link add link eth0 name eth0.2 type vlan id 2
+#sudo ifconfig eth0.2 1.2.1.2 up
+#sudo route add -host 239.2.0.3 dev eth0.2
+sudo ifconfig eth0:vmps 1.2.1.2
+sudo route add -host 239.2.0.3 dev eth0:vmps

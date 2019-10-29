@@ -1,12 +1,7 @@
-#include "tkCommon/communication/UDPSocket.h"
+#include "tkCommon/communication/ethernet/UDPSocket.h"
 
 namespace tk { namespace communication {
-    UDPSocket::UDPSocket() {
-        this->sock_fd   = 0;
-        this->port      = 0;
-        this->ip        = "";
-        memset(&this->sock_addr, 0, sizeof(this->sock_addr));
-    }
+    UDPSocket::UDPSocket() = default;
 
 
     UDPSocket::~UDPSocket() = default;
@@ -14,7 +9,17 @@ namespace tk { namespace communication {
 
     bool
     UDPSocket::initReceiver(const int port, const std::string ip) {
-        initSender(port, ip);
+
+        this->sock_fd   = 0;
+        this->port      = 0;
+        this->ip        = "";
+        memset(&this->sock_addr, 0, sizeof(this->sock_addr));
+        
+        bool status = initSender(port, ip);
+
+        if(status == false){
+            return false;
+        }
 
         // Bind the socket with the sender address
         int r = bind(this->sock_fd, (const struct sockaddr *)&this->sock_addr,  sizeof(this->sock_addr));
@@ -34,11 +39,10 @@ namespace tk { namespace communication {
                     std::cout << "[UDPSocket] Error while joining multicast group.\n";
                     return false;
                 }
-            } else
-                std::cout << "[UDPSocket] IP "<<ip<<" is not a multicast IP.\n";
+            }
         }
 
-        mode = "receiver";
+        reciver = true;
         return true;
     }
 
@@ -53,7 +57,7 @@ namespace tk { namespace communication {
         // open socket
         this->sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
         if (this->sock_fd < 0){
-            std::cout<<"[SocketUDP] Error while opening socket.\n";
+            std::cout<<"[UDPSocket] Error while opening socket.\n";
             return false;
         }
 
@@ -67,17 +71,17 @@ namespace tk { namespace communication {
                     return false;
                 }
             } else
-                std::cout << "[SocketUDP] IP "<<ip<<" is not a multicast IP.\n";
+                std::cout << "[UDPSocket] IP "<<ip<<" is not a multicast IP.\n";
         }
 
-        mode = "sender";
+        reciver = false;
         return true;
     }
 
 
     int
     UDPSocket::receive(uint8_t *buffer, int length) {
-        if (mode == "receiver")
+        if (reciver == true)
             return recvfrom(this->sock_fd, buffer, (size_t) length, MSG_WAITALL, nullptr, nullptr);
         else
             return -1;
@@ -85,7 +89,7 @@ namespace tk { namespace communication {
 
     bool
     UDPSocket::send(uint8_t *buffer, int length) {
-        if (mode == "sender") {
+        if (reciver == false) {
             int r = sendto(this->sock_fd, buffer, (size_t) length, 0, (sockaddr *) &this->sock_addr,
                            sizeof(this->sock_addr));
             return r != -1;
@@ -94,9 +98,9 @@ namespace tk { namespace communication {
     }
 
 
-    void
+    bool
     UDPSocket::close() {
-        ::close(this->sock_fd);
+        return ::close(this->sock_fd);
     }
 
     bool
