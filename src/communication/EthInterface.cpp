@@ -41,6 +41,7 @@ namespace tk { namespace communication {
     void
     Ethinterface::record(const std::string fileName, const std::string iface, const std::string filter){
 
+        this->replayMode = true;
         pcap.initRecord(fileName, iface, filter);
         pcap.record();
     }
