@@ -1,0 +1,74 @@
+#!/bin/bash
+
+if [ "$1" == "-h" ]; then
+
+    printf "Usage: 512x10, 1024x10, 2048x10, 512x20, 1024x20(default)\n"
+	exit
+
+fi
+config=1024x20
+
+if [ $# != "0" ]; then
+
+	if [ "$1" == "512x10" ]; then
+
+		config=512x10
+	else
+
+		if [ "$1" == "1024x10" ]; then
+
+			config=1024x10
+		else
+
+			if [ "$1" == "2048x10" ]; then
+
+				config=2048x10
+			else
+
+				if [ "$1" == "512x20" ]; then
+
+					config=512x20
+				else
+
+					if [ "$1" == "1024x20" ]; then
+
+						config=1024x20
+					else
+						printf "Option $1 not recognize. Abort\n"
+						exit
+					fi
+				fi
+			fi
+		fi
+	fi
+fi
+
+#set destination ip (this pc)
+echo "set_config_param udp_ip $(hostname -I)" | nc 192.168.1.100 7501
+
+if [ $? != "0" ]; then
+	echo -e"\e[41mError setting ip dest $(hostname -I)\e[0m"
+else
+	echo -e "\e[42mSet ip dest $(hostname -I) (this pc)\e[0m"
+fi
+
+#set lidar mode
+echo "set_config_param lidar_mode $config" | nc 192.168.1.100 7501
+if [ $? != "0" ]; then
+	echo -e "\e[41mError setting lidar mode\e[0m"
+else
+	echo -e "\e[42mSet lidar mode\e[0m"
+fi
+
+
+#start sensor
+echo "reinitialize" | nc 192.168.1.100 7501
+if [ $? != "0" ]; then
+	echo -e "\e[41mError starting sensor\e[0m"
+else
+	echo -e "\e[42mSensor start successfully. You must attend 10 seconds\e[0m"
+fi
+
+
+
+
