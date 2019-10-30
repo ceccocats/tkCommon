@@ -4,7 +4,8 @@
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <signal.h>  
+#include <signal.h>
+#include <tkCommon/data/CameraData.h>
 #include "tkCommon/common.h"
 #include "tkCommon/gui/MouseView3D.h"
 #include "tkCommon/gui/Color.h"
@@ -68,6 +69,8 @@ namespace tk { namespace gui {
         static void tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float radius);
         // data 
         static void tkDrawRadarData(tk::data::RadarData_t *data, bool enable_near, bool enable_far);
+        static void tkDrawImage(tk::data::ImageData_t<uint8_t>& image, GLuint texture);
+        void tkDrawCameraData(tk::data::CameraData_t *data, GLuint texture[], bool fullscreen = false);
 
         static void tkViewport2D(int width, int height, int x=0, int y=0);
 
