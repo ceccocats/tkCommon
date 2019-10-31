@@ -3,7 +3,9 @@
 #include <map>
 #include <string>
 
-namespace tk { namespace color{
+namespace tk { namespace tcolor{
+
+
 
     namespace foreground{
 

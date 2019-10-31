@@ -667,6 +667,121 @@ Viewer::tkDrawLiDARData(tk::data::LidarData_t *data){
     }
     glEnd();
 }
+void
+Viewer::tkDrawImage(tk::data::ImageData_t<uint8_t>& image, GLuint texture)
+{
+
+    if(image.empty()){
+        std::cout << "image empty" << std::endl;
+    }else{
+
+        //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        glBindTexture(GL_TEXTURE_2D, texture);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        // Set texture clamping method
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+        if(image.channels == 4) {
+            glTexImage2D(GL_TEXTURE_2D,         // Type of texture
+                         0,                   // Pyramid level (for mip-mapping) - 0 is the top level
+                         GL_RGB,              // Internal colour format to convert to
+                         image.width,          // Image width  i.e. 640 for Kinect in standard mode
+                         image.height,          // Image height i.e. 480 for Kinect in standard mode
+                         0,                   // Border width in pixels (can either be 1 or 0)
+                         GL_RGBA,              // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
+                         GL_UNSIGNED_BYTE,    // Image data type
+                         image.data);        // The actual image data itself
+        }else if(image.channels == 3){
+            glTexImage2D(GL_TEXTURE_2D,         // Type of texture
+                         0,                   // Pyramid level (for mip-mapping) - 0 is the top level
+                         GL_RGB,              // Internal colour format to convert to
+                         image.width,          // Image width  i.e. 640 for Kinect in standard mode
+                         image.height,          // Image height i.e. 480 for Kinect in standard mode
+                         0,                   // Border width in pixels (can either be 1 or 0)
+                         GL_RGB,              // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
+                         GL_UNSIGNED_BYTE,    // Image data type
+                         image.data);        // The actual image data itself
+        }
+    }
+}
+
+
+void
+Viewer::tkSplitPanel(int count, float ratio, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y){
+    num_rows = 4;
+    if(ratio <= 0) {
+        num_rows = ceil(sqrt(count));
+    }else{
+        num_rows = count > 4 ? num_rows : 4;
+        num_rows = count > 8 ? 8 : num_rows;
+    }
+    num_cols = ceil((float)count/num_rows);
+
+    h = 1.0f/((float)num_rows/2);
+    if(ratio > 0){
+        w = h * ratio;
+    }
+    else{
+        w = 1.0f / num_cols * 2.0f;
+    }
+
+    if(ratio > 0){
+        x = 1.0f - w/2 - w * (num_cols-1);
+        y = -1.0f + h/2;
+    }
+    else {
+        x = -w * ((float) num_cols / 2) + w / 2;
+        y = -1.0f + h / 2, 0;
+    }
+}
+
+void
+Viewer::tkDrawCameraData(tk::data::CameraData_t *data, GLuint texture [], bool fullscreen) {
+    int col = 0, row = 0;
+    int num_rows, num_cols;
+    float x, y, w, h;
+    float ratio = -1;
+    if(data->count < 1)
+        return;
+    if(!fullscreen)
+        ratio = (float)data->data[0].width/(float)data->data[0].height;
+
+    tkSplitPanel(data->count, ratio, num_cols, num_rows, w, h, x, y);
+
+    if(fullscreen){
+        x = x * ((float)width/(float)height);
+        w = w * ((float)width/(float)height);
+    }
+    else{
+        x = x + ((float)width/(float)height) - 1.0;
+    }
+
+    for(int i=0; i<data->count; i++) {
+
+        col = num_cols - i / num_rows - 1;
+        row = i % num_rows;
+
+        tkDrawImage(data->data[i], texture[i]);
+        // draw 2D HUD
+        int dimW = width/num_rows;
+        int dimH = height/num_rows;
+
+        glPushMatrix(); {
+
+            tkViewport2D(dimW, dimH, col * dimW, height - dimH*((i%num_rows)+1));
+
+            glTranslatef(x + ( col * w ), y + ( row * h ), 0);
+
+            glColor4f(1,1,1,1);
+            tkDrawTexture(texture[i], h, w);
+
+        } glPopMatrix();
+    }
+}
 
 void
 Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float radius) {
