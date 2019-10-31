@@ -12,7 +12,8 @@ namespace tk { namespace data {
                               RANGE_VAR     = 2,
                               VELOCITY_VAR  = 3,
                               ANGLE_VAR     = 4,
-                              RCS           = 5
+                              RCS           = 5,
+                              ID            = 6
                             };
 
     struct RadarData_t {
