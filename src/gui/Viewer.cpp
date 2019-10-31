@@ -696,43 +696,76 @@ Viewer::tkDrawImage(tk::data::ImageData_t<uint8_t>& image, GLuint texture)
     }
 }
 
+
+void
+Viewer::tkSplitPanel(int count, float ratio, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y){
+    num_rows = 4;
+    if(ratio <= 0) {
+        num_rows = ceil(sqrt(count));
+    }else{
+        num_rows = count > 4 ? num_rows : 4;
+        num_rows = count > 8 ? 8 : num_rows;
+    }
+    num_cols = ceil((float)count/num_rows);
+
+    h = 1.0f/((float)num_rows/2);
+    if(ratio > 0){
+        w = h * ratio;
+    }
+    else{
+        w = 1.0f / num_cols * 2.0f;
+    }
+
+    if(ratio > 0){
+        x = 1.0f - w/2 - w * (num_cols-1);
+        y = -1.0f + h/2;
+    }
+    else {
+        x = -w * ((float) num_cols / 2) + w / 2;
+        y = -1.0f + h / 2, 0;
+    }
+}
+
 void
 Viewer::tkDrawCameraData(tk::data::CameraData_t *data, GLuint texture [], bool fullscreen) {
-    int col = 0;
-    int num_rows = 4;
-    int rq;
-    if(fullscreen) {
-        rq = ceil(sqrt(data->count));
-        num_rows = rq;
-    }else{
-        num_rows = data->count > 4 ? num_rows : 4;
-        num_rows = data->count > 8 ? 8 : num_rows;
+    int col = 0, row = 0;
+    int num_rows, num_cols;
+    float x, y, w, h;
+    float ratio = -1;
+    if(data->count < 1)
+        return;
+    if(!fullscreen)
+        ratio = (float)data->data[0].width/(float)data->data[0].height;
+
+    tkSplitPanel(data->count, ratio, num_cols, num_rows, w, h, x, y);
+
+    if(fullscreen){
+        x = x * ((float)width/(float)height);
+        w = w * ((float)width/(float)height);
     }
+    else{
+        x = x + ((float)width/(float)height) - 1.0;
+    }
+
     for(int i=0; i<data->count; i++) {
 
-        col = i / num_rows;
+        col = num_cols - i / num_rows - 1;
+        row = i % num_rows;
 
         tkDrawImage(data->data[i], texture[i]);
         // draw 2D HUD
         int dimW = width/num_rows;
         int dimH = height/num_rows;
-        float h = 1.0f/((float)num_rows/2);
-        float w;
-        if(!fullscreen){
-            w = h * ((float)data->data[i].width / (float)data->data[i].height);
-        }
-        else{
-            w = ((float)width/(float)height) / (data->count / num_rows /2);
-        }
-        tkViewport2D(dimW, dimH, col * dimW, height - dimH*((i%num_rows)+1));
 
         glPushMatrix(); {
-            if(!fullscreen)
-                glTranslatef(xLim - w/2, -yLim + h*((i%num_rows)+1) - h/2, 0);
-            else
-                glTranslatef(-w*(rq/2)+w/2 + w*(i/num_rows), -yLim + h*((i%num_rows)+1) - h/2, 0);
+
+            tkViewport2D(dimW, dimH, col * dimW, height - dimH*((i%num_rows)+1));
+
+            glTranslatef(x + ( col * w ), y + ( row * h ), 0);
+
             glColor4f(1,1,1,1);
             tkDrawTexture(texture[i], h, w);
+
         } glPopMatrix();
     }
 }
