@@ -33,7 +33,7 @@ namespace tk { namespace tcolor{
      * @return std::string          String Formatted
      */
     static std::string 
-    print(std::string const& str, int foreground_color = 39, int background_color = 39)
+    print(std::string const& str, int foreground_color, int background_color = 39)
     {
         std::string const start = "\033[0;";
         std::string const end   = "\033[0m";
@@ -51,7 +51,7 @@ namespace tk { namespace tcolor{
      * @return std::string          Set string
      */
     static std::string
-    set(int foreground_color = 39, int background_color = 39)
+    set(int foreground_color, int background_color = 39)
     {
         std::string const start = "\033[0;";
 
