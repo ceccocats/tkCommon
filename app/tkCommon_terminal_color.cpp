@@ -3,13 +3,29 @@
 
 int main(int argc, char* argv[]){
 
-    std::cout<<tk::color::print("Questo è tk",tk::color::foreground::yellow)<<"\n\n";
+    //Print usage
+    std::cout<<"Using print:\n";
 
-    std::cout<<tk::color::print("Questo è tk",tk::color::foreground::yellow,tk::color::background::red)<<"\n\n";
+    std::cout<<tk::tcolor::print("Questo è tk",tk::tcolor::yellow)<<"\n\n";
 
-    std::cout<<tk::color::print("Questo è tk","",tk::color::foreground::red)<<"\n\n";
+    std::cout<<tk::tcolor::print("Questo è tk",tk::tcolor::yellow,tk::tcolor::red)<<"\n\n";
 
-    std::cout<<tk::color::print("Questo è tk","",tk::color::foreground::green)<<"\n\n";
+    std::cout<<tk::tcolor::print("Questo è tk",tk::tcolor::predefined,tk::tcolor::red)<<"\n\n";
+
+
+    //Set unset usage
+    std::cout<<"Using set/unset:\n";
+
+    std::cout<<tk::tcolor::set(tk::tcolor::yellow);
+    std::cout<<"Qusto è tk"<<tk::tcolor::unset()<<"\n\n";
+
+    std::cout<<tk::tcolor::set(tk::tcolor::yellow,tk::tcolor::red);
+    std::cout<<"Qusto è tk"<<tk::tcolor::unset()<<"\n\n";
+
+    std::cout<<tk::tcolor::set(tk::tcolor::predefined,tk::tcolor::red);
+    std::cout<<"Qusto è tk"<<tk::tcolor::unset()<<"\n\n";
+
+
 
     return  0;
 }
