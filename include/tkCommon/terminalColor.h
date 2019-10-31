@@ -6,7 +6,7 @@
 namespace tk { namespace tcolor{
 
     const static uint8_t    predefined      = 39;
-    const static uint8_t    black           = 30;
+    const static uint8_t    white           = 30;
     const static uint8_t    red             = 31;
     const static uint8_t    green           = 32;
     const static uint8_t    yellow          = 33;
@@ -21,7 +21,7 @@ namespace tk { namespace tcolor{
     const static uint8_t    lightBlue       = 94;
     const static uint8_t    lightMagenta    = 95;
     const static uint8_t    lightCyan       = 96;
-    const static uint8_t    white           = 97;
+    const static uint8_t    black           = 97;
 
     const static uint8_t    bold            = 1;
     const static uint8_t    dim             = 2;
