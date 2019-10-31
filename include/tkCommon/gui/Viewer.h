@@ -14,6 +14,7 @@
 #include "tkCommon/gui/imgui_impl_opengl3.h"
 
 #include "tkCommon/data/RadarData.h"
+#include "tkCommon/data/LidarData.h"
 
 #include "tkCommon/gui/libdrawtext/drawtext.h"
 
@@ -66,8 +67,13 @@ namespace tk { namespace gui {
         static void tkRainbowColor(float hue, uint8_t &r, uint8_t &g, uint8_t &b);
         static void tkSetRainbowColor(float hue);
         static void tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float radius);
+
         // data 
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         static void tkDrawRadarData(tk::data::RadarData_t *data, bool enable_near, bool enable_far);
+
+        static void tkDrawLiDARData(tk::data::LidarData_t *data);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         static void tkViewport2D(int width, int height, int x=0, int y=0);
 

@@ -655,6 +655,20 @@ Viewer::tkDrawRadarData(tk::data::RadarData_t *data, bool enable_near, bool enab
 }
 
 void
+Viewer::tkDrawLiDARData(tk::data::LidarData_t *data){
+
+    glPointSize(1.0);
+    glBegin(GL_POINTS);
+    //white
+    glColor4ub(250, 250, 250, 255);
+
+    for (int p = 0; p < data->nPoints; p++) {
+        glVertex3f(data->points.coeff(0,p),data->points.coeff(1,p),data->points.coeff(2,p));
+    }
+    glEnd();
+}
+
+void
 Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float radius) {
     glPushMatrix(); 
 
