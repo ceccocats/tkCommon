@@ -19,6 +19,8 @@
 
 #include "tkCommon/gui/libdrawtext/drawtext.h"
 
+#include <tkCommon/terminalColor.h>
+
 
 namespace tk { namespace gui {
 

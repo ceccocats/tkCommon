@@ -1,5 +1,25 @@
 #include <tkCommon/terminalColor.h>
 #include <iostream>
+#include <cxxabi.h>
+
+namespace tk{
+class tkClass{
+    public:
+        void error(){
+            clsErr("Messaggio di errore\n");
+        }
+        void success(){
+            clsSuc("Messaggio di successo\n");
+        }
+        void warning(){
+            clsWrn("Messaggio di warning\n");
+        }
+        void message(){
+            clsMsg("Messaggio classico\n");
+        }
+};
+}
+
 
 int main(int argc, char* argv[]){
 
@@ -21,21 +41,27 @@ int main(int argc, char* argv[]){
     std::cout<<"Using set/unset:\n";
 
     std::cout<<tk::tcolor::set(tk::tcolor::yellow);
-    std::cout<<"Qusto è tk"<<tk::tcolor::unset()<<"\n\n";
+    std::cout<<"Questo è tk"<<tk::tcolor::unset()<<"\n\n";
 
     std::cout<<tk::tcolor::set(tk::tcolor::yellow,tk::tcolor::red);
-    std::cout<<"Qusto è tk"<<tk::tcolor::unset()<<"\n\n";
+    std::cout<<"Questo è tk"<<tk::tcolor::unset()<<"\n\n";
 
     std::cout<<tk::tcolor::set(tk::tcolor::predefined,tk::tcolor::red);
-    std::cout<<"Qusto è tk"<<tk::tcolor::unset()<<"\n\n";
+    std::cout<<"Questo è tk"<<tk::tcolor::unset()<<"\n\n";
 
     std::cout<<tk::tcolor::set(tk::tcolor::predefined,tk::tcolor::red,tk::tcolor::bold);
-    std::cout<<"Qusto è tk"<<tk::tcolor::unset()<<"\n\n";
+    std::cout<<"Questo è tk"<<tk::tcolor::unset()<<"\n\n";
 
     std::cout<<tk::tcolor::set(tk::tcolor::predefined,tk::tcolor::red,tk::tcolor::reverse);
-    std::cout<<"Qusto è tk"<<tk::tcolor::unset()<<"\n\n";
+    std::cout<<"Questo è tk"<<tk::tcolor::unset()<<"\n\n";
 
 
+    //Class printing
+    tk::tkClass a;
+    a.error();
+    a.message();
+    a.success();
+    a.warning();
 
     return  0;
 }

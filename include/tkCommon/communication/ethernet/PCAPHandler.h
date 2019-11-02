@@ -1,7 +1,8 @@
 #pragma once
 
-#include "tkCommon/common.h"
-#include "tkCommon/utils.h"
+#include <tkCommon/common.h>
+#include <tkCommon/utils.h>
+#include <tkCommon/terminalColor.h>
 #include <pcap.h>
 
 namespace tk { namespace communication {
@@ -25,7 +26,7 @@ namespace tk { namespace communication {
          * @param stamp     Packet timestamp
          * @return          Packet lenght
          */
-        int getPacket(uint8_t& buffer, timeStamp_t& stamp);
+        int getPacket(uint8_t* buffer, timeStamp_t& stamp);
 
         //Recording
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -91,11 +91,17 @@ target_link_libraries(tkCommon_cmd tkCommon)
 add_executable(tkCommon_eth_pcap app/tkCommon_eth_pcap.cpp)
 target_link_libraries(tkCommon_eth_pcap tkCommon tkCommunication)
 
+add_executable(tkCommon_pcap_replay app/tkCommon_pcap_replay.cpp)
+target_link_libraries(tkCommon_pcap_replay tkCommon tkCommunication)
+
 add_executable(tkCommon_eth_socket app/tkCommon_eth_socket.cpp)
 target_link_libraries(tkCommon_eth_socket tkCommon tkCommunication)
 
 add_executable(tkCommon_terminal_color app/tkCommon_terminal_color.cpp)
-target_link_libraries(tkCommon_terminal_color tkCommon)
+target_link_libraries(tkCommon_terminal_color)
+
+add_executable(tkCommon_segfault app/tkCommon_segfault.cpp)
+#target_link_libraries(tkCommon_segfault tkCommon)
 
 #-------------------------------------------------------------------------------
 # Install

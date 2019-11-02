@@ -2,6 +2,7 @@
 #include <tkCommon/common.h>
 #include <csignal>
 #include <tkCommon/communication/EthInterface.h>
+#include <tkCommon/exceptions.h>
 
 bool recorder, gRun = true;
 tk::communication::Ethinterface iface;
@@ -13,13 +14,13 @@ void recorderLoop(std::string file, std::string interface, std::string filter){
 
 void replayLoop(std::string file, std::string filter){
 
-    iface.initPcapReplay(file,filter);
+    tkASSERT(iface.initPcapReplay(file,filter));
     uint8_t buffer[2000];
 
     while(gRun){
 
         timeStamp_t time;
-        int n = iface.read(*buffer,time);
+        int n = iface.read(buffer,time);
 
         if(n == -1){
 
@@ -28,7 +29,7 @@ void replayLoop(std::string file, std::string filter){
 
             tk::common::hex_dump(std::cout, buffer, n);
 
-            std::cout<<"Timestamp: "<<time<<"\n\n";
+            std::cout<<"Timestamp: "<<(long int)time<<"\n\n";
         }
     }
 
