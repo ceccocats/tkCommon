@@ -14,11 +14,9 @@ void replayLoop(std::string file, int port){
     sender.initSender(port,"127.0.0.1");
     uint8_t buffer[2000];
     int count = 0;
-    timeStamp_t prec = 0, now, startComputation;
+    timeStamp_t prec = 0, now;
 
     while(gRun){      
-
-        startComputation = getTimeStamp();
 
         int n = iface.read(buffer,now);
 
@@ -26,8 +24,11 @@ void replayLoop(std::string file, int port){
 
         if(prec != 0){
 
-            timeStamp_t sleep_for = (now-prec); - (getTimeStamp() - startComputation);
-            usleep(sleep_for);
+            if(now > prec){
+                
+                timeStamp_t sleep_for = (now-prec);
+                usleep(sleep_for);
+            }
         }
 
         prec = now;
@@ -49,7 +50,7 @@ int main(int argc, char* argv[]){
 
     tk::common::CmdParser   cmd(argv, "Samples for handle ethernet packets");
     std::string file        = cmd.addOpt("-file", "", "pcap replay file");
-    int port                = cmd.addIntOpt("-port", 2386, "pcap replay file");
+    int port                = cmd.addIntOpt("-port", 2368, "pcap replay file");
     cmd.print();
 
     tk::exceptions::handleSegfault();

@@ -670,7 +670,7 @@ Viewer::tkDrawRadarData(tk::data::RadarData_t *data, bool enable_near, bool enab
 void
 Viewer::tkDrawLiDARData(tk::data::LidarData_t *data){
 
-    glPointSize(4.0);
+    glPointSize(1.0);
     glBegin(GL_POINTS);
     //white
     tkSetColor(tk::gui::color::WHITE);
@@ -678,8 +678,6 @@ Viewer::tkDrawLiDARData(tk::data::LidarData_t *data){
     for (int p = 0; p < data->nPoints; p++) {
 
         glVertex3f(data->points.coeff(0,p),data->points.coeff(1,p),data->points.coeff(2,p));
-
-        //std::cout<<data->points.coeff(0,p)<<"__"<<data->points.coeff(1,p)<<"__"<<data->points.coeff(2,p)<<"\n";
     }
     glEnd();
 }
