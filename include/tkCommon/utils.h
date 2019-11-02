@@ -439,3 +439,14 @@ struct PoolQueue {
     }
 
 };
+
+/**
+ * @brief           Function for convert degrees in radiants
+ * 
+ * @param x         degrees
+ * @return double   degrees in radiant
+ */
+inline double toRadians(double x){
+    
+    return ((x * M_PI) / 180.0);
+}

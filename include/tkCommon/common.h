@@ -9,6 +9,7 @@
 
 #include "utils.h"
 #include "timer.h"
+#define EIGEN_STACK_ALLOCATION_LIMIT 0
 #include "Eigen/Dense"
 #include "geodetic_conv.h"
 #include "CmdParser.h"

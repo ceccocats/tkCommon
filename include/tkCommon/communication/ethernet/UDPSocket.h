@@ -12,6 +12,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#include <tkCommon/terminalColor.h>
+
 namespace tk{ namespace communication {
 
     class UDPSocket{
@@ -70,9 +72,7 @@ namespace tk{ namespace communication {
 
     private:
         int             sock_fd;
-        int             port;
         bool            reciver;
-        std::string     ip;
         sockaddr_in     sock_addr;
     };
 

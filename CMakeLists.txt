@@ -67,11 +67,15 @@ target_link_libraries(tkGUI tklibDrawText ${GUI_LIBS})
 add_library(tkCommon SHARED
     src/common.cpp
     src/CmdParser.cpp
+)
+target_link_libraries(tkCommon tkGUI yaml-cpp matio)
+
+add_library(tkCommunication SHARED
     src/communication/ethernet/UDPSocket.cpp
     src/communication/ethernet/PCAPHandler.cpp
     src/communication/EthInterface.cpp
 )
-target_link_libraries(tkCommon tkGUI yaml-cpp matio pcap)
+target_link_libraries(tkCommunication pcap)
 
 add_library(tkMath SHARED src/math/CSpline.cpp src/math/CSpline2D.cpp src/math/CSpline3D.cpp)
 
@@ -85,10 +89,19 @@ add_executable(tkCommon_cmd app/tkCommon_cmd.cpp)
 target_link_libraries(tkCommon_cmd tkCommon)
 
 add_executable(tkCommon_eth_pcap app/tkCommon_eth_pcap.cpp)
-target_link_libraries(tkCommon_eth_pcap tkCommon)
+target_link_libraries(tkCommon_eth_pcap tkCommon tkCommunication)
+
+add_executable(tkCommon_pcap_replay app/tkCommon_pcap_replay.cpp)
+target_link_libraries(tkCommon_pcap_replay tkCommon tkCommunication)
 
 add_executable(tkCommon_eth_socket app/tkCommon_eth_socket.cpp)
-target_link_libraries(tkCommon_eth_socket tkCommon)
+target_link_libraries(tkCommon_eth_socket tkCommon tkCommunication)
+
+add_executable(tkCommon_terminal_color app/tkCommon_terminal_color.cpp)
+target_link_libraries(tkCommon_terminal_color)
+
+add_executable(tkCommon_segfault app/tkCommon_segfault.cpp)
+#target_link_libraries(tkCommon_segfault tkCommon)
 
 #-------------------------------------------------------------------------------
 # Install

@@ -50,7 +50,7 @@ Viewer::init() {
         // Initialize OpenGL loader
         bool err = glewInit() != GLEW_OK;
         if (err) {
-            fprintf(stderr, "Failed to initialize OpenGL loader!\n");
+            tk::tcolor::printErr("Viewer", "Failed to initialize OpenGL loader!\n");
             exit(-1);
         }
 
@@ -76,7 +76,7 @@ Viewer::init() {
 
         /* XXX dtx_open_font opens a font file and returns a pointer to dtx_font */
         if(!(font = dtx_open_font(fontPath.c_str(), TK_FONT_SIZE))) {
-            std::cout<<"failed to open font: "<<fontPath<<"\n";
+            tk::tcolor::printErr("Viewer",std::string{"failed to open font: "+fontPath});
             exit(1);
         }
         /* XXX select the font and size to render with by calling dtx_use_font
@@ -97,9 +97,10 @@ Viewer::init() {
     //glDepthFunc(GL_GEQUAL);
     //glEnable(GL_LINE_SMOOTH);
 
-    std::cout<<"OPENGL running on:\n";
-    std::cout<<glGetString(GL_VERSION) << std::endl;
-    std::cout<<glGetString(GL_RENDERER)<< std::endl;
+    std::string msg =   std::string{"OPENGL running on:"} + 
+                        std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))) + " " +
+                        std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))) + "\n";
+    tk::tcolor::printMsg("Viewer",msg);
 }
 
 
@@ -223,10 +224,13 @@ Viewer::tkLoadTexture(std::string filename, GLuint &tex) {
     unsigned char* image;
     unsigned width, height;
 
+    tk::tcolor::printMsg("Viewer",std::string{"loading:"+filename}+"\n");
+
     error = lodepng_decode32_file(&image, &width, &height, filename.c_str());
     if(error == 0) {
-        if( (width % 32) != 0 || (height % 32) != 0)
-            std::cout<<"please use images size multiple of 32\n";
+        if( (width % 32) != 0 || (height % 32) != 0){
+            tk::tcolor::printErr("Viewer","please use images size multiple of 32\n");
+        }
 
         //upload to GPU texture
         glGenTextures(1, &tex);
@@ -243,12 +247,11 @@ Viewer::tkLoadTexture(std::string filename, GLuint &tex) {
     } else {
         tex = 0;
     }
-
-    std::cout<<"loading "<<filename<<"    ";
+    
     if(error == 0)
-        std::cout<<" OK!!\n";
+        tk::tcolor::printSuc("Viewer","file open successfully\n");
     else
-        std::cout<<" ERROR: "<<error<<"\n";
+        tk::tcolor::printErr("Viewer",std::string{"error: "}+std::to_string(error)+std::string{"\n"});
 
     return error;
 }
@@ -258,7 +261,8 @@ int
 Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
 
     int error = 0;
-    std::cout<<"loading "<<filename<<".obj";
+    
+    tk::tcolor::printMsg("Viewer",std::string{"loading:"+filename}+std::string{".obj\n"});
     
     // correct locale dependent stof
     std::setlocale(LC_ALL, "C");
@@ -266,12 +270,15 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
     objl::Loader loader;
     if(loader.LoadFile((filename + ".obj").c_str())) {
    
-        std::cout<<" OK!!\n";
+        tk::tcolor::printSuc("Viewer","file open successfully\n");
         obj.triangles.resize(loader.LoadedMeshes.size());
         obj.colors.resize(loader.LoadedMeshes.size());
 
         for(int o=0; o<loader.LoadedMeshes.size(); o++) {
-            std::cout<<"name: "<<loader.LoadedMeshes[o].MeshName<<"  verts: "<<loader.LoadedMeshes[o].Vertices.size()<<"\n";
+
+            std::string msg = std::string{"name: "}+loader.LoadedMeshes[o].MeshName+"  verts: "+std::to_string(loader.LoadedMeshes[o].Vertices.size())+"\n";
+            tk::tcolor::printMsg("Viewer",msg);
+            //std::cout<<"name: "<<loader.LoadedMeshes[o].MeshName<<"  verts: "<<loader.LoadedMeshes[o].Vertices.size()<<"\n";
    
             std::vector<unsigned int> indices = loader.LoadedMeshes[o].Indices;
             std::vector<objl::Vertex> verts = loader.LoadedMeshes[o].Vertices;
@@ -279,7 +286,13 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
             obj.colors[o].x = loader.LoadedMeshes[o].MeshMaterial.Kd.X;
             obj.colors[o].y = loader.LoadedMeshes[o].MeshMaterial.Kd.Y;
             obj.colors[o].z = loader.LoadedMeshes[o].MeshMaterial.Kd.Z;
-            std::cout<<"mat: "<<loader.LoadedMeshes[o].MeshMaterial.name<<" diffuse: "<<obj.colors[o]<<"\n";
+
+            msg = std::string{"mat: "}+loader.LoadedMeshes[o].MeshMaterial.name;
+            msg += std::string{" ("}+std::to_string(obj.colors[0].x)+std::to_string(obj.colors[0].y)+std::to_string(obj.colors[0].z)+std::string{")\n"};
+            tk::tcolor::printMsg("Viewer",msg);
+
+
+            //std::cout<<"mat: "<<loader.LoadedMeshes[o].MeshMaterial.name<<" diffuse: "<<obj.colors[o]<<"\n";
             
             obj.triangles[o] = Eigen::MatrixXf(5, indices.size());
             for(int i=0; i<indices.size(); i++) {
@@ -294,11 +307,11 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
 
 
     } else {
-        error = 1;
-        std::cout<<" ERROR\n";
+        error = tkLoadTexture((filename + ".png"), obj.tex);
+        if(error == 1)
+            tk::tcolor::printErr("Viewer","error\n");
     }
-    
-    error = error || tkLoadTexture((filename + ".png"), obj.tex);
+
     return error;
 }
 
@@ -655,12 +668,27 @@ Viewer::tkDrawRadarData(tk::data::RadarData_t *data, bool enable_near, bool enab
 }
 
 void
+Viewer::tkDrawLiDARData(tk::data::LidarData_t *data){
+
+    glPointSize(4.0);
+    glBegin(GL_POINTS);
+    //white
+    tkSetColor(tk::gui::color::WHITE);
+
+    for (int p = 0; p < data->nPoints; p++) {
+
+        glVertex3f(data->points.coeff(0,p),data->points.coeff(1,p),data->points.coeff(2,p));
+
+        std::cout<<data->points.coeff(0,p)<<"__"<<data->points.coeff(1,p)<<"__"<<data->points.coeff(2,p)<<"\n";
+    }
+    glEnd();
+}
+void
 Viewer::tkDrawImage(tk::data::ImageData_t<uint8_t>& image, GLuint texture)
 {
 
     if(image.empty()){
-        std::cout << "image empty" << std::endl;
-        std::cout << image.width<<"x"<<image.height<<" ["<<image.channels<<"]\n";
+        tk::tcolor::printMsg("Viewer","Image empty\n");
     }else{
 
         //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -883,7 +911,7 @@ Viewer::tkViewport2D(int width, int height, int x, int y) {
 
 void 
 Viewer::errorCallback(int error, const char* description) {
-    fprintf(stderr, "Error: %s\n", description);
+    tk::tcolor::printErr("Viewer", std::string{"error: "}+description);
 }
 
 void

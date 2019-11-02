@@ -15,8 +15,11 @@
 #include "tkCommon/gui/imgui_impl_opengl3.h"
 
 #include "tkCommon/data/RadarData.h"
+#include "tkCommon/data/LidarData.h"
 
 #include "tkCommon/gui/libdrawtext/drawtext.h"
+
+#include <tkCommon/terminalColor.h>
 
 
 namespace tk { namespace gui {
@@ -67,10 +70,15 @@ namespace tk { namespace gui {
         static void tkRainbowColor(float hue, uint8_t &r, uint8_t &g, uint8_t &b);
         static void tkSetRainbowColor(float hue);
         static void tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float radius);
+
         // data 
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         static void tkDrawRadarData(tk::data::RadarData_t *data, bool enable_near, bool enable_far);
         static void tkDrawImage(tk::data::ImageData_t<uint8_t>& image, GLuint texture);
         static void tkSplitPanel(int count, float ratio, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y);
+
+        static void tkDrawLiDARData(tk::data::LidarData_t *data);
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         static void tkViewport2D(int width, int height, int x=0, int y=0);
 

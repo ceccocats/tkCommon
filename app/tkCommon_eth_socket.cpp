@@ -48,10 +48,11 @@ void senderLoop(int port, std::string ip){
 
 void signal_handler(int signal)
 {
-    std::cout<<"\nRequest closing..\n";
     if(gRun == false){
+        std::cout<<"\nForced closing.\n";
         exit(-1);
     }
+    std::cout<<"\nRequest closing..\n";
     gRun = false;
 }
 
@@ -59,16 +60,11 @@ int main(int argc, char* argv[]){
     std::signal(SIGINT, signal_handler);
     std::signal(SIGTERM, signal_handler);
 
-    std::string             type, ip;
-    int                     port;
-
     tk::common::CmdParser   cmd(argv, "Samples for handle ethernet packets");
-    type                    = cmd.addOpt("-type", "reciver" ,"reciver, sender");
-    ip                      = cmd.addOpt("-ip", "", "ip multicast only in case of multicast type");
-    port                    = atoi(cmd.addArg("-port", "40000", "port").c_str());
+    std::string  type       = cmd.addOpt("-type", "reciver" ,"reciver, sender");
+    std::string  ip         = cmd.addOpt("-ip", "", "ip");
+    int port                = cmd.addIntOpt("-port", 40000, "port");
     cmd.print();
-
-
 
     if( type == "reciver"){
         std::cout<<"Reciver...\n";

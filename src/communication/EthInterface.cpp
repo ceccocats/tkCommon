@@ -21,7 +21,7 @@ namespace tk { namespace communication {
     }
 
     int
-    Ethinterface::read(uint8_t& buffer, timeStamp_t& stamp){
+    Ethinterface::read(uint8_t* buffer, timeStamp_t& stamp){
 
         if(this->replayMode == true){
 
@@ -31,7 +31,7 @@ namespace tk { namespace communication {
 
             //Socket
             int len;
-            this->socket.receive(&buffer,len);
+            this->socket.receive(buffer,len);
             stamp           = getTimeStamp();
             return len;
 

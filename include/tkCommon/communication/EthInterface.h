@@ -40,7 +40,7 @@ namespace tk { namespace communication {
          * @param stamp     Packet timestamp
          * @return          Packet lenght
          */
-        int read(uint8_t& buffer, timeStamp_t& stamp);
+        int read(uint8_t* buffer, timeStamp_t& stamp);
 
 
 
