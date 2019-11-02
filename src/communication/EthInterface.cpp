@@ -30,8 +30,7 @@ namespace tk { namespace communication {
         }else{
 
             //Socket
-            int len;
-            this->socket.receive(buffer,len);
+            int len = this->socket.receive(buffer,2000);
             stamp           = getTimeStamp();
             return len;
 

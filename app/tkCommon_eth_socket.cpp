@@ -3,6 +3,7 @@
 #include <csignal>
 #include <tkCommon/communication/ethernet/UDPSocket.h>
 
+
 bool gRun = true;
 
 void reciverLoop(int port, std::string ip){
@@ -11,6 +12,7 @@ void reciverLoop(int port, std::string ip){
 
     socket.initReceiver(port,ip);
     uint8_t buffer[1000];
+    timeStamp_t time;
 
      while(gRun){
 

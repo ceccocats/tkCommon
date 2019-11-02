@@ -22,7 +22,6 @@ namespace tk { namespace communication {
         int r = bind(this->sock_fd, (const struct sockaddr *)&this->sock_addr,  sizeof(this->sock_addr));
         if (r < 0) {
             clsErr("error while binding the socket.\n");
-            //std::cerr<<tk::tcolor::print("[UDPSocket]\t",tk::tcolor::red)<<"error while binding the socket.\n";
             return false;
         }
 
@@ -33,10 +32,8 @@ namespace tk { namespace communication {
                 mreq.imr_multiaddr.s_addr = inet_addr(ip.c_str());
                 mreq.imr_interface.s_addr = htonl(INADDR_ANY);
                 r = setsockopt(this->sock_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *) &mreq, sizeof(mreq));
-                if (r < 0) {
-                    
+                if (r < 0) {   
                     clsErr("error while joining multicast group.")
-                    //tk::tcolor::classMsg("UDPSocket","error while joining multicast group.",tk::tcolor::error);
                     return false;
                 }
             }
@@ -65,7 +62,6 @@ namespace tk { namespace communication {
         this->sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
         if (this->sock_fd < 0){
             clsErr("error while opening socket.\n");
-            //std::cerr<<tk::tcolor::print("[UDPSocket]\t",tk::tcolor::red)<<"error while opening socket.\n";
             return false;
         }
 
@@ -76,19 +72,15 @@ namespace tk { namespace communication {
                 int r = setsockopt(this->sock_fd, SOL_SOCKET, SO_REUSEADDR, (char*) &optname, sizeof(optname));
                 if (r < 0){
                     clsErr("error while allowing multiple sockets.\n");
-                    //std::cerr<<tk::tcolor::print("[UDPSocket]",tk::tcolor::red)<<"error while allowing multiple sockets.\n";
                     return false;
                 }
                 clsSuc("multicast socket created.\n");
-                //std::cout<<tk::tcolor::print("[UDPSocket]\t",tk::tcolor::green)<<"multicast socket created.\n";
             } else
 
                 clsSuc("classic socket created.\n");
-                //std::cout<<tk::tcolor::print("[UDPSocket]\t",tk::tcolor::green)<<"classic socket created.\n";
         }else{
 
             clsSuc("socket port created.\n");
-            //tk::tcolor::classMsg("UDPSocket","socket port created.\n",tk::tcolor::warning);
         }
 
         reciver = false;

@@ -679,7 +679,7 @@ Viewer::tkDrawLiDARData(tk::data::LidarData_t *data){
 
         glVertex3f(data->points.coeff(0,p),data->points.coeff(1,p),data->points.coeff(2,p));
 
-        std::cout<<data->points.coeff(0,p)<<"__"<<data->points.coeff(1,p)<<"__"<<data->points.coeff(2,p)<<"\n";
+        //std::cout<<data->points.coeff(0,p)<<"__"<<data->points.coeff(1,p)<<"__"<<data->points.coeff(2,p)<<"\n";
     }
     glEnd();
 }

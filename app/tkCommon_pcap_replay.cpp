@@ -35,7 +35,7 @@ void replayLoop(std::string file, int port){
         count++;
         if(count%500 == 0){
 
-            tk::tcolor::printMsg("pcapReplay", std::string{"send"}+std::to_string(count)+" packets\n");
+            tk::tcolor::printMsg("pcapReplay", std::string{"send "}+std::to_string(count)+" packets\n");
         }
 
 
