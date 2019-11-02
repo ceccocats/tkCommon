@@ -52,6 +52,8 @@ int main(int argc, char* argv[]){
     int port                = cmd.addIntOpt("-port", 2386, "pcap replay file");
     cmd.print();
 
+    tk::exceptions::handleSegfault();
+
     replayLoop(file,port);
 
     return 0;

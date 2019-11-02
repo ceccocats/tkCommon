@@ -52,8 +52,11 @@ void signal_handler(int signal)
 }
 
 int main(int argc, char* argv[]){
+    
     std::signal(SIGINT, signal_handler);
     std::signal(SIGTERM, signal_handler);
+
+    tk::exceptions::handleSegfault();
 
     std::string             file,filter,interface;
 
