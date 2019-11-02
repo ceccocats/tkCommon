@@ -98,7 +98,7 @@ Viewer::init() {
     //glEnable(GL_LINE_SMOOTH);
 
     std::string msg =   std::string{"OPENGL running on:"} + 
-                        std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))) + 
+                        std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))) + " " +
                         std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))) + "\n";
     tk::tcolor::printMsg("Viewer",msg);
 }
@@ -311,7 +311,7 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
         if(error == 1)
             tk::tcolor::printErr("Viewer","error\n");
     }
-    
+
     return error;
 }
 
