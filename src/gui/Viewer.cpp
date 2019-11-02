@@ -742,7 +742,7 @@ Viewer::tkSplitPanel(int count, float ratio, int &num_cols, int &num_rows, float
         w = h * ratio;
     }
     else{
-        w = 1.0f / num_cols * 2.0f;
+        w = 2.0f / num_cols;
     }
 
     if(ratio > 0){
@@ -752,50 +752,6 @@ Viewer::tkSplitPanel(int count, float ratio, int &num_cols, int &num_rows, float
     else {
         x = -w * ((float) num_cols / 2) + w / 2;
         y = -1.0f + h / 2, 0;
-    }
-}
-
-void
-Viewer::tkDrawCameraData(tk::data::CameraData_t *data, GLuint texture [], bool fullscreen) {
-    int col = 0, row = 0;
-    int num_rows, num_cols;
-    float x, y, w, h;
-    float ratio = -1;
-    if(data->count < 1)
-        return;
-    if(!fullscreen)
-        ratio = (float)data->data[0].width/(float)data->data[0].height;
-
-    tkSplitPanel(data->count, ratio, num_cols, num_rows, w, h, x, y);
-
-    if(fullscreen){
-        x = x * ((float)width/(float)height);
-        w = w * ((float)width/(float)height);
-    }
-    else{
-        x = x + ((float)width/(float)height) - 1.0;
-    }
-
-    for(int i=0; i<data->count; i++) {
-
-        col = num_cols - i / num_rows - 1;
-        row = i % num_rows;
-
-        tkDrawImage(data->data[i], texture[i]);
-        // draw 2D HUD
-        int dimW = width/num_rows;
-        int dimH = height/num_rows;
-
-        glPushMatrix(); {
-
-            tkViewport2D(dimW, dimH, col * dimW, height - dimH*((i%num_rows)+1));
-
-            glTranslatef(x + ( col * w ), y + ( row * h ), 0);
-
-            glColor4f(1,1,1,1);
-            tkDrawTexture(texture[i], h, w);
-
-        } glPopMatrix();
     }
 }
 

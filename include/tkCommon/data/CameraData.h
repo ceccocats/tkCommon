@@ -41,6 +41,16 @@ namespace tk{namespace data{
                 return *this;
             }
 
+            void copyData(const CameraData_t& s){
+                if(s.count != count){
+                    release();
+                    init(s.count);
+                }
+                for(unsigned int i = 0; i < count; i++){
+                    data[i].copyData(s.data[i]);
+                }
+            }
+
             void release(){
                 if(data == nullptr){
                     return;
