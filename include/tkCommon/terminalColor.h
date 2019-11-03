@@ -67,6 +67,12 @@ namespace tk { namespace tcolor{
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * @brief               Set class name in output format
+     * 
+     * @param s             Class name
+     * @return std::string  Output stream
+     */
     inline std::string
     formatName(std::string s){
 
