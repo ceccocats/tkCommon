@@ -29,14 +29,16 @@ std::string CmdParser::addArg(std::string name, std::string default_val, std::st
 
 bool CmdParser::addBoolOpt(std::string opt, std::string info) {
     if(opt.size() <= 1 || opt[0] != '-') {
-        std::cout<<"option must start with '-', this is not valid: "<<opt<<"\n";
+        clsErr(std::string{"option must start with '-', this is not valid: "}+opt+"\n");
+        //std::cout<<"option must start with '-', this is not valid: "<<opt<<"\n";
         exit(1);
     }
 
     argh::parser cmdl(argv_ptr, argv_mode);
 
     if(!cmdl(opt).str().empty()) {
-        std::cout<<"ERROR: you cant append values to boolean flag: "<<opt<<"\n";
+        clsErr(std::string{"you cant append values to boolean flag: "}+opt+"\n");
+        //std::cout<<"ERROR: you cant append values to boolean flag: "<<opt<<"\n";
         exit(-1);
     }
 
@@ -51,7 +53,8 @@ bool CmdParser::addBoolOpt(std::string opt, std::string info) {
 
 std::string CmdParser::addOpt(std::string opt, std::string default_val, std::string info) {
     if(opt.size() <= 1 || opt[0] != '-') {
-        std::cout<<"option must start with '-', this is not valid: "<<opt<<"\n";
+        clsErr(std::string{"option must start with '-', this is not valid: "}+opt+"\n");
+        //std::cout<<"option must start with '-', this is not valid: "<<opt<<"\n";
         exit(1);
     }
 
@@ -122,7 +125,8 @@ void CmdParser::print() {
                 found = true;
         }
         if(!found) {
-            std::cout<<"ERROR: flag not valid: -"<<flag<<"\n";
+            clsErr(std::string{"flag not valid: -"}+flag+"\n");
+            //std::cout<<"ERROR: flag not valid: -"<<flag<<"\n";
             printUsage(cmdl[0]);
             exit(1);
         }
@@ -130,7 +134,8 @@ void CmdParser::print() {
 
     // print exec info if avaible
     if (!generalInfo.empty()) {
-        std::cout << generalInfo << "\n";
+        clsMsg(generalInfo+"\n");
+        //std::cout << generalInfo << "\n";
     }
 
     if (cmdl["-h"]) {

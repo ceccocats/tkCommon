@@ -5,17 +5,20 @@
 #include <execinfo.h>
 #include <typeinfo>
 #include <cxxabi.h>
+#include <iomanip>
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 
-#define clsErr(X)  (tk::tcolor::printErr(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
+#define clsErr(X)  (tk::tformat::printErr(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
 
-#define clsSuc(X)  (tk::tcolor::printSuc(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
+#define clsSuc(X)  (tk::tformat::printSuc(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
 
-#define clsWrn(X)  (tk::tcolor::printWrn(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
+#define clsWrn(X)  (tk::tformat::printWrn(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
 
-#define clsMsg(X)  (tk::tcolor::printMsg(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
+#define clsMsg(X)  (tk::tformat::printMsg(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
 
-namespace tk { namespace tcolor{
+namespace tk { namespace tformat{
 
     const static uint8_t    predefined      = 39;
     const static uint8_t    white           = 30;
@@ -41,6 +44,8 @@ namespace tk { namespace tcolor{
     const static uint8_t    blink           = 5;
     const static uint8_t    reverse         = 7;
     const static uint8_t    hidden          = 8;
+
+    const static int        LEN_CLASS_NAME  = 16;
 
      /**
      * @brief                       Color formatting text
@@ -81,14 +86,36 @@ namespace tk { namespace tcolor{
         }
 
         s = std::string{"["} + s + std::string{"]:"};
-        int tabs = 32 - s.length();
-        tabs = (tabs/8) -1;
 
-        for(int c = 0; c < tabs; c++){
-            s += std::string{"\t"};
-        }
+        s += std::string(LEN_CLASS_NAME-s.size(), ' ');
 
         return s;
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief               Set message in output format
+     * 
+     * @param s             Msg
+     * @return std::string  Output stream
+     */
+    inline std::string
+    formatMsg(std::string m){
+
+        std::string out = "";
+
+        struct winsize size;
+        ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
+
+        int len = size.ws_col - LEN_CLASS_NAME;
+
+        int c = 0;
+        for(c = 0; c < (int)m.size(); c += len){
+
+            out += m.substr(c,len) + '\n' + std::string(LEN_CLASS_NAME, ' ');
+        }
+
+        return out.substr(0,out.size()-1-LEN_CLASS_NAME);
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -101,7 +128,7 @@ namespace tk { namespace tcolor{
     inline void
     printErr(std::string className, std::string msg){
 
-        msg = print(formatName(className),red) + msg;
+        msg = print(formatName(className),red) + formatMsg(msg);
         std::cerr<<msg;
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,8 +142,8 @@ namespace tk { namespace tcolor{
     inline void
     printSuc(std::string className, std::string msg){
 
-        msg = print(formatName(className),green) + msg;
-        std::cerr<<msg;
+        msg = print(formatName(className),green) + formatMsg(msg);
+        std::cout<<msg;
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -129,8 +156,8 @@ namespace tk { namespace tcolor{
     inline void
     printWrn(std::string className, std::string msg){
 
-        msg = print(formatName(className),yellow) + msg;
-        std::cerr<<msg;
+        msg = print(formatName(className),yellow) + formatMsg(msg);
+        std::cout<<msg;
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -143,8 +170,8 @@ namespace tk { namespace tcolor{
     inline void
     printMsg(std::string className, std::string msg){
 
-        msg = print(formatName(className),predefined) + msg;
-        std::cerr<<msg;
+        msg = print(formatName(className),predefined) + formatMsg(msg);
+        std::cout<<msg;
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

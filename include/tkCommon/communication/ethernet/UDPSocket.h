@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#include <tkCommon/terminalColor.h>
+#include <tkCommon/terminalFormat.h>
 
 namespace tk{ namespace communication {
 

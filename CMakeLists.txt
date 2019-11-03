@@ -97,8 +97,8 @@ target_link_libraries(tkCommon_pcap_replay tkCommon tkCommunication)
 add_executable(tkCommon_eth_socket app/tkCommon_eth_socket.cpp)
 target_link_libraries(tkCommon_eth_socket tkCommon tkCommunication)
 
-add_executable(tkCommon_terminal_color app/tkCommon_terminal_color.cpp)
-target_link_libraries(tkCommon_terminal_color)
+add_executable(tkCommon_terminal_format app/tkCommon_terminal_format.cpp)
+target_link_libraries(tkCommon_terminal_format)
 
 add_executable(tkCommon_segfault app/tkCommon_segfault.cpp)
 #target_link_libraries(tkCommon_segfault tkCommon)

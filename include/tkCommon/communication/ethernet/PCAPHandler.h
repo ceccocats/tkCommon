@@ -2,7 +2,7 @@
 
 #include <tkCommon/common.h>
 #include <tkCommon/utils.h>
-#include <tkCommon/terminalColor.h>
+#include <tkCommon/terminalFormat.h>
 #include <pcap.h>
 
 namespace tk { namespace communication {
