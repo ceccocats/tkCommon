@@ -15,7 +15,7 @@ class tkClass{
             clsWrn("warning message\n");
         }
         void message(){
-            clsMsg("clasic message. Each type message print reading the terminal column in a way that a single print remain at left of class name. This permits to have a clean print. I don't konw what'else to write for have a long phrase for demostrating the work. Bye Bye\n");
+            clsMsg("classic message. Each type message print reading the terminal column in a way that a single print remain at left of class name. This permits to have a clean print. I don't konw what'else to write for have a long phrase for demostrating the work. Bye Bye\n");
         }
 };
 }
@@ -35,23 +35,12 @@ int main(int argc, char* argv[]){
     }
 
     //Set unset usage
-    std::cout<<"\nUsing set/unset:\n";
-
-    std::cout<<tk::tformat::set(tk::tformat::yellow);
-    std::cout<<"This is tk"<<tk::tformat::unset()<<"\n";
-
-    std::cout<<tk::tformat::set(tk::tformat::yellow,tk::tformat::red);
-    std::cout<<"This is tk"<<tk::tformat::unset()<<"\n";
-
-    std::cout<<tk::tformat::set(tk::tformat::predefined,tk::tformat::red);
-    std::cout<<"This is tk"<<tk::tformat::unset()<<"\n";
-
-    std::cout<<tk::tformat::set(tk::tformat::predefined,tk::tformat::red,tk::tformat::bold);
-    std::cout<<"This is tk"<<tk::tformat::unset()<<"\n";
-
-    std::cout<<tk::tformat::set(tk::tformat::predefined,tk::tformat::red,tk::tformat::reverse);
-    std::cout<<"This is tk"<<tk::tformat::unset()<<"\n\n";
-
+    for(uint8_t i=tk::tformat::darkGray; i<=tk::tformat::black; i++) {
+        std::cout<<tk::tformat::set(i);
+        std::cout<<"Color code:  ";
+        std::cout<<tk::tformat::set(i, tk::tformat::predefined, tk::tformat::reverse);
+        std::cout<<int(i)<<tk::tformat::unset()<<"\n";
+    }
 
     //Class printing
     tk::tkClass a;
