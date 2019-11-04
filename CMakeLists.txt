@@ -68,7 +68,7 @@ add_library(tkCommon SHARED
     src/common.cpp
     src/CmdParser.cpp
 )
-target_link_libraries(tkCommon tkGUI yaml-cpp matio)
+target_link_libraries(tkCommon tkGUI yaml-cpp matio dl)
 
 add_library(tkCommunication SHARED
     src/communication/ethernet/UDPSocket.cpp
@@ -104,7 +104,7 @@ add_executable(tkCommon_pcap_gui_replay app/tkCommon_pcap_gui_replay.cpp)
 target_link_libraries(tkCommon_pcap_gui_replay tkCommon tkCommunication ${GUI_LIBS})
 
 add_executable(tkCommon_segfault app/tkCommon_segfault.cpp)
-#target_link_libraries(tkCommon_segfault tkCommon)
+target_link_libraries(tkCommon_segfault tkCommon)
 
 #-------------------------------------------------------------------------------
 # Install
