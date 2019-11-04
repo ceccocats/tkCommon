@@ -50,6 +50,18 @@ namespace tk { namespace data {
         }
     };
 
+    struct replayPcap_t{
+
+        float           velocity      = 1;
+        bool            pressedStart  = false;
+        bool            pressedStop   = false;
+        bool            pressedBar    = false;
+        int             barNumPacket  = 0;
+        int             barMinVal     = 0;
+        int             barMaxVal     = 0;
+        std::string     textOutput    = ""; 
+    };
+
     //Velodyne Data
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     namespace velodyne{

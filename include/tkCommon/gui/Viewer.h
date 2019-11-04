@@ -78,6 +78,8 @@ namespace tk { namespace gui {
         static void tkSplitPanel(int count, float ratio, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y);
 
         static void tkDrawLiDARData(tk::data::LidarData_t *data);
+        void tkDrawGuiReplay();
+        void setGuiReplay(tk::data::replayPcap_t *replay){this->replaypcap = replay;}
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         static void tkViewport2D(int width, int height, int x=0, int y=0);
@@ -107,13 +109,15 @@ namespace tk { namespace gui {
         std::string fontPath = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf";
         struct dtx_font *font;
 
+        //gui replay
+        tk::data::replayPcap_t *replaypcap = nullptr;
+
     private:
         std::string             windowName;
         Color_t                 background = tk::gui::color::DARK_GRAY;
 
         GLFWwindow*             window;
         static GLUquadric*      quadric;
-
 
         const char*             glsl_version = "#version 130";
 

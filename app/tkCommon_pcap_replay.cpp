@@ -38,8 +38,6 @@ void replayLoop(std::string file, int port){
 
             tk::tformat::printMsg("pcapReplay", std::string{"send "}+std::to_string(count)+" packets\n");
         }
-
-
     }
 
     iface.close();

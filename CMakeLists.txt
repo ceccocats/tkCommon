@@ -100,6 +100,9 @@ target_link_libraries(tkCommon_eth_socket tkCommon tkCommunication)
 add_executable(tkCommon_terminal_format app/tkCommon_terminal_format.cpp)
 target_link_libraries(tkCommon_terminal_format)
 
+add_executable(tkCommon_pcap_gui_replay app/tkCommon_pcap_gui_replay.cpp)
+target_link_libraries(tkCommon_pcap_gui_replay tkCommon tkCommunication ${GUI_LIBS})
+
 add_executable(tkCommon_segfault app/tkCommon_segfault.cpp)
 #target_link_libraries(tkCommon_segfault tkCommon)
 
