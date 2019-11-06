@@ -1,6 +1,7 @@
 #include "tkCommon/gui/Viewer.h"
 #include "tkCommon/gui/OBJ_Loader.h"
 
+extern bool gRun;
 using namespace tk::gui;
 bool            Viewer::keys[MAX_KEYS];
 MouseView3D     Viewer::mouseView;
@@ -100,7 +101,9 @@ Viewer::init() {
     std::string msg =   std::string{"OPENGL running on:"} + 
                         std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))) + " -- " +
                         std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))) + "\n";
-    tk::tformat::printMsg("Viewer",msg);
+    clsMsg(msg);
+
+    tkLoadTexture(std::string(TKPROJ_PATH) + "data/HipertLab.png", hipertTex);
 }
 
 
@@ -120,6 +123,17 @@ Viewer::draw() {
     tkApplyTf(tk::common::odom2tf(p.x, p.y, 0));
     tkDrawAxis();
     glPopMatrix();
+}
+
+void
+Viewer::drawSplash() {
+    // draw 2D HUD
+    tkViewport2D(width, height);
+
+    glPushMatrix(); {
+        tkSetColor(tk::gui::color::WHITE);
+        tkDrawTexture(hipertTex, 0.8, 0.8);
+    } glPopMatrix();
 }
 
 void Viewer::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) 
@@ -147,13 +161,8 @@ void
 Viewer::run() {
     timeStamp_t VIZ_DT_US = dt*1e6;
     LoopRate rate((VIZ_DT_US), "VIZ_UPDATE");
-    while (!glfwWindowShouldClose(window)) {
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+    while (gRun && !glfwWindowShouldClose(window)) {
 
-        Viewer::mouseView.mouseOnGUI = ImGui::IsMouseHoveringAnyWindow(); 
-            
         glfwGetFramebufferSize(window, &width, &height);
         aspectRatio = (float)width / (float)height;
         xLim = aspectRatio;
@@ -171,23 +180,32 @@ Viewer::run() {
 
         Viewer::mouseView.setWindowAspect(float(width)/height);
 
-
         glPushMatrix();
 
-        // apply matrix
-        glMultMatrixf(Viewer::mouseView.getProjection()->data());
-        glMultMatrixf(Viewer::mouseView.getModelView()->data());
+        if(splash) {
+            Viewer::mouseView.mouseOnGUI = true;
+            drawSplash();
+        } else {
+            // apply matrix
+            glMultMatrixf(Viewer::mouseView.getProjection()->data());
+            glMultMatrixf(Viewer::mouseView.getModelView()->data());
 
-        plotManger->drawPlots();
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
 
-        draw();
+            Viewer::mouseView.mouseOnGUI = ImGui::IsMouseHoveringAnyWindow();
 
-        plotManger->drawLegend();
+            plotManger->drawPlots();
+            draw();
+            plotManger->drawLegend();
+
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        }
 
         glPopMatrix();
 
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
@@ -195,6 +213,7 @@ Viewer::run() {
         glfwPollEvents();
         rate.wait(false);
     }
+    gRun = false;
     
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();  

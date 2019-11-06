@@ -37,11 +37,40 @@ namespace tk { namespace gui {
             std::vector<Eigen::MatrixXf> triangles;
             std::vector<tk::common::Vector3<float>> colors;
         };
-        
+
         virtual void init();
         virtual void draw();
-        
+        virtual void drawSplash();
         void run();
+
+
+        static void *threadCaller(void *args) {
+            Viewer *self = (Viewer*) args;
+            self->init();
+            self->init_mutex.unlock();
+            self->run();
+        }
+
+        void initOnThread(bool splashScreen = true) {
+            // enable splash screen
+            splash = splashScreen;
+
+            clsSuc("start viz thread\n");
+            init_mutex.lock();
+            pthread_create(&thread, NULL, threadCaller, (void*)this);
+            init_mutex.lock();
+            clsSuc("viz thread initted\n");
+            init_mutex.unlock();
+        }
+
+        void joinThread() {
+            // disable splash screen
+            splash = false;
+
+            pthread_join(thread, NULL);
+            clsSuc("end viz thread\n");
+        }
+
 
         void setWindowName(std::string name);
         void setBackground(tk::gui::Color_t c);
@@ -102,14 +131,23 @@ namespace tk { namespace gui {
 
         PlotManager *plotManger;
 
+        // tread for running viz in background
+        pthread_t thread;
+        std::mutex init_mutex;
+
         // font
         static int TK_FONT_SIZE;
         std::string fontPath = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf";
         struct dtx_font *font;
 
+        // tex
+        GLuint                  hipertTex;
+
+
     private:
         std::string             windowName;
         Color_t                 background = tk::gui::color::DARK_GRAY;
+        bool                    splash = false; // true if splash screen
 
         GLFWwindow*             window;
         static GLUquadric*      quadric;
