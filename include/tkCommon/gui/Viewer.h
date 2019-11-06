@@ -78,8 +78,6 @@ namespace tk { namespace gui {
         static void tkSplitPanel(int count, float ratio, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y);
 
         static void tkDrawLiDARData(tk::data::LidarData_t *data);
-        void tkDrawGuiReplay();
-        void setGuiReplay(tk::data::replayPcap_t *replay){this->replaypcap = replay;}
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         static void tkViewport2D(int width, int height, int x=0, int y=0);
@@ -108,9 +106,6 @@ namespace tk { namespace gui {
         static int TK_FONT_SIZE;
         std::string fontPath = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf";
         struct dtx_font *font;
-
-        //gui replay
-        tk::data::replayPcap_t *replaypcap = nullptr;
 
     private:
         std::string             windowName;

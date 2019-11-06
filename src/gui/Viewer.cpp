@@ -120,9 +120,6 @@ Viewer::draw() {
     tkApplyTf(tk::common::odom2tf(p.x, p.y, 0));
     tkDrawAxis();
     glPopMatrix();
-
-    
-    tkDrawGuiReplay();
 }
 
 void Viewer::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) 
@@ -683,25 +680,6 @@ Viewer::tkDrawLiDARData(tk::data::LidarData_t *data){
         glVertex3f(data->points.coeff(0,p),data->points.coeff(1,p),data->points.coeff(2,p));
     }
     glEnd();
-}
-
-void 
-Viewer::tkDrawGuiReplay(){
-
-    if(replaypcap == nullptr)
-        return;
-
-    bool a = true;
-    ImGui::Begin("pktseeker",&a, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove);
-    ImGui::SetWindowSize(ImVec2(400,200));
-    ImGui::SetWindowPos(ImVec2(0,0));
-    replaypcap->pressedBar = ImGui::SliderInt("Packet", &replaypcap->barNumPacket, replaypcap->barMinVal, replaypcap->barMaxVal);
-    ImGui::InputFloat("Frame ratio", &replaypcap->velocity);
-    replaypcap->pressedStart = ImGui::Button("Start");
-    ImGui::SameLine();
-    replaypcap->pressedStop = ImGui::Button("Stop");
-    ImGui::Text("%s", replaypcap->textOutput.c_str());
-    ImGui::End();
 }
 
 void

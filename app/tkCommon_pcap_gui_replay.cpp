@@ -15,11 +15,45 @@
 #include <tkCommon/exceptions.h>
 #include <tkCommon/terminalFormat.h>
 
+class MyViewer : public tk::gui::Viewer {
+    private:
+        //gui replay
+        tk::data::replayPcap_t *replaypcap = nullptr;
+
+    public:
+        MyViewer() {}
+        ~MyViewer() {}
+
+        void init() {
+            tk::gui::Viewer::init();
+        }
+
+        void draw() {
+            tk::gui::Viewer::draw();
+
+            if(replaypcap == nullptr)
+                return;
+
+            bool a = true;
+            ImGui::Begin("pktseeker",&a, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove);
+            ImGui::SetWindowSize(ImVec2(400,200));
+            ImGui::SetWindowPos(ImVec2(0,0));
+            replaypcap->pressedBar = ImGui::SliderInt("Packet", &replaypcap->barNumPacket, replaypcap->barMinVal, replaypcap->barMaxVal);
+            ImGui::InputFloat("Frame ratio", &replaypcap->velocity);
+            replaypcap->pressedStart = ImGui::Button("Start");
+            ImGui::SameLine();
+            replaypcap->pressedStop = ImGui::Button("Stop");
+            ImGui::Text("%s", replaypcap->textOutput.c_str());
+            ImGui::End();
+        }
+        void setGuiReplay(tk::data::replayPcap_t *replay){this->replaypcap = replay;}
+};
+
 tk::communication::PCAPHandler  handler;
 tk::communication::UDPSocket    sender;
 std::mutex                      pcapMutex;
 
-tk::gui::Viewer                 *viewer = nullptr;
+MyViewer                        *viewer = nullptr;
 
 std::string                     fileLog;
 std::string                     filterLog;
@@ -30,8 +64,8 @@ bool                            gRun        = true;
 int			                    velocity = 1;
 int 		                    Npackets, packets;
 bool                            running = false;
-timeStamp_t                     nulla, prec = 0, now;
-
+timeStamp_t                     nulla, prec = 0, now, start, end;
+double                          timeFor1Pkt;
 tk::data::replayPcap_t          gui_data;
 
 
@@ -41,9 +75,11 @@ int counterPackets(){
     uint8_t buffer[2000];
     int packets = 0; 
 	tkASSERT( counter.initReplay(fileLog,filterLog) );
-	while( counter.getPacket(buffer,nulla) != -1)
+    counter.getPacket(buffer,start);
+	while( counter.getPacket(buffer,end) != -1)
 		packets++;
     counter.close();
+    timeFor1Pkt = ( (double)(end-start)/1000000.0 ) / packets;
 	return packets;
 
 }
@@ -108,7 +144,7 @@ void* replayLoop(void*){
             if(now > prec){
                 
                 timeStamp_t sleep_for = (now-prec);
-                usleep(sleep_for*velocity);
+                usleep(sleep_for/velocity);
             }
         }
 
@@ -145,7 +181,7 @@ void* control(void*){
 
         if (running && (Npackets % 100) == 0)
         {
-            gui_data.textOutput = "\nFile:\t\t"+fileLog+"\n\nTime:\t\t" + std::to_string(Npackets*(0.1/156)) + "s\nTotal time:  " + std::to_string(packets*(0.1/156)) + "s";
+            gui_data.textOutput = "\nFile:\t\t"+fileLog+"\n\nTime:\t\t" + std::to_string(Npackets*timeFor1Pkt) + "s\nTotal time:  " + std::to_string(packets*(0.1/156)) + "s";
         }
 
         gui_data.barNumPacket = Npackets;
@@ -168,9 +204,9 @@ int main(int argc, char *argv[])
 
     packets = counterPackets();
     gui_data.barMaxVal = packets;
-    gui_data.textOutput = "\nFile:\t\t"+fileLog+"\n\nTime:\t\t" + std::to_string(0) + "s\nTotal time:  " + std::to_string(packets*(0.1/156)) + "s";
+    gui_data.textOutput = "\nFile:\t\t"+fileLog+"\n\nTime:\t\t" + std::to_string(0) + "s\nTotal time:  " + std::to_string((double)(end-start)/1000000.0) + "s";
 	
-	viewer = new tk::gui::Viewer();
+	viewer = new MyViewer();
     viewer->setWindowName("Lidar replay control panel");
 	viewer->width = 400;
 	viewer->height = 200;
