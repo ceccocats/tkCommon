@@ -110,7 +110,7 @@ target_link_libraries(tkCommon_segfault tkCommon)
 # Install
 #-------------------------------------------------------------------------------
 install(TARGETS tkGUI_simple tkCommon_pcap_replay tkCommon_pcap_gui_replay tkCommon_eth_socket tkCommon_eth_pcap DESTINATION bin )
-install(TARGETS tkCommon tkGUI tkMath tklibDrawText DESTINATION lib)
+install(TARGETS tkCommon tkGUI tkMath tklibDrawText tkCommunication DESTINATION lib)
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts/" # source directory
         DESTINATION "bin/"
 )
