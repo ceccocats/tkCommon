@@ -194,11 +194,11 @@ int main( int argc, char** argv){
     // update thread
     pthread_t       t0;
     pthread_create(&t0, NULL, update_th, NULL);
-    sleep(10);
+
+    // fake loading
+    sleep(5);
 
     viewer->joinThread();
-
-
     pthread_join(t0, NULL);
     return 0;
 }

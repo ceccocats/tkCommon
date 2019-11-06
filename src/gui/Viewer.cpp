@@ -131,8 +131,8 @@ Viewer::drawSplash() {
     tkViewport2D(width, height);
 
     static float x = 0;
-    float size = 0.8f + 0.2f*sin(x);
-    x += dt;
+    float size = 1.0f + 0.08f*sin(x);
+    x += dt*2;
 
     glPushMatrix(); {
         tkSetColor(tk::gui::color::WHITE);
