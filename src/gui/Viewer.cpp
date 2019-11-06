@@ -130,9 +130,13 @@ Viewer::drawSplash() {
     // draw 2D HUD
     tkViewport2D(width, height);
 
+    static float x = 0;
+    float size = 0.8f + 0.2f*sin(x);
+    x += dt;
+
     glPushMatrix(); {
         tkSetColor(tk::gui::color::WHITE);
-        tkDrawTexture(hipertTex, 0.8, 0.8);
+        tkDrawTexture(hipertTex, size, size);
     } glPopMatrix();
 }
 
