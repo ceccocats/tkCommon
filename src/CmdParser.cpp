@@ -17,6 +17,11 @@ void CmdParser::setGeneralInfo(std::string info) {
 }
 
 std::string CmdParser::addArg(std::string name, std::string default_val, std::string info) {
+    if(name.size() <= 1 || name[0] == '-') {
+        clsErr(std::string{"arguments should not start with '-', this is not valid: "}+name+"\n");
+        exit(1);
+    }
+
     argh::parser cmdl(argv_ptr, argv_mode);
     Arg a;
     a.name = name;
@@ -30,7 +35,6 @@ std::string CmdParser::addArg(std::string name, std::string default_val, std::st
 bool CmdParser::addBoolOpt(std::string opt, std::string info) {
     if(opt.size() <= 1 || opt[0] != '-') {
         clsErr(std::string{"option must start with '-', this is not valid: "}+opt+"\n");
-        //std::cout<<"option must start with '-', this is not valid: "<<opt<<"\n";
         exit(1);
     }
 
@@ -38,7 +42,6 @@ bool CmdParser::addBoolOpt(std::string opt, std::string info) {
 
     if(!cmdl(opt).str().empty()) {
         clsErr(std::string{"you cant append values to boolean flag: "}+opt+"\n");
-        //std::cout<<"ERROR: you cant append values to boolean flag: "<<opt<<"\n";
         exit(-1);
     }
 

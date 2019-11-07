@@ -4,7 +4,6 @@
 
 class MyViewer : public tk::gui::Viewer {
     private:
-        GLuint hipertTex;
         object3D_t carObj;
 
         tk::common::Tfpose tf = tk::common::Tfpose::Identity();
@@ -20,9 +19,7 @@ class MyViewer : public tk::gui::Viewer {
         void init() {
             tk::gui::Viewer::init();
 
-            int err = 0;
-            err = err || tkLoadTexture(std::string(TKPROJ_PATH) + "data/HipertLab.png", hipertTex);
-            err = err || tkLoadOBJ(std::string(TKPROJ_PATH) + "data/levante", carObj);
+            tkLoadOBJ(std::string(TKPROJ_PATH) + "data/levante", carObj);
 
             plotManger->addLinePlot("test", tk::gui::color::WHITE, 1);
         }
@@ -129,7 +126,7 @@ bool gRun = true;
 
 
 void sig_handler(int signo) {
-    std::cout<<"request gateway stop\n";
+    std::cout<<"request stop\n";
     gRun = false;
 }
 
@@ -191,16 +188,17 @@ int main( int argc, char** argv){
     viewer = new MyViewer();
     viewer->setWindowName("test");
     viewer->setBackground(tk::gui::color::DARK_GRAY);
-    viewer->init();
+    viewer->initOnThread();
     viewer->setCloud(&cloud);
 
     // update thread
     pthread_t       t0;
     pthread_create(&t0, NULL, update_th, NULL);
 
-    viewer->run();
+    // fake loading
+    sleep(5);
 
-    gRun = false;
+    viewer->joinThread();
     pthread_join(t0, NULL);
     return 0;
 }
