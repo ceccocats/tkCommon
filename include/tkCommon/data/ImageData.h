@@ -5,6 +5,8 @@
 #ifdef VIBRANTE
 #define float16_t dwF16
 #include <dw/image/Image.h>
+#else
+#include <opencv2/core/core.hpp>
 #endif
 
 namespace tk{namespace data{
@@ -22,6 +24,11 @@ namespace tk{namespace data{
         dwImageHandle_t dwImage;
         dwContextHandle_t *dw = nullptr;
         dwImageProperties props;
+
+#else
+
+        cv::Mat cvImage;
+
 #endif
 
         void init(int w, int h, int ch){
@@ -55,6 +62,8 @@ namespace tk{namespace data{
             else{
                 dwImage_copyConvert(dwImage, s.dwImage, *dw);
             }
+#else
+            cvImage = s.cvImage;
 #endif
             memcpy(data, s.data, width * height * channels * sizeof(T));
             mtx.unlock();
