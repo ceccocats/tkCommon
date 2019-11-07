@@ -306,10 +306,9 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
         }
 
 
-    } else {
-        error = tkLoadTexture((filename + ".png"), obj.tex);
-        if(error == 1)
-            tk::tformat::printErr("Viewer","error\n");
+    error = tkLoadTexture((filename + ".png"), obj.tex);
+    if(error == 1)
+        tk::tformat::printErr("Viewer","Texture not found\n");
     }
 
     return error;
