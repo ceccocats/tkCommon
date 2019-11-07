@@ -13,6 +13,8 @@
 #include "Eigen/Dense"
 #include "geodetic_conv.h"
 #include "CmdParser.h"
+#include "terminalFormat.h"
+#include "exceptions.h"
 
 namespace tk { namespace common {
 
