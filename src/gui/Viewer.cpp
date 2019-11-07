@@ -106,7 +106,6 @@ Viewer::init() {
 
 void 
 Viewer::draw() {
-
     tk::common::Vector3<float> s = { 1, 1, 1 };
     tk::gui::Color_t col = tk::gui::color::LIGHT_BLUE;
     tkSetColor(col);
@@ -121,7 +120,7 @@ Viewer::draw() {
     tkDrawAxis();
     glPopMatrix();
 
-    
+
     tkDrawGuiReplay();
 }
 
@@ -316,6 +315,38 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
     }
 
     return error;
+}
+
+void
+Viewer::tkLoadLogo(std::string filename, std::vector<tk::common::Vector3<float>> &logo){
+    std::ifstream in;
+    in.open(filename);
+    float x, y, max_x, max_y;
+    in >> x;
+    in >> y;
+    max_x = x;
+    max_y = y;
+    while(!in.eof()){
+        if(x>max_x)
+            max_x = x;
+        if(y>max_y)
+            max_y = y;
+        logo.push_back(tk::common::Vector3<float>(x, y, 0.1));
+        in >> x;
+        in >> y;
+    }
+
+    float max = std::max(max_x, max_y);
+
+    for(int i = 0; i < logo.size(); i++){
+        logo[i].x -= max_x/2;
+        logo[i].y -= max_y/2;
+        logo[i].x /= max;
+        logo[i].y /= max;
+        logo[i].y *= -1;
+    }
+    logo.push_back(logo[0]);
+    in.close();
 }
 
 void 

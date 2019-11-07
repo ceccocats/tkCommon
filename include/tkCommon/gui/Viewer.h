@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
+#include <iostream>
+#include <fstream>
 #include <tkCommon/data/CameraData.h>
 #include "tkCommon/common.h"
 #include "tkCommon/gui/MouseView3D.h"
@@ -48,6 +50,7 @@ namespace tk { namespace gui {
         
         static int  tkLoadTexture(std::string filename, GLuint &tex);
         static int  tkLoadOBJ(std::string filename, object3D_t &obj);
+        static void tkLoadLogo(std::string filename, std::vector<common::Vector3<float>> &logo);
         
         static void tkSetColor(tk::gui::Color_t c, float alpha = -1);
         static void tkApplyTf(tk::common::Tfpose tf);
@@ -73,6 +76,7 @@ namespace tk { namespace gui {
 
         // data 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        static void tkDrawLogo(std::string file, double scale);
         static void tkDrawRadarData(tk::data::RadarData_t *data, bool enable_near, bool enable_far);
         static void tkDrawImage(tk::data::ImageData_t<uint8_t>& image, GLuint texture);
         static void tkSplitPanel(int count, float ratio, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y);
@@ -99,6 +103,7 @@ namespace tk { namespace gui {
         static const int        MAX_KEYS = 1024;
         static bool             keys[MAX_KEYS];
         static std::vector<tk::gui::Color_t> colors;
+        std::vector<tk::common::Vector3<float>> logo;
 
         double dt = 1.0/30;
 
