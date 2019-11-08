@@ -230,13 +230,13 @@ Viewer::run() {
             glPushMatrix();
             {
                 tkViewport2D(width,height);
-                double margin = 0.2;
+                float margin = 0.2;
                 tkSetColor(tk::gui::color::WHITE, 0.3);
                 for(int i=0; i<logo.size(); i++)
                     tkDrawCircle(tk::common::Vector3<float>{
-                            logo[i].x * 0.2 + xLim -margin,
-                            logo[i].y * 0.2 - yLim +margin,
-                            -0.9}, 0.005, 50, true);
+                            logo[i].x * 0.2f + xLim -margin,
+                            logo[i].y * 0.2f - yLim +margin,
+                            -0.9f}, 0.005, 50, true);
             }
             glPopMatrix();
 
