@@ -3,7 +3,7 @@
 #include <tkCommon/common.h>
 
 #ifdef VIBRANTE
-
+#define float16_t dwF16
 #include <dw/image/Image.h>
 #endif
 
@@ -17,12 +17,6 @@ namespace tk{namespace data{
         int height = 0;
         int channels = 0;
         std::mutex mtx;
-
-#ifdef VIBRANTE
-        dwImageHandle_t dwImage;
-        dwContextHandle_t *dw = nullptr;
-        dwImageProperties props;
-#endif
 
         void init(int w, int h, int ch){
             mtx.lock();
@@ -41,34 +35,9 @@ namespace tk{namespace data{
                 init(s.width, s.height, s.channels);
             }
             mtx.lock();
-#ifdef VIBRANTE
-            if(dw != s.dw) {
-                if(dw != nullptr){
-                    dwImage_destroy(dwImage);
-                }
-
-                dw = s.dw;
-                props = s.props;
-                dwImage_create(&dwImage, props, *dw);
-                dwImage_copyConvert(dwImage, s.dwImage, *dw);
-            }
-            else{
-                dwImage_copyConvert(dwImage, s.dwImage, *dw);
-            }
-#endif
             memcpy(data, s.data, width * height * channels * sizeof(T));
             mtx.unlock();
             return *this;
-        }
-
-        void copyData(const ImageData_t<T>& s){
-            if(s.width != width || s.height != height || s.channels != channels){
-                release();
-                init(s.width, s.height, s.channels);
-            }
-            mtx.lock();
-            memcpy(data, s.data, width * height * channels * sizeof(T));
-            mtx.unlock();
         }
 
         void release(){

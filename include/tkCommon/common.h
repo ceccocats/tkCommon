@@ -7,12 +7,15 @@
 #include <iomanip>
 #include <csignal>
 
-#include "utils.h"
-#include "timer.h"
 #define EIGEN_STACK_ALLOCATION_LIMIT 0
-#include "Eigen/Dense"
-#include "geodetic_conv.h"
-#include "CmdParser.h"
+#include <Eigen/Dense>
+
+#include "tkCommon/utils.h"
+#include "tkCommon/timer.h"
+#include "tkCommon/geodetic_conv.h"
+#include "tkCommon/CmdParser.h"
+#include "tkCommon/terminalFormat.h"
+#include "tkCommon/exceptions.h"
 
 namespace tk { namespace common {
 

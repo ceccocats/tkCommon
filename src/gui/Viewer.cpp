@@ -1,6 +1,7 @@
 #include "tkCommon/gui/Viewer.h"
 #include "tkCommon/gui/OBJ_Loader.h"
 
+extern bool gRun;
 using namespace tk::gui;
 bool            Viewer::keys[MAX_KEYS];
 MouseView3D     Viewer::mouseView;
@@ -100,13 +101,17 @@ Viewer::init() {
     std::string msg =   std::string{"OPENGL running on:"} + 
                         std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))) + " -- " +
                         std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))) + "\n";
-    tk::tformat::printMsg("Viewer",msg);
+    clsMsg(msg);
+
+    tkLoadTexture(std::string(TKPROJ_PATH) + "data/HipertLab.png", hipertTex);
+
+    tkLoadLogo(std::string(TKPROJ_PATH) + "data/tkLogo.pts", logo);
 }
 
 
 void 
 Viewer::draw() {
-    tk::common::Vector3<float> s = { 1, 1, 1 };
+    tk::common::Vector3<float> s = {1, 1, 1};
     tk::gui::Color_t col = tk::gui::color::LIGHT_BLUE;
     tkSetColor(col);
     tkDrawRectangle(Viewer::mouseView.getPointOnGround(), s, false);
@@ -121,7 +126,40 @@ Viewer::draw() {
     glPopMatrix();
 
 
-    tkDrawGuiReplay();
+}
+
+void
+Viewer::drawSplash() {
+    // draw 2D HUD
+    //tkViewport2D(width, height);
+
+    static float x = 0;
+    static int i = 0;
+    float size = 0.2f + 0.1*sin(x);
+    x += dt*2;
+
+    //glPushMatrix(); {
+    //    tkSetColor(tk::gui::color::WHITE);
+    //    tkDrawTexture(hipertTex, size, size);
+    //} glPopMatrix();
+
+    glPushMatrix();
+    {
+        //tkViewport2D(width * size,height * size);
+        //glLineWidth(10);
+        //glTranslatef(size, size, size);
+        tkSetColor(tk::gui::color::WHITE, size);
+        for(int i=0; i<logo.size(); i++)
+            tkDrawCircle(tk::common::Vector3<float>(logo[i].x * (4*(size - 0.1)), logo[i].y * (4*(size-0.1)), 0.1), 0.0025 / (size*size), 100, true);
+
+        //for(int i=0; i<logo.size(); i++)
+        //    tkDrawCircle(tk::common::Vector3<float>(logo[i].x * (0.5+size/2), logo[i].y * (0.5+size/2), 0.1), 0.1 * size/2, 100, true);
+        //tkDrawLine(logo);
+    }
+    glPopMatrix();
+
+    i = (i+2) % 100;
+
 }
 
 void Viewer::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) 
@@ -149,13 +187,8 @@ void
 Viewer::run() {
     timeStamp_t VIZ_DT_US = dt*1e6;
     LoopRate rate((VIZ_DT_US), "VIZ_UPDATE");
-    while (!glfwWindowShouldClose(window)) {
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+    while (gRun && !glfwWindowShouldClose(window)) {
 
-        Viewer::mouseView.mouseOnGUI = ImGui::IsMouseHoveringAnyWindow(); 
-            
         glfwGetFramebufferSize(window, &width, &height);
         aspectRatio = (float)width / (float)height;
         xLim = aspectRatio;
@@ -173,23 +206,43 @@ Viewer::run() {
 
         Viewer::mouseView.setWindowAspect(float(width)/height);
 
-
         glPushMatrix();
 
-        // apply matrix
-        glMultMatrixf(Viewer::mouseView.getProjection()->data());
-        glMultMatrixf(Viewer::mouseView.getModelView()->data());
+        if(splash) {
+            Viewer::mouseView.mouseOnGUI = true;
+            drawSplash();
+        } else {
+            // apply matrix
+            glMultMatrixf(Viewer::mouseView.getProjection()->data());
+            glMultMatrixf(Viewer::mouseView.getModelView()->data());
 
-        plotManger->drawPlots();
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
 
-        draw();
+            Viewer::mouseView.mouseOnGUI = ImGui::IsMouseHoveringAnyWindow();
 
-        plotManger->drawLegend();
+            plotManger->drawPlots();
+            draw();
+            plotManger->drawLegend();
+
+            glPushMatrix();
+            {
+                tkViewport2D(width,height);
+                double ratio = (double)width/height;
+                tkSetColor(tk::gui::color::WHITE, 0.3);
+                for(int i=0; i<logo.size(); i++)
+                    tkDrawCircle(tk::common::Vector3<float>(logo[i].x * 0.2 + 0.85 * ratio, logo[i].y * 0.2 - 0.85 , -0.9), 0.01, 50, true);
+
+            }
+            glPopMatrix();
+
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        }
 
         glPopMatrix();
 
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
@@ -197,6 +250,7 @@ Viewer::run() {
         glfwPollEvents();
         rate.wait(false);
     }
+    gRun = false;
     
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();  
@@ -716,25 +770,6 @@ Viewer::tkDrawLiDARData(tk::data::LidarData_t *data){
     glEnd();
 }
 
-void 
-Viewer::tkDrawGuiReplay(){
-
-    if(replaypcap == nullptr)
-        return;
-
-    bool a = true;
-    ImGui::Begin("pktseeker",&a, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove);
-    ImGui::SetWindowSize(ImVec2(400,200));
-    ImGui::SetWindowPos(ImVec2(0,0));
-    replaypcap->pressedBar = ImGui::SliderInt("Packet", &replaypcap->barNumPacket, replaypcap->barMinVal, replaypcap->barMaxVal);
-    ImGui::InputFloat("Frame ratio", &replaypcap->velocity);
-    replaypcap->pressedStart = ImGui::Button("Start");
-    ImGui::SameLine();
-    replaypcap->pressedStop = ImGui::Button("Stop");
-    ImGui::Text("%s", replaypcap->textOutput.c_str());
-    ImGui::End();
-}
-
 void
 Viewer::tkDrawImage(tk::data::ImageData_t<uint8_t>& image, GLuint texture)
 {
@@ -963,7 +998,7 @@ Viewer::tkViewport2D(int width, int height, int x, int y) {
 
 void 
 Viewer::errorCallback(int error, const char* description) {
-    tk::tformat::printErr("Viewer", std::string{"error: "}+description);
+    tk::tformat::printErr("Viewer", std::string{"error: "}+std::to_string(error)+" "+description+"\n");
 }
 
 void

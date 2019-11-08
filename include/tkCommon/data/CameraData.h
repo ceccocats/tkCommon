@@ -1,6 +1,6 @@
 #pragma once
 #include "tkCommon/data/ImageData.h"
-
+/*
 namespace tk{namespace data{
 
         struct CameraData_t{
@@ -66,3 +66,4 @@ namespace tk{namespace data{
             }
         };
     }}
+    */

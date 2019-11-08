@@ -2,7 +2,6 @@
 #include <tkCommon/common.h>
 #include <csignal>
 #include <tkCommon/communication/EthInterface.h>
-#include <tkCommon/exceptions.h>
 
 bool                            gRun = true;
 tk::communication::Ethinterface iface;

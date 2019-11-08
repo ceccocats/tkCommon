@@ -68,7 +68,7 @@ add_library(tkCommon SHARED
     src/common.cpp
     src/CmdParser.cpp
 )
-target_link_libraries(tkCommon tkGUI yaml-cpp matio)
+target_link_libraries(tkCommon tkGUI yaml-cpp matio dl)
 
 add_library(tkCommunication SHARED
     src/communication/ethernet/UDPSocket.cpp
@@ -104,17 +104,24 @@ add_executable(tkCommon_pcap_gui_replay app/tkCommon_pcap_gui_replay.cpp)
 target_link_libraries(tkCommon_pcap_gui_replay tkCommon tkCommunication ${GUI_LIBS})
 
 add_executable(tkCommon_segfault app/tkCommon_segfault.cpp)
-#target_link_libraries(tkCommon_segfault tkCommon)
+target_link_libraries(tkCommon_segfault tkCommon)
 
 #-------------------------------------------------------------------------------
 # Install
 #-------------------------------------------------------------------------------
-install(TARGETS tkCommon tkGUI tkMath tklibDrawText DESTINATION lib)
+install(TARGETS tkGUI_simple tkCommon_pcap_replay tkCommon_pcap_gui_replay tkCommon_eth_socket tkCommon_eth_pcap DESTINATION bin )
+install(TARGETS tkCommon tkGUI tkMath tklibDrawText tkCommunication DESTINATION lib)
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts/" # source directory
+        DESTINATION "bin/"
+)
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" # source directory
         DESTINATION "include/"
 )
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" # source directory
         DESTINATION "share/tkCommon/cmake/" # target directory
+)
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/data/" # source directory
+        DESTINATION "share/tkCommon/data"
 )
 
 
