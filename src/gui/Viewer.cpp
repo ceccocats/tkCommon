@@ -226,14 +226,17 @@ Viewer::run() {
             draw();
             plotManger->drawLegend();
 
+            // draw tk LOGO
             glPushMatrix();
             {
                 tkViewport2D(width,height);
-                double ratio = (double)width/height;
+                double margin = 0.2;
                 tkSetColor(tk::gui::color::WHITE, 0.3);
                 for(int i=0; i<logo.size(); i++)
-                    tkDrawCircle(tk::common::Vector3<float>(logo[i].x * 0.2 + 0.85 * ratio, logo[i].y * 0.2 - 0.85 , -0.9), 0.01, 50, true);
-
+                    tkDrawCircle(tk::common::Vector3<float>{
+                            logo[i].x * 0.2 + xLim -margin,
+                            logo[i].y * 0.2 - yLim +margin,
+                            -0.9}, 0.005, 50, true);
             }
             glPopMatrix();
 
