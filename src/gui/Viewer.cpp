@@ -131,12 +131,35 @@ Viewer::draw() {
 void
 Viewer::drawSplash() {
     // draw 2D HUD
-    //tkViewport2D(width, height);
+    tkViewport2D(width, height);
 
     static float x = 0;
-    static int i = 0;
-    float size = 0.2f + 0.1*sin(x);
-    x += dt*2;
+    static int j = 0;
+    //float size = 0.2f + 0.1*sin(x);
+
+    float y = 0;
+
+    // Fourier series
+    for(int i = 1; i <= 3; i+=2){
+        y += 1.0/i * sin(2.0 * i *M_PI * x);
+    }
+
+    float size;
+    // Pulse basing on Fourier series
+    if(y>0){
+        size= 0.2f + 0.1*y;
+        //size = 0.2f + 0.1*(sin(2*x*M_PI));
+
+        // Slower
+        x += dt / 4;
+    }
+    // Collapse in a circle
+    else{
+        size = 0.2f + 0.1*(sin(2*x*M_PI));
+
+        //Faster
+        x += dt / 3;
+    }
 
     //glPushMatrix(); {
     //    tkSetColor(tk::gui::color::WHITE);
@@ -145,20 +168,13 @@ Viewer::drawSplash() {
 
     glPushMatrix();
     {
-        //tkViewport2D(width * size,height * size);
-        //glLineWidth(10);
-        //glTranslatef(size, size, size);
         tkSetColor(tk::gui::color::WHITE, size);
         for(int i=0; i<logo.size(); i++)
-            tkDrawCircle(tk::common::Vector3<float>(logo[i].x * (4*(size - 0.1)), logo[i].y * (4*(size-0.1)), 0.1), 0.0025 / (size*size), 100, true);
-
-        //for(int i=0; i<logo.size(); i++)
-        //    tkDrawCircle(tk::common::Vector3<float>(logo[i].x * (0.5+size/2), logo[i].y * (0.5+size/2), 0.1), 0.1 * size/2, 100, true);
-        //tkDrawLine(logo);
+            tkDrawCircle(tk::common::Vector3<float>(logo[i].x * (4*(size - 0.1)), logo[i].y * (4*(size-0.1)), 0.1), 0.00025 / (size*size*size), 100, true);
+            //tkDrawCircle(tk::common::Vector3<float>(logo[i].x * (0.5+size/2), logo[i].y * (0.5+size/2), 0.1), 0.1 * size/2, 100, true);
     }
     glPopMatrix();
 
-    i = (i+2) % 100;
 
 }
 
