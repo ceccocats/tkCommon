@@ -22,19 +22,25 @@ namespace tk { namespace data {
          *  ( 1 )
          * 
          */
-        Eigen::Matrix<float  , 4, LIDAR_MAX_POINTS, Eigen::ColMajor>    points;
+        Eigen::MatrixXf                                                  points;
 
         /**
          * @brief Points intensity
          * 
          */
-        Eigen::Matrix<float  , 1, LIDAR_MAX_POINTS, Eigen::RowMajor>    intensity;
+        Eigen::MatrixXf                                                 intensity;
 
         /**
          * @brief ID matrix
          * 
          */
         Eigen::MatrixXi                                                 idMatrix;
+
+        void init(){
+
+            this->points.resize(4,LIDAR_MAX_POINTS);     
+            this->intensity.resize(1,LIDAR_MAX_POINTS);    
+        }        
 
         /**
          * @brief Overloading for struct copy

@@ -7,7 +7,6 @@
 #include <iomanip>
 #include <csignal>
 
-#define EIGEN_STACK_ALLOCATION_LIMIT 0
 #include <Eigen/Dense>
 
 #include "tkCommon/utils.h"
