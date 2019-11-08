@@ -26,6 +26,7 @@ set(tkCommon_LIBRARIES
     tkCommon
     tkGUI
     tkMath
+    tkCommunication
     ${FREETYPE_LIBRARIES}
     tklibDrawText
     matio
