@@ -7,7 +7,6 @@
 #include <signal.h>
 #include <iostream>
 #include <fstream>
-#include <tkCommon/data/CameraData.h>
 #include "tkCommon/common.h"
 #include "tkCommon/gui/MouseView3D.h"
 #include "tkCommon/gui/Color.h"
@@ -18,6 +17,7 @@
 
 #include "tkCommon/data/RadarData.h"
 #include "tkCommon/data/LidarData.h"
+#include "tkCommon/data/ImageData.h"
 
 #include "tkCommon/gui/libdrawtext/drawtext.h"
 

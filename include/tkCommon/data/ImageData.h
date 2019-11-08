@@ -5,6 +5,8 @@
 #ifdef VIBRANTE
 #define float16_t dwF16
 #include <dw/image/Image.h>
+#else
+#include <opencv2/core/core.hpp>
 #endif
 
 namespace tk{namespace data{
