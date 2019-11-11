@@ -1,11 +1,13 @@
 #pragma once
-#include <tkCommon/common.h>
+#include <tkCommon/data/DataHeader.h>
 
 namespace tk { namespace data {
 
     static const int LIDAR_MAX_POINTS = 200000;
 
     struct LidarData_t {
+
+        tk::data::DataHeader_t header;
 
         /**
          * @brief Points in lidar Pointcloud
