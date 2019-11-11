@@ -8,8 +8,9 @@ namespace tk { namespace data {
      */
     struct VehicleData_t {
 
-        int    CAN_TYPE; // 0 = CCAN, 1 = PWTCAN
+        tk::data::DataHeader_t header;
 
+        int    CAN_TYPE; // 0 = CCAN, 1 = PWTCAN
         double CAR_WHEELBASE;                   // car wheelbase [m]
         double CAR_DIM_X, CAR_DIM_Y, CAR_DIM_Z; // car dimensions [m]
         double CAR_BACK2AXLE;                   // from back to axle [m]

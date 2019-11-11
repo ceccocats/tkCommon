@@ -5,6 +5,7 @@ namespace tk { namespace data {
 
     struct DataHeader_t {
         timeStamp_t stamp = 0;
+        std::string name = "sensor";
         tk::common::Tfpose tf = tk::common::Tfpose::Identity();
         int sensorID = 0;
         int messageID = 0;
