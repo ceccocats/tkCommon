@@ -450,3 +450,13 @@ inline double toRadians(double x){
     
     return ((x * M_PI) / 180.0);
 }
+
+inline std::vector<std::string> splitString(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    std::stringstream ss(s);
+    std::string substr;
+    while(std::getline(ss, substr, delim)) {
+        elems.push_back(substr);
+    }
+    return elems;
+}
