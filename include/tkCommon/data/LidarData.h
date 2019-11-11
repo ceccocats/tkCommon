@@ -38,15 +38,16 @@ namespace tk { namespace data {
 
         void init(){
 
-            this->points.resize(4,LIDAR_MAX_POINTS);     
-            this->intensity.resize(1,LIDAR_MAX_POINTS);    
-        }        
+            this->points.resize(4,LIDAR_MAX_POINTS);
+            this->intensity.resize(1,LIDAR_MAX_POINTS);
+        }
 
         /**
          * @brief Overloading for struct copy
          * 
          */
         LidarData_t& operator=(const LidarData_t& s){
+            init(); // it allocates only if it is necessary
 
             nPoints = s.nPoints;
             std::memcpy(points.data(),      s.points.data(),    nPoints * 4 * sizeof(float) );

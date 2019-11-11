@@ -18,6 +18,9 @@ namespace tk { namespace data {
         double accX, accY, accZ;
         double sideSlip;
 
+        enum type_t { ADMA, VMPS, XSENS, UNKNOWN };
+        type_t type = UNKNOWN;
+
         friend std::ostream& operator<<(std::ostream& os, const GPSData_t& m) {
             os << "Lat/Lon: " << m.lat <<"°/" << m.lon
                <<"°, Height: "<<m.height<<" Nsats: "<<m.sats;

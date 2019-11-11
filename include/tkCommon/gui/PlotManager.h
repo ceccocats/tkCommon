@@ -21,7 +21,7 @@ namespace tk { namespace gui {
                 int circleRes = 20;
                 float lineW = 1;
                 float pointW = 1;
-                int maxPoints = 100;
+                int maxPoints = 1000;
                 bool show = true;
             } conf;
 

@@ -65,6 +65,10 @@ namespace tk { namespace gui {
             init_mutex.unlock();
         }
 
+        void setSplash(bool splash) {
+            this->splash = splash;
+        }
+
         void joinThread() {
             // disable splash screen
             splash = false;
