@@ -1,5 +1,5 @@
 #pragma once
-#include <tkCommon/common.h>
+#include "tkCommon/data/DataHeader.h"
 
 namespace tk { namespace data {
     static const int CLOUD_MAX_POINTS       = 200000;
@@ -20,14 +20,13 @@ namespace tk { namespace data {
     };
 
     struct CloudData_t {
-        int                 nPoints;
-        timeStamp_t         stamp;
+        DataHeader_t        header;
 
+        int                 nPoints;
         Eigen::MatrixXf     points;
         Eigen::MatrixXf     ranges;
         Eigen::MatrixXf     features;
 
-        tk::common::Tfpose  tf;
 
         void init(){
             this->points.resize(4, CLOUD_MAX_POINTS);
@@ -43,8 +42,7 @@ namespace tk { namespace data {
             init();
 
             nPoints     = s.nPoints;
-            stamp       = s.stamp;
-            tf          = s.tf;
+            header      = s.header;
             std::memcpy(points.data(),   s.points.data(),   nPoints * 4 * sizeof(float));
             std::memcpy(ranges.data(),   s.ranges.data(),   nPoints * 2 * sizeof(float));
             std::memcpy(features.data(), s.features.data(), nPoints * CLOUD_MAX_FEATURES * sizeof(float));
