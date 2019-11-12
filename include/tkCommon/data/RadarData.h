@@ -1,5 +1,6 @@
 #pragma once
 #include <tkCommon/common.h>
+#include <tkCommon/data/DataHeader.h>
 
 namespace tk { namespace data {
 
@@ -17,6 +18,8 @@ namespace tk { namespace data {
                             };
 
     struct RadarData_t {
+        tk::data::DataHeader_t header;
+
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
         Eigen::Matrix<float, 4, RADAR_MAX_POINTS, Eigen::ColMajor> near_points[N_RADAR];
         Eigen::Matrix<float, 4, RADAR_MAX_POINTS, Eigen::ColMajor> far_points[N_RADAR];
