@@ -5,8 +5,6 @@
 
 namespace tk { namespace data {
     struct CanData_t {
-        tk::data::DataHeader_t header;
-
         struct can_frame frame;     // socketCAN frame
         timeStamp_t stamp;          // timestap of message when read
 

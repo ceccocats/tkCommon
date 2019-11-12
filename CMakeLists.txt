@@ -74,6 +74,7 @@ add_library(tkCommunication SHARED
     src/communication/ethernet/UDPSocket.cpp
     src/communication/ethernet/PCAPHandler.cpp
     src/communication/EthInterface.cpp
+    src/communication/CanInterface.cpp
 )
 target_link_libraries(tkCommunication pcap)
 
