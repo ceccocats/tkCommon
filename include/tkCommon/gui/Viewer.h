@@ -109,6 +109,7 @@ namespace tk { namespace gui {
 
         // data 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        static void tkDrawTf(std::string name, tk::common::Tfpose tf);
         static void tkDrawLogo(std::string file, double scale);
         static void tkDrawRadarData(tk::data::RadarData_t *data);
         static void tkDrawImage(tk::data::ImageData_t<uint8_t>& image, GLuint texture);

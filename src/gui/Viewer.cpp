@@ -736,6 +736,7 @@ Viewer::tkDrawRadarData(tk::data::RadarData_t *data) {
     tk::common::Vector3<float> pose;
     for(int i = 0; i < data->nRadar; i++) {
         glPushMatrix();
+        tkDrawTf(data->near_data[i].header.name, data->near_data[i].header.tf);
         tkApplyTf(data->near_data[i].header.tf);
         // draw near
         for (int j = 0; j < data->near_data[i].nPoints; j++) {
@@ -751,20 +752,20 @@ Viewer::tkDrawRadarData(tk::data::RadarData_t *data) {
 
             tkDrawCircle(pose, 0.05);
         }
-        // draw far
-        for (int j = 0; j < data->far_data[i].nPoints; j++) {
-            float rcs = data->far_data[i].features(tk::data::CloudFeatureType::RCS, j);
-
-            //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
-            float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
-            tkSetRainbowColor(hue);
-
-            pose.x = data->far_data[i].points(0, j);
-            pose.y = data->far_data[i].points(1, j);
-            pose.z = data->far_data[i].points(2, j);
-
-            tkDrawCircle(pose, 0.05);
-        }
+        //// draw far
+        //for (int j = 0; j < data->far_data[i].nPoints; j++) {
+        //    float rcs = data->far_data[i].features(tk::data::CloudFeatureType::RCS, j);
+//
+        //    //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+        //    float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
+        //    tkSetRainbowColor(hue);
+//
+        //    pose.x = data->far_data[i].points(0, j);
+        //    pose.y = data->far_data[i].points(1, j);
+        //    pose.z = data->far_data[i].points(2, j);
+//
+        //    tkDrawCircle(pose, 0.05);
+        //}
         glPopMatrix();
     }
 }
@@ -1008,6 +1009,22 @@ Viewer::tkViewport2D(int width, int height, int x, int y) {
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+}
+
+void
+Viewer::tkDrawTf(std::string name, tk::common::Tfpose tf) {
+    // draw tfs
+    tk::gui::Viewer::tkSetColor(tk::gui::color::WHITE);
+    glLineWidth(1);
+    tk::gui::Viewer::tkDrawLine(tk::common::Vector3<float>{0,0,0}, tk::common::tf2pose(tf));
+    glPushMatrix();
+    tk::gui::Viewer::tkApplyTf(tf);
+    tk::gui::Viewer::tkDrawText(name,
+                                tk::common::Vector3<float>{0.01,0.01,0},
+                                tk::common::Vector3<float>{M_PI/2,0,0},
+                                tk::common::Vector3<float>{0.15,0.15,0});
+    tk::gui::Viewer::tkDrawAxis(0.2);
+    glPopMatrix();
 }
 
 void 

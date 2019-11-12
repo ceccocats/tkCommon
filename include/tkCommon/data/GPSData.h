@@ -1,5 +1,6 @@
 #pragma once
-#include <tkCommon/common.h>
+
+#include <tkCommon/data/DataHeader.h>
 
 namespace tk { namespace data {
 
