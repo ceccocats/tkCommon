@@ -732,45 +732,41 @@ Viewer::tkDrawText(std::string text, tk::common::Vector3<float> pose, tk::common
 }
 
 void 
-Viewer::tkDrawRadarData(tk::data::RadarData_t *data, bool enable_near, bool enable_far) {
-    glPushMatrix(); 
-    if (enable_near) {
-        tk::common::Vector3<float> pose;
-        for (int i = 0; i < N_RADAR; i++) {
-            for (int j = 0; j < data->near_n_points[i]; j++) {
-                float rcs = data->near_features[i](tk::data::RadarFeatureType_t::RCS, j);
+Viewer::tkDrawRadarData(tk::data::RadarData_t *data) {
+    tk::common::Vector3<float> pose;
+    for(int i = 0; i < data->nRadar; i++) {
+        glPushMatrix();
+        tkApplyTf(data->near_data[i].header.tf);
+        // draw near
+        for (int j = 0; j < data->near_data[i].nPoints; j++) {
+            float rcs = data->near_data[i].features(tk::data::CloudFeatureType::RCS, j);
 
-                //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
-                float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
-                tkSetRainbowColor(hue);
+            //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+            float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
+            tkSetRainbowColor(hue);
 
-                pose.x = data->near_points[i](0, j);
-                pose.y = data->near_points[i](1, j);
-                pose.z = data->near_points[i](2, j);
+            pose.x = data->near_data[i].points(0, j);
+            pose.y = data->near_data[i].points(1, j);
+            pose.z = data->near_data[i].points(2, j);
 
-                tkDrawCircle(pose, 0.05);     
-            }       
+            tkDrawCircle(pose, 0.05);
         }
+        // draw far
+        for (int j = 0; j < data->far_data[i].nPoints; j++) {
+            float rcs = data->far_data[i].features(tk::data::CloudFeatureType::RCS, j);
+
+            //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+            float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
+            tkSetRainbowColor(hue);
+
+            pose.x = data->far_data[i].points(0, j);
+            pose.y = data->far_data[i].points(1, j);
+            pose.z = data->far_data[i].points(2, j);
+
+            tkDrawCircle(pose, 0.05);
+        }
+        glPopMatrix();
     }
-    if (enable_far) {
-        tk::common::Vector3<float> pose;
-        for (int i = 0; i < N_RADAR; i++) {
-            for (int j = 0; j < data->far_n_points[i]; j++) {
-                float rcs = data->far_features[i](tk::data::RadarFeatureType_t::RCS, j);
-
-                //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
-                float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
-                tkSetRainbowColor(hue);
-
-                pose.x = data->far_points[i](0, j);
-                pose.y = data->far_points[i](1, j);
-                pose.z = data->far_points[i](2, j);
-
-                tkDrawCircle(pose, 0.05);     
-            }       
-        }    
-    }
-    glPopMatrix();
 }
 
 void
