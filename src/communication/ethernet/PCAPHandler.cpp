@@ -10,6 +10,7 @@ bool tk::communication::PCAPHandler::initReplay(const std::string fileName, cons
     char errbuff[PCAP_ERRBUF_SIZE];
     struct bpf_program fp;
 
+    clsMsg("opening: " + fileName + "\n");
     pcapFile = pcap_open_offline(fileName.c_str(), errbuff);
 
     if (!pcapFile){
