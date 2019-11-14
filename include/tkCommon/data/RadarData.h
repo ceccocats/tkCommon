@@ -41,7 +41,7 @@ namespace tk { namespace data {
                 std::memcpy(far_points[i].data(),   s.far_points[i].data(),     far_n_points[i] * 4 * sizeof(float));
                 std::memcpy(near_features[i].data(), s.near_features[i].data(), near_n_points[i] * RADAR_MAX_FEATURES * sizeof(float));
                 std::memcpy(far_features[i].data(), s.far_features[i].data(), far_n_points[i] * RADAR_MAX_FEATURES * sizeof(float));
-                std::memcpy(near_ranges[i].data(), s.near_ranges[i].data(), near_n_points[i] * RADAR_MAX_FEATURES * sizeof(float));
+                std::memcpy(near_ranges[i].data(), s.near_ranges[i].data(), near_n_points[i] * 2 * sizeof(float));
             }
         }
     };
