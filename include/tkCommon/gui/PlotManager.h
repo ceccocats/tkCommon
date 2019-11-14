@@ -21,7 +21,7 @@ namespace tk { namespace gui {
                 int circleRes = 20;
                 float lineW = 1;
                 float pointW = 1;
-                int maxPoints = 1000;
+                int maxPoints = 10000;
                 bool show = true;
             } conf;
 
@@ -47,10 +47,6 @@ namespace tk { namespace gui {
         }
 
         void addCirclePlot(std::string id, Color_t color = tk::gui::color::WHITE, float circleRay  = 0.5, float lineW = 1, int circleRes = 20) {
-            // key alread present
-            if ( plots.find(id) != plots.end() )
-                return;
-
             plot_t plot;
             plot.conf.type = plot_t::plottype_t::CIRCLES;
             plot.conf.color = color;
@@ -58,6 +54,11 @@ namespace tk { namespace gui {
             plot.conf.circleRay = circleRay;
             plot.conf.circleRes = circleRes;
             addPlot(id, plot.conf);
+        }
+
+        bool plotExist(std::string id) {
+            // key alread present
+            return plots.find(id) != plots.end();
         }
 
         void addPoint(std::string id, tk::common::Vector3<float> pt) {

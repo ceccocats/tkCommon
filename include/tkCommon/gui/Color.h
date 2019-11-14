@@ -35,5 +35,35 @@ namespace tk { namespace gui {
         static Color_t DARK_GRAY    = {33, 33, 33, 255};
         static Color_t BLACK        = {0, 0, 0, 255};
         static Color_t WHITE        = {250, 250, 250, 255};
-    }    
-}} // namespace name
+    }
+
+
+    inline Color_t randomColor(float alpha = 1.0) {
+        Color_t cols[] = {
+                color::RED,
+                color::PINK,
+                color::PURPLE,
+                color::DEEP_PURPLE,
+                color::INDIGO,
+                color::BLUE,
+                color::LIGHT_BLUE,
+                color::CYAN,
+                color::TEAL,
+                color::GREEN,
+                color::LIGHT_GREEN,
+                color::LIME,
+                color::YELLOW,
+                color::AMBER,
+                color::ORANGE,
+                color::DEEP_ORANGE,
+                color::WHITE,
+        };
+        int n_cols = sizeof(cols)/sizeof(*cols);
+
+        static std::mt19937 rng(48);
+        Color_t c = cols[rng() % n_cols];
+        c.a = alpha*255;
+        return c;
+    }
+
+    }} // namespace name

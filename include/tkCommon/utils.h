@@ -152,7 +152,7 @@ struct LoopRate {
 template<typename T>
 struct CircularArray {
 
-    static const int MAX_DIM = 1000;
+    static const int MAX_DIM = 10000;
     T array[CircularArray::MAX_DIM];
     int dim, position;
 
@@ -176,9 +176,9 @@ struct CircularArray {
      * @param _dim
      */
     void setDim(int _dim) {
+        dim = _dim;
         if(dim > CircularArray::MAX_DIM)
             dim = CircularArray::MAX_DIM;
-        dim = _dim;
     }
 
     /**
