@@ -848,12 +848,12 @@ Viewer::tkSplitPanel(int count, float ratio, int &num_cols, int &num_rows, float
     }
 
     if(ratio > 0){
-        x = 1.0f - w/2 - w * (num_cols-1);
+        x = -1.0f + w/2 + w * (num_cols-1);
         y = -1.0f + h/2;
     }
     else {
         x = -w * ((float) num_cols / 2) + w / 2;
-        y = -1.0f + h / 2, 0;
+        y = -1.0f + h / 2;
     }
 }
 

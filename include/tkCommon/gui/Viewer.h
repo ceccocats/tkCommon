@@ -57,6 +57,8 @@ namespace tk { namespace gui {
             // enable splash screen
             splash = splashScreen;
 
+            ts = getTimeStamp();
+
             clsSuc("start viz thread\n");
             init_mutex.lock();
             pthread_create(&thread, NULL, threadCaller, (void*)this);
@@ -70,6 +72,11 @@ namespace tk { namespace gui {
         }
 
         void joinThread() {
+
+            while(getTimeStamp() - ts < splashTime){
+                usleep(100);
+            }
+
             // disable splash screen
             splash = false;
 
@@ -77,6 +84,9 @@ namespace tk { namespace gui {
             clsSuc("end viz thread\n");
         }
 
+        void setSplashTime(float t) {
+            splashTime = t * 1000000;
+        }
 
         void setWindowName(std::string name);
         void setBackground(tk::gui::Color_t c);
@@ -158,6 +168,8 @@ namespace tk { namespace gui {
         std::string             windowName;
         Color_t                 background = tk::gui::color::DARK_GRAY;
         bool                    splash = false; // true if splash screen
+        timeStamp_t             ts;
+        float                   splashTime = 0;
 
         GLFWwindow*             window;
         static GLUquadric*      quadric;
