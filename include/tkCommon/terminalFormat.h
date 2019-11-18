@@ -112,6 +112,8 @@ namespace tk { namespace tformat{
         ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
 
         int len = size.ws_col - LEN_CLASS_NAME;
+        if(len <= 0)
+            len = 80;
 
         int c = 0;
         for(c = 0; c < (int)m.size(); c += len){
