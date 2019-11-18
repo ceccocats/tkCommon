@@ -46,4 +46,5 @@ add_custom_target(upload
     COMMAND sshpass -p "${TK_PASS}" ssh -o StrictHostKeyChecking=no -p 22 ${TK_USER}@${TK_IP} "mkdir -p ${TK_TARGET_INSTALL_PATH}"
     # upload installation
     COMMAND sshpass -p "${TK_PASS}" rsync --progress -rltgDz -e "ssh -p 22" ${CMAKE_INSTALL_PREFIX}/ ${TK_USER}@${TK_IP}:${TK_TARGET_INSTALL_PATH}/
+    COMMAND echo "installed to ${TK_IP}:${TK_TARGET_INSTALL_PATH}"
 )
