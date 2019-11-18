@@ -46,6 +46,12 @@ namespace tk { namespace data {
         uint8_t    tractionGrip = 0;  // traction control grip [ ? ]
 
 
+        // faults
+        uint8_t ESPFault = 0;
+
+        // inputs
+        uint8_t activateDrive = 0, activateSteer = 0;
+
         /**
          * Odometry vales
          */
