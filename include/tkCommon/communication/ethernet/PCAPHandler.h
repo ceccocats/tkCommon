@@ -55,9 +55,11 @@ namespace tk { namespace communication {
          */
         bool close();
     private:
-        bool            replayMode;
-        pcap_dumper_t   *pcapDumper;
-        pcap_t      	*pcapFile;
+        bool                replayMode;
+        pcap_dumper_t       *pcapDumper;
+        pcap_t      	    *pcapFile;
+
+        const static int    HEADER_LEN = 42;
 
     };
 }}

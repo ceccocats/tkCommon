@@ -91,6 +91,10 @@ namespace tk { namespace data {
             }
             return false;
         }
+
+        void init(){
+            //TODO:
+        }
     };
 }
 }

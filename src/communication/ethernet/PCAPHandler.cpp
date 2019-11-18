@@ -104,11 +104,11 @@ int tk::communication::PCAPHandler::getPacket(uint8_t* buffer, timeStamp_t& stam
         return -1;
     }
 
-    std::memcpy(buffer,pkt_data,header->len);
+    std::memcpy(buffer,pkt_data + HEADER_LEN,header->len - HEADER_LEN);
 
     //stamp = header->ts.tv_sec;
     stamp = header->ts.tv_sec * 1e6 + header->ts.tv_usec;
-    return header->len;
+    return header->len - HEADER_LEN;
 }
 
 bool tk::communication::PCAPHandler::close(){

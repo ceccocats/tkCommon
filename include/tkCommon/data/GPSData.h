@@ -26,6 +26,10 @@ namespace tk { namespace data {
                <<"°, Height: "<<m.height<<" Nsats: "<<m.sats;
             return os;
         }
+
+        void init(){
+            //TODO:
+        }
     };
 }
 }
