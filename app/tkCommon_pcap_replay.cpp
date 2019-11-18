@@ -7,10 +7,10 @@ bool                            gRun = true;
 tk::communication::Ethinterface iface;
 tk::communication::UDPSocket    sender;
 
-void replayLoop(std::string file, int port){
+void replayLoop(std::string file, int port, std::string filter,std::string ip){
 
-    tkASSERT(iface.initPcapReplay(file));
-    sender.initSender(port,"127.0.0.1");
+    tkASSERT(iface.initPcapReplay(file,filter));
+    sender.initSender(port,ip);
     uint8_t buffer[2000];
     int count = 0;
     timeStamp_t prec = 0, now;
@@ -46,13 +46,15 @@ void replayLoop(std::string file, int port){
 int main(int argc, char* argv[]){
 
     tk::common::CmdParser   cmd(argv, "Samples for handle ethernet packets");
-    std::string file        = cmd.addOpt("-file", "", "pcap replay file");
+    std::string file        = cmd.addArg("file", "", "pcap replay file");
+    std::string filter      = cmd.addOpt("-filter", "", "pcap filter");
+    std::string ip          = cmd.addOpt("-ip", "127.0.0.1", "pcap filter");
     int port                = cmd.addIntOpt("-port", 2368, "pcap replay file");
     cmd.print();
 
     tk::exceptions::handleSegfault();
 
-    replayLoop(file,port);
+    replayLoop(file,port,filter,ip);
 
     return 0;
 }
