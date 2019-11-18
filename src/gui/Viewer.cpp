@@ -734,9 +734,10 @@ Viewer::tkDrawText(std::string text, tk::common::Vector3<float> pose, tk::common
 void 
 Viewer::tkDrawRadarData(tk::data::RadarData_t *data) {
     tk::common::Vector3<float> pose;
+    tk::common::Tfpose  correction = tk::common::odom2tf(0, 0, 0, +M_PI/2);
     for(int i = 0; i < data->nRadar; i++) {
         glPushMatrix();
-        tkDrawTf(data->near_data[i].header.name, data->near_data[i].header.tf);
+        tkDrawTf(data->near_data[i].header.name, (data->near_data[i].header.tf * correction));
         tkApplyTf(data->near_data[i].header.tf);
         // draw near
         for (int j = 0; j < data->near_data[i].nPoints; j++) {
