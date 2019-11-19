@@ -41,6 +41,8 @@ namespace tk { namespace data {
 
         // wheel speeds [ m/s ]
         double     wheelFLspeed =0, wheelFRspeed =0, wheelRLspeed =0, wheelRRspeed =0;
+        uint8_t    wheelFLDir =0, wheelFRDir =0, wheelRLDir =0, wheelRRDir =0;
+
 
         double     sideSlip = 0;      // beta angle            [ rad   ]
         uint8_t    tractionGrip = 0;  // traction control grip [ ? ]
