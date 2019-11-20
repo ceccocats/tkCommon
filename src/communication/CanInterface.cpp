@@ -148,7 +148,7 @@ namespace tk { namespace communication {
 
     void
     CanInterface::record(const std::string fileName, const std::string iface){
-
+        system(std::string(std::string("candump -L ") + iface + " > " + fileName + "/" + iface + ".log &").c_str());
     }
 
     bool
