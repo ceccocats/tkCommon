@@ -31,7 +31,7 @@ set(GUI_LIBS
     ${OPENGL_gl_LIBRARY}
     ${OPENGL_glu_LIBRARY}
     ${GLEW_LIBRARY}  
-    glfw
+    glfw3
     glut
     ${FREETYPE_LIBRARIES}
 )

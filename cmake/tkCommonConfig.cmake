@@ -21,7 +21,7 @@ set(tkCommon_LIBRARIES
     ${OPENGL_gl_LIBRARY}
     ${OPENGL_glu_LIBRARY}
     ${GLEW_LIBRARY}
-    glfw
+    glfw3
     glut
     tkCommon
     tkGUI

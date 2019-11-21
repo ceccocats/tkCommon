@@ -35,6 +35,7 @@ set(CUDA_npps_LIBRARY ${CUDA_TOOLKIT_ROOT_DIR}/targets/${cuda_target_full_path}/
 set(CUDA_cusolver_LIBRARY ${CUDA_TOOLKIT_ROOT_DIR}/targets/${cuda_target_full_path}/lib/stubs/libcusolver.so)
 
 include_directories(/usr/include/aarch64-linux-gnu/)
+include_directories(${CMAKE_SYSROOT}/usr/local/include)
 
 # set UPLOAD to target
 set(TK_USER nvidia)
