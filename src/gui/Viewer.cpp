@@ -14,6 +14,7 @@ std::vector<Color_t> tk::gui::Viewer::colors = std::vector<Color_t>{color::RED, 
 int Viewer::TK_FONT_SIZE = 256;
 
 Viewer::Viewer() {
+    // this must stay in the constructor because the file is loaded in the init function
     icon_fname = std::string(std::string(TKPROJ_PATH)+"/data/tkLogo.png");
 }
 
@@ -41,6 +42,8 @@ Viewer::init() {
 
 #if GLFW_VERSION_MAJOR >= 3
 #if GLFW_VERSION_MINOR >= 2
+    glfwMaximizeWindow(window);
+
     unsigned w, h;
     lodepng_decode32_file(&(icons[0].pixels), &w, &h, icon_fname.c_str());
     icons[0].width = w;
@@ -119,8 +122,10 @@ Viewer::init() {
     clsMsg(msg);
 
     tkLoadTexture(std::string(TKPROJ_PATH) + "data/HipertLab.png", hipertTex);
-
     tkLoadLogo(std::string(TKPROJ_PATH) + "data/tkLogo.pts", logo);
+
+    glfwGetFramebufferSize(window, &width, &height);
+    clsSuc("init with resolution " + std::to_string(width) + "x" + std::to_string(height) + "\n");
 }
 
 
@@ -373,8 +378,8 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
 
         for(int o=0; o<loader.LoadedMeshes.size(); o++) {
 
-            std::string msg = std::string{"name: "}+loader.LoadedMeshes[o].MeshName+"  verts: "+std::to_string(loader.LoadedMeshes[o].Vertices.size())+"\n";
-            tk::tformat::printMsg("Viewer",msg);
+            //std::string msg = std::string{"name: "}+loader.LoadedMeshes[o].MeshName+"  verts: "+std::to_string(loader.LoadedMeshes[o].Vertices.size())+"\n";
+            //tk::tformat::printMsg("Viewer",msg);
             //std::cout<<"name: "<<loader.LoadedMeshes[o].MeshName<<"  verts: "<<loader.LoadedMeshes[o].Vertices.size()<<"\n";
    
             std::vector<unsigned int> indices = loader.LoadedMeshes[o].Indices;
@@ -384,9 +389,9 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
             obj.colors[o].y = loader.LoadedMeshes[o].MeshMaterial.Kd.Y;
             obj.colors[o].z = loader.LoadedMeshes[o].MeshMaterial.Kd.Z;
 
-            msg = std::string{"mat: "}+loader.LoadedMeshes[o].MeshMaterial.name;
-            msg += std::string{" ("}+std::to_string(obj.colors[0].x)+std::to_string(obj.colors[0].y)+std::to_string(obj.colors[0].z)+std::string{")\n"};
-            tk::tformat::printMsg("Viewer",msg);
+            //msg = std::string{"mat: "}+loader.LoadedMeshes[o].MeshMaterial.name;
+            //msg += std::string{" ("}+std::to_string(obj.colors[0].x)+std::to_string(obj.colors[0].y)+std::to_string(obj.colors[0].z)+std::string{")\n"};
+            //tk::tformat::printMsg("Viewer",msg);
 
 
             //std::cout<<"mat: "<<loader.LoadedMeshes[o].MeshMaterial.name<<" diffuse: "<<obj.colors[o]<<"\n";
