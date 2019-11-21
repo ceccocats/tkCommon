@@ -23,7 +23,6 @@
 
 #include <tkCommon/terminalFormat.h>
 
-
 namespace tk { namespace gui {
 
     class PlotManager;
@@ -88,6 +87,7 @@ namespace tk { namespace gui {
             splashTime = t * 1000000;
         }
 
+        void setIcon(std::string filename);
         void setWindowName(std::string name);
         void setBackground(tk::gui::Color_t c);
         
@@ -166,6 +166,7 @@ namespace tk { namespace gui {
 
     private:
         std::string             windowName;
+        std::string             icon_fname;
         Color_t                 background = tk::gui::color::DARK_GRAY;
         bool                    splash = false; // true if splash screen
         timeStamp_t             ts;

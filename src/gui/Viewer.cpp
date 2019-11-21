@@ -14,6 +14,7 @@ std::vector<Color_t> tk::gui::Viewer::colors = std::vector<Color_t>{color::RED, 
 int Viewer::TK_FONT_SIZE = 256;
 
 Viewer::Viewer() {
+    icon_fname = std::string(std::string(TKPROJ_PATH)+"/data/tkLogo.png");
 }
 
 
@@ -30,11 +31,23 @@ Viewer::init() {
     glfwSetErrorCallback(errorCallback);
     glfwInit();
 
+    GLFWimage icons[1];
+
     // Create a windowed mode window and its OpenGL context
     window = glfwCreateWindow(width, height, windowName.c_str(), NULL, NULL);
     if (!window) {
         glfwTerminate();
     }
+
+#if GLFW_VERSION_MINOR >= 2
+    unsigned w, h;
+    lodepng_decode32_file(&(icons[0].pixels), &w, &h, icon_fname.c_str());
+    icons[0].width = w;
+    icons[0].height = h;
+
+    glfwSetWindowIcon(window, 1, icons);
+#endif
+
     Viewer::mouseView.window = window;
 
     glfwSetScrollCallback(window, Viewer::scroll_callback);
@@ -279,6 +292,13 @@ Viewer::run() {
     glfwTerminate();
 }
 
+void
+Viewer::setIcon(std::string filename) {
+    icon_fname = filename;
+#if GLFW_VERSION_MINOR < 2
+    clsWrn("To load program icon update GLFW version to 3.3")
+#endif
+}
 
 void
 Viewer::setWindowName(std::string name) {
