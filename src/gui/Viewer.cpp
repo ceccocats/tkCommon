@@ -39,6 +39,7 @@ Viewer::init() {
         glfwTerminate();
     }
 
+#if GLFW_VERSION_MAJOR >= 3
 #if GLFW_VERSION_MINOR >= 2
     unsigned w, h;
     lodepng_decode32_file(&(icons[0].pixels), &w, &h, icon_fname.c_str());
@@ -46,6 +47,7 @@ Viewer::init() {
     icons[0].height = h;
 
     glfwSetWindowIcon(window, 1, icons);
+#endif
 #endif
 
     Viewer::mouseView.window = window;
