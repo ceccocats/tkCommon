@@ -7,6 +7,9 @@ find_package(Eigen3 REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glfw3 3 REQUIRED)
+if(NOT DEFINED GLFW3_LIBRARY)
+    set(GLFW3_LIBRARY glfw3)
+endif()
 find_package(Freetype REQUIRED)
 
 set(tkCommon_INCLUDE_DIRS
@@ -21,7 +24,7 @@ set(tkCommon_LIBRARIES
     ${OPENGL_gl_LIBRARY}
     ${OPENGL_glu_LIBRARY}
     ${GLEW_LIBRARY}
-    glfw3
+    ${GLFW3_LIBRARY}
     glut
     tkCommon
     tkGUI
