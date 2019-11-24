@@ -38,21 +38,23 @@ namespace tk { namespace gui {
             plots[id].points.clear();
         }
 
-        void addLinePlot(std::string id, Color_t color = tk::gui::color::WHITE, float lineW = 1) {
+        void addLinePlot(std::string id, Color_t color = tk::gui::color::WHITE, int maxpts = 10000, float lineW = 1) {
             plot_t plot;
             plot.conf.type = plot_t::plottype_t::LINE;
             plot.conf.color = color;
             plot.conf.lineW = lineW;
+            plot.conf.maxPoints = maxpts;
             addPlot(id, plot.conf);
         }
 
-        void addCirclePlot(std::string id, Color_t color = tk::gui::color::WHITE, float circleRay  = 0.5, float lineW = 1, int circleRes = 20) {
+        void addCirclePlot(std::string id, Color_t color = tk::gui::color::WHITE, int maxpts = 10000, float circleRay  = 0.5, float lineW = 1, int circleRes = 20) {
             plot_t plot;
             plot.conf.type = plot_t::plottype_t::CIRCLES;
             plot.conf.color = color;
             plot.conf.lineW = lineW;
             plot.conf.circleRay = circleRay;
             plot.conf.circleRes = circleRes;
+            plot.conf.maxPoints = maxpts;
             addPlot(id, plot.conf);
         }
 

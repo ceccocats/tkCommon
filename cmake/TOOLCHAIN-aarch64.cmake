@@ -1,7 +1,7 @@
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR aarch64)
 
-set(CMAKE_SYSROOT /home/cecco/nvidia/nvidia_sdk/DRIVE_Software_9.0_Linux_hyperion_E3550/DriveSDK/drive-t186ref-linux/targetfs)
+set(CMAKE_SYSROOT $ENV{HOME}/nvidia/nvidia_sdk/DRIVE_Software_9.0_Linux_hyperion_E3550/DriveSDK/drive-t186ref-linux/targetfs)
 
 set(CMAKE_C_COMPILER /usr/bin/aarch64-linux-gnu-gcc)
 set(CMAKE_CXX_COMPILER /usr/bin/aarch64-linux-gnu-g++)
