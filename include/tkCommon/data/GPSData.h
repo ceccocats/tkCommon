@@ -16,10 +16,10 @@ namespace tk { namespace data {
         int quality = 0, sats = 0;
 
         // IMU
-        double angleX, angleY, angleZ;
-        double angleRateX, angleRateY, angleRateZ;
-        double accX, accY, accZ;
-        double sideSlip;
+        double angleX = 0, angleY = 0, angleZ = 0;
+        double angleRateX = 0, angleRateY = 0, angleRateZ = 0;
+        double accX = 0, accY = 0, accZ = 0;
+        double sideSlip = 0;
 
         friend std::ostream& operator<<(std::ostream& os, const GPSData_t& m) {
             os << "Lat/Lon: " << m.lat <<"°/" << m.lon
@@ -29,6 +29,27 @@ namespace tk { namespace data {
 
         void init(){
             //TODO:
+        }
+
+        matvar_t *matVar(std::string name = "gps") {
+
+            const int n = 14;
+            const char *fields[n+1] = {"stamp", "lat", "lon", "height", "sats", "angleX", "angleY", "angleZ",
+                                    "angleRateX", "angleRateY", "angleRateZ", "accX", "accY", "accZ", "sideSlip"};
+            double vals[n] = {lat, lon, height, (double)sats, angleX, angleY, angleZ,
+                               angleRateX, angleRateY, angleRateZ, accX, accY, accZ, sideSlip};
+
+            size_t dim[2] = { 1, 1 }; // create 1x1 struct
+            matvar_t* matstruct = Mat_VarCreateStruct(name.c_str(), 2, dim, fields, n); //main struct: Data
+
+            matvar_t *var = Mat_VarCreate("stamp", MAT_C_UINT64, MAT_T_UINT64, 2, dim, &stamp, 0);
+            Mat_VarSetStructFieldByName(matstruct, "stamp", 0, var); //0 for first row
+            for(int i =0; i<n; i++) {
+                matvar_t *var;
+                var = Mat_VarCreate(fields[i+1], MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dim, &vals[i], 0);
+                Mat_VarSetStructFieldByName(matstruct, fields[i+1], 0, var); //0 for first row
+            }
+            return matstruct;
         }
     };
 }
