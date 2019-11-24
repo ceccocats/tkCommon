@@ -38,7 +38,7 @@ namespace tk { namespace data {
                                angleRateX, angleRateY, angleRateZ, accX, accY, accZ, sideSlip};
 
             size_t dim[2] = { 1, 1 }; // create 1x1 struct
-            matvar_t* matstruct = Mat_VarCreateStruct(name.c_str(), 2, dim, fields, n); //main struct: Data
+            matvar_t* matstruct = Mat_VarCreateStruct(name.c_str(), 2, dim, fields, n+1); //main struct: Data
 
             matvar_t *var = Mat_VarCreate("stamp", MAT_C_UINT64, MAT_T_UINT64, 2, dim, &header.stamp, 0);
             Mat_VarSetStructFieldByName(matstruct, "stamp", 0, var); //0 for first row
