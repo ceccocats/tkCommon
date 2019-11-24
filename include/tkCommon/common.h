@@ -317,42 +317,6 @@ namespace tk { namespace common {
     Vector3<float> tf2rot(Tfpose tf);
 
     /**
-     * generate matvar from eigen matrix
-     */
-    matvar_t *eigenXf2matvar(Eigen::MatrixXf mat, std::string name = "mat") {
-        size_t dim[2];
-        dim[0] = mat.rows();
-        dim[1] = mat.cols();
-        return Mat_VarCreate(name.c_str(), MAT_C_SINGLE, MAT_T_SINGLE, 2, dim, mat.data(), 0);
-    }
-    /**
-     * generate matvar from eigen matrix
-     */
-    matvar_t *eigenXd2matvar(Eigen::MatrixXd mat, std::string name = "mat") {
-        size_t dim[2];
-        dim[0] = mat.rows();
-        dim[1] = mat.cols();
-        return Mat_VarCreate(name.c_str(), MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dim, mat.data(), 0);
-    }
-    /**
-     * write matvar to file
-     */
-    bool matvarWrite(std::string filename, matvar_t *m) {
-        //Open file
-        mat_t *matfp;
-        matfp = Mat_CreateVer(filename.c_str(), NULL, MAT_FT_MAT5);
-
-        //save main struct
-        Mat_VarWrite(matfp, m, MAT_COMPRESSION_ZLIB);
-
-        //cleanup
-        //Mat_VarFree(m);
-
-        //Close file
-        Mat_Close(matfp);
-    }
-
-    /**
      * project 2d point to 3d point
      * @param p_mat projection matrix
      * @param v_mat model view matrix
@@ -429,6 +393,44 @@ namespace tk { namespace common {
         is.read((char *)m.data(), m.size() * sizeof(T));
         return is.is_open();
     }
+
+    /**
+     * generate matvar from eigen matrix
+     */
+    inline matvar_t *eigenXf2matvar(Eigen::MatrixXf mat, std::string name = "mat") {
+        size_t dim[2];
+        dim[0] = mat.rows();
+        dim[1] = mat.cols();
+        return Mat_VarCreate(name.c_str(), MAT_C_SINGLE, MAT_T_SINGLE, 2, dim, mat.data(), 0);
+    }
+    /**
+     * generate matvar from eigen matrix
+     */
+    inline matvar_t *eigenXd2matvar(Eigen::MatrixXd mat, std::string name = "mat") {
+        size_t dim[2];
+        dim[0] = mat.rows();
+        dim[1] = mat.cols();
+        return Mat_VarCreate(name.c_str(), MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dim, mat.data(), 0);
+    }
+    /**
+     * write matvar to file
+     */
+    inline bool matvarWrite(std::string filename, matvar_t *m) {
+        //Open file
+        mat_t *matfp;
+        matfp = Mat_CreateVer(filename.c_str(), NULL, MAT_FT_MAT5);
+
+        //save main struct
+        Mat_VarWrite(matfp, m, MAT_COMPRESSION_ZLIB);
+
+        //cleanup
+        //Mat_VarFree(m);
+
+        //Close file
+        Mat_Close(matfp);
+    }
+
+
 
     /**
      * Tell if point c is on the left side respect to the segment a - b
