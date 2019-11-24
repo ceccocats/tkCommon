@@ -10,8 +10,6 @@ namespace tk { namespace data {
     struct GPSData_t {
         tk::data::DataHeader_t header;
 
-        timeStamp_t stamp = 0;
-
         double lat = 0, lon = 0, hdop =0, height = 0, age = 0;
         int quality = 0, sats = 0;
 
@@ -22,7 +20,7 @@ namespace tk { namespace data {
         double sideSlip = 0;
 
         friend std::ostream& operator<<(std::ostream& os, const GPSData_t& m) {
-            os << "Lat/Lon: " << m.lat <<"°/" << m.lon
+            os << m.header.stamp<< " Lat/Lon: " << m.lat <<"°/" << m.lon
                <<"°, Height: "<<m.height<<" Nsats: "<<m.sats;
             return os;
         }
@@ -42,7 +40,7 @@ namespace tk { namespace data {
             size_t dim[2] = { 1, 1 }; // create 1x1 struct
             matvar_t* matstruct = Mat_VarCreateStruct(name.c_str(), 2, dim, fields, n); //main struct: Data
 
-            matvar_t *var = Mat_VarCreate("stamp", MAT_C_UINT64, MAT_T_UINT64, 2, dim, &stamp, 0);
+            matvar_t *var = Mat_VarCreate("stamp", MAT_C_UINT64, MAT_T_UINT64, 2, dim, &header.stamp, 0);
             Mat_VarSetStructFieldByName(matstruct, "stamp", 0, var); //0 for first row
             for(int i =0; i<n; i++) {
                 matvar_t *var;
