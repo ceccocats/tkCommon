@@ -74,6 +74,9 @@ namespace tk{ namespace communication {
         int             sock_fd;
         bool            reciver;
         sockaddr_in     sock_addr;
+        ip_mreq         imr;
+
+        bool            isMulti;
     };
 
 }}

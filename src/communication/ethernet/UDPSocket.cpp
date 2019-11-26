@@ -9,12 +9,45 @@ namespace tk { namespace communication {
 
     bool
     UDPSocket::initReceiver(const int port, const std::string ip) {
-
+    
         memset(&this->sock_addr, 0, sizeof(this->sock_addr));
-        
-        bool status = initSender(port, ip);
 
-        if(status == false){
+        this->sock_addr.sin_family          = AF_INET; // IPv4
+        this->sock_addr.sin_port            = htons(port);
+
+        if(ip.empty()){
+
+             this->sock_addr.sin_addr.s_addr    = htonl(INADDR_ANY);
+        }else{
+
+            this->sock_addr.sin_addr.s_addr     = inet_addr(ip.c_str());
+        }
+
+        if (!ip.empty()) {
+            if (isMulticast(ip)) {
+                this->isMulti = true;
+                this->imr.imr_multiaddr.s_addr = inet_addr(ip.c_str());
+                this->imr.imr_interface.s_addr = htonl(INADDR_ANY);
+                int r = setsockopt(this->sock_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &imr, sizeof(ip_mreq));
+                if (r < 0){
+                    clsErr("error while allowing multiple sockets.\n");
+                    return false;
+                }
+                clsSuc("multicast socket created.\n");
+            } else{
+
+                this->isMulti = false;
+                clsSuc("classic socket created.\n");
+            }
+        }else{
+
+            clsSuc("socket port created.\n");
+        }
+
+        // open socket
+        this->sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
+        if (this->sock_fd < 0){
+            clsErr("error while opening socket.\n");
             return false;
         }
 
@@ -32,13 +65,14 @@ namespace tk { namespace communication {
     bool
     UDPSocket::initSender(const int port, const std::string ip) {
 
+        memset(&this->sock_addr, 0, sizeof(this->sock_addr));
+
         this->sock_addr.sin_family          = AF_INET; // IPv4
-        this->sock_addr.sin_addr.s_addr     = inet_addr(ip.c_str());
         this->sock_addr.sin_port            = htons(port);
 
         if(ip.empty()){
 
-             this->sock_addr.sin_addr.s_addr    = INADDR_ANY;
+             this->sock_addr.sin_addr.s_addr    = htonl(INADDR_ANY);
         }else{
 
             this->sock_addr.sin_addr.s_addr     = inet_addr(ip.c_str());
@@ -54,27 +88,19 @@ namespace tk { namespace communication {
         // allow multiple sockets
         if (!ip.empty()) {
             if (isMulticast(ip)) {
-
-                int optname = 1;
-                int r = setsockopt(this->sock_fd, SOL_SOCKET, SO_REUSEADDR, (char*) &optname, sizeof(optname));
+                this->isMulti = true;
+                unsigned char ttl = 1;
+                int r = setsockopt(this->sock_fd, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl));
                 if (r < 0){
                     clsErr("error while allowing multiple sockets.\n");
                     return false;
                 }
-                // join multicast group
-                struct ip_mreq mreq;
-                mreq.imr_multiaddr.s_addr = inet_addr(ip.c_str());
-                mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-                r = setsockopt(this->sock_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *) &mreq, sizeof(mreq));
-                if (r < 0) {   
-                    clsErr("error while joining multicast group.")
-                    return false;
-                }
-
                 clsSuc("multicast socket created.\n");
-            } else
+            } else{
 
+                this->isMulti = false;
                 clsSuc("classic socket created.\n");
+            }
         }else{
 
             clsSuc("socket port created.\n");
@@ -106,6 +132,10 @@ namespace tk { namespace communication {
 
     bool
     UDPSocket::close() {
+
+        if(this->isMulti && reciver){
+            setsockopt(this->sock_fd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &this->imr, sizeof(this->imr));
+        }
         return ::close(this->sock_fd);
     }
 
