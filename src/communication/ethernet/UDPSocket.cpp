@@ -23,6 +23,13 @@ namespace tk { namespace communication {
             this->sock_addr.sin_addr.s_addr     = inet_addr(ip.c_str());
         }
 
+        // open socket
+        this->sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
+        if (this->sock_fd < 0){
+            clsErr("error while opening socket.\n");
+            return false;
+        }
+
         if (!ip.empty()) {
             if (isMulticast(ip)) {
                 this->isMulti = true;
@@ -44,12 +51,6 @@ namespace tk { namespace communication {
             clsSuc("socket port created.\n");
         }
 
-        // open socket
-        this->sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
-        if (this->sock_fd < 0){
-            clsErr("error while opening socket.\n");
-            return false;
-        }
 
         // Bind the socket with the sender address
         int r = bind(this->sock_fd, (const struct sockaddr *)&this->sock_addr,  sizeof(this->sock_addr));
