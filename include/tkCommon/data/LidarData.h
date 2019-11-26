@@ -113,7 +113,7 @@ namespace tk { namespace data {
 
         struct FiringData
         {
-            unsigned short blockIdentifier;
+            unsigned short verticalPosition;
             unsigned short rotationalPosition;
             LaserReturn laserReturns[LASER_PER_FIRING];
         };
@@ -231,6 +231,8 @@ namespace tk { namespace data {
 
 
     }
+
+    
 
 
 }}
