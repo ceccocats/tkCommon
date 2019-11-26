@@ -25,20 +25,6 @@ namespace tk { namespace communication {
             return false;
         }
 
-        // join multicast group
-        if (!ip.empty()) {
-            if (isMulticast(ip)) {
-                struct ip_mreq mreq;
-                mreq.imr_multiaddr.s_addr = inet_addr(ip.c_str());
-                mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-                r = setsockopt(this->sock_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *) &mreq, sizeof(mreq));
-                if (r < 0) {   
-                    clsErr("error while joining multicast group.")
-                    return false;
-                }
-            }
-        }
-
         reciver = true;
         return true;
     }
@@ -68,12 +54,23 @@ namespace tk { namespace communication {
         // allow multiple sockets
         if (!ip.empty()) {
             if (isMulticast(ip)) {
+
                 int optname = 1;
                 int r = setsockopt(this->sock_fd, SOL_SOCKET, SO_REUSEADDR, (char*) &optname, sizeof(optname));
                 if (r < 0){
                     clsErr("error while allowing multiple sockets.\n");
                     return false;
                 }
+                // join multicast group
+                struct ip_mreq mreq;
+                mreq.imr_multiaddr.s_addr = inet_addr(ip.c_str());
+                mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+                r = setsockopt(this->sock_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *) &mreq, sizeof(mreq));
+                if (r < 0) {   
+                    clsErr("error while joining multicast group.")
+                    return false;
+                }
+
                 clsSuc("multicast socket created.\n");
             } else
 
