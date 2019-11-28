@@ -122,8 +122,8 @@ namespace tk { namespace data {
         {
             FiringData firingData[FIRING_PER_PKT];
             unsigned int  gpsTimestamp;
-            unsigned char blank1;
-            unsigned char blank2;
+            unsigned char returnType;
+            unsigned char veloType;
         };
 
         enum Block
