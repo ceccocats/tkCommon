@@ -145,6 +145,8 @@ namespace tk { namespace gui {
         static const int        MAX_KEYS = 1024;
         static bool             keys[MAX_KEYS];
         static std::vector<tk::gui::Color_t> colors;
+
+        bool drawLogo = true;
         std::vector<tk::common::Vector3<float>> logo;
 
         double dt = 1.0/30;

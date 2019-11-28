@@ -264,18 +264,20 @@ Viewer::run() {
             plotManger->drawLegend();
 
             // draw tk LOGO
-            glPushMatrix();
-            {
-                tkViewport2D(width,height);
-                float margin = 0.2;
-                tkSetColor(tk::gui::color::WHITE, 0.3);
-                for(int i=0; i<logo.size(); i++)
-                    tkDrawCircle(tk::common::Vector3<float>{
-                            logo[i].x * 0.2f + xLim -margin,
-                            logo[i].y * 0.2f - yLim +margin,
-                            -0.9f}, 0.005, 50, true);
+            if(drawLogo) {
+                glPushMatrix();
+                {
+                    tkViewport2D(width, height);
+                    float margin = 0.2;
+                    tkSetColor(tk::gui::color::WHITE, 0.3);
+                    for (int i = 0; i < logo.size(); i++)
+                        tkDrawCircle(tk::common::Vector3<float>{
+                                logo[i].x * 0.2f + xLim - margin,
+                                logo[i].y * 0.2f - yLim + margin,
+                                -0.9f}, 0.005, 50, true);
+                }
+                glPopMatrix();
             }
-            glPopMatrix();
 
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
