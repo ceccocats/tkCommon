@@ -45,9 +45,10 @@ Viewer::init() {
     glfwMaximizeWindow(window);
 
     unsigned w, h;
-    lodepng_decode32_file(&(icons[0].pixels), &w, &h, icon_fname.c_str());
+    unsigned err = lodepng_decode32_file(&(icons[0].pixels), &w, &h, icon_fname.c_str());
     icons[0].width = w;
     icons[0].height = h;
+    clsMsg("loading icon: " + icon_fname + ": " + std::to_string(err) + "\n");
 
     glfwSetWindowIcon(window, 1, icons);
 #endif
