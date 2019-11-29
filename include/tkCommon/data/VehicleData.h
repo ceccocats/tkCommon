@@ -94,6 +94,13 @@ namespace tk { namespace data {
             return false;
         }
 
+        bool carOdometry(tk::common::Tfpose &tf, uint64_t time = 0){
+            odom_t odom;
+            bool status = carOdometry(odom, time);
+            tf = tk::common::odom2tf(odom.x, odom.y, odom.yaw);
+            return status;
+        }
+
         void init(){
             //TODO:
         }

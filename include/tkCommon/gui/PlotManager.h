@@ -123,5 +123,11 @@ namespace tk { namespace gui {
                 ImGui::End();
             }
         }
+
+        plot_t *getPlot(std::string id) {
+            if(plotExist(id))
+                return &plots[id];
+            return nullptr;
+        }
     };
 }} // namespace name

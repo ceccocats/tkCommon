@@ -45,9 +45,10 @@ Viewer::init() {
     glfwMaximizeWindow(window);
 
     unsigned w, h;
-    lodepng_decode32_file(&(icons[0].pixels), &w, &h, icon_fname.c_str());
+    unsigned err = lodepng_decode32_file(&(icons[0].pixels), &w, &h, icon_fname.c_str());
     icons[0].width = w;
     icons[0].height = h;
+    clsMsg("loading icon: " + icon_fname + ": " + std::to_string(err) + "\n");
 
     glfwSetWindowIcon(window, 1, icons);
 #endif
@@ -263,18 +264,20 @@ Viewer::run() {
             plotManger->drawLegend();
 
             // draw tk LOGO
-            glPushMatrix();
-            {
-                tkViewport2D(width,height);
-                float margin = 0.2;
-                tkSetColor(tk::gui::color::WHITE, 0.3);
-                for(int i=0; i<logo.size(); i++)
-                    tkDrawCircle(tk::common::Vector3<float>{
-                            logo[i].x * 0.2f + xLim -margin,
-                            logo[i].y * 0.2f - yLim +margin,
-                            -0.9f}, 0.005, 50, true);
+            if(drawLogo) {
+                glPushMatrix();
+                {
+                    tkViewport2D(width, height);
+                    float margin = 0.2;
+                    tkSetColor(tk::gui::color::WHITE, 0.3);
+                    for (int i = 0; i < logo.size(); i++)
+                        tkDrawCircle(tk::common::Vector3<float>{
+                                logo[i].x * 0.2f + xLim - margin,
+                                logo[i].y * 0.2f - yLim + margin,
+                                -0.9f}, 0.005, 50, true);
+                }
+                glPopMatrix();
             }
-            glPopMatrix();
 
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -807,7 +810,8 @@ Viewer::tkDrawLiDARData(tk::data::LidarData_t *data){
     tkSetColor(tk::gui::color::WHITE);
 
     for (int p = 0; p < data->nPoints; p++) {
-
+        float i = float(data->intensity(p))/255.0;
+        tkSetRainbowColor(i);
         glVertex3f(data->points.coeff(0,p),data->points.coeff(1,p),data->points.coeff(2,p));
     }
     glEnd();
