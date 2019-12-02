@@ -31,6 +31,7 @@ namespace tk { namespace data {
          * @param size
          */
         void init(int size) {
+            SensorData::init();
             tkASSERT(size <= CLOUD_MAX_POINTS);
 
             this->points.resize(4, size);
