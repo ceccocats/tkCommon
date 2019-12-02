@@ -52,13 +52,6 @@ add_library(tklibDrawText SHARED
     src/gui/libdrawtext/utf8.c
 )
 
-add_library(tkData SHARED
-    src/data/HeaderData.cpp
-    src/data/CloudData.cpp
-    src/data/RadarData.cpp
-    src/common.cpp
-)
-
 add_library(tkGUI SHARED
     src/gui/Viewer.cpp
     src/gui/lodepng.cpp
@@ -72,7 +65,7 @@ add_library(tkGUI SHARED
     src/gui/imgui_impl_opengl3.cpp
     src/common.cpp
 )
-target_link_libraries(tkGUI tklibDrawText tkData ${GUI_LIBS})
+target_link_libraries(tkGUI tklibDrawText ${GUI_LIBS})
 
 add_library(tkCommon SHARED
     src/common.cpp

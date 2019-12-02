@@ -12,29 +12,22 @@ namespace tk { namespace data {
     class SensorData {
     public:
         HeaderData  header;                 /**< Header, @see HeaderData */
-        bool        isInitilized = false;   /**< */
-
-        /**
-         * @brief Constructor.
-         */
-        SensorData() = default;
-
-        /**
-         * @brief Destructor.
-         */
-        virtual ~SensorData() = default;
 
         /**
          * @brief Initialization method.
          * Must be implemented by child classes, and will handle the allocation of member variables, if any.
          */
-        virtual void init() = 0;
+        virtual void init() {
+            header.init();
+        }
 
         /**
          * @brief Release method.
          * Must be implemented by child classes, and will handle the deallocation of member variables, if any,
          */
         virtual void release() = 0;
+
+        virtual bool checkDimension(SensorData *s) = 0;
 
         /**
          * @brief Overloading of operator =
@@ -43,7 +36,9 @@ namespace tk { namespace data {
          * @param s
          * @return
          */
-        SensorData& operator=(const SensorData& s){
+        SensorData& operator=(const SensorData &s) {
+            tkASSERT(checkDimension((SensorData*)&s));
+
             this->header        = s.header;
 
             return *this;
