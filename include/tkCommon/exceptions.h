@@ -5,6 +5,7 @@
 #include <string.h>
 #include <execinfo.h>
 #include <regex>
+#include <fstream>
 #include <tkCommon/terminalFormat.h>
 
 #define tkASSERT(X) tk::exceptions::check_error(X,__FILE__,__FUNCTION__,__LINE__);
@@ -37,6 +38,21 @@ namespace tk{
             
         private:
 
+            static std::string ssystem (std::string command) {
+                std::string tmpname = "temp.txt";
+                std::string scommand = command;
+                std::string cmd = scommand + " >> " + tmpname;
+                std::system(cmd.c_str());
+                std::ifstream file(tmpname, std::ios::in | std::ios::binary );
+                std::string result;
+                if (file) {
+                    while (!file.eof()) result.push_back(file.get());
+                    file.close();
+                }
+                remove(tmpname.c_str());
+                return result.substr(0,(int)result.size()-2);
+            }
+
             static void sign_handler(int sig, siginfo_t *dont_care, void *dont_care_either){
 
                 void *array[16];
@@ -55,7 +71,7 @@ namespace tk{
                 std::regex addr_reg("\\[(0x.*?)\\]"); // inside brackets []
 
 
-                std::cout<<tk::tformat::set(tk::tformat::red,tk::tformat::predefined,tk::tformat::bold);
+                std::cout<<tk::tformat::set(tk::tformat::red,tk::tformat::predefined,tk::tformat::bold)<<"\n";
                 std::cerr<<"SEGFAULT\n";
                 std::cerr<<"----------------------------------------------------------------------\n";
                 for (i = 0; i < size; i++){
@@ -68,7 +84,21 @@ namespace tk{
                     for (auto x : m)
                         addr = x;
                     std::string cmd = std::string("addr2line -e ") + name_buf + " " + addr;
-                    int e = system(cmd.c_str());
+                    std::string output = ssystem(cmd);
+
+                    if(output.find("?") != 0 && i != 0){
+
+                        std::string file = output.substr(0,output.find(":"));
+                        std::string line = output.substr(output.find(":")+1);
+                        line = line.substr(0,line.find("(")-1);
+
+                        std::cout<<tk::tformat::set(tk::tformat::predefined,tk::tformat::predefined,tk::tformat::bold)<<"\n";
+                        output = "sed -n "+line+"p "+file;
+                        std::cout<<"Error in file "<<file<<" at line "<<line<<"\n\n";
+                        int p = system(output.c_str());
+                        std::cout<<tk::tformat::set(tk::tformat::red,tk::tformat::predefined,tk::tformat::bold)<<"\n";
+
+                    }                    
                 }
                 std::cerr<<"----------------------------------------------------------------------";
                 std::cout<<tk::tformat::unset()<<"\n";

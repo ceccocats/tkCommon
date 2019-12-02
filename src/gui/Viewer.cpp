@@ -802,7 +802,7 @@ Viewer::tkDrawRadarData(tk::data::RadarData *data) {
 }
 
 void
-Viewer::tkDrawLiDARData(tk::data::LidarData_t *data){
+Viewer::tkDrawLiDARData(tk::data::LidarData *data){
 
     glPointSize(1.0);
     glBegin(GL_POINTS);

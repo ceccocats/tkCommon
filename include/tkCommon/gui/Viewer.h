@@ -125,7 +125,7 @@ namespace tk { namespace gui {
         static void tkDrawImage(tk::data::ImageData_t<uint8_t>& image, GLuint texture);
         static void tkSplitPanel(int count, float ratio, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y);
 
-        static void tkDrawLiDARData(tk::data::LidarData_t *data);
+        static void tkDrawLiDARData(tk::data::LidarData *data);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         static void tkViewport2D(int width, int height, int x=0, int y=0);
