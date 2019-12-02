@@ -121,7 +121,7 @@ namespace tk { namespace gui {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         static void tkDrawTf(std::string name, tk::common::Tfpose tf);
         static void tkDrawLogo(std::string file, double scale);
-        static void tkDrawRadarData(tk::data::RadarData_t *data);
+        static void tkDrawRadarData(tk::data::RadarData *data);
         static void tkDrawImage(tk::data::ImageData_t<uint8_t>& image, GLuint texture);
         static void tkSplitPanel(int count, float ratio, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y);
 

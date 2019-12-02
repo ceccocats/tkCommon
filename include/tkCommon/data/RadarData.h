@@ -1,43 +1,50 @@
 #pragma once
 
+#include "tkCommon/data/SensorData.h"
 #include "tkCommon/data/CloudData.h"
+#include <vector>
 
 namespace tk { namespace data {
-    static const int MAX_RADAR = 8;
+    static const int RADAR_MAX = 8;
+    static const int RADAR_MAX_PONINTS = 10000;
 
-    struct RadarData_t {
-        tk::data::DataHeader_t      header;
-        int                         nRadar;
-
-        std::vector<tk::data::CloudData_t>  near_data;
-        std::vector<tk::data::CloudData_t>  far_data;
-
-
-        void init() {
-            near_data.resize(MAX_RADAR);
-            far_data.resize(MAX_RADAR);
-
-            for (int i = 0; i < MAX_RADAR; i++) {
-                near_data[i].init();
-                far_data[i].init();
-            }
-        }
+    /**
+     * @brief Radar data class.
+     * Contains all the information generated from a generic Radar sensor.
+     */
+    class RadarData : public SensorData {
+    public:
+        int nRadar;     /**< Number of radar  */
+        std::vector<tk::data::CloudData>  near_data;    /**< Vector of @see tk::data::CloudData */
+        std::vector<tk::data::CloudData>  far_data;     /**< Vector of @see tk::data::CloudData */
 
         /**
-         * @brief Overloading for struct copy
-         *
+         * @brief Costructor.
          */
-        RadarData_t& operator=(const RadarData_t& s){
-            init();
+        RadarData();
 
-            this->nRadar    = s.nRadar;
-            this->header    = s.header;
-            for (int i = 0; i < nRadar; i++) {
-                this->near_data[i]    = s.near_data[i];
-                this->far_data[i]     = s.far_data[i];
-            }
+        /**
+         * @brief Desctructor.
+         */
+        ~RadarData() override = default;
 
-            return *this;
-        }
+        /**
+         * @brief Initialization method.
+         * Handles the allocation of dynamic vector of @see tk::data::CloudData at maximum size.
+         */
+        void init() override;
+
+        /**
+         * @brief Release method.
+         * Handles the deallocation of of dynamic vector of @see tk::data::CloudData.
+         */
+        void release() override;
+
+        /**
+         * @brief Overloading of operator = for class copy.
+         * @param s
+         * @return
+         */
+        RadarData& operator=(const RadarData& s);
     };
 }}

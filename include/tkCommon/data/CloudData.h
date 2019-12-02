@@ -1,9 +1,13 @@
 #pragma once
-#include "tkCommon/data/DataHeader.h"
+#include "tkCommon/data/SensorData.h"
 
 namespace tk { namespace data {
     static const int CLOUD_MAX_POINTS       = 200000;
     static const int CLOUD_MAX_FEATURES     = 16;
+
+    /**
+     *
+     */
     enum CloudFeatureType {
         R              = 0,
         G              = 1,
@@ -19,35 +23,51 @@ namespace tk { namespace data {
         ID             = 11
     };
 
-    struct CloudData_t {
-        DataHeader_t        header;
-
-        int                 nPoints;
-        Eigen::MatrixXf     points;
-        Eigen::MatrixXf     ranges;
-        Eigen::MatrixXf     features;
-
-
-        void init(){
-            this->points.resize(4, CLOUD_MAX_POINTS);
-            this->ranges.resize(2, CLOUD_MAX_POINTS);
-            this->features.resize(CLOUD_MAX_FEATURES, CLOUD_MAX_POINTS);
-        }
+    /**
+     * @brief Cloud data class.
+     * Contains all the information of a generic point cloud. Both in cartesian and polar coordinates.
+     */
+    class CloudData : public SensorData {
+    public:
+        int                 nPoints;    /**< Number of points */
+        Eigen::MatrixXf     points;     /**< Points in cartesian coordinates */
+        Eigen::MatrixXf     ranges;     /**< Points in polar coordinates */
+        Eigen::MatrixXf     features;   /**< Feature of the cloud */
 
         /**
-         * @brief Overloading for struct copy
-         *
+         * @brief Constructor.
          */
-        CloudData_t& operator=(const CloudData_t& s){
-            init();
+        CloudData();
 
-            nPoints     = s.nPoints;
-            header      = s.header;
-            std::memcpy(points.data(),   s.points.data(),   nPoints * 4 * sizeof(float));
-            std::memcpy(ranges.data(),   s.ranges.data(),   nPoints * 2 * sizeof(float));
-            std::memcpy(features.data(), s.features.data(), nPoints * CLOUD_MAX_FEATURES * sizeof(float));
+        /**
+         * @brief Destructor.
+         */
+        ~CloudData();
 
-            return *this;
-        }
+        /**
+         * @brief Initialization method.
+         * Handles the allocation of dynamic eigen matrices to the maximum size.
+         */
+        void init() override;
+
+        /**
+         * @brief Initialization method.
+         * Handles the allocation of dynamic eigen matrices to the size passed as parameter.
+         * @param size
+         */
+        void init(int size);
+
+        /**
+         * @brief Release method.
+         * Deallocate eigen matrix.
+         */
+        void release() override;
+
+        /**
+         * @brief Overloading of operator = for class copy.
+         * @param s
+         * @return
+         */
+         CloudData& operator=(const CloudData& s);
     };
 }}

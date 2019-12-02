@@ -762,7 +762,7 @@ Viewer::tkDrawText(std::string text, tk::common::Vector3<float> pose, tk::common
 }
 
 void 
-Viewer::tkDrawRadarData(tk::data::RadarData_t *data) {
+Viewer::tkDrawRadarData(tk::data::RadarData *data) {
     tk::common::Vector3<float> pose;
     tk::common::Tfpose  correction = tk::common::odom2tf(0, 0, 0, +M_PI/2);
     for(int i = 0; i < data->nRadar; i++) {
