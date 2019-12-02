@@ -19,6 +19,11 @@ void replayLoop(std::string file, int port){
 
         int n = iface.read(buffer,now);
 
+        if(n == -1){
+            gRun = false;
+            continue;
+        }
+
         sender.send(buffer,n);
 
         if(prec != 0){
@@ -46,7 +51,7 @@ void replayLoop(std::string file, int port){
 int main(int argc, char* argv[]){
 
     tk::common::CmdParser   cmd(argv, "Samples for handle ethernet packets");
-    std::string file        = cmd.addOpt("-file", "", "pcap replay file");
+    std::string file        = cmd.addArg("file", "", "pcap replay file");
     int port                = cmd.addIntOpt("-port", 2368, "pcap replay file");
     cmd.print();
 

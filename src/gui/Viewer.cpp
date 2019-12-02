@@ -762,7 +762,7 @@ Viewer::tkDrawText(std::string text, tk::common::Vector3<float> pose, tk::common
 }
 
 void 
-Viewer::tkDrawRadarData(tk::data::RadarData_t *data) {
+Viewer::tkDrawRadarData(tk::data::RadarData *data) {
     tk::common::Vector3<float> pose;
     tk::common::Tfpose  correction = tk::common::odom2tf(0, 0, 0, +M_PI/2);
     for(int i = 0; i < data->nRadar; i++) {
@@ -771,7 +771,7 @@ Viewer::tkDrawRadarData(tk::data::RadarData_t *data) {
         tkApplyTf(data->near_data[i].header.tf);
         // draw near
         for (int j = 0; j < data->near_data[i].nPoints; j++) {
-            float rcs = data->near_data[i].features(tk::data::CloudFeatureType::RCS, j);
+            float rcs = data->near_features[i](tk::data::RadarFeatureType::RCS, j);
 
             //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
             float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
@@ -802,7 +802,7 @@ Viewer::tkDrawRadarData(tk::data::RadarData_t *data) {
 }
 
 void
-Viewer::tkDrawLiDARData(tk::data::LidarData_t *data){
+Viewer::tkDrawLiDARData(tk::data::LidarData *data){
 
     glPointSize(1.0);
     glBegin(GL_POINTS);

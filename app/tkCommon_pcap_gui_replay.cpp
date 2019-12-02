@@ -15,10 +15,22 @@
 #include <tkCommon/exceptions.h>
 #include <tkCommon/terminalFormat.h>
 
+struct replayPcap_t{
+
+        float           velocity      = 1;
+        bool            pressedStart  = false;
+        bool            pressedStop   = false;
+        bool            pressedBar    = false;
+        int             barNumPacket  = 0;
+        int             barMinVal     = 0;
+        int             barMaxVal     = 0;
+        std::string     textOutput    = ""; 
+};
+
 class MyViewer : public tk::gui::Viewer {
     private:
         //gui replay
-        tk::data::replayPcap_t *replaypcap = nullptr;
+        replayPcap_t *replaypcap = nullptr;
 
     public:
         MyViewer() {}
@@ -46,7 +58,7 @@ class MyViewer : public tk::gui::Viewer {
             ImGui::Text("%s", replaypcap->textOutput.c_str());
             ImGui::End();
         }
-        void setGuiReplay(tk::data::replayPcap_t *replay){this->replaypcap = replay;}
+        void setGuiReplay(replayPcap_t *replay){this->replaypcap = replay;}
 };
 
 tk::communication::PCAPHandler  handler;
@@ -66,7 +78,7 @@ int 		                    Npackets, packets;
 bool                            running = false;
 timeStamp_t                     nulla, prec = 0, now, start, end;
 double                          timeFor1Pkt;
-tk::data::replayPcap_t          gui_data;
+replayPcap_t          gui_data;
 
 
 int counterPackets(){
