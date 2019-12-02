@@ -40,6 +40,8 @@ namespace tk { namespace data {
          * Handles the allocation of dynamic vector of @see tk::data::CloudData at maximum size.
          */
         void init() {
+            SensorData::init();
+
             this->near_data.resize(RADAR_MAX);
             this->far_data.resize(RADAR_MAX);
             this->near_features.resize(RADAR_MAX);
