@@ -27,7 +27,6 @@ set(tkCommon_LIBRARIES
     ${GLFW3_LIBRARY}
     glut
     tkCommon
-    tkData
     tkGUI
     tkMath
     tkCommunication

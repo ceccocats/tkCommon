@@ -771,7 +771,7 @@ Viewer::tkDrawRadarData(tk::data::RadarData *data) {
         tkApplyTf(data->near_data[i].header.tf);
         // draw near
         for (int j = 0; j < data->near_data[i].nPoints; j++) {
-            float rcs = data->near_data[i].features(tk::data::CloudFeatureType::RCS, j);
+            float rcs = data->near_features[i](tk::data::RadarFeatureType::RCS, j);
 
             //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
             float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;

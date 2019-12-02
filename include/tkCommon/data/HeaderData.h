@@ -16,15 +16,13 @@ namespace tk { namespace data {
         int                 sensorID;   /**< ID of the sensor. */
         int                 messageID;  /**< Incremental message counter. */
 
-        /**
-         * @brief Constructor.
-         */
-        HeaderData();
-
-        /**
-         * @brief Destructor.
-         */
-        ~HeaderData() = default;
+        void init() {
+            this->stamp         = 0;
+            this->tf            = tk::common::Tfpose::Identity();
+            this->sensorID      = 0;
+            this->messageID     = 0;
+            this->name          = "sensor";
+        }
 
         /**
          * @brief Overloading of operator = for class copy.
@@ -32,6 +30,12 @@ namespace tk { namespace data {
          * @param s
          * @return
          */
-        HeaderData &operator=(const HeaderData &s);
+        HeaderData &operator=(const HeaderData &s) {
+            this->stamp         = s.stamp;
+            this->tf            = s.tf;
+            this->sensorID      = s.sensorID;
+            this->messageID     = s.messageID;
+            this->name          = s.name;
+        }
     };
 }}
