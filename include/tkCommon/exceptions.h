@@ -31,7 +31,7 @@ namespace tk{
                 
                 if(status == false){
 
-                    tk::tformat::printErr("Exception",std::string{"Error at line "}+std::to_string(line)+" in funtion "+funz+" at "+file+"\n");
+                    tk::tformat::printErr("tkAssert",std::string{"Error at line "}+std::to_string(line)+" in funtion "+funz+" at "+file+"\n");
                     exit(-1);
                 }
             }
