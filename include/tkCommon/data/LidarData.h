@@ -1,39 +1,19 @@
 #pragma once
-#include "tkCommon/data/SensorData.h"
+#include "tkCommon/data/CloudData.h"
 
 namespace tk { namespace data {
 
-    class LidarData : public SensorData{
+    class LidarData : public CloudData{
     
     public:
 
         static const int LIDAR_MAX_POINTS = 200000;
 
         /**
-         * @brief Points in lidar Pointcloud
-         */
-        int             nPoints;
-        /**
-         * @brief Pointcloud
-         *                  ( X )...
-         *                  ( Y )...
-         *                  ( Z )...
-         *                  ( 1 )...
-         */
-        Eigen::MatrixXf points;
-        /**
          * @brief Points intensity
          */
         Eigen::MatrixXf intensity;
 
-        /**
-         * @brief number of vertical layer 
-         */
-        int v_layers;
-        /**
-         * @brief number of horizontal layer 
-         */
-        int o_layers;
         /**
          * @brief ID matrix
          */
@@ -43,9 +23,9 @@ namespace tk { namespace data {
          * @brief Initialization method only for Eigen points and intensity.
          */
         void init(){
+            SensorData::init();
             this->points.resize(4,LIDAR_MAX_POINTS);
             this->intensity.resize(1,LIDAR_MAX_POINTS);
-            this->v_layers = this->o_layers = 0;
         }
         /**
          * @brief Initialization method for all data
@@ -64,8 +44,6 @@ namespace tk { namespace data {
          * @param v_layers vertical layers
          */
         void initIdMatrix(int o_layers, int v_layers){
-            this->o_layers = o_layers;
-            this->v_layers = v_layers;
             this->idMatrix.resize(v_layers,o_layers);
             this->idMatrix.setConstant(v_layers,o_layers,-1);
         }
@@ -84,12 +62,14 @@ namespace tk { namespace data {
          */
         LidarData& operator=(const LidarData& s){
             this->nPoints   = s.nPoints;
-            this->o_layers  = s.o_layers;
-            this->v_layers  = s.v_layers;
             this->idMatrix  = s.idMatrix;
             this->points    = s.points;
             this->intensity = s.intensity;
             return *this;
+        }
+
+        bool checkDimension(SensorData *s){
+            return true;
         }
     };
 }}
