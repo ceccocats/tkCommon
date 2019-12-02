@@ -412,6 +412,7 @@ namespace tk { namespace common {
         dim[1] = mat.cols();
         return Mat_VarCreate(name.c_str(), MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dim, mat.data(), 0);
     }
+
     /**
      * write matvar to file
      */

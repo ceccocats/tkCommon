@@ -59,7 +59,7 @@ namespace tk{namespace data{
             delete mtx;
         }
 
-        matvar_t *matVar(std::string name = "image") {
+        matvar_t *toMatVar(std::string name = "image") {
             tkASSERT(sizeof(T) == sizeof(uint8_t))
             size_t dim[3] = { height, width, channels }; // create 1x1 struct
             matvar_t *var = Mat_VarCreate(name.c_str(), MAT_C_UINT8, MAT_T_UINT8, 3, dim, data, 0);

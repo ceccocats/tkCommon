@@ -11,7 +11,7 @@ namespace tk { namespace data {
         tk::data::DataHeader_t header;
 
         double lat = 0, lon = 0, hdop =0, height = 0, age = 0;
-        int quality = 0, sats = 0;
+        double quality = 0, sats = 0;
 
         // IMU
         double angleX = 0, angleY = 0, angleZ = 0;
@@ -29,13 +29,15 @@ namespace tk { namespace data {
             //TODO:
         }
 
-        matvar_t *matVar(std::string name = "gps") {
+        static const int nfields = 15;
+        const char *fields[nfields] = {"stamp", "lat", "lon", "height", "sats", "angleX", "angleY", "angleZ",
+                                   "angleRateX", "angleRateY", "angleRateZ", "accX", "accY", "accZ", "sideSlip"};
+        double *vals[nfields-1] = {&lat, &lon, &height, &sats, &angleX, &angleY, &angleZ,
+                                   &angleRateX, &angleRateY, &angleRateZ, &accX, &accY, &accZ, &sideSlip};
 
-            const int n = 14;
-            const char *fields[n+1] = {"stamp", "lat", "lon", "height", "sats", "angleX", "angleY", "angleZ",
-                                    "angleRateX", "angleRateY", "angleRateZ", "accX", "accY", "accZ", "sideSlip"};
-            double vals[n] = {lat, lon, height, (double)sats, angleX, angleY, angleZ,
-                               angleRateX, angleRateY, angleRateZ, accX, accY, accZ, sideSlip};
+        matvar_t *toMatVar(std::string name = "gps") {
+
+            const int n = nfields-1;
 
             size_t dim[2] = { 1, 1 }; // create 1x1 struct
             matvar_t* matstruct = Mat_VarCreateStruct(name.c_str(), 2, dim, fields, n+1); //main struct: Data
@@ -48,6 +50,18 @@ namespace tk { namespace data {
                 Mat_VarSetStructFieldByName(matstruct, fields[i+1], 0, var); //0 for first row
             }
             return matstruct;
+        }
+        bool fromMatVar(matvar_t *var) {
+
+            matvar_t *pvar = Mat_VarGetStructFieldByName(var, fields[0], 0);
+            tkASSERT(pvar->class_type == MAT_C_UINT64);
+            memcpy(&header.stamp, pvar->data, sizeof(uint64_t));
+
+            for (int i = 1; i < nfields; i++) {
+                matvar_t *pvar = Mat_VarGetStructFieldByName(var, fields[i], 0);
+                tkASSERT(pvar->class_type == MAT_C_DOUBLE);
+                memcpy(vals[i], pvar->data, sizeof(double));
+            }
         }
     };
 }
