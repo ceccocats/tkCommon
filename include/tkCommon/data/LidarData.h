@@ -24,6 +24,7 @@ namespace tk { namespace data {
          */
         void init(){
             SensorData::init();
+            this->nPoints = 0;
             this->points.resize(4,LIDAR_MAX_POINTS);
             this->intensity.resize(1,LIDAR_MAX_POINTS);
         }
@@ -61,6 +62,8 @@ namespace tk { namespace data {
          * 
          */
         LidarData& operator=(const LidarData& s){
+            SensorData::operator=(s);
+
             this->nPoints   = s.nPoints;
             this->idMatrix  = s.idMatrix;
             this->points    = s.points;
