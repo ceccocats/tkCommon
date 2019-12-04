@@ -7,8 +7,6 @@ namespace tk { namespace data {
     
     public:
 
-        static const int LIDAR_MAX_POINTS = 200000;
-
         /**
          * @brief Points intensity
          */
@@ -25,8 +23,8 @@ namespace tk { namespace data {
         void init(){
             SensorData::init();
             this->nPoints = 0;
-            this->points.resize(4,LIDAR_MAX_POINTS);
-            this->intensity.resize(1,LIDAR_MAX_POINTS);
+            this->points.resize(4,CLOUD_MAX_POINTS);
+            this->intensity.resize(1,CLOUD_MAX_POINTS);
         }
         /**
          * @brief Initialization method for all data
