@@ -71,4 +71,27 @@ typedef LineData_t<tk::common::Vector3<float>> LineData3D_t;
 typedef BoundaryData_t<tk::common::Vector2<float>> BoundaryData2D_t;
 typedef BoundaryData_t<tk::common::Vector3<float>> BoundaryData3D_t;
 
+struct LinesData_t {
+public:
+    std::vector<LineData3D_t> data;
+
+    matvar_t *toMatVar(std::string name = "lines") {
+        size_t dims[] = {data.size(), 1};
+        matvar_t *array = Mat_VarCreate(name.c_str(),MAT_C_CELL,MAT_T_CELL,2,dims,NULL,0);
+
+        for(int i=0; i<data.size(); i++) {
+            Eigen::MatrixXf p(3, data[i].points.size());
+            for(int j=0; j<p.cols(); j++) {
+                p(0, j) = data[i].points[j].x;
+                p(1, j) = data[i].points[j].y;
+                p(2, j) = data[i].points[j].z;
+            }
+            matvar_t *var = tk::common::eigenXf2matvar(p, "line");
+            Mat_VarSetCell(array, i,var);
+        }
+        return array;
+    }
+};
+
+
 }}
