@@ -9,6 +9,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
+#define clsName(X) (tk::tformat::printErr(abi::__cxa_demangle(typeid(*this).name());
 
 #define clsErr(X)  (tk::tformat::printErr(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
 
@@ -87,6 +88,9 @@ namespace tk { namespace tformat{
 
         s = std::string{"["} + s + std::string{"]:"};
 
+        if(s.size() > LEN_CLASS_NAME)
+            s.resize(LEN_CLASS_NAME);
+
         s += std::string(LEN_CLASS_NAME-s.size(), ' ');
 
         return s;
@@ -108,6 +112,8 @@ namespace tk { namespace tformat{
         ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
 
         int len = size.ws_col - LEN_CLASS_NAME;
+        if(len <= 0)
+            len = 80;
 
         int c = 0;
         for(c = 0; c < (int)m.size(); c += len){

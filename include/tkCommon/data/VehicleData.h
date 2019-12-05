@@ -1,4 +1,6 @@
 #pragma once
+
+#include "tkCommon/data/DataHeader.h"
 #include <tkCommon/common.h>
 
 namespace tk { namespace data {
@@ -8,7 +10,7 @@ namespace tk { namespace data {
      */
     struct VehicleData_t {
 
-        int    CAN_TYPE; // 0 = CCAN, 1 = PWTCAN
+        tk::data::DataHeader_t header;
 
         double CAR_WHEELBASE;                   // car wheelbase [m]
         double CAR_DIM_X, CAR_DIM_Y, CAR_DIM_Z; // car dimensions [m]
@@ -18,30 +20,90 @@ namespace tk { namespace data {
         double CAR_BACKAXLE_W;                  // width of back axle [m]
         double CAR_WHEEL_R;                     // wheel radius [m]
 
-        double     speed;         // speed                [ m/s   ]
-        double     speedKMH;      // speed                [ Km/h  ]
+        double     speed    = 0;  // speed                [ m/s   ]
+        double     speedKMH = 0;  // speed                [ Km/h  ]
 
-        double     yawRate;       // yaw rate             [ rad/s ]
-        double     accelX;        // longitudinal acc     [ m/s2  ]
-        double     accelY;        // lateral acc          [ m/s2  ]
+        double     yawRate = 0;        // yaw rate             [ rad/s ]
+        double     accelX  = 0;        // longitudinal acc     [ m/s2  ]
+        double     accelY  = 0;        // lateral acc          [ m/s2  ]
 
-        double     steerAngle;            // steering wheel angle [ rad   ]
-        double     steerAngleRate;        // steering wheel angle [ rad/s ]
-        double     wheelAngle;            // wheel angle          [ rad   ]
+        double     steerAngle     = 0;    // steering wheel angle [ rad   ]
+        double     steerAngleRate = 0;    // steering wheel angle [ rad/s ]
+        double     wheelAngle     = 0;    // wheel angle          [ rad   ]
 
-        uint8_t    brakePedalSts;         // brake status   [ on/off ]
-        double     brakeMasterPressure;   // brake pressure [ bar ]
-        double     engineTorque;          // engine torque  [ % ]
-        double     engineFrictionTorque;  // friction torque[ % ]
+        uint8_t    brakePedalSts        = 0;    // brake status   [ on/off ]
+        double     brakeMasterPressure  = 0;    // brake pressure [ bar ]
+        double     engineTorque         = 0;    // engine torque  [ % ]
+        double     engineFrictionTorque = 0;    // friction torque[ % ]
 
-        uint8_t    actualGear;    // current Gear          [ int ]
-        uint16_t   RPM;           // RPM
+        uint8_t    actualGear = 0;    // current Gear          [ int ]
+        uint16_t   RPM = 0;           // RPM
 
         // wheel speeds [ m/s ]
-        double     wheelFLspeed, wheelFRspeed, wheelRLspeed, wheelRRspeed;
+        double     wheelFLspeed =0, wheelFRspeed =0, wheelRLspeed =0, wheelRRspeed =0;
+        uint8_t    wheelFLDir =0, wheelFRDir =0, wheelRLDir =0, wheelRRDir =0;
 
-        double     sideSlip;      // beta angle            [ rad   ]
-        uint8_t    tractionGrip;  // traction control grip [ ? ]
+
+        double     sideSlip = 0;      // beta angle            [ rad   ]
+        uint8_t    tractionGrip = 0;  // traction control grip [ ? ]
+
+
+        // faults
+        uint8_t ESPFault = 0;
+
+        // inputs
+        uint8_t activateDrive = 0, activateSteer = 0;
+
+        /**
+         * Odometry vales
+         */
+        // x e y position of car in space
+        long double x = 0;
+        long double y = 0;
+
+        // Direction of car in space
+        long double carDirection = 0;
+
+        // Boolean variable for know if new data is arrived
+        bool Bspeed = 0, Bsteer = 0;
+        int  posBuffer = 0;
+
+        #define ODOM_BUFFER_SIZE 10
+        struct odom_t {
+            long double x = 0;
+            long double y = 0;
+            long double yaw = 0;
+            uint64_t t = 0;
+        } odometryBuffer[ODOM_BUFFER_SIZE];
+
+        bool carOdometry(odom_t &odom, uint64_t time = 0){
+
+            int bufPos = posBuffer;
+            for(int i=1; i<ODOM_BUFFER_SIZE; i++) {
+                int c = (bufPos - i) % ODOM_BUFFER_SIZE;
+                if(c <0)
+                    c += ODOM_BUFFER_SIZE;
+
+                if(odometryBuffer[c].t < time || time == 0){
+                    odom = odometryBuffer[c];
+                    //if(odom.t == 0)
+                    //    return false;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool carOdometry(tk::common::Tfpose &tf, uint64_t time = 0){
+            odom_t odom;
+            bool status = carOdometry(odom, time);
+            tf = tk::common::odom2tf(odom.x, odom.y, odom.yaw);
+            return status;
+        }
+
+        void init(){
+            //TODO:
+        }
     };
 }
 }

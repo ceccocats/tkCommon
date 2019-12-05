@@ -19,6 +19,11 @@ void replayLoop(std::string file, int port, std::string filter,std::string ip){
 
         int n = iface.read(buffer,now);
 
+        if(n == -1){
+            gRun = false;
+            continue;
+        }
+
         sender.send(buffer,n);
 
         if(prec != 0){

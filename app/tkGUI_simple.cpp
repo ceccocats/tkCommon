@@ -21,7 +21,7 @@ class MyViewer : public tk::gui::Viewer {
 
             tkLoadOBJ(std::string(TKPROJ_PATH) + "data/levante", carObj);
 
-            plotManger->addLinePlot("test", tk::gui::color::WHITE, 1);
+            plotManger->addLinePlot("test", tk::gui::color::WHITE, 1000, 1);
         }
 
         void draw() {

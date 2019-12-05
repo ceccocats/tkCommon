@@ -14,6 +14,8 @@ std::vector<Color_t> tk::gui::Viewer::colors = std::vector<Color_t>{color::RED, 
 int Viewer::TK_FONT_SIZE = 256;
 
 Viewer::Viewer() {
+    // this must stay in the constructor because the file is loaded in the init function
+    icon_fname = std::string(std::string(TKPROJ_PATH)+"/data/tkLogo.png");
 }
 
 
@@ -30,11 +32,28 @@ Viewer::init() {
     glfwSetErrorCallback(errorCallback);
     glfwInit();
 
+    GLFWimage icons[1];
+
     // Create a windowed mode window and its OpenGL context
     window = glfwCreateWindow(width, height, windowName.c_str(), NULL, NULL);
     if (!window) {
         glfwTerminate();
     }
+
+#if GLFW_VERSION_MAJOR >= 3
+#if GLFW_VERSION_MINOR >= 2
+    glfwMaximizeWindow(window);
+
+    unsigned w, h;
+    unsigned err = lodepng_decode32_file(&(icons[0].pixels), &w, &h, icon_fname.c_str());
+    icons[0].width = w;
+    icons[0].height = h;
+    clsMsg("loading icon: " + icon_fname + ": " + std::to_string(err) + "\n");
+
+    glfwSetWindowIcon(window, 1, icons);
+#endif
+#endif
+
     Viewer::mouseView.window = window;
 
     glfwSetScrollCallback(window, Viewer::scroll_callback);
@@ -104,8 +123,10 @@ Viewer::init() {
     clsMsg(msg);
 
     tkLoadTexture(std::string(TKPROJ_PATH) + "data/HipertLab.png", hipertTex);
-
     tkLoadLogo(std::string(TKPROJ_PATH) + "data/tkLogo.pts", logo);
+
+    glfwGetFramebufferSize(window, &width, &height);
+    clsSuc("init with resolution " + std::to_string(width) + "x" + std::to_string(height) + "\n");
 }
 
 
@@ -243,18 +264,20 @@ Viewer::run() {
             plotManger->drawLegend();
 
             // draw tk LOGO
-            glPushMatrix();
-            {
-                tkViewport2D(width,height);
-                float margin = 0.2;
-                tkSetColor(tk::gui::color::WHITE, 0.3);
-                for(int i=0; i<logo.size(); i++)
-                    tkDrawCircle(tk::common::Vector3<float>{
-                            logo[i].x * 0.2f + xLim -margin,
-                            logo[i].y * 0.2f - yLim +margin,
-                            -0.9f}, 0.005, 50, true);
+            if(drawLogo) {
+                glPushMatrix();
+                {
+                    tkViewport2D(width, height);
+                    float margin = 0.2;
+                    tkSetColor(tk::gui::color::WHITE, 0.3);
+                    for (int i = 0; i < logo.size(); i++)
+                        tkDrawCircle(tk::common::Vector3<float>{
+                                logo[i].x * 0.2f + xLim - margin,
+                                logo[i].y * 0.2f - yLim + margin,
+                                -0.9f}, 0.005, 50, true);
+                }
+                glPopMatrix();
             }
-            glPopMatrix();
 
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -279,6 +302,13 @@ Viewer::run() {
     glfwTerminate();
 }
 
+void
+Viewer::setIcon(std::string filename) {
+    icon_fname = filename;
+#if GLFW_VERSION_MINOR < 2
+    clsWrn("To load program icon update GLFW version to 3.3")
+#endif
+}
 
 void
 Viewer::setWindowName(std::string name) {
@@ -351,8 +381,8 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
 
         for(int o=0; o<loader.LoadedMeshes.size(); o++) {
 
-            std::string msg = std::string{"name: "}+loader.LoadedMeshes[o].MeshName+"  verts: "+std::to_string(loader.LoadedMeshes[o].Vertices.size())+"\n";
-            tk::tformat::printMsg("Viewer",msg);
+            //std::string msg = std::string{"name: "}+loader.LoadedMeshes[o].MeshName+"  verts: "+std::to_string(loader.LoadedMeshes[o].Vertices.size())+"\n";
+            //tk::tformat::printMsg("Viewer",msg);
             //std::cout<<"name: "<<loader.LoadedMeshes[o].MeshName<<"  verts: "<<loader.LoadedMeshes[o].Vertices.size()<<"\n";
    
             std::vector<unsigned int> indices = loader.LoadedMeshes[o].Indices;
@@ -362,9 +392,9 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
             obj.colors[o].y = loader.LoadedMeshes[o].MeshMaterial.Kd.Y;
             obj.colors[o].z = loader.LoadedMeshes[o].MeshMaterial.Kd.Z;
 
-            msg = std::string{"mat: "}+loader.LoadedMeshes[o].MeshMaterial.name;
-            msg += std::string{" ("}+std::to_string(obj.colors[0].x)+std::to_string(obj.colors[0].y)+std::to_string(obj.colors[0].z)+std::string{")\n"};
-            tk::tformat::printMsg("Viewer",msg);
+            //msg = std::string{"mat: "}+loader.LoadedMeshes[o].MeshMaterial.name;
+            //msg += std::string{" ("}+std::to_string(obj.colors[0].x)+std::to_string(obj.colors[0].y)+std::to_string(obj.colors[0].z)+std::string{")\n"};
+            //tk::tformat::printMsg("Viewer",msg);
 
 
             //std::cout<<"mat: "<<loader.LoadedMeshes[o].MeshMaterial.name<<" diffuse: "<<obj.colors[o]<<"\n";
@@ -732,49 +762,47 @@ Viewer::tkDrawText(std::string text, tk::common::Vector3<float> pose, tk::common
 }
 
 void 
-Viewer::tkDrawRadarData(tk::data::RadarData_t *data, bool enable_near, bool enable_far) {
-    glPushMatrix(); 
-    if (enable_near) {
-        tk::common::Vector3<float> pose;
-        for (int i = 0; i < N_RADAR; i++) {
-            for (int j = 0; j < data->near_n_points[i]; j++) {
-                float rcs = data->near_features[i](tk::data::RadarFeatureType_t::RCS, j);
+Viewer::tkDrawRadarData(tk::data::RadarData *data) {
+    tk::common::Vector3<float> pose;
+    tk::common::Tfpose  correction = tk::common::odom2tf(0, 0, 0, +M_PI/2);
+    for(int i = 0; i < data->nRadar; i++) {
+        glPushMatrix();
+        tkDrawTf(data->near_data[i].header.name, (data->near_data[i].header.tf * correction));
+        tkApplyTf(data->near_data[i].header.tf);
+        // draw near
+        for (int j = 0; j < data->near_data[i].nPoints; j++) {
+            float rcs = data->near_features[i](tk::data::RadarFeatureType::RCS, j);
 
-                //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
-                float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
-                tkSetRainbowColor(hue);
+            //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+            float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
+            tkSetRainbowColor(hue);
 
-                pose.x = data->near_points[i](0, j);
-                pose.y = data->near_points[i](1, j);
-                pose.z = data->near_points[i](2, j);
+            pose.x = data->near_data[i].points(0, j);
+            pose.y = data->near_data[i].points(1, j);
+            pose.z = data->near_data[i].points(2, j);
 
-                tkDrawCircle(pose, 0.05);     
-            }       
+            tkDrawCircle(pose, 0.05);
         }
+        //// draw far
+        //for (int j = 0; j < data->far_data[i].nPoints; j++) {
+        //    float rcs = data->far_data[i].features(tk::data::CloudFeatureType::RCS, j);
+//
+        //    //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+        //    float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
+        //    tkSetRainbowColor(hue);
+//
+        //    pose.x = data->far_data[i].points(0, j);
+        //    pose.y = data->far_data[i].points(1, j);
+        //    pose.z = data->far_data[i].points(2, j);
+//
+        //    tkDrawCircle(pose, 0.05);
+        //}
+        glPopMatrix();
     }
-    if (enable_far) {
-        tk::common::Vector3<float> pose;
-        for (int i = 0; i < N_RADAR; i++) {
-            for (int j = 0; j < data->far_n_points[i]; j++) {
-                float rcs = data->far_features[i](tk::data::RadarFeatureType_t::RCS, j);
-
-                //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
-                float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
-                tkSetRainbowColor(hue);
-
-                pose.x = data->far_points[i](0, j);
-                pose.y = data->far_points[i](1, j);
-                pose.z = data->far_points[i](2, j);
-
-                tkDrawCircle(pose, 0.05);     
-            }       
-        }    
-    }
-    glPopMatrix();
 }
 
 void
-Viewer::tkDrawLiDARData(tk::data::LidarData_t *data){
+Viewer::tkDrawLiDARData(tk::data::LidarData *data){
 
     glPointSize(1.0);
     glBegin(GL_POINTS);
@@ -782,7 +810,8 @@ Viewer::tkDrawLiDARData(tk::data::LidarData_t *data){
     tkSetColor(tk::gui::color::WHITE);
 
     for (int p = 0; p < data->nPoints; p++) {
-
+        float i = float(data->intensity(p))/255.0;
+        tkSetRainbowColor(i);
         glVertex3f(data->points.coeff(0,p),data->points.coeff(1,p),data->points.coeff(2,p));
     }
     glEnd();
@@ -1012,6 +1041,22 @@ Viewer::tkViewport2D(int width, int height, int x, int y) {
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+}
+
+void
+Viewer::tkDrawTf(std::string name, tk::common::Tfpose tf) {
+    // draw tfs
+    tk::gui::Viewer::tkSetColor(tk::gui::color::WHITE);
+    glLineWidth(1);
+    tk::gui::Viewer::tkDrawLine(tk::common::Vector3<float>{0,0,0}, tk::common::tf2pose(tf));
+    glPushMatrix();
+    tk::gui::Viewer::tkApplyTf(tf);
+    tk::gui::Viewer::tkDrawText(name,
+                                tk::common::Vector3<float>{0.01,0.01,0},
+                                tk::common::Vector3<float>{M_PI/2,0,0},
+                                tk::common::Vector3<float>{0.15,0.15,0});
+    tk::gui::Viewer::tkDrawAxis(0.2);
+    glPopMatrix();
 }
 
 void 

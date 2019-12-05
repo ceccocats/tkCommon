@@ -23,7 +23,6 @@
 
 #include <tkCommon/terminalFormat.h>
 
-
 namespace tk { namespace gui {
 
     class PlotManager;
@@ -88,6 +87,7 @@ namespace tk { namespace gui {
             splashTime = t * 1000000;
         }
 
+        void setIcon(std::string filename);
         void setWindowName(std::string name);
         void setBackground(tk::gui::Color_t c);
         
@@ -119,12 +119,13 @@ namespace tk { namespace gui {
 
         // data 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        static void tkDrawTf(std::string name, tk::common::Tfpose tf);
         static void tkDrawLogo(std::string file, double scale);
-        static void tkDrawRadarData(tk::data::RadarData_t *data, bool enable_near, bool enable_far);
+        static void tkDrawRadarData(tk::data::RadarData *data);
         static void tkDrawImage(tk::data::ImageData_t<uint8_t>& image, GLuint texture);
         static void tkSplitPanel(int count, float ratio, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y);
 
-        static void tkDrawLiDARData(tk::data::LidarData_t *data);
+        static void tkDrawLiDARData(tk::data::LidarData *data);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         static void tkViewport2D(int width, int height, int x=0, int y=0);
@@ -144,6 +145,8 @@ namespace tk { namespace gui {
         static const int        MAX_KEYS = 1024;
         static bool             keys[MAX_KEYS];
         static std::vector<tk::gui::Color_t> colors;
+
+        bool drawLogo = true;
         std::vector<tk::common::Vector3<float>> logo;
 
         double dt = 1.0/30;
@@ -165,6 +168,7 @@ namespace tk { namespace gui {
 
     private:
         std::string             windowName;
+        std::string             icon_fname;
         Color_t                 background = tk::gui::color::DARK_GRAY;
         bool                    splash = false; // true if splash screen
         timeStamp_t             ts;

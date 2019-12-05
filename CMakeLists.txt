@@ -23,6 +23,9 @@ find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
 
 find_package(glfw3 3 REQUIRED)
+if(NOT DEFINED GLFW3_LIBRARY)
+    set(GLFW3_LIBRARY glfw3)
+endif()
 
 find_package(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
@@ -30,8 +33,8 @@ include_directories(${FREETYPE_INCLUDE_DIRS})
 set(GUI_LIBS
     ${OPENGL_gl_LIBRARY}
     ${OPENGL_glu_LIBRARY}
-    ${GLEW_LIBRARY}  
-    glfw
+    ${GLEW_LIBRARY}
+    ${GLFW3_LIBRARY}
     glut
     ${FREETYPE_LIBRARIES}
 )
@@ -74,6 +77,7 @@ add_library(tkCommunication SHARED
     src/communication/ethernet/UDPSocket.cpp
     src/communication/ethernet/PCAPHandler.cpp
     src/communication/EthInterface.cpp
+    src/communication/CanInterface.cpp
 )
 target_link_libraries(tkCommunication pcap)
 
@@ -105,6 +109,9 @@ target_link_libraries(tkCommon_pcap_gui_replay tkCommon tkCommunication ${GUI_LI
 
 add_executable(tkCommon_segfault app/tkCommon_segfault.cpp)
 target_link_libraries(tkCommon_segfault tkCommon)
+
+add_executable(tkCommon_geoconv app/tkCommon_geoconv.cpp)
+target_link_libraries(tkCommon_geoconv tkCommon)
 
 #-------------------------------------------------------------------------------
 # Install

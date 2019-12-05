@@ -11,15 +11,15 @@ namespace tk{namespace data{
         int width = 0;
         int height = 0;
         int channels = 0;
-        std::mutex mtx;
+        std::mutex *mtx = nullptr; // mutex contructor is marked delete, so you cant copy the struct containing mutex
 
         void init(int w, int h, int ch){
-            mtx.lock();
+            mtx->lock();
             width = w;
             height = h;
             channels = ch;
             data = new T[width*height*channels];
-            mtx.unlock();
+            mtx->unlock();
         }
 
         bool empty() {return channels == 0 || width == 0 || height == 0 || data == nullptr; }
@@ -29,9 +29,9 @@ namespace tk{namespace data{
                 release();
                 init(s.width, s.height, s.channels);
             }
-            mtx.lock();
+            mtx->lock();
             memcpy(data, s.data, width * height * channels * sizeof(T));
-            mtx.unlock();
+            mtx->unlock();
             return *this;
         }
 
@@ -39,18 +39,31 @@ namespace tk{namespace data{
             if(empty())
                 return;
 
-            mtx.lock();
+            mtx->lock();
             T* tmp = data;
             data = nullptr;
             width = 0;
             height = 0;
             channels = 0;
             delete [] tmp;
-            mtx.unlock();
+            mtx->unlock();
+        }
+
+
+        ImageData_t() {
+            mtx = new std::mutex();
         }
 
         ~ImageData_t(){
             release();
+            delete mtx;
+        }
+
+        matvar_t *toMatVar(std::string name = "image") {
+            tkASSERT(sizeof(T) == sizeof(uint8_t))
+            size_t dim[3] = { height, width, channels }; // create 1x1 struct
+            matvar_t *var = Mat_VarCreate(name.c_str(), MAT_C_UINT8, MAT_T_UINT8, 3, dim, data, 0);
+            return var;
         }
     };
 }}

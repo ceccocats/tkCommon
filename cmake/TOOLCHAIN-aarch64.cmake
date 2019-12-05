@@ -1,7 +1,7 @@
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR aarch64)
 
-set(CMAKE_SYSROOT /home/cecco/nvidia/nvidia_sdk/DRIVE_Software_9.0_Linux_hyperion_E3550/DriveSDK/drive-t186ref-linux/targetfs)
+set(CMAKE_SYSROOT $ENV{HOME}/nvidia/nvidia_sdk/DRIVE_Software_9.0_Linux_hyperion_E3550/DriveSDK/drive-t186ref-linux/targetfs)
 
 set(CMAKE_C_COMPILER /usr/bin/aarch64-linux-gnu-gcc)
 set(CMAKE_CXX_COMPILER /usr/bin/aarch64-linux-gnu-g++)
@@ -35,6 +35,7 @@ set(CUDA_npps_LIBRARY ${CUDA_TOOLKIT_ROOT_DIR}/targets/${cuda_target_full_path}/
 set(CUDA_cusolver_LIBRARY ${CUDA_TOOLKIT_ROOT_DIR}/targets/${cuda_target_full_path}/lib/stubs/libcusolver.so)
 
 include_directories(/usr/include/aarch64-linux-gnu/)
+include_directories(${CMAKE_SYSROOT}/usr/local/include)
 
 # set UPLOAD to target
 set(TK_USER nvidia)
@@ -46,4 +47,5 @@ add_custom_target(upload
     COMMAND sshpass -p "${TK_PASS}" ssh -o StrictHostKeyChecking=no -p 22 ${TK_USER}@${TK_IP} "mkdir -p ${TK_TARGET_INSTALL_PATH}"
     # upload installation
     COMMAND sshpass -p "${TK_PASS}" rsync --progress -rltgDz -e "ssh -p 22" ${CMAKE_INSTALL_PREFIX}/ ${TK_USER}@${TK_IP}:${TK_TARGET_INSTALL_PATH}/
+    COMMAND echo "installed to ${TK_IP}:${TK_TARGET_INSTALL_PATH}"
 )
