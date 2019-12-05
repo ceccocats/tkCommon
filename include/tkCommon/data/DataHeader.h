@@ -16,6 +16,7 @@ namespace tk { namespace data {
          */
         DataHeader_t &operator=(const DataHeader_t &s) {
             this->stamp = s.stamp;
+            this->name = s.name;
             this->tf = s.tf;
             this->sensorID = s.sensorID;
             this->messageID = s.messageID;
