@@ -31,22 +31,19 @@ namespace tk{ namespace data{
          */
         bool load(const YAML::Node conf){
 
-            memset(k,0.0,9*sizeof(double));
-            memset(d,0.0,5*sizeof(double));
-            memset(r,0.0,9*sizeof(double));
-
-            std::vector<double> k_tmp = getYAMLconf<std::vector<double>>(conf, "K", std::vector<double>(9,0));
-            tkASSERT(k_tmp.size() != 9)
+            //std::vector<double> k_tmp = getYAMLconf<std::vector<double>>(conf, "K", std::vector<double>(9,0));
+            std::vector<double> k_tmp = conf["K"]? conf["K"].as<std::vector<double>>(): std::vector<double>(9,0);
+            tkASSERT(k_tmp.size() == 9)
             for(int i = 0; i < 9; i++)
                 k[i] = k_tmp[i];
 
-            std::vector<double> d_tmp = getYAMLconf<std::vector<double>>(conf, "D", std::vector<double>(5,0));
-            tkASSERT(k_tmp.size() != 5)
+            std::vector<double> d_tmp = conf["D"]? conf["D"].as<std::vector<double>>(): std::vector<double>(5,0);
+            tkASSERT(d_tmp.size() == 5)
             for(int i = 0; i < 5; i++)
                 d[i] = d_tmp[i];
 
-            std::vector<double> r_tmp = getYAMLconf<std::vector<double>>(conf, "R", std::vector<double>(9,0));
-            tkASSERT(r_tmp.size() != 9)
+            std::vector<double> r_tmp = conf["R"]? conf["R"].as<std::vector<double>>(): std::vector<double>(9,0);
+            tkASSERT(r_tmp.size() == 9)
             for(int i = 0; i < 9; i++)
                 r[i] = r_tmp[i];
 
