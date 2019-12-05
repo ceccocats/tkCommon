@@ -110,6 +110,9 @@ target_link_libraries(tkCommon_pcap_gui_replay tkCommon tkCommunication ${GUI_LI
 add_executable(tkCommon_segfault app/tkCommon_segfault.cpp)
 target_link_libraries(tkCommon_segfault tkCommon)
 
+add_executable(tkCommon_geoconv app/tkCommon_geoconv.cpp)
+target_link_libraries(tkCommon_geoconv tkCommon)
+
 #-------------------------------------------------------------------------------
 # Install
 #-------------------------------------------------------------------------------
