@@ -24,8 +24,6 @@ namespace tk { namespace data {
         static const int GPS_FIELDS = 15;
         const char  *fields[GPS_FIELDS] = {"stamp", "lat", "lon", "height", "sats", "angleX", "angleY", "angleZ",
                                            "angleRateX", "angleRateY", "angleRateZ", "accX", "accY", "accZ", "sideSlip"};
-        double      *vals[GPS_FIELDS-1] = {&lat, &lon, &height, &sats, &angleX, &angleY, &angleZ,
-                                           &angleRateX, &angleRateY, &angleRateZ, &accX, &accY, &accZ, &sideSlip};
 
         /**
          *
@@ -125,18 +123,28 @@ namespace tk { namespace data {
          */
         matvar_t *toMatVar(std::string name = "gps") {
 
-            const int n = GPS_FIELDS - 1;
+            #define TK_GPSDATA_MATVAR_DOUBLE(x) var = Mat_VarCreate(#x, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dim, &x, 0); \
+                                                Mat_VarSetStructFieldByName(matstruct, #x, 0, var); //0 for first row
 
             size_t dim[2] = { 1, 1 }; // create 1x1 struct
-            matvar_t* matstruct = Mat_VarCreateStruct(name.c_str(), 2, dim, fields, n+1); //main struct: Data
+            matvar_t* matstruct = Mat_VarCreateStruct(name.c_str(), 2, dim, fields, GPS_FIELDS); //main struct: Data
 
             matvar_t *var = Mat_VarCreate("stamp", MAT_C_UINT64, MAT_T_UINT64, 2, dim, &header.stamp, 0);
             Mat_VarSetStructFieldByName(matstruct, "stamp", 0, var); //0 for first row
-            for(int i =0; i<n; i++) {
-                matvar_t *var;
-                var = Mat_VarCreate(fields[i+1], MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dim, &vals[i], 0);
-                Mat_VarSetStructFieldByName(matstruct, fields[i+1], 0, var); //0 for first row
-            }
+            TK_GPSDATA_MATVAR_DOUBLE(lat);
+            TK_GPSDATA_MATVAR_DOUBLE(lon);
+            TK_GPSDATA_MATVAR_DOUBLE(height);
+            TK_GPSDATA_MATVAR_DOUBLE(sats);
+            TK_GPSDATA_MATVAR_DOUBLE(angleX);
+            TK_GPSDATA_MATVAR_DOUBLE(angleY);
+            TK_GPSDATA_MATVAR_DOUBLE(angleZ);
+            TK_GPSDATA_MATVAR_DOUBLE(angleRateX);
+            TK_GPSDATA_MATVAR_DOUBLE(angleRateY);
+            TK_GPSDATA_MATVAR_DOUBLE(angleRateZ);
+            TK_GPSDATA_MATVAR_DOUBLE(accX);
+            TK_GPSDATA_MATVAR_DOUBLE(accY);
+            TK_GPSDATA_MATVAR_DOUBLE(accZ);
+            TK_GPSDATA_MATVAR_DOUBLE(sideSlip);
             return matstruct;
         }
 
@@ -147,15 +155,28 @@ namespace tk { namespace data {
          */
         bool fromMatVar(matvar_t *var) {
 
-            matvar_t *pvar = Mat_VarGetStructFieldByName(var, fields[0], 0);
+            matvar_t *pvar = Mat_VarGetStructFieldByName(var, "stamp", 0);
             tkASSERT(pvar->class_type == MAT_C_UINT64);
             memcpy(&header.stamp, pvar->data, sizeof(uint64_t));
 
-            for (int i = 1; i < GPS_FIELDS; i++) {
-                matvar_t *pvar = Mat_VarGetStructFieldByName(var, fields[i], 0);
-                tkASSERT(pvar->class_type == MAT_C_DOUBLE);
-                memcpy(vals[i], pvar->data, sizeof(double));
-            }
+            #define TK_GPSDATA_MATVAR_READ_DOUBLE(x) pvar = Mat_VarGetStructFieldByName(var, #x, 0); \
+                                                     tkASSERT(pvar != 0); \
+                                                     tkASSERT(pvar->class_type == MAT_C_DOUBLE); \
+                                                     memcpy(&x, pvar->data, sizeof(double));
+            TK_GPSDATA_MATVAR_READ_DOUBLE(lat);
+            TK_GPSDATA_MATVAR_READ_DOUBLE(lon);
+            TK_GPSDATA_MATVAR_READ_DOUBLE(height);
+            TK_GPSDATA_MATVAR_READ_DOUBLE(sats);
+            TK_GPSDATA_MATVAR_READ_DOUBLE(angleX);
+            TK_GPSDATA_MATVAR_READ_DOUBLE(angleY);
+            TK_GPSDATA_MATVAR_READ_DOUBLE(angleZ);
+            TK_GPSDATA_MATVAR_READ_DOUBLE(angleRateX);
+            TK_GPSDATA_MATVAR_READ_DOUBLE(angleRateY);
+            TK_GPSDATA_MATVAR_READ_DOUBLE(angleRateZ);
+            TK_GPSDATA_MATVAR_READ_DOUBLE(accX);
+            TK_GPSDATA_MATVAR_READ_DOUBLE(accY);
+            TK_GPSDATA_MATVAR_READ_DOUBLE(accZ);
+            TK_GPSDATA_MATVAR_READ_DOUBLE(sideSlip);
         }
     };
 }}
