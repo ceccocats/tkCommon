@@ -91,6 +91,26 @@ public:
         }
         return array;
     }
+
+    bool fromMatVar(matvar_t *var) {
+
+        int n = var->dims[0];
+        for(int i=0; i<n; i++) {
+            matvar_t *pvar = Mat_VarGetCell(var, i);
+            Eigen::MatrixXf mat = tk::common::matvar2eigenXf(pvar);
+
+            LineData3D_t line;
+            for(int j=0; j<mat.cols(); j++) {
+                tk::common::Vector3<float> p;
+                p.x = mat(0, j);
+                p.y = mat(1, j);
+                p.z = mat(2, j);
+                line.points.push_back(p);
+            }
+            data.push_back(line);
+        }
+        return true;
+    }
 };
 
 
