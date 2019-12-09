@@ -1,5 +1,6 @@
 #pragma once
 #include "tkCommon/common.h"
+#include "tkCommon/data/HeaderData.h"
 
 namespace tk{namespace data{
 
@@ -73,6 +74,7 @@ typedef BoundaryData_t<tk::common::Vector3<float>> BoundaryData3D_t;
 
 struct LinesData_t {
 public:
+    tk::data::HeaderData header;
     std::vector<LineData3D_t> data;
 
     matvar_t *toMatVar(std::string name = "lines") {
