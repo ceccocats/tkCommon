@@ -32,7 +32,6 @@ namespace tk{namespace data{
 
 		bool checkDimension(SensorData *s){
 			auto *t = dynamic_cast<ImageData<T>*>(s);
-			std::cout<<width<<"  "<<height<<"  "<<channels<<"  "<<t->width<<"  "<<t->height<<"  "<<t->channels<<"\n";
 			if(t->width != width || t->height != height || t->channels != channels){
 				return false;
 			}
