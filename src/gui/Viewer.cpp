@@ -818,7 +818,7 @@ Viewer::tkDrawLiDARData(tk::data::LidarData *data){
 }
 
 void
-Viewer::tkDrawImage(tk::data::ImageData_t<uint8_t>& image, GLuint texture)
+Viewer::tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture)
 {
 
     if(image.empty()){
