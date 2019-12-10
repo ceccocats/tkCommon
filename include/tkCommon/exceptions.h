@@ -33,6 +33,7 @@ namespace tk{
                 if(status == false){
 
                     tk::tformat::printErr("tkAssert",std::string{"Error at line "}+std::to_string(line)+" in funtion "+funz+" at "+file+"\n");
+                    sign_handler(0, 0, 0);
                     exit(-1);
                 }
             }
