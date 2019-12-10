@@ -1,5 +1,6 @@
 #pragma once
 #include "tkCommon/common.h"
+#include "tkCommon/data/HeaderData.h"
 
 namespace tk{namespace data{
 
@@ -70,5 +71,49 @@ typedef LineData_t<tk::common::Vector3<float>> LineData3D_t;
 
 typedef BoundaryData_t<tk::common::Vector2<float>> BoundaryData2D_t;
 typedef BoundaryData_t<tk::common::Vector3<float>> BoundaryData3D_t;
+
+struct LinesData_t {
+public:
+    tk::data::HeaderData header;
+    std::vector<LineData3D_t> data;
+
+    matvar_t *toMatVar(std::string name = "lines") {
+        size_t dims[] = {data.size(), 1};
+        matvar_t *array = Mat_VarCreate(name.c_str(),MAT_C_CELL,MAT_T_CELL,2,dims,NULL,0);
+
+        for(int i=0; i<data.size(); i++) {
+            Eigen::MatrixXf p(3, data[i].points.size());
+            for(int j=0; j<p.cols(); j++) {
+                p(0, j) = data[i].points[j].x;
+                p(1, j) = data[i].points[j].y;
+                p(2, j) = data[i].points[j].z;
+            }
+            matvar_t *var = tk::common::eigenXf2matvar(p, "line");
+            Mat_VarSetCell(array, i,var);
+        }
+        return array;
+    }
+
+    bool fromMatVar(matvar_t *var) {
+
+        int n = var->dims[0];
+        for(int i=0; i<n; i++) {
+            matvar_t *pvar = Mat_VarGetCell(var, i);
+            Eigen::MatrixXf mat = tk::common::matvar2eigenXf(pvar);
+
+            LineData3D_t line;
+            for(int j=0; j<mat.cols(); j++) {
+                tk::common::Vector3<float> p;
+                p.x = mat(0, j);
+                p.y = mat(1, j);
+                p.z = mat(2, j);
+                line.points.push_back(p);
+            }
+            data.push_back(line);
+        }
+        return true;
+    }
+};
+
 
 }}

@@ -571,6 +571,20 @@ Viewer::tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, 
     glEnd();
 }
 
+void
+Viewer::tkDrawCloudRGB(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int r, int g, int b) {
+    glBegin(GL_POINTS);
+    for (int p = 0; p < points->cols(); p++) {
+        if(features->coeff(r, p) == 0 && features->coeff(g, p) == 0 && features->coeff(b, p) == 0)
+            continue;
+        glColor3f(features->coeff(r, p), features->coeff(g, p), features->coeff(b, p));
+
+        Eigen::Vector4f v = points->col(p);
+        glVertex3f(v(0), v(1), v(2));
+    }
+    glEnd();
+}
+
 void 
 Viewer::tkDrawArrow(float length, float radius, int nbSubdivisions) {
     if (radius < 0.0)
@@ -861,7 +875,7 @@ Viewer::tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture)
 
 
 void
-Viewer::tkSplitPanel(int count, float ratio, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y){
+Viewer::tkSplitPanel(int count, float ratio, float xLim, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y){
     num_rows = 4;
     if(ratio <= 0) {
         num_rows = ceil(sqrt(count));
@@ -880,7 +894,7 @@ Viewer::tkSplitPanel(int count, float ratio, int &num_cols, int &num_rows, float
     }
 
     if(ratio > 0){
-        x = -1.0f + w/2 + w * (num_cols-1);
+        x = -xLim + w/2 + w * (num_cols-1);
         y = -1.0f + h/2;
     }
     else {

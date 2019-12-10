@@ -414,6 +414,27 @@ namespace tk { namespace common {
     }
 
     /**
+     * generate eigen matrix from matvar
+     */
+    inline Eigen::MatrixXf matvar2eigenXf(matvar_t *var) {
+        tkASSERT(var != NULL)
+        tkASSERT(var->class_type == MAT_C_SINGLE)
+        Eigen::MatrixXf mat(var->dims[0], var->dims[1]);
+        memcpy(mat.data(), var->data, mat.size()*var->data_size);
+        return mat;
+    }
+    /**
+     * generate eigen matrix from matvar
+     */
+    inline Eigen::MatrixXd matvar2eigenXd(matvar_t *var) {
+        tkASSERT(var != NULL)
+        tkASSERT(var->class_type == MAT_C_DOUBLE)
+        Eigen::MatrixXd mat(var->dims[0], var->dims[1]);
+        memcpy(mat.data(), var->data, mat.size()*var->data_size);
+        return mat;
+    }
+
+    /**
      * write matvar to file
      */
     inline bool matvarWrite(std::string filename, matvar_t *m) {

@@ -102,6 +102,7 @@ namespace tk { namespace gui {
         static void tkDrawSphere(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = true);
         static void tkDrawCloud(Eigen::MatrixXf *data);
         static void tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx);
+        static void tkDrawCloudRGB(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int r, int g, int b);
         static void tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght, float radius = -1.0, int nbSubdivisions = 12);
         static void tkDrawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
         static void tkDrawRectangle(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
@@ -122,8 +123,9 @@ namespace tk { namespace gui {
         static void tkDrawTf(std::string name, tk::common::Tfpose tf);
         static void tkDrawLogo(std::string file, double scale);
         static void tkDrawRadarData(tk::data::RadarData *data);
+
         static void tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture);
-        static void tkSplitPanel(int count, float ratio, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y);
+        static void tkSplitPanel(int count, float ratio, float xLim, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y);
 
         static void tkDrawLiDARData(tk::data::LidarData *data);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

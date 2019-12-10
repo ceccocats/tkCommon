@@ -410,15 +410,26 @@ struct PoolQueue {
 
         gmtx.lock();
         int idx = last;
-        if(inserted > 0 && mtx[ idx%dim ].try_lock()) {
-            out = array[ idx%dim ];
-            locked++;
-            inserted = 0;
-        } else {
-            idx = -1;
-        }    
+
+        // starting from last,
+        int i = 0;
+        while(true) {
+            if(i>=dim || i >= inserted) {
+                idx = -1;
+                break;
+            }
+
+            // starting from last search for unlocked element
+            idx = (idx+dim - i)%dim;
+            if(mtx[ idx ].try_lock()) {
+                out = array[idx % dim];
+                locked++;
+                break;
+            }
+
+            i++;
+        }
         gmtx.unlock();
- 
 
         return idx;
     }

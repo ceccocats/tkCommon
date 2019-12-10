@@ -38,7 +38,21 @@ class GeodeticConverter
     *altitude = initial_altitude_;
   }
 
-  void initialiseReference(const double latitude, const double longitude, const double altitude)
+  Eigen::Vector3d getReference() {
+    double latitude = rad2Deg(initial_latitude_);
+    double longitude = rad2Deg(initial_longitude_);
+    double altitude = initial_altitude_;
+    Eigen::Vector3d ref;
+    ref << latitude, longitude, altitude;
+    return ref;
+  }
+
+  void setReference(Eigen::Vector3d ref) {
+      initialiseReference(ref(0), ref(1), ref(2));
+  }
+
+
+    void initialiseReference(const double latitude, const double longitude, const double altitude)
   {
     // Save NED origin
     initial_latitude_ = deg2Rad(latitude);
