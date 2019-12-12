@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
 
 PROJECT(tkCommon)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -21,7 +21,10 @@ include_directories(${OPENGL_INCLUDE_DIR})
 
 find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
-
+message(STATUS "ciao")
+message(STATUS ${GLEW_INCLUDE_DIRS})
+message(STATUS ${GLEW_LIBRARIES})
+message(STATUS "ciao")
 find_package(glfw3 3 REQUIRED)
 if(NOT DEFINED GLFW3_LIBRARY)
     set(GLFW3_LIBRARY glfw3)
@@ -33,7 +36,7 @@ include_directories(${FREETYPE_INCLUDE_DIRS})
 set(GUI_LIBS
     ${OPENGL_gl_LIBRARY}
     ${OPENGL_glu_LIBRARY}
-    ${GLEW_LIBRARY}
+    ${GLEW_LIBRARIES}
     ${GLFW3_LIBRARY}
     glut
     ${FREETYPE_LIBRARIES}
