@@ -386,10 +386,11 @@ struct PoolQueue {
             // search first free object        
             int insert_to = (last + 1) % dim;
             while(true) {
-                if(mtx[ insert_to%dim ].try_lock())
+                if(mtx[ insert_to ].try_lock())
                     break;
                 insert_to++;
-            }
+				insert_to = insert_to % dim;
+			}
             inserted++;
         gmtx.unlock();
 
