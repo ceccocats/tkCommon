@@ -21,7 +21,6 @@ include_directories(${OPENGL_INCLUDE_DIR})
 
 find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
-
 find_package(glfw3 3 REQUIRED)
 if(NOT DEFINED GLFW3_LIBRARY)
     set(GLFW3_LIBRARY glfw3)
@@ -33,7 +32,7 @@ include_directories(${FREETYPE_INCLUDE_DIRS})
 set(GUI_LIBS
     ${OPENGL_gl_LIBRARY}
     ${OPENGL_glu_LIBRARY}
-    ${GLEW_LIBRARY}
+    ${GLEW_LIBRARIES}
     ${GLFW3_LIBRARY}
     glut
     ${FREETYPE_LIBRARIES}

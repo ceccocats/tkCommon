@@ -23,7 +23,7 @@ set(tkCommon_LIBRARIES
     yaml-cpp
     ${OPENGL_gl_LIBRARY}
     ${OPENGL_glu_LIBRARY}
-    ${GLEW_LIBRARY}
+    ${GLEW_LIBRARIES}
     ${GLFW3_LIBRARY}
     glut
     tkCommon

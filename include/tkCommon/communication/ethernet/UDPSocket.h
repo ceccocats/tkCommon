@@ -70,6 +70,14 @@ namespace tk{ namespace communication {
          */
         static bool isMulticast(const std::string ip);
 
+        /**
+         * Method that return if an ip is broadcast
+         *
+         * @param ip        IP
+         * @return          true if ip is multicast
+         */
+        static bool isBroadcast(const std::string ip);
+
     private:
         int             sock_fd;
         bool            reciver;
