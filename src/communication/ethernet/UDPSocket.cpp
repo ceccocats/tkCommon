@@ -97,8 +97,17 @@ namespace tk { namespace communication {
                     return false;
                 }
                 clsSuc("multicast socket created.\n");
-            } else{
 
+            } if(isBroadcast(ip)) {
+                int broadcast= 1;
+                int r = setsockopt(this->sock_fd, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast));
+                if (r < 0){
+                    clsErr("error while setting broadcast\n");
+                    return false;
+                }
+                clsSuc("broadcast socket created.\n");
+
+            } else{
                 this->isMulti = false;
                 clsSuc("classic socket created.\n");
             }
@@ -143,5 +152,10 @@ namespace tk { namespace communication {
     bool
     UDPSocket::isMulticast (const std::string ip) {
         return (ntohl(inet_addr(ip.c_str())) & 0xF0000000) == 0xE0000000;
+    }
+
+    bool
+    UDPSocket::isBroadcast (const std::string ip) {
+        return ip.compare(ip.size()-3, 3, "255");
     }
 }}
