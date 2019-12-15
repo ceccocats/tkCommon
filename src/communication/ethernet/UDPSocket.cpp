@@ -156,6 +156,6 @@ namespace tk { namespace communication {
 
     bool
     UDPSocket::isBroadcast (const std::string ip) {
-        return ip.compare(ip.size()-3, 3, "255");
+        return ip.compare(ip.size()-3, 3, "255") == 0;
     }
 }}
