@@ -56,6 +56,7 @@ namespace tk { namespace communication {
         int r = bind(this->sock_fd, (const struct sockaddr *)&this->sock_addr,  sizeof(this->sock_addr));
         if (r < 0) {
             clsErr("error while binding the socket.\n");
+            perror("UDP error");
             return false;
         }
 
