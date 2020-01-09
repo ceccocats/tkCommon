@@ -27,6 +27,7 @@ namespace tk { namespace communication {
         this->sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
         if (this->sock_fd < 0){
             clsErr("error while opening socket.\n");
+            perror("UDP error");
             return false;
         }
 
@@ -36,8 +37,11 @@ namespace tk { namespace communication {
                 this->imr.imr_multiaddr.s_addr = inet_addr(ip.c_str());
                 this->imr.imr_interface.s_addr = htonl(INADDR_ANY);
                 int r = setsockopt(this->sock_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &imr, sizeof(ip_mreq));
+                int val = 1;
+                r = setsockopt(this->sock_fd, SOL_SOCKET, SO_REUSEPORT, &val, sizeof(val));
                 if (r < 0){
                     clsErr("error while allowing multiple sockets.\n");
+                    perror("UDP error");
                     return false;
                 }
                 clsSuc("multicast socket created.\n");
