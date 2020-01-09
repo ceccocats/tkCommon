@@ -1,3 +1,4 @@
+#pragma once
 #include <stdint.h>
 #include <iostream>
 
@@ -9,7 +10,7 @@ uint16_t polynominal16bit = 0x1021;
 bool isinit = false;
 
 
-void Crc16TableGenerator()
+inline void Crc16TableGenerator()
 {
     uint16_t remainder;
     uint16_t topBit = 0x8000;
@@ -35,7 +36,7 @@ void Crc16TableGenerator()
     }
 }
 
-uint16_t CalculateCRC16(const uint8_t *crc_DataPtr, uint32_t crc_Length)
+inline uint16_t CalculateCRC16(const uint8_t *crc_DataPtr, uint32_t crc_Length)
 {
     uint32_t ui32Counter;
     uint8_t temp;
