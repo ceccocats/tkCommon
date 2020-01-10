@@ -38,7 +38,7 @@ namespace tk { namespace communication {
                 this->imr.imr_interface.s_addr = htonl(INADDR_ANY);
                 int r = setsockopt(this->sock_fd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &imr, sizeof(ip_mreq));
                 int val = 1;
-                r = setsockopt(this->sock_fd, SOL_SOCKET, SO_REUSEPORT, &val, sizeof(val));
+                r = setsockopt(this->sock_fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
                 if (r < 0){
                     clsErr("error while allowing multiple sockets.\n");
                     perror("UDP error");
