@@ -1,7 +1,20 @@
 #!/bin/bash
 
+# usb conn
+sudo ip link set dev enx0023573c6701 name eth1
+sudo ip link add link eth1 name eth1.2 type vlan id 2
+sudo ifconfig eth1 up
+sudo ifconfig eth1.2 1.2.1.2 up
+sudo route add -host 239.2.0.3 dev eth1.2
+sudo route add -host 239.2.0.4 dev eth1.2
+
+# pc
 #sudo ip link add link eth0 name eth0.2 type vlan id 2
 #sudo ifconfig eth0.2 1.2.1.2 up
 #sudo route add -host 239.2.0.3 dev eth0.2
-sudo ifconfig eth0:vmps 1.2.1.2
-sudo route add -host 239.2.0.3 dev eth0:vmps
+#sudo route add -host 239.2.0.4 dev eth0.2
+
+# pegasus
+#sudo ifconfig eth0:vmps 1.2.1.2
+#sudo route add -host 239.2.0.3 dev eth0:vmps
+#sudo route add -host 239.2.0.4 dev eth0:vmps
