@@ -1,4 +1,6 @@
 #pragma once
+
+#include <tkCommon/communication/ethernet/PCAPHandler.h>
 #include "tkCommon/common.h"
 #include "tkCommon/data/CanData.h"
 
@@ -20,7 +22,7 @@ namespace tk { namespace communication {
 
         /**
          * Method that init read from log file
-         * 
+         *
          * @param fileName  Saving file name
          * @param filter    Filter on recorder, default empty
          * @return          Success
@@ -48,7 +50,7 @@ namespace tk { namespace communication {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /**
          * Method that record the ethernet messages (blocking)
-         * 
+         *
          * @param fileName  Saving file name
          * @param interface SocketCan port to record
          */
@@ -67,6 +69,6 @@ namespace tk { namespace communication {
     private:
         bool offlineMode;
         int             soc = -1;
-        std::ifstream   logstream;
+        tk::communication::PCAPHandler pcap;
     };
 }}

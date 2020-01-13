@@ -52,70 +52,20 @@ namespace tk { namespace communication {
     CanInterface::initFile(const std::string fileName){
         offlineMode = true;
 
-        logstream.open(fileName, std::ifstream::in);
-        if(logstream)
+        bool ok = pcap.initReplay(fileName);
+        if(ok)
             clsSuc("opened file: " + fileName + "\n")
         else
             clsErr("fail open file: " + fileName + "\n")
-        return logstream.is_open();
+        return ok;
     }
 
     int
     CanInterface::read(tk::data::CanData_t *data) {
 
         if(offlineMode){
-            if(!logstream.is_open())
-                return false;
+            data->frame.can_dlc = pcap.getPacket(data->frame.data, data->stamp);
 
-            std::string line;
-            if(!std::getline(logstream, line))
-                return false;
-
-            std::istringstream iss(line);
-
-            std::string stamp;
-            // get timestamp string
-            iss >> stamp;
-            // remove brakets
-            stamp = stamp.substr(1, stamp.size()-2);
-            // remove point
-            stamp.erase(std::remove(stamp.begin(), stamp.end(), '.'), stamp.end());
-
-            // fill timestamp value
-            data->stamp = std::stoull(stamp);
-
-            // trash interface name
-            std::string name;
-            iss >> name;
-
-            // get data string
-            std::string s;
-            for(int i =0; i<2; i++) {
-                std::getline(iss, s, '#');
-
-                // get msg ID
-                if(i==0) {
-                    data->frame.can_id = std::stoul(s, nullptr, 16);
-                    //std::cout<<std::hex<<data.frame.can_id<<" ";
-                }
-
-                // parse data
-                if(i==1) {
-                    data->frame.can_dlc = s.size()/2;
-                    if(data->frame.can_dlc > CAN_MAX_DLEN) {
-                        return false;
-                    }
-
-                    std::string val = "00";
-                    for(int k=0; k<data->frame.can_dlc; k++) {
-                        val[0] = s[k*2];
-                        val[1] = s[k*2+1];
-                        data->frame.data[k] = std::stoul(val, nullptr, 16);
-                        //std::cout<<val;
-                    }
-                    //std::cout<<"\n";
-                }
-            }
             return true;
 
         }else{
@@ -148,14 +98,15 @@ namespace tk { namespace communication {
 
     void
     CanInterface::record(const std::string fileName, const std::string iface){
-        system(std::string(std::string("candump -L ") + iface + " > " + fileName + "/" + iface + ".log &").c_str());
+        pcap.initRecord(fileName + "/" + iface + ".pcap", iface);
+        //system(std::string(std::string("candump -L ") + iface + " > " + fileName + "/" + iface + ".log &").c_str());
     }
 
     bool
     CanInterface::close(){
 
         if(offlineMode){
-            logstream.close();
+            pcap.close();
             return true;
         }else{
             int err = ::close(soc);
