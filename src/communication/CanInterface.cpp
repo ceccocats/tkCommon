@@ -64,10 +64,27 @@ namespace tk { namespace communication {
     CanInterface::read(tk::data::CanData_t *data) {
 
         if(offlineMode){
-            data->frame.can_dlc = pcap.getPacket(data->frame.data, data->stamp);
+            uint8_t buffer[64];
+            int len = pcap.getPacket(buffer, data->stamp, 0); // we get the header to read ID and DLC
+            if(len > 8) { // header is 8 byte
+                uint16_t id;
+                memcpy(&id, buffer + 2, sizeof(uint16_t));
+                id = __bswap_16(id);
+                data->frame.can_id = id;
+                memcpy(&data->frame.can_dlc, buffer + 4, sizeof(uint8_t));
 
-            return true;
+                // dimensions doesn match
+                if(8 + data->frame.can_dlc != len)
+                    return false;
 
+                memcpy(&data->frame.data, buffer + 8, data->frame.can_dlc * sizeof(uint8_t));
+                //tk::common::hex_dump(std::cout, buffer, len);
+                //std::cout << std::hex << data->frame.can_id << std::dec << " " << int(data->frame.can_dlc) << " "
+                //          << data->stamp << "\n";
+                return true;
+            } else {
+                return false;
+            }
         }else{
             int retval = 0;
 

@@ -83,7 +83,7 @@ void tk::communication::PCAPHandler::recordStat(struct pcap_stat& stat){
     }
 }
 
-int tk::communication::PCAPHandler::getPacket(uint8_t* buffer, timeStamp_t& stamp){
+int tk::communication::PCAPHandler::getPacket(uint8_t* buffer, timeStamp_t& stamp, int HEADER_LEN){
 
     if(!replayMode){
         clsErr("you are in recorder mode.\n");

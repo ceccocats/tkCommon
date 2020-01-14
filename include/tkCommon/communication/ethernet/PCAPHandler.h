@@ -24,9 +24,10 @@ namespace tk { namespace communication {
          * Method that return a packet
          * @param buffer    Packet data
          * @param stamp     Packet timestamp
+         * @param HEADER_LEN header to skip (42 for UDP)
          * @return          Packet lenght
          */
-        int getPacket(uint8_t* buffer, timeStamp_t& stamp);
+        int getPacket(uint8_t* buffer, timeStamp_t& stamp, int HEADER_LEN = 42);
 
         //Recording
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,8 +59,6 @@ namespace tk { namespace communication {
         bool                replayMode;
         pcap_dumper_t       *pcapDumper;
         pcap_t      	    *pcapFile;
-
-        const static int    HEADER_LEN = 42;
 
     };
 }}
