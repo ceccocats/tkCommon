@@ -94,6 +94,15 @@ namespace tk { namespace communication {
 
         // set source port
         if(srcport != 0) {
+            int val = 1;
+            int r = setsockopt(this->sock_fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
+            if (r < 0){
+                clsErr("error while allowing multiple sockets.\n");
+                perror("UDP error");
+                return false;
+            }
+
+            std::cout<<"BIND ON SRCPORT: "<<srcport<<"\n";
             struct sockaddr_in srcaddr;
             memset(&srcaddr, 0, sizeof(srcaddr));
             srcaddr.sin_family = AF_INET;
