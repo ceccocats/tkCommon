@@ -36,7 +36,7 @@ namespace tk{ namespace communication {
          * @param ip            IP
          * @return
          */
-        bool initSender(const int port, const std::string ip);
+        bool initSender(const int port, const std::string ip, const int srcport = 0);
 
         /**
          * Method that read a packet
