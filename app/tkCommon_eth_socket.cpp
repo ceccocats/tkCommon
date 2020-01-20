@@ -30,18 +30,23 @@ void reciverLoop(int port, std::string ip){
 
 }
 
-void senderLoop(int port, std::string ip){
+void senderLoop(int port, std::string ip, int srcport){
 
     tk::communication::UDPSocket socket;
 
-    socket.initSender(port,ip);
+    socket.initSender(port, ip, srcport);
     uint8_t buffer[1000];
 
     while(gRun){
-
+        std::cout<<"Input to send: ";
         std::cin>>buffer;
 
-        socket.send(buffer,(int)strlen((const char *)buffer));
+        std::cout<<"Send: "<<buffer<<"\n";
+        bool ok = socket.send(buffer,(int)strlen((const char *)buffer));
+        if(ok)
+            std::cout<<tk::tformat::print("correctly sent\n", tk::tformat::green, tk::tformat::predefined, tk::tformat::bold);
+        else
+            std::cout<<tk::tformat::print("not sent\n", tk::tformat::red, tk::tformat::predefined, tk::tformat::bold);
     }
 
     socket.close();
@@ -66,6 +71,7 @@ int main(int argc, char* argv[]){
     std::string  type       = cmd.addOpt("-type", "reciver" ,"reciver, sender");
     std::string  ip         = cmd.addOpt("-ip", "", "ip");
     int port                = cmd.addIntOpt("-port", 40000, "port");
+    int srcport             = cmd.addIntOpt("-srcport", 40000, "source port");
     cmd.print();
 
     if( type == "reciver"){
@@ -75,7 +81,7 @@ int main(int argc, char* argv[]){
 
     if( type == "sender"){
         std::cout<<"Sender...\n";
-        senderLoop(port,ip);
+        senderLoop(port,ip,srcport);
     }
 
     return 0;

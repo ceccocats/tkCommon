@@ -69,7 +69,7 @@ namespace tk { namespace communication {
     }
 
     bool
-    UDPSocket::initSender(const int port, const std::string ip) {
+    UDPSocket::initSender(const int port, const std::string ip, const int srcport) {
 
         memset(&this->sock_addr, 0, sizeof(this->sock_addr));
 
@@ -88,7 +88,30 @@ namespace tk { namespace communication {
         this->sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
         if (this->sock_fd < 0){
             clsErr("error while opening socket.\n");
+            perror("socket error");
             return false;
+        }
+
+        // set source port
+        if(srcport != 0) {
+            int val = 1;
+            int r = setsockopt(this->sock_fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
+            if (r < 0){
+                clsErr("error while allowing multiple sockets.\n");
+                perror("UDP error");
+                return false;
+            }
+
+            std::cout<<"BIND ON SRCPORT: "<<srcport<<"\n";
+            struct sockaddr_in srcaddr;
+            memset(&srcaddr, 0, sizeof(srcaddr));
+            srcaddr.sin_family = AF_INET;
+            srcaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+            srcaddr.sin_port = htons(srcport);
+            if (bind(sock_fd, (struct sockaddr *) &srcaddr, sizeof(srcaddr)) < 0) {
+                clsErr("error while setting socket.\n");
+                perror("bind");
+            }
         }
 
         // allow multiple sockets
