@@ -65,7 +65,7 @@ namespace tk { namespace communication {
 
         if(offlineMode){
             uint8_t buffer[64];
-            int len = pcap.getPacket(buffer, data->stamp, 0); // we get the header to read ID and DLC
+            int len = pcap.getPacket(buffer, data->stamp); // we get the header to read ID and DLC
             if(len > 8) { // header is 8 byte
                 uint16_t id;
                 memcpy(&id, buffer + 2, sizeof(uint16_t));

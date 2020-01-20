@@ -27,7 +27,7 @@ namespace tk { namespace communication {
          * @param HEADER_LEN header to skip (42 for UDP)
          * @return          Packet lenght
          */
-        int getPacket(uint8_t* buffer, timeStamp_t& stamp, int HEADER_LEN = 42);
+        int getPacket(uint8_t* buffer, timeStamp_t& stamp);
 
         //Recording
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

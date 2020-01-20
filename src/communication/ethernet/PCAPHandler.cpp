@@ -1,4 +1,5 @@
 #include "tkCommon/communication/ethernet/PCAPHandler.h"
+#include "tkCommon/communication/ethernet/packet_parser.h"
 
 tk::communication::PCAPHandler::PCAPHandler() = default;
 tk::communication::PCAPHandler::~PCAPHandler() = default;
@@ -83,7 +84,7 @@ void tk::communication::PCAPHandler::recordStat(struct pcap_stat& stat){
     }
 }
 
-int tk::communication::PCAPHandler::getPacket(uint8_t* buffer, timeStamp_t& stamp, int HEADER_LEN){
+int tk::communication::PCAPHandler::getPacket(uint8_t* buffer, timeStamp_t& stamp){
 
     if(!replayMode){
         clsErr("you are in recorder mode.\n");
@@ -104,6 +105,12 @@ int tk::communication::PCAPHandler::getPacket(uint8_t* buffer, timeStamp_t& stam
         return -1;
     }
 
+    int HEADER_LEN = 0;
+    PCAP_header pcap_header;
+    if(parse_UDP_packet(pkt_data, header->caplen, pcap_header)) {
+        //dump_PCAP_header(pcap_header);
+        HEADER_LEN = pcap_header.headerLen;
+    }
     std::memcpy(buffer,pkt_data + HEADER_LEN,header->len - HEADER_LEN);
 
     //stamp = header->ts.tv_sec;
