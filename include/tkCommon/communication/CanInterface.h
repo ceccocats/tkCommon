@@ -54,7 +54,7 @@ namespace tk { namespace communication {
          * @param fileName  Saving file name
          * @param interface SocketCan port to record
          */
-        void record(const std::string fileName, const std::string iface);
+        bool startRecord(const std::string fileName, const std::string iface);
 
 
         //Closing
@@ -70,5 +70,11 @@ namespace tk { namespace communication {
         bool offlineMode;
         int             soc = -1;
         tk::communication::PCAPHandler pcap;
+
+        //Record static thread
+        static void* record (void* object){
+            CanInterface* obj = reinterpret_cast<CanInterface*>(object);
+            obj->pcap.record();
+        }
     };
 }}

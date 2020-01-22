@@ -113,9 +113,18 @@ namespace tk { namespace communication {
         return retval == sizeof(struct can_frame);
     }
 
-    void
-    CanInterface::record(const std::string fileName, const std::string iface){
+    bool
+    CanInterface::startRecord(const std::string fileName, const std::string iface){
         pcap.initRecord(fileName + "/" + iface + ".pcap", iface);
+        pthread_t t1;
+        int val = pthread_create(&t1, NULL, CanInterface::record, this);
+
+        if(val == -1){
+            clsErr("error creating recorder thread.\n");
+            return false;
+        }else{
+            return true;
+        }
         //system(std::string(std::string("candump -L ") + iface + " > " + fileName + "/" + iface + ".log &").c_str());
     }
 
