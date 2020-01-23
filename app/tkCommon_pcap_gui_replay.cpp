@@ -210,9 +210,13 @@ int main(int argc, char *argv[])
     tk::exceptions::handleSegfault();
 
     tk::common::CmdParser   cmd(argv, "Samples for handle ethernet packets");
-    fileLog                 = cmd.addOpt("-file", "", "pcap replay file");
+    fileLog                 = cmd.addArg("file", "", "pcap replay file");
     port                    = cmd.addIntOpt("-port", 2368, "pcap replay file");
     cmd.print();
+
+    if(fileLog == ""){
+        return 0;
+    }
 
     packets = counterPackets();
     gui_data.barMaxVal = packets;
