@@ -52,7 +52,16 @@ namespace tk { namespace communication {
     CanInterface::initFile(const std::string fileName){
         offlineMode = true;
 
-        bool ok = pcap.initReplay(fileName);
+        bool ok;
+        if(tk::common::endsWith(fileName,"pcap")) {
+            ok = pcap.initReplay(fileName);
+            pcapmode = true;
+        } else {
+            logstream.open(fileName);
+            ok = logstream.is_open();
+            pcapmode = false;
+        }
+
         if(ok)
             clsSuc("opened file: " + fileName + "\n")
         else
@@ -64,26 +73,83 @@ namespace tk { namespace communication {
     CanInterface::read(tk::data::CanData_t *data) {
 
         if(offlineMode){
-            uint8_t buffer[64];
-            int len = pcap.getPacket(buffer, data->stamp); // we get the header to read ID and DLC
-            if(len > 8) { // header is 8 byte
-                uint16_t id;
-                memcpy(&id, buffer + 2, sizeof(uint16_t));
-                id = __bswap_16(id);
-                data->frame.can_id = id;
-                memcpy(&data->frame.can_dlc, buffer + 4, sizeof(uint8_t));
 
-                // dimensions doesn match
-                if(8 + data->frame.can_dlc != len)
+            if(pcapmode) {
+                uint8_t buffer[64];
+                int len = pcap.getPacket(buffer, data->stamp); // we get the header to read ID and DLC
+                if (len > 8) { // header is 8 byte
+                    uint16_t id;
+                    memcpy(&id, buffer + 2, sizeof(uint16_t));
+                    id = __bswap_16(id);
+                    data->frame.can_id = id;
+                    memcpy(&data->frame.can_dlc, buffer + 4, sizeof(uint8_t));
+
+                    // dimensions doesn match
+                    if (8 + data->frame.can_dlc != len)
+                        return false;
+
+                    memcpy(&data->frame.data, buffer + 8, data->frame.can_dlc * sizeof(uint8_t));
+                    //tk::common::hex_dump(std::cout, buffer, len);
+                    //std::cout << std::hex << data->frame.can_id << std::dec << " " << int(data->frame.can_dlc) << " "
+                    //          << data->stamp << "\n";
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                if(!logstream.is_open())
                     return false;
 
-                memcpy(&data->frame.data, buffer + 8, data->frame.can_dlc * sizeof(uint8_t));
-                //tk::common::hex_dump(std::cout, buffer, len);
-                //std::cout << std::hex << data->frame.can_id << std::dec << " " << int(data->frame.can_dlc) << " "
-                //          << data->stamp << "\n";
+                std::string line;
+                if(!std::getline(logstream, line))
+                    return false;
+
+                std::istringstream iss(line);
+
+                std::string stamp;
+                // get timestamp string
+                iss >> stamp;
+                // remove brakets
+                stamp = stamp.substr(1, stamp.size()-2);
+                // remove point
+                stamp.erase(std::remove(stamp.begin(), stamp.end(), '.'), stamp.end());
+
+                // fill timestamp value
+                data->stamp = std::stoull(stamp);
+
+                // trash interface name
+                std::string name;
+                iss >> name;
+
+                // get data string
+                std::string s;
+                for(int i =0; i<2; i++) {
+                    std::getline(iss, s, '#');
+
+                    // get msg ID
+                    if(i==0) {
+                        data->frame.can_id = std::stoul(s, nullptr, 16);
+                        //std::cout<<std::hex<<data.frame.can_id<<" ";
+                    }
+
+                    // parse data
+                    if(i==1) {
+                        data->frame.can_dlc = s.size()/2;
+                        if(data->frame.can_dlc > CAN_MAX_DLEN) {
+                            return false;
+                        }
+
+                        std::string val = "00";
+                        for(int k=0; k<data->frame.can_dlc; k++) {
+                            val[0] = s[k*2];
+                            val[1] = s[k*2+1];
+                            data->frame.data[k] = std::stoul(val, nullptr, 16);
+                            //std::cout<<val;
+                        }
+                        //std::cout<<"\n";
+                    }
+                }
                 return true;
-            } else {
-                return false;
             }
         }else{
             int retval = 0;

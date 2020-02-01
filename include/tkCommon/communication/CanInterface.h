@@ -69,7 +69,10 @@ namespace tk { namespace communication {
     private:
         bool offlineMode;
         int             soc = -1;
+
+        bool pcapmode;
         tk::communication::PCAPHandler pcap;
+        std::ifstream logstream;
 
         //Record static thread
         static void* record (void* object){

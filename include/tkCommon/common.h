@@ -40,6 +40,20 @@ namespace tk { namespace common {
     typedef Eigen::Matrix<uint8_t, Eigen::Dynamic, Eigen::Dynamic> MatrixXu8;
 
     /**
+     * check if a string end with another string
+     * @param mainStr
+     * @param toMatch
+     * @return
+     */
+    inline bool endsWith(const std::string &mainStr, const std::string &toMatch) {
+        if(mainStr.size() >= toMatch.size() &&
+           mainStr.compare(mainStr.size() - toMatch.size(), toMatch.size(), toMatch) == 0)
+            return true;
+        else
+            return false;
+    }
+
+    /**
      * Rect [ x y w h ]
      * @tparam T
      */

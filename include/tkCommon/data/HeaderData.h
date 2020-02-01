@@ -10,7 +10,7 @@ namespace tk { namespace data {
      */
     class HeaderData {
     public:
-        timeStamp_t         stamp;      /**< Time stamp, expressed in millisecond. */
+        timeStamp_t         stamp = 0;      /**< Time stamp, expressed in millisecond. */
         std::string         name;       /**< Name of the sensor. */
         tk::common::Tfpose  tf;         /**< TF in respect to back axel, @see tk::common::Tfpose. */
         int                 sensorID;   /**< ID of the sensor. */
