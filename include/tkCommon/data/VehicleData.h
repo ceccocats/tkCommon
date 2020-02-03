@@ -33,6 +33,7 @@ namespace tk { namespace data {
 
         uint8_t    brakePedalSts        = 0;    // brake status   [ on/off ]
         double     brakeMasterPressure  = 0;    // brake pressure [ bar ]
+        double     gasPedal             = 0;    // gas padal percentage [ 0-1 ]
         double     engineTorque         = 0;    // engine torque  [ % ]
         double     engineFrictionTorque = 0;    // friction torque[ % ]
 
@@ -111,10 +112,10 @@ namespace tk { namespace data {
             return os;
         }
 
-        static const int VEHICLE_FIELDS = 24;
+        static const int VEHICLE_FIELDS = 25;
         const char  *fields[VEHICLE_FIELDS] = {"stamp",
            "CAR_WHEELBASE", "CAR_DIM_X", "CAR_DIM_Y", "CAR_DIM_Z", "CAR_BACK2AXLE", "CAR_MASS", "CAR_FRONTAXLE_W", "CAR_BACKAXLE_W",
-           "CAR_WHEEL_R", "speed", "yawRate", "accelX", "accelY", "wheelAngle", "brakeMasterPressure", "engineTorque",
+           "CAR_WHEEL_R", "speed", "yawRate", "accelX", "accelY", "wheelAngle", "brakeMasterPressure", "gasPedal", "engineTorque",
            "actualGear_d", "wheelFLspeed", "wheelFRspeed", "wheelRLspeed", "wheelRRspeed", "sideSlip", "tractionGrip_d"};
 
         /**
@@ -147,6 +148,7 @@ namespace tk { namespace data {
             TK_VEHDATA_MATVAR_DOUBLE(accelY);
             TK_VEHDATA_MATVAR_DOUBLE(wheelAngle);
             TK_VEHDATA_MATVAR_DOUBLE(brakeMasterPressure);
+            TK_VEHDATA_MATVAR_DOUBLE(gasPedal);
             TK_VEHDATA_MATVAR_DOUBLE(engineTorque);
             double actualGear_d = actualGear;
             TK_VEHDATA_MATVAR_DOUBLE(actualGear_d);
@@ -189,6 +191,7 @@ namespace tk { namespace data {
             TK_VEHDATA_MATVAR_READ_DOUBLE(accelY);
             TK_VEHDATA_MATVAR_READ_DOUBLE(wheelAngle);
             TK_VEHDATA_MATVAR_READ_DOUBLE(brakeMasterPressure);
+            TK_VEHDATA_MATVAR_READ_DOUBLE(gasPedal);
             TK_VEHDATA_MATVAR_READ_DOUBLE(engineTorque);
             double actualGear_d;
             TK_VEHDATA_MATVAR_READ_DOUBLE(actualGear_d);
