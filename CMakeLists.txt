@@ -112,6 +112,9 @@ target_link_libraries(tkCommon_segfault tkCommon)
 add_executable(tkCommon_geoconv app/tkCommon_geoconv.cpp)
 target_link_libraries(tkCommon_geoconv tkCommon)
 
+add_executable(tkCommon_canasc app/tkCommon_canasc.cpp)
+target_link_libraries(tkCommon_canasc tkCommon tkCommunication)
+
 #-------------------------------------------------------------------------------
 # Install
 #-------------------------------------------------------------------------------
