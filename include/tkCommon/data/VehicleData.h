@@ -154,6 +154,7 @@ namespace tk { namespace data {
             TK_VEHDATA_MATVAR_DOUBLE(actualGear_d);
             TK_VEHDATA_MATVAR_DOUBLE(wheelFLspeed);
             TK_VEHDATA_MATVAR_DOUBLE(wheelFRspeed);
+            TK_VEHDATA_MATVAR_DOUBLE(wheelRLspeed);
             TK_VEHDATA_MATVAR_DOUBLE(wheelRRspeed);
             TK_VEHDATA_MATVAR_DOUBLE(sideSlip);
             double tractionGrip_d = tractionGrip;
@@ -198,6 +199,7 @@ namespace tk { namespace data {
             actualGear = actualGear_d;
             TK_VEHDATA_MATVAR_READ_DOUBLE(wheelFLspeed);
             TK_VEHDATA_MATVAR_READ_DOUBLE(wheelFRspeed);
+            TK_VEHDATA_MATVAR_READ_DOUBLE(wheelRLspeed);
             TK_VEHDATA_MATVAR_READ_DOUBLE(wheelRRspeed);
             TK_VEHDATA_MATVAR_READ_DOUBLE(sideSlip);
             double tractionGrip_d;

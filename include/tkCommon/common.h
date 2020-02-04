@@ -20,6 +20,12 @@
 namespace tk { namespace common {
 
     /**
+     * retrive current TK version from GIT repo
+     * @return version hash
+     */
+    std::string tkVersionGit();
+
+    /**
      *  RotoTranslation transform
      *  it is implemented as a matrix 4x4
      *      r r r x
@@ -184,6 +190,18 @@ namespace tk { namespace common {
                 T dy = y-v.y;
                 T dz = z-v.z;
                 return sqrt(dx*dx + dy*dy + dz*dz);
+            }
+
+            T dist2_2d(Vector3<T> v) {
+                T dx = x-v.x;
+                T dy = y-v.y;
+                return dx*dx + dy*dy;
+            }
+
+            T dist_2d(Vector3<T> v) {
+                T dx = x-v.x;
+                T dy = y-v.y;
+                return sqrt(dx*dx + dy*dy);
             }
 
             /**

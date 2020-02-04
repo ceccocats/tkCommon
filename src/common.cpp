@@ -2,6 +2,14 @@
 
 namespace tk { namespace common {
 
+    std::string tkVersionGit() {
+#ifdef TKVERSION_GIT
+        return TKVERSION_GIT;
+#else
+        return "None";
+#endif
+    }
+
     Tfpose odom2tf(float x, float y, float yaw) {
         Eigen::Quaternionf quat =
                 Eigen::AngleAxisf(0, Eigen::Vector3f::UnitX())*

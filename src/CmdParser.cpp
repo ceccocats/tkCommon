@@ -110,6 +110,8 @@ void CmdParser::printUsage(std::string name) {
                   << def_str;
         std::cout << opts[i].info << "\n";
     }
+
+    std::cout<<"Version: "<<tk::common::tkVersionGit()<<" (git)\n";
 }
 
 void CmdParser::print() {

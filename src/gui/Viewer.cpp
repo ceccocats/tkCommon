@@ -275,6 +275,11 @@ Viewer::run() {
                                 logo[i].x * 0.2f + xLim - margin,
                                 logo[i].y * 0.2f - yLim + margin,
                                 -0.9f}, 0.005, 50, true);
+
+                    tkDrawText("version: " + tk::common::tkVersionGit(),
+                            tk::common::Vector3<float>{xLim - margin*1.6f, -yLim + margin/10, -0.9f},
+                            tk::common::Vector3<float>{0,0,0},
+                            tk::common::Vector3<float>{0.035,0.035,0});
                 }
                 glPopMatrix();
             }

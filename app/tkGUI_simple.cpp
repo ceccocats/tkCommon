@@ -196,7 +196,7 @@ int main( int argc, char** argv){
     pthread_create(&t0, NULL, update_th, NULL);
 
     // fake loading
-    sleep(9);
+    sleep(2);
 
     viewer->joinThread();
     pthread_join(t0, NULL);
