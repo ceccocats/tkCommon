@@ -2,11 +2,11 @@
 
 namespace tk { namespace common {
 
-    std::string tkVersionGit() {
+    int tkVersionGit() {
 #ifdef TKVERSION_GIT
         return TKVERSION_GIT;
 #else
-        return "None";
+        return 0;
 #endif
     }
 

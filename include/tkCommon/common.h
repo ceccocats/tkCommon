@@ -23,7 +23,7 @@ namespace tk { namespace common {
      * retrive current TK version from GIT repo
      * @return version hash
      */
-    std::string tkVersionGit();
+    int tkVersionGit();
 
     /**
      *  RotoTranslation transform
