@@ -73,6 +73,7 @@ namespace tk { namespace data {
         struct odom_t {
             long double x = 0;
             long double y = 0;
+            long double z = 0;
             long double yaw = 0;
             uint64_t t = 0;
         } odometryBuffer[ODOM_BUFFER_SIZE];
