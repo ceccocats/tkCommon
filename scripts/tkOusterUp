@@ -60,6 +60,13 @@ else
 	echo -e "\e[42mSet lidar mode\e[0m"
 fi
 
+#Save configs
+echo "write_config_txt" | nc 192.168.1.100 7501
+if [ $? != "0" ]; then
+	echo -e "\e[41mError saving configuration\e[0m"
+else
+	echo -e "\e[42mConfiguration saved for next reboots\e[0m"
+fi
 
 #start sensor
 echo "reinitialize" | nc 192.168.1.100 7501
