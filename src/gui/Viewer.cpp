@@ -276,7 +276,7 @@ Viewer::run() {
                                 logo[i].y * 0.2f - yLim + margin,
                                 -0.9f}, 0.005, 50, true);
 
-                    tkDrawText("version: " + std::to_string(tk::common::tkVersionGit()),
+                    tkDrawText("version: " + tk::common::tkVersionGit(),
                             tk::common::Vector3<float>{xLim - margin*1.55f, -yLim + margin/10, -0.9f},
                             tk::common::Vector3<float>{0,0,0},
                             tk::common::Vector3<float>{0.035,0.035,0});

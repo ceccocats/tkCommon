@@ -2,13 +2,27 @@
 
 namespace tk { namespace common {
 
-    int tkVersionGit() {
+    std::string tkVersionGit() {
 #ifdef TKVERSION_GIT
         return TKVERSION_GIT;
 #else
-        return 0;
+        return "0000000";
 #endif
     }
+
+    int tkVersion2Int(std::string version) {
+        tkASSERT(version.size() == 7);
+        return stoi(version, 0, 16);
+    }
+
+    std::string tkVersion2String(int version) {
+        std::stringstream sstream;
+        sstream << std::hex << version;
+        std::string ver = sstream.str();
+        tkASSERT(ver.size() == 7);
+        return ver;
+    }
+
 
     Tfpose odom2tf(float x, float y, float yaw) {
         Eigen::Quaternionf quat =
