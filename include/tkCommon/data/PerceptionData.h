@@ -74,8 +74,14 @@ typedef BoundaryData_t<tk::common::Vector3<float>> BoundaryData3D_t;
 
 struct LinesData_t {
 public:
+    struct LineInfo_t {
+        int camIdx;
+        char type;
+    };
+
     tk::data::HeaderData header;
     std::vector<LineData3D_t> data;
+    std::vector<LineInfo_t> info;
 
     matvar_t *toMatVar(std::string name = "lines") {
         size_t dims[] = {data.size(), 1};
