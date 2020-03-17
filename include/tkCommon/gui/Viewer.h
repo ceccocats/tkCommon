@@ -18,6 +18,7 @@
 
 namespace tk { namespace gui {
 
+    class PlotManager;
     class Viewer {
 
     public:
@@ -123,7 +124,7 @@ namespace tk { namespace gui {
         float aspectRatio = 1;
         float xLim = 1.0; /**< 2d x coord screen limit (1.0 if quad) */  
         float yLim = 1.0; /**< 2d y coord screen limit (fixed to 1.0) */
-        Camera camera;
+        rl::Camera camera;
 
         double dt = 1.0/30;
 
@@ -131,6 +132,7 @@ namespace tk { namespace gui {
         pthread_t thread;
         std::mutex init_mutex;
 
+        PlotManager *plotManger;
 
     private:
         std::string             windowName;
@@ -150,3 +152,4 @@ namespace tk { namespace gui {
     };
 
 }}
+#include "tkCommon/gui/PlotManager.h"

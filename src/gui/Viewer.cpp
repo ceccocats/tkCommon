@@ -4,6 +4,7 @@
 
 extern bool gRun;
 using namespace tk::gui;
+using namespace rl;
 
 Viewer::Viewer() {
     // this must stay in the constructor because the file is loaded in the init function

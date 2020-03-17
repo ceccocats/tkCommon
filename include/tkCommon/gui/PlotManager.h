@@ -68,60 +68,9 @@ namespace tk { namespace gui {
         }
 
         void drawPlots() {
-            // Iterate through all elements in std::map
-            std::map<std::string, plot_t>::iterator it = plots.begin();
-            while(it != plots.end()) {
-                plot_t *p = &it->second;
-                if(p->conf.show) {
-                    tk::gui::Viewer::tkSetColor(p->conf.color);
-                    glLineWidth(p->conf.lineW);
-                    glPointSize(p->conf.pointW);
-
-                    if (p->conf.type == plot_t::plottype_t::LINE) {
-                        for (int i = 0; i < p->points.size() - 1; i++) {
-                            tk::gui::Viewer::tkDrawLine(p->points.head(i), p->points.head(i + 1));
-                        }
-
-                    } else if (p->conf.type == plot_t::plottype_t::CIRCLES) {
-                        for (int i = 0; i < p->points.size() - 1; i++) {
-                            tk::gui::Viewer::tkDrawCircle(p->points.head(i), p->conf.circleRay, p->conf.circleRes);
-                        }
-                    }
-
-                    glLineWidth(1);
-                    glPointSize(1);
-                }
-                it++;
-            }
         }
 
         void drawLegend() {
-
-            if(plots.size() > 0) {
-
-                ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowWidth()-50, 10), ImGuiCond_FirstUseEver);
-                ImGui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
-                ImGui::Begin("Legend");
-
-                std::map<std::string, plot_t>::iterator it = plots.begin();
-                while(it != plots.end()) {
-                    plot_t *p = &it->second;
-                    tk::gui::Color_t col = p->conf.color;
-
-                    std::string type_str;
-                    if(p->conf.type == plot_t::plottype_t::LINE)
-                        type_str = "-";
-                    else if(p->conf.type == plot_t::plottype_t::CIRCLES)
-                        type_str = "o";
-
-                    ImGui::Checkbox(it->first.c_str(), &p->conf.show);
-                    ImGui::SameLine(0, 10);
-                    ImGui::TextColored(ImVec4(float_t(col.r)/255.0f, float_t(col.g)/255.0f, float_t(col.b)/255.0f, float_t(col.a)/255.0f), type_str.c_str());
-
-                    it++;
-                }
-                ImGui::End();
-            }
         }
 
         plot_t *getPlot(std::string id) {
