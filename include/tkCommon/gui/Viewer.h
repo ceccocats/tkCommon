@@ -1,6 +1,9 @@
 #pragma once
-#include <GL/glew.h> 
-#include <GL/freeglut.h>
+#define RLGL_IMPLEMENTATION
+#define RLGL_STANDALONE
+#define GRAPHICS_API_OPENGL_33
+#include "tkCommon/gui/raylib/rlgl.h" 
+
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -11,9 +14,6 @@
 #include "tkCommon/gui/MouseView3D.h"
 #include "tkCommon/gui/Color.h"
 #include "tkCommon/gui/lodepng.h"
-#include "tkCommon/gui/imgui.h"
-#include "tkCommon/gui/imgui_impl_glfw.h"
-#include "tkCommon/gui/imgui_impl_opengl3.h"
 
 #include "tkCommon/data/RadarData.h"
 #include "tkCommon/data/LidarData.h"
@@ -91,7 +91,7 @@ namespace tk { namespace gui {
         void setWindowName(std::string name);
         void setBackground(tk::gui::Color_t c);
         
-        static int  tkLoadTexture(std::string filename, GLuint &tex);
+        //static int  tkLoadTexture(std::string filename, GLuint &tex);
         static int  tkLoadOBJ(std::string filename, object3D_t &obj);
         static void tkLoadLogo(std::string filename, std::vector<common::Vector3<float>> &logo);
         
@@ -99,18 +99,18 @@ namespace tk { namespace gui {
         static void tkApplyTf(tk::common::Tfpose tf);
         static void tkDrawAxis(float s = 1.0);
         static void tkDrawCircle(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = false);
-        static void tkDrawSphere(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = true);
+        //static void tkDrawSphere(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = true);
         static void tkDrawCloud(Eigen::MatrixXf *data);
         static void tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx);
         static void tkDrawCloudRGB(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int r, int g, int b);
-        static void tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght, float radius = -1.0, int nbSubdivisions = 12);
+        //static void tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght, float radius = -1.0, int nbSubdivisions = 12);
         static void tkDrawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
         static void tkDrawRectangle(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
         static void tkDrawLine(tk::common::Vector3<float> p0, tk::common::Vector3<float> p1);
         static void tkDrawLine(std::vector<tk::common::Vector3<float>> poses);
         static void tkDrawPoses(std::vector<tk::common::Vector3<float>> poses, tk::common::Vector3<float> size = tk::common::Vector3<float>{0.2, 0.2, 0.2});
         static void tkDrawObject3D(object3D_t *obj, float size = 1.0, bool textured = false);
-        static void tkDrawTexture(GLuint tex, float sx, float sy);
+        //static void tkDrawTexture(GLuint tex, float sx, float sy);
         static void tkDrawText(std::string text, tk::common::Vector3<float> pose,
                            tk::common::Vector3<float> rot = tk::common::Vector3<float>{0.0, 0.0, 0.0},
                            tk::common::Vector3<float> scale = tk::common::Vector3<float>{1.0, 1.0, 1.0});
@@ -177,7 +177,6 @@ namespace tk { namespace gui {
         float                   splashTime = 0;
 
         GLFWwindow*             window;
-        static GLUquadric*      quadric;
 
         const char*             glsl_version = "#version 130";
 
@@ -185,8 +184,7 @@ namespace tk { namespace gui {
         static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
         static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
-        static void tkDrawArrow(float length = 1.0, float radius = -1.0, int nbSubdivisions = 12);
+        //static void tkDrawArrow(float length = 1.0, float radius = -1.0, int nbSubdivisions = 12);
     };
 
 }}
-#include "tkCommon/gui/PlotManager.h"

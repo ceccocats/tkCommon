@@ -1,11 +1,11 @@
 #include "tkCommon/gui/Viewer.h"
 #include "tkCommon/gui/OBJ_Loader.h"
 
+
 extern bool gRun;
 using namespace tk::gui;
 bool            Viewer::keys[MAX_KEYS];
 MouseView3D     Viewer::mouseView;
-GLUquadric*     Viewer::quadric;
 
 std::vector<Color_t> tk::gui::Viewer::colors = std::vector<Color_t>{color::RED, color::PINK, 
                                                                     color::BLUE, color::YELLOW, 
@@ -27,8 +27,6 @@ Viewer::init() {
     for(int i=0; i<MAX_KEYS; i++)
         Viewer::keys[i] = false;
 
-    Viewer::quadric = gluNewQuadric();
-
     glfwSetErrorCallback(errorCallback);
     glfwInit();
 
@@ -40,6 +38,7 @@ Viewer::init() {
         glfwTerminate();
     }
 
+/*
 #if GLFW_VERSION_MAJOR >= 3
 #if GLFW_VERSION_MINOR >= 2
     glfwMaximizeWindow(window);
@@ -53,6 +52,7 @@ Viewer::init() {
     glfwSetWindowIcon(window, 1, icons);
 #endif
 #endif
+*/
 
     Viewer::mouseView.window = window;
 
@@ -62,67 +62,33 @@ Viewer::init() {
 
     glfwSetKeyCallback(window, keyCallback);
     glfwMakeContextCurrent(window);
-    //gladLoadGL(glfwGetProcAddress);
+    //rladLoadGL(glfwGetProcAddress);
     glfwSwapInterval(1);
 
-    //ImGUI
-    {
-        // Initialize OpenGL loader
-        bool err = glewInit() != GLEW_OK;
-        if (err) {
-            tk::tformat::printErr("Viewer", "Failed to initialize OpenGL loader!\n");
-            exit(-1);
-        }
+    // Load OpenGL 3.3 supported extensions
+    rlLoadExtensions((void*)glfwGetProcAddress);
+    rlglInit(width, height);
 
-        // Setup Dear ImGui context
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO(); (void)io;
-        // Setup Dear ImGui style
-        ImGui::StyleColorsDark();
-        //ImGui::StyleColorsClassic();
-
-        // Setup Platform/Renderer bindings
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
-        ImGui_ImplOpenGL3_Init(glsl_version);
-    }
-
-    // font
-    {
-        int foo = 1;
-        char* bar[1] = {" "}; 
-        glutInit(&foo, bar);
+    rlClearColor(float(background.r), float(background.g), float(background.b), float(background.a));
+    rlEnableDepthTest();                                // Enable DEPTH_TEST for 3D
 
 
-        /* XXX dtx_open_font opens a font file and returns a pointer to dtx_font */
-        if(!(font = dtx_open_font(fontPath.c_str(), TK_FONT_SIZE))) {
-            tk::tformat::printErr("Viewer",std::string{"failed to open font: "+fontPath});
-            exit(1);
-        }
-        /* XXX select the font and size to render with by calling dtx_use_font
-         * if you want to use a different font size, you must first call:
-         * dtx_prepare(font, size) once.
-         */
-        dtx_use_font(font, TK_FONT_SIZE);
-
-    }
-
-    plotManger = new PlotManager();
-
+/*
     // OPENGL confs
-    glDisable(GL_LIGHTING);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_DEPTH_TEST);
-    //glDepthFunc(GL_GEQUAL);
-    //glEnable(GL_LINE_SMOOTH);
+    rlDisable(GL_LIGHTING);
+    rlEnable(GL_BLEND);
+    rlBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    rlEnable(GL_DEPTH_TEST);
+    //rlDepthFunc(GL_GEQUAL);
+    //rlEnable(GL_LINE_SMOOTH);
+*/
 
-    std::string msg =   std::string{"OPENGL running on:"} + 
-                        std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))) + " -- " +
-                        std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))) + "\n";
-    clsMsg(msg);
+    //std::string msg =   std::string{"OPENGL running on:"} + 
+    //                    std::string(reinterpret_cast<const char*>(rlGetString(GL_VERSION))) + " -- " +
+    //                    std::string(reinterpret_cast<const char*>(rlGetString(GL_RENDERER))) + "\n";
+    //clsMsg(msg);
 
-    tkLoadTexture(std::string(TKPROJ_PATH) + "data/HipertLab.png", hipertTex);
+    //tkLoadTexture(std::string(TKPROJ_PATH) + "data/HipertLab.png", hipertTex);
     tkLoadLogo(std::string(TKPROJ_PATH) + "data/tkLogo.pts", logo);
 
     glfwGetFramebufferSize(window, &width, &height);
@@ -132,21 +98,17 @@ Viewer::init() {
 
 void 
 Viewer::draw() {
+
     tk::common::Vector3<float> s = {1, 1, 1};
     tk::gui::Color_t col = tk::gui::color::LIGHT_BLUE;
     tkSetColor(col);
-    tkDrawRectangle(Viewer::mouseView.getPointOnGround(), s, false);
-    col.a /= 4;
-    tkSetColor(col);
     tkDrawRectangle(Viewer::mouseView.getPointOnGround(), s, true);
-
-    glPushMatrix();
+/*
+    rlPushMatrix();
     tk::common::Vector3<float> p = Viewer::mouseView.getWorldPos();
     tkApplyTf(tk::common::odom2tf(p.x, p.y, 0));
     tkDrawAxis();
-    glPopMatrix();
-
-
+    rlPopMatrix();*/
 }
 
 void
@@ -182,19 +144,19 @@ Viewer::drawSplash() {
         x += dt / 3;
     }
 
-    //glPushMatrix(); {
+    //rlPushMatrix(); {
     //    tkSetColor(tk::gui::color::WHITE);
     //    tkDrawTexture(hipertTex, size, size);
-    //} glPopMatrix();
+    //} rlPopMatrix();
 
-    glPushMatrix();
+    rlPushMatrix();
     {
         tkSetColor(tk::gui::color::WHITE, size);
         for(int i=0; i<logo.size(); i++)
             tkDrawCircle(tk::common::Vector3<float>(logo[i].x * (4*(size - 0.1)), logo[i].y * (4*(size-0.1)), 0.1), 0.00025 / (size*size*size), 100, true);
             //tkDrawCircle(tk::common::Vector3<float>(logo[i].x * (0.5+size/2), logo[i].y * (0.5+size/2), 0.1), 0.1 * size/2, 100, true);
     }
-    glPopMatrix();
+    rlPopMatrix();
 
 
 }
@@ -231,64 +193,68 @@ Viewer::run() {
         xLim = aspectRatio;
         yLim = 1.0;
 
-        glViewport(0, 0, width, height);
+        rlViewport(0, 0, width, height);
 
-        glMatrixMode( GL_PROJECTION );
-        glLoadIdentity();
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity() ;
+        rlMatrixMode( RL_PROJECTION );
+        rlLoadIdentity();
+        rlMatrixMode( RL_MODELVIEW);
+        rlLoadIdentity() ;
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(float(background.r)/255, float(background.g)/255, float(background.b)/255, float(background.a)/255);
+        rlClearScreenBuffers();
 
         Viewer::mouseView.setWindowAspect(float(width)/height);
 
-        glPushMatrix();
+        rlPushMatrix();
 
-        if(splash) {
-            Viewer::mouseView.mouseOnGUI = true;
-            drawSplash();
-        } else {
-            // apply matrix
-            glMultMatrixf(Viewer::mouseView.getProjection()->data());
-            glMultMatrixf(Viewer::mouseView.getModelView()->data());
+        // apply matrix
+        //rlMultMatrixf((float*)Viewer::mouseView.getProjection()->data());
+        //rlMultMatrixf((float*)Viewer::mouseView.getModelView()->data());
 
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
+        // sooooooo shitty
+        Matrix proj;
+        proj.m0  = Viewer::mouseView.getProjection()->data()[0 ];
+        proj.m1  = Viewer::mouseView.getProjection()->data()[1 ];
+        proj.m2  = Viewer::mouseView.getProjection()->data()[2 ];
+        proj.m3  = Viewer::mouseView.getProjection()->data()[3 ];
+        proj.m4  = Viewer::mouseView.getProjection()->data()[4 ];
+        proj.m5  = Viewer::mouseView.getProjection()->data()[5 ];  
+        proj.m6  = Viewer::mouseView.getProjection()->data()[6 ];
+        proj.m7  = Viewer::mouseView.getProjection()->data()[7 ];
+        proj.m8  = Viewer::mouseView.getProjection()->data()[8 ];
+        proj.m9  = Viewer::mouseView.getProjection()->data()[9 ];
+        proj.m10 = Viewer::mouseView.getProjection()->data()[10];
+        proj.m11 = Viewer::mouseView.getProjection()->data()[11];
+        proj.m12 = Viewer::mouseView.getProjection()->data()[12];
+        proj.m13 = Viewer::mouseView.getProjection()->data()[13];
+        proj.m14 = Viewer::mouseView.getProjection()->data()[14];  
+        proj.m15 = Viewer::mouseView.getProjection()->data()[15];
 
-            Viewer::mouseView.mouseOnGUI = ImGui::IsMouseHoveringAnyWindow();
+        Matrix modl;
+        modl.m0  = Viewer::mouseView.getModelView()->data()[0 ];
+        modl.m1  = Viewer::mouseView.getModelView()->data()[1 ];
+        modl.m2  = Viewer::mouseView.getModelView()->data()[2 ];
+        modl.m3  = Viewer::mouseView.getModelView()->data()[3 ];
+        modl.m4  = Viewer::mouseView.getModelView()->data()[4 ];
+        modl.m5  = Viewer::mouseView.getModelView()->data()[5 ];  
+        modl.m6  = Viewer::mouseView.getModelView()->data()[6 ];
+        modl.m7  = Viewer::mouseView.getModelView()->data()[7 ];
+        modl.m8  = Viewer::mouseView.getModelView()->data()[8 ];
+        modl.m9  = Viewer::mouseView.getModelView()->data()[9 ];
+        modl.m10 = Viewer::mouseView.getModelView()->data()[10];
+        modl.m11 = Viewer::mouseView.getModelView()->data()[11];
+        modl.m12 = Viewer::mouseView.getModelView()->data()[12];
+        modl.m13 = Viewer::mouseView.getModelView()->data()[13];
+        modl.m14 = Viewer::mouseView.getModelView()->data()[14];  
+        modl.m15 = Viewer::mouseView.getModelView()->data()[15];
 
-            plotManger->drawPlots();
-            draw();
-            plotManger->drawLegend();
+        SetMatrixProjection(proj);
+        SetMatrixModelview(modl);
 
-            // draw tk LOGO
-            if(drawLogo) {
-                glPushMatrix();
-                {
-                    tkViewport2D(width, height);
-                    float margin = 0.2;
-                    tkSetColor(tk::gui::color::WHITE, 0.3);
-                    for (int i = 0; i < logo.size(); i++)
-                        tkDrawCircle(tk::common::Vector3<float>{
-                                logo[i].x * 0.2f + xLim - margin,
-                                logo[i].y * 0.2f - yLim + margin,
-                                -0.9f}, 0.005, 50, true);
+        draw();
 
-                    tkDrawText("version: " + std::to_string(tk::common::tkVersionGit()),
-                            tk::common::Vector3<float>{xLim - margin*1.55f, -yLim + margin/10, -0.9f},
-                            tk::common::Vector3<float>{0,0,0},
-                            tk::common::Vector3<float>{0.035,0.035,0});
-                }
-                glPopMatrix();
-            }
+        rlPopMatrix();
 
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        }
-
-        glPopMatrix();
+        rlglDraw();
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
@@ -298,13 +264,11 @@ Viewer::run() {
         rate.wait(false);
     }
     gRun = false;
-    
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();  
-    ImGui::DestroyContext();
 
     glfwDestroyWindow(window);
     glfwTerminate();
+
+    rlglClose();                    // Unload rlgl internal buffers and default shader/texture
 }
 
 void
@@ -326,7 +290,7 @@ Viewer::setBackground(tk::gui::Color_t c) {
     background = c;
 }
 
-
+/*
 int 
 Viewer::tkLoadTexture(std::string filename, GLuint &tex) {
 
@@ -343,12 +307,12 @@ Viewer::tkLoadTexture(std::string filename, GLuint &tex) {
         }
 
         //upload to GPU texture
-        glGenTextures(1, &tex);
-        glBindTexture(GL_TEXTURE_2D, tex);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        rlGenTextures(1, &tex);
+        rlBindTexture(GL_TEXTURE_2D, tex);
+        rlTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        rlTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        rlTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+        rlBindTexture(GL_TEXTURE_2D, 0);
 
         delete [] image;
 
@@ -364,7 +328,7 @@ Viewer::tkLoadTexture(std::string filename, GLuint &tex) {
         tk::tformat::printErr("Viewer",std::string{"error: "}+std::to_string(error)+std::string{"\n"});
 
     return error;
-}
+}*/
 
 
 int 
@@ -416,9 +380,9 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
         }
 
 
-    error = tkLoadTexture((filename + ".png"), obj.tex);
-    if(error == 1)
-        tk::tformat::printErr("Viewer","Texture not found\n");
+    //error = tkLoadTexture((filename + ".png"), obj.tex);
+    //if(error == 1)
+    //    tk::tformat::printErr("Viewer","Texture not found\n");
     }
 
     return error;
@@ -459,34 +423,42 @@ Viewer::tkLoadLogo(std::string filename, std::vector<tk::common::Vector3<float>>
 void 
 Viewer::tkSetColor(tk::gui::Color_t c, float alpha) {
     if(alpha >= 0)
-        glColor4ub(c.r, c.g, c.b, alpha*255);
+        rlColor4ub(c.r, c.g, c.b, alpha*255);
     else
-        glColor4ub(c.r, c.g, c.b, c.a);
+        rlColor4ub(c.r, c.g, c.b, c.a);
 }
 
 void 
 Viewer::tkApplyTf(tk::common::Tfpose tf) {
     // apply roto translation
-    glMultMatrixf(tf.matrix().data());
+    rlMultMatrixf(tf.matrix().data());
 }  
 
 void 
 Viewer::tkDrawAxis(float s) {
-    glLineWidth(2.5); 
-    glBegin(GL_LINES);
+
+    //rlLineWidth(2.5); 
+
+    rlColor4ub(255, 0, 0, 255);
+    rlBegin(RL_LINES);
     // x
-    glColor3f(1.0, 0.0, 0.0);
-    glVertex3f(0, 0, 0);
-    glVertex3f(s, 0, 0);
+    rlVertex3f(0, 0, 0);
+    rlVertex3f(s, 0, 0);
+    rlEnd();
+
+    rlColor4ub(0, 255, 0, 255);
+    rlBegin(RL_LINES);
     // y
-    glColor3f(0.0, 1.0, 0.0);
-    glVertex3f(0, 0, 0);
-    glVertex3f(0, s, 0);
+    rlVertex3f(0, 0, 0);
+    rlVertex3f(0, s, 0);
+    rlEnd();
+
+    rlColor4ub(0, 0, 255, 255);
+    rlBegin(RL_LINES);
     // z
-    glColor3f(0.0, 0.0, 1.0);
-    glVertex3f(0, 0, 0);
-    glVertex3f(0, 0, s);
-    glEnd();
+    rlVertex3f(0, 0, 0);
+    rlVertex3f(0, 0, s);
+    rlEnd();
 }
 
 void 
@@ -495,22 +467,23 @@ Viewer::tkDrawCircle(tk::common::Vector3<float> pose, float r, int res, bool fil
     int res_1 = res;
 
     if(filled) {
-        glBegin(GL_TRIANGLE_FAN);
-        glVertex3f(pose.x, pose.y, pose.z);
+        rlBegin(GL_TRIANGLE_FAN);
+        rlVertex3f(pose.x, pose.y, pose.z);
         res_1++;
     } else {
-        glBegin(GL_LINE_LOOP);
+        rlBegin(GL_LINE_LOOP);
     }
     for (int j = 0; j < res_1; j++)   {
         float theta = 2.0f * 3.1415926f * float(j) / float(res);//get the current angle 
         float xr = r * cosf(theta);//calculate the x component 
         float yr = r * sinf(theta);//calculate the y component
 
-        glVertex3f(pose.x + xr, pose.y + yr, pose.z);//output vertex
+        rlVertex3f(pose.x + xr, pose.y + yr, pose.z);//output vertex
     }
-    glEnd();
+    rlEnd();
 }
 
+/*
 void 
 Viewer::tkDrawSphere(tk::common::Vector3<float> pose, float r, int res, bool filled) {
     if (!filled)
@@ -523,15 +496,16 @@ Viewer::tkDrawSphere(tk::common::Vector3<float> pose, float r, int res, bool fil
     if (!filled)
         glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
 }
+*/
 
 void 
 Viewer::tkDrawCloud(Eigen::MatrixXf *points) {
-    glBegin(GL_POINTS);
+    rlBegin(GL_POINTS);
     for (int p = 0; p < points->cols(); p++) {
         Eigen::Vector4f v = points->col(p);
-        glVertex3f(v(0), v(1), v(2));
+        rlVertex3f(v(0), v(1), v(2));
     }
-    glEnd();
+    rlEnd();
 }
 
 void Viewer::tkRainbowColor(float hue, uint8_t &r, uint8_t &g, uint8_t &b) {
@@ -559,37 +533,38 @@ void Viewer::tkSetRainbowColor(float hue) {
     
     uint8_t r = 0, g = 0, b = 0;
     tkRainbowColor(hue, r, g, b);
-    glColor3f(float(r)/255.0, float(g)/255.0, float(b)/255.0);
+    rlColor3f(float(r)/255.0, float(g)/255.0, float(b)/255.0);
 }
 
 
 void
 Viewer::tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx) {
-    glBegin(GL_POINTS);
+    rlBegin(GL_POINTS);
     for (int p = 0; p < points->cols(); p++) {
         float i = float(features->coeff(idx, p))/255.0;
         tkSetRainbowColor(i);
 
         Eigen::Vector4f v = points->col(p);
-        glVertex3f(v(0), v(1), v(2));
+        rlVertex3f(v(0), v(1), v(2));
     }
-    glEnd();
+    rlEnd();
 }
 
 void
 Viewer::tkDrawCloudRGB(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int r, int g, int b) {
-    glBegin(GL_POINTS);
+    rlBegin(GL_POINTS);
     for (int p = 0; p < points->cols(); p++) {
         if(features->coeff(r, p) == 0 && features->coeff(g, p) == 0 && features->coeff(b, p) == 0)
             continue;
-        glColor3f(features->coeff(r, p), features->coeff(g, p), features->coeff(b, p));
+        rlColor3f(features->coeff(r, p), features->coeff(g, p), features->coeff(b, p));
 
         Eigen::Vector4f v = points->col(p);
-        glVertex3f(v(0), v(1), v(2));
+        rlVertex3f(v(0), v(1), v(2));
     }
-    glEnd();
+    rlEnd();
 }
 
+/*
 void 
 Viewer::tkDrawArrow(float length, float radius, int nbSubdivisions) {
     if (radius < 0.0)
@@ -598,111 +573,133 @@ Viewer::tkDrawArrow(float length, float radius, int nbSubdivisions) {
     const float head = 2.5 * (radius / length) + 0.1;
     const float coneRadiusCoef = 4.0 - 5.0 * head;
 
-    gluCylinder(Viewer::quadric, radius, radius, length * (1.0 - head / coneRadiusCoef), nbSubdivisions, 1);
-    glTranslated(0.0, 0.0, length * (1.0 - head));
-    gluCylinder(Viewer::quadric, coneRadiusCoef * radius, 0.0, head * length, nbSubdivisions, 1);
-    glTranslated(0.0, 0.0, -length * (1.0 - head));
-}
-
+    rluCylinder(Viewer::quadric, radius, radius, length * (1.0 - head / coneRadiusCoef), nbSubdivisions, 1);
+    rlTranslated(0.0, 0.0, length * (1.0 - head));
+    rluCylinder(Viewer::quadric, coneRadiusCoef * radius, 0.0, head * length, nbSubdivisions, 1);
+    rlTranslated(0.0, 0.0, -length * (1.0 - head));
+}*/
+/*
 void 
 Viewer::tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght, float radius, int nbSubdivisions) {
-    glPushMatrix();
-    glTranslatef(pose.x, pose.y, pose.z);
-    glRotatef(90.0, 1.0, 0.0, 0.0);
-    glRotatef(90.0 + yaw*180/M_PI, 0.0, 1.0, 0.0);
+    rlPushMatrix();
+    rlTranslatef(pose.x, pose.y, pose.z);
+    rlRotatef(90.0, 1.0, 0.0, 0.0);
+    rlRotatef(90.0 + yaw*180/M_PI, 0.0, 1.0, 0.0);
     tkDrawArrow(lenght, radius, nbSubdivisions);
-    glPopMatrix();
+    rlPopMatrix();
 }
+*/
 
 void 
 Viewer::tkDrawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled) {
-    if (!filled)
-        glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
 
-    glPushMatrix();
-    glTranslatef(pose.x, pose.y, pose.z);
-    glScalef(size.x, size.y, size.z);
+    rlPushMatrix();
+    rlTranslatef(pose.x, pose.y, pose.z);
+    rlScalef(size.x, size.y, size.z);
 
-    // BACK
-    glBegin(GL_POLYGON);
-    glVertex3f(  0.5, -0.5, 0.5 );
-    glVertex3f(  0.5,  0.5, 0.5 );
-    glVertex3f( -0.5,  0.5, 0.5 );
-    glVertex3f( -0.5, -0.5, 0.5 );
-    glEnd();
-    
-    // RIGHT
-    glBegin(GL_POLYGON);
-    glVertex3f( 0.5, -0.5, -0.5 );
-    glVertex3f( 0.5,  0.5, -0.5 );
-    glVertex3f( 0.5,  0.5,  0.5 );
-    glVertex3f( 0.5, -0.5,  0.5 );
-    glEnd();
-    
-    // LEFT
-    glBegin(GL_POLYGON);
-    glVertex3f( -0.5, -0.5,  0.5 );
-    glVertex3f( -0.5,  0.5,  0.5 );
-    glVertex3f( -0.5,  0.5, -0.5 );
-    glVertex3f( -0.5, -0.5, -0.5 );
-    glEnd();
-    
-    // TOP
-    glBegin(GL_POLYGON);
-    glVertex3f(  0.5,  0.5,  0.5 );
-    glVertex3f(  0.5,  0.5, -0.5 );
-    glVertex3f( -0.5,  0.5, -0.5 );
-    glVertex3f( -0.5,  0.5,  0.5 );
-    glEnd();
-    
-    // BOTTOM
-    glBegin(GL_POLYGON);
-    glVertex3f(  0.5, -0.5, -0.5 );
-    glVertex3f(  0.5, -0.5,  0.5 );
-    glVertex3f( -0.5, -0.5,  0.5 );
-    glVertex3f( -0.5, -0.5, -0.5 );
-    glEnd();
 
-    glPopMatrix();
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+    float width = size.x;
+    float height = size.y;
+    float length = size.z;
 
-    if (!filled)
-        glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
+
+        rlBegin(RL_TRIANGLES);
+
+            // Front Face -----------------------------------------------------
+            rlVertex3f(x-width/2, y-height/2, z+length/2);  // Bottom Left
+            rlVertex3f(x+width/2, y-height/2, z+length/2);  // Bottom Right
+            rlVertex3f(x-width/2, y+height/2, z+length/2);  // Top Left
+
+            rlVertex3f(x+width/2, y+height/2, z+length/2);  // Top Right
+            rlVertex3f(x-width/2, y+height/2, z+length/2);  // Top Left
+            rlVertex3f(x+width/2, y-height/2, z+length/2);  // Bottom Right
+
+            // Back Face ------------------------------------------------------
+            rlVertex3f(x-width/2, y-height/2, z-length/2);  // Bottom Left
+            rlVertex3f(x-width/2, y+height/2, z-length/2);  // Top Left
+            rlVertex3f(x+width/2, y-height/2, z-length/2);  // Bottom Right
+
+            rlVertex3f(x+width/2, y+height/2, z-length/2);  // Top Right
+            rlVertex3f(x+width/2, y-height/2, z-length/2);  // Bottom Right
+            rlVertex3f(x-width/2, y+height/2, z-length/2);  // Top Left
+
+            // Top Face -------------------------------------------------------
+            rlVertex3f(x-width/2, y+height/2, z-length/2);  // Top Left
+            rlVertex3f(x-width/2, y+height/2, z+length/2);  // Bottom Left
+            rlVertex3f(x+width/2, y+height/2, z+length/2);  // Bottom Right
+
+            rlVertex3f(x+width/2, y+height/2, z-length/2);  // Top Right
+            rlVertex3f(x-width/2, y+height/2, z-length/2);  // Top Left
+            rlVertex3f(x+width/2, y+height/2, z+length/2);  // Bottom Right
+
+            // Bottom Face ----------------------------------------------------
+            rlVertex3f(x-width/2, y-height/2, z-length/2);  // Top Left
+            rlVertex3f(x+width/2, y-height/2, z+length/2);  // Bottom Right
+            rlVertex3f(x-width/2, y-height/2, z+length/2);  // Bottom Left
+
+            rlVertex3f(x+width/2, y-height/2, z-length/2);  // Top Right
+            rlVertex3f(x+width/2, y-height/2, z+length/2);  // Bottom Right
+            rlVertex3f(x-width/2, y-height/2, z-length/2);  // Top Left
+
+            // Right face -----------------------------------------------------
+            rlVertex3f(x+width/2, y-height/2, z-length/2);  // Bottom Right
+            rlVertex3f(x+width/2, y+height/2, z-length/2);  // Top Right
+            rlVertex3f(x+width/2, y+height/2, z+length/2);  // Top Left
+
+            rlVertex3f(x+width/2, y-height/2, z+length/2);  // Bottom Left
+            rlVertex3f(x+width/2, y-height/2, z-length/2);  // Bottom Right
+            rlVertex3f(x+width/2, y+height/2, z+length/2);  // Top Left
+
+            // Left Face ------------------------------------------------------
+            rlVertex3f(x-width/2, y-height/2, z-length/2);  // Bottom Right
+            rlVertex3f(x-width/2, y+height/2, z+length/2);  // Top Left
+            rlVertex3f(x-width/2, y+height/2, z-length/2);  // Top Right
+
+            rlVertex3f(x-width/2, y-height/2, z+length/2);  // Bottom Left
+            rlVertex3f(x-width/2, y+height/2, z+length/2);  // Top Left
+            rlVertex3f(x-width/2, y-height/2, z-length/2);  // Bottom Right
+        rlEnd();
+
+    rlPopMatrix();
 }
 
 void 
 Viewer::tkDrawRectangle(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled) {
     if (!filled)
-        glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
+        rlEnableWireMode();
 
-    glPushMatrix();
-    glTranslatef(pose.x, pose.y, pose.z);
-    glScalef(size.x, size.y, size.z);
+    rlPushMatrix();
+    rlTranslatef(pose.x, pose.y, pose.z);
+    rlScalef(size.x, size.y, size.z);
 
-    glBegin(GL_POLYGON);
-    glVertex3f(  0.5, -0.5, 0 );
-    glVertex3f(  0.5,  0.5, 0 );
-    glVertex3f( -0.5,  0.5, 0 );
-    glVertex3f( -0.5, -0.5, 0 );
-    glEnd();
+    rlBegin(RL_QUADS);
+    rlVertex3f(  0.5, -0.5, 0 );
+    rlVertex3f(  0.5,  0.5, 0 );
+    rlVertex3f( -0.5,  0.5, 0 );
+    rlVertex3f( -0.5, -0.5, 0 );
+    rlEnd();
 
-    glPopMatrix();
+    rlPopMatrix();
 
     if (!filled)
-        glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
+        rlDisableWireMode();
 }
 
 void Viewer::tkDrawLine(tk::common::Vector3<float> p0, tk::common::Vector3<float> p1) {
-    glBegin(GL_LINES);
-    glVertex3f(p0.x, p0.y, p0.z);
-    glVertex3f(p1.x, p1.y, p1.z);
-    glEnd();
+    rlBegin(GL_LINES);
+    rlVertex3f(p0.x, p0.y, p0.z);
+    rlVertex3f(p1.x, p1.y, p1.z);
+    rlEnd();
 }
 void Viewer::tkDrawLine(std::vector<tk::common::Vector3<float>> poses) {
-    glBegin(GL_LINE_STRIP);
+    rlBegin(GL_LINE_STRIP);
     for(unsigned int i=0; i<poses.size(); i++) {
-        glVertex3f(poses[i].x, poses[i].y, poses[i].z);
+        rlVertex3f(poses[i].x, poses[i].y, poses[i].z);
     }
-    glEnd();
+    rlEnd();
 }
 
 void Viewer::tkDrawPoses(std::vector<tk::common::Vector3<float>> poses, tk::common::Vector3<float> size) {
@@ -714,70 +711,75 @@ void Viewer::tkDrawPoses(std::vector<tk::common::Vector3<float>> poses, tk::comm
 void 
 Viewer::tkDrawObject3D(object3D_t *obj, float size, bool textured) {
 
-    glPushMatrix();
-    glScalef(size, size, size);
+    rlPushMatrix();
+    rlScalef(size, size, size);
 
+    /*
     if(textured) {
-        glBindTexture(GL_TEXTURE_2D, obj->tex);
-        glEnable(GL_TEXTURE_2D);
+        rlBindTexture(GL_TEXTURE_2D, obj->tex);
+        rlEnable(GL_TEXTURE_2D);
     }
+    */
 
-    glBegin(GL_TRIANGLES);
+    rlBegin(GL_TRIANGLES);
     for(int o=0; o<obj->triangles.size(); o++) {
         if(!textured)
-            glColor3f(obj->colors[o].x, obj->colors[o].y, obj->colors[o].z);
+            rlColor3f(obj->colors[o].x, obj->colors[o].y, obj->colors[o].z);
 
         for(int i=0; i<obj->triangles[o].cols(); i++) {
-            glTexCoord2f(obj->triangles[o](3,i), obj->triangles[o](4,i)); 
-            glVertex3f(obj->triangles[o](0,i),obj->triangles[o](1,i),obj->triangles[o](2,i));
+            rlTexCoord2f(obj->triangles[o](3,i), obj->triangles[o](4,i)); 
+            rlVertex3f(obj->triangles[o](0,i),obj->triangles[o](1,i),obj->triangles[o](2,i));
         }
     }
-    glEnd();
+    rlEnd();
 
+/*
     if(textured) {
-        glDisable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        rlDisable(GL_TEXTURE_2D);
+        rlBindTexture(GL_TEXTURE_2D, 0);
     }
-    glPopMatrix();
+    */
+    rlPopMatrix();
 }
 
+/*
 void Viewer::tkDrawTexture(GLuint tex, float sx, float sy) {
 
     float i = -1;
     float j = +1;
 
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glEnable(GL_TEXTURE_2D);
-    glBegin(GL_QUADS);
+    rlBindTexture(GL_TEXTURE_2D, tex);
+    rlEnable(GL_TEXTURE_2D);
+    rlBegin(GL_QUADS);
 
     // 2d draw
-    glTexCoord2f(0, 1); glVertex3f(i*(sy/2), i*(sx/2), 0);
-    glTexCoord2f(0, 0); glVertex3f(i*(sy/2), j*(sx/2), 0);
-    glTexCoord2f(1, 0); glVertex3f(j*(sy/2), j*(sx/2), 0);
-    glTexCoord2f(1, 1); glVertex3f(j*(sy/2), i*(sx/2), 0);
+    rlTexCoord2f(0, 1); rlVertex3f(i*(sy/2), i*(sx/2), 0);
+    rlTexCoord2f(0, 0); rlVertex3f(i*(sy/2), j*(sx/2), 0);
+    rlTexCoord2f(1, 0); rlVertex3f(j*(sy/2), j*(sx/2), 0);
+    rlTexCoord2f(1, 1); rlVertex3f(j*(sy/2), i*(sx/2), 0);
 
 
-    glEnd();
-    glDisable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
-}
+    rlEnd();
+    rlDisable(GL_TEXTURE_2D);
+    rlBindTexture(GL_TEXTURE_2D, 0);
+}*/
 
 void
 Viewer::tkDrawText(std::string text, tk::common::Vector3<float> pose, tk::common::Vector3<float> rot, tk::common::Vector3<float> size) {
 
     float corectRatio = 1.0/TK_FONT_SIZE;
     
-    glPushMatrix();
-    glTranslatef(pose.x, pose.y, pose.z);
-    glRotatef(rot.x*180.0/M_PI, 1, 0, 0);
-    glRotatef(rot.y*180.0/M_PI, 0, 1, 0);
-    glRotatef(rot.z*180.0/M_PI, 0, 0, 1);    
-    glScalef(size.x*corectRatio, size.y*corectRatio, size.z*corectRatio);
+    rlPushMatrix();
+    rlTranslatef(pose.x, pose.y, pose.z);
+    rlRotatef(rot.x*180.0/M_PI, 1, 0, 0);
+    rlRotatef(rot.y*180.0/M_PI, 0, 1, 0);
+    rlRotatef(rot.z*180.0/M_PI, 0, 0, 1);    
+    rlScalef(size.x*corectRatio, size.y*corectRatio, size.z*corectRatio);
 
     dtx_string(text.c_str());
-    //glutStrokeString(GLUT_STROKE_ROMAN, (unsigned char*) text.c_str());
+    //rlutStrokeString(GLUT_STROKE_ROMAN, (unsigned char*) text.c_str());
     
-    glPopMatrix();
+    rlPopMatrix();
 }
 
 void 
@@ -785,7 +787,7 @@ Viewer::tkDrawRadarData(tk::data::RadarData *data) {
     tk::common::Vector3<float> pose;
     tk::common::Tfpose  correction = tk::common::odom2tf(0, 0, 0, +M_PI/2);
     for(int i = 0; i < data->nRadar; i++) {
-        glPushMatrix();
+        rlPushMatrix();
         tkDrawTf(data->near_data[i].header.name, (data->near_data[i].header.tf * correction));
         tkApplyTf(data->near_data[i].header.tf);
         // draw near
@@ -816,26 +818,27 @@ Viewer::tkDrawRadarData(tk::data::RadarData *data) {
 //
         //    tkDrawCircle(pose, 0.05);
         //}
-        glPopMatrix();
+        rlPopMatrix();
     }
 }
 
 void
 Viewer::tkDrawLiDARData(tk::data::LidarData *data){
 
-    glPointSize(1.0);
-    glBegin(GL_POINTS);
+    //rlPointSize(1.0);
+    rlBegin(GL_POINTS);
     //white
     tkSetColor(tk::gui::color::WHITE);
 
     for (int p = 0; p < data->nPoints; p++) {
         float i = float(data->intensity(p))/255.0;
         tkSetRainbowColor(i);
-        glVertex3f(data->points.coeff(0,p),data->points.coeff(1,p),data->points.coeff(2,p));
+        rlVertex3f(data->points.coeff(0,p),data->points.coeff(1,p),data->points.coeff(2,p));
     }
-    glEnd();
+    rlEnd();
 }
 
+/*
 void
 Viewer::tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture)
 {
@@ -844,18 +847,18 @@ Viewer::tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture)
         tk::tformat::printMsg("Viewer","Image empty\n");
     }else{
 
-        //glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        //rlTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        rlBindTexture(GL_TEXTURE_2D, texture);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        rlTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        rlTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         // Set texture clamping method
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        rlTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        rlTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
         if(image.channels == 4) {
-            glTexImage2D(GL_TEXTURE_2D,         // Type of texture
+            rlTexImage2D(GL_TEXTURE_2D,         // Type of texture
                          0,                   // Pyramid level (for mip-mapping) - 0 is the top level
                          GL_RGB,              // Internal colour format to convert to
                          image.width,          // Image width  i.e. 640 for Kinect in standard mode
@@ -865,7 +868,7 @@ Viewer::tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture)
                          GL_UNSIGNED_BYTE,    // Image data type
                          image.data);        // The actual image data itself
         }else if(image.channels == 3){
-            glTexImage2D(GL_TEXTURE_2D,         // Type of texture
+            rlTexImage2D(GL_TEXTURE_2D,         // Type of texture
                          0,                   // Pyramid level (for mip-mapping) - 0 is the top level
                          GL_RGB,              // Internal colour format to convert to
                          image.width,          // Image width  i.e. 640 for Kinect in standard mode
@@ -877,6 +880,7 @@ Viewer::tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture)
         }
     }
 }
+*/
 
 
 void
@@ -910,7 +914,7 @@ Viewer::tkSplitPanel(int count, float ratio, float xLim, int &num_cols, int &num
 
 void
 Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float radius) {
-    glPushMatrix(); 
+    rlPushMatrix(); 
 
     float diff_radius = 0.03;
     float outer_radius = radius;
@@ -929,33 +933,33 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
 
     // outer circle
     tkSetColor(tk::gui::color::WHITE);
-    glLineWidth(1);
-	glBegin(GL_LINE_LOOP);
+    //rlLineWidth(1);
+	rlBegin(GL_LINE_LOOP);
 	for (float angle = 0; angle < 360; angle += 5) {
-		glVertex2f(outer_radius * cos(angle*D2R) + pose.x, outer_radius * sin(angle*D2R) + pose.y);
+		rlVertex2f(outer_radius * cos(angle*D2R) + pose.x, outer_radius * sin(angle*D2R) + pose.y);
 	}
-	glEnd();
+	rlEnd();
 
     // inner circle
     tkSetColor(tk::gui::color::WHITE);
-	glBegin(GL_LINE_STRIP);
-	glVertex2f((inner_radius + 0.005) * cos(-70 * D2R) + pose.x, (inner_radius + 0.005) * sin(-70 * D2R) + pose.y);
-	glVertex2f((outer_radius) * cos(-70 * D2R) + pose.x, (outer_radius) * sin(-70 * D2R) + pose.y);
+	rlBegin(GL_LINE_STRIP);
+	rlVertex2f((inner_radius + 0.005) * cos(-70 * D2R) + pose.x, (inner_radius + 0.005) * sin(-70 * D2R) + pose.y);
+	rlVertex2f((outer_radius) * cos(-70 * D2R) + pose.x, (outer_radius) * sin(-70 * D2R) + pose.y);
 	for (float angle = 0 - 70; angle <= 320 - 70; angle += 5) {
-		glVertex2f(inner_radius * cos(angle*D2R) + pose.x, inner_radius * sin(angle*D2R) + pose.y);
+		rlVertex2f(inner_radius * cos(angle*D2R) + pose.x, inner_radius * sin(angle*D2R) + pose.y);
 	}
-	glVertex2f((inner_radius + 0.005) * cos(250 * D2R) + pose.x, (inner_radius + 0.005) * sin(250 * D2R) + pose.y);
-	glVertex2f((outer_radius) * cos(250 * D2R) + pose.x, (outer_radius) * sin(250 * D2R) + pose.y);
-	glEnd();
+	rlVertex2f((inner_radius + 0.005) * cos(250 * D2R) + pose.x, (inner_radius + 0.005) * sin(250 * D2R) + pose.y);
+	rlVertex2f((outer_radius) * cos(250 * D2R) + pose.x, (outer_radius) * sin(250 * D2R) + pose.y);
+	rlEnd();
 
     // speed text lines
     tkSetColor(tk::gui::color::WHITE);
-	glBegin(GL_LINES);
+	rlBegin(GL_LINES);
 	for (float angle = 0 - 70; angle <= 320 - 70; angle += 20) {
-		glVertex2f(inner_radius * cos(angle*D2R) + pose.x, inner_radius * sin(angle*D2R) + pose.y);
-		glVertex2f((inner_radius - 0.02) * cos(angle*D2R) + pose.x, (inner_radius - 0.02) * sin(angle*D2R) + pose.y);
+		rlVertex2f(inner_radius * cos(angle*D2R) + pose.x, inner_radius * sin(angle*D2R) + pose.y);
+		rlVertex2f((inner_radius - 0.02) * cos(angle*D2R) + pose.x, (inner_radius - 0.02) * sin(angle*D2R) + pose.y);
 	}
-	glEnd();
+	rlEnd();
 
     // speed text
     /*
@@ -984,12 +988,12 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
 
     // danger zone
     tkSetColor(tk::gui::color::RED);
-    glLineWidth(4);
-	glBegin(GL_LINE_STRIP);
+    //rlLineWidth(4);
+	rlBegin(GL_LINE_STRIP);
 	for (float angle = 320 - 30; angle <= 320 + 30; angle += 5) {
-		glVertex2f((inner_radius - 0.01) * cos(angle*D2R) + pose.x, (inner_radius - 0.01) * sin(angle*D2R) + pose.y);
+		rlVertex2f((inner_radius - 0.01) * cos(angle*D2R) + pose.x, (inner_radius - 0.01) * sin(angle*D2R) + pose.y);
 	}
-	glEnd();
+	rlEnd();
 
     // indicator
     indicator_a.x = inner_radius * cos((250 + -indicator_angle) * D2R) + pose.x;
@@ -1001,81 +1005,81 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
 	indicator_d.x = 0.01875 * cos((-10 + -indicator_angle) * D2R) + pose.x;
 	indicator_d.y = 0.01875 * sin((-10 + -indicator_angle) * D2R) + pose.y;
 
-    glBegin(GL_QUADS);
-	glVertex2f(indicator_a.x, indicator_a.y);
-	glVertex2f(indicator_b.x, indicator_b.y);
-	glVertex2f(indicator_c.x, indicator_c.y);
-	glVertex2f(indicator_d.x, indicator_d.y);
-	glEnd();
+    rlBegin(RL_QUADS);
+	rlVertex2f(indicator_a.x, indicator_a.y);
+	rlVertex2f(indicator_b.x, indicator_b.y);
+	rlVertex2f(indicator_c.x, indicator_c.y);
+	rlVertex2f(indicator_d.x, indicator_d.y);
+	rlEnd();
 
-	glLineWidth(3);
-	glColor3f(0.5, 0, 0);
-	glBegin(GL_LINE_LOOP);
-	glVertex2f(indicator_a.x, indicator_a.y);
-	glVertex2f(indicator_b.x, indicator_b.y);
-	glVertex2f(indicator_c.x, indicator_c.y);
-	glVertex2f(indicator_d.x, indicator_d.y);
-	glEnd();
+	//rlLineWidth(3);
+	rlColor3f(0.5, 0, 0);
+	rlBegin(GL_LINE_LOOP);
+	rlVertex2f(indicator_a.x, indicator_a.y);
+	rlVertex2f(indicator_b.x, indicator_b.y);
+	rlVertex2f(indicator_c.x, indicator_c.y);
+	rlVertex2f(indicator_d.x, indicator_d.y);
+	rlEnd();
 
     tkSetColor(tk::gui::color::BLACK);
-    tkDrawSphere(tk::common::Vector3<float>{pose.x, pose.y, 0}, 0.01);
+    //tkDrawSphere(tk::common::Vector3<float>{pose.x, pose.y, 0}, 0.01);
 
     // speed arc
     tkSetColor(tk::gui::color::GREEN);
 	if (indicator_angle > 260)
 		tkSetColor(tk::gui::color::RED);
-	glLineWidth(4);
-	glBegin(GL_LINE_STRIP);
-	glVertex2f((radius - 0.0075) * cos(250 * D2R) + pose.x, (radius - 0.0075) * sin(250 * D2R) + pose.y);
-	glVertex2f((radius - 0.0225) * cos(250 * D2R) + pose.x, (radius - 0.0225) * sin(250 * D2R) + pose.y);
+	//rlLineWidth(4);
+	rlBegin(GL_LINE_STRIP);
+	rlVertex2f((radius - 0.0075) * cos(250 * D2R) + pose.x, (radius - 0.0075) * sin(250 * D2R) + pose.y);
+	rlVertex2f((radius - 0.0225) * cos(250 * D2R) + pose.x, (radius - 0.0225) * sin(250 * D2R) + pose.y);
 	for (float a = 0; a <= indicator_angle; a += 5) {
-		glVertex2f((radius - 0.0225) * cos((250 + -a)*D2R) + pose.x, (radius - 0.0225) * sin((250 + -a)*D2R) + pose.y);
+		rlVertex2f((radius - 0.0225) * cos((250 + -a)*D2R) + pose.x, (radius - 0.0225) * sin((250 + -a)*D2R) + pose.y);
 	}
-	glVertex2f((radius - 0.0225) * cos((250 + -indicator_angle) * D2R) + pose.x, (radius - 0.0225) * sin((250 + -indicator_angle) * D2R) + pose.y);
-	glVertex2f((radius - 0.0075) * cos((250 + -indicator_angle) * D2R) + pose.x, (radius - 0.0075) * sin((250 + -indicator_angle) * D2R) + pose.y);
-	glEnd();
-	glBegin(GL_LINE_STRIP);
+	rlVertex2f((radius - 0.0225) * cos((250 + -indicator_angle) * D2R) + pose.x, (radius - 0.0225) * sin((250 + -indicator_angle) * D2R) + pose.y);
+	rlVertex2f((radius - 0.0075) * cos((250 + -indicator_angle) * D2R) + pose.x, (radius - 0.0075) * sin((250 + -indicator_angle) * D2R) + pose.y);
+	rlEnd();
+	rlBegin(GL_LINE_STRIP);
 	for (float a = 0; a <= indicator_angle; a++) {
-		glVertex2f((radius - 0.0075) * cos((250 + -a)*D2R) + pose.x, (radius - 0.0075) * sin((250 + -a)*D2R) + pose.y);
+		rlVertex2f((radius - 0.0075) * cos((250 + -a)*D2R) + pose.x, (radius - 0.0075) * sin((250 + -a)*D2R) + pose.y);
 	}
-	glEnd();
+	rlEnd();
 
 
-    glPopMatrix();
-    glLineWidth(1);
+    rlPopMatrix();
+    //rlLineWidth(1);
 }
 
 void 
 Viewer::tkViewport2D(int width, int height, int x, int y) {
     float ar = (float)width / (float)height;
 
-    //glViewport(x, y, width, height);
-    //glOrtho(0, width, 0, height, -1, 1);
-    //glLoadIdentity();
+    //rlViewport(x, y, width, height);
+    //rlOrtho(0, width, 0, height, -1, 1);
+    //rlLoadIdentity();
     
-    glMatrixMode( GL_PROJECTION );
-    glLoadIdentity();
+    rlMatrixMode( RL_PROJECTION );
+    rlLoadIdentity();
 
-    glOrtho(-ar, ar, -1, 1, 1, -1);
+    rlOrtho(-ar, ar, -1, 1, 1, -1);
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    rlMatrixMode(RL_MODELVIEW);
+    rlLoadIdentity();
 }
 
 void
 Viewer::tkDrawTf(std::string name, tk::common::Tfpose tf) {
     // draw tfs
     tk::gui::Viewer::tkSetColor(tk::gui::color::WHITE);
-    glLineWidth(1);
+    //rlLineWidth(1);
     tk::gui::Viewer::tkDrawLine(tk::common::Vector3<float>{0,0,0}, tk::common::tf2pose(tf));
-    glPushMatrix();
+    rlPushMatrix();
     tk::gui::Viewer::tkApplyTf(tf);
     tk::gui::Viewer::tkDrawText(name,
                                 tk::common::Vector3<float>{0.01,0.01,0},
                                 tk::common::Vector3<float>{M_PI/2,0,0},
                                 tk::common::Vector3<float>{0.15,0.15,0});
     tk::gui::Viewer::tkDrawAxis(0.2);
-    glPopMatrix();
+    rlPopMatrix();
 }
 
 void 

@@ -2,13 +2,86 @@
 #include <thread>
 #include <signal.h>
 
+
+// Draw cube
+// NOTE: Cube position is the center position
+static void DrawCube(Vector3 position, float width, float height, float length, Color color)
+{
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+
+    rlPushMatrix();
+
+        // NOTE: Be careful! Function order matters (rotate -> scale -> translate)
+        rlTranslatef(position.x, position.y, position.z);
+        //rlScalef(2.0f, 2.0f, 2.0f);
+        //rlRotatef(45, 0, 1, 0);
+
+        rlBegin(RL_TRIANGLES);
+            rlColor4ub(color.r, color.g, color.b, color.a);
+
+            // Front Face -----------------------------------------------------
+            rlVertex3f(x-width/2, y-height/2, z+length/2);  // Bottom Left
+            rlVertex3f(x+width/2, y-height/2, z+length/2);  // Bottom Right
+            rlVertex3f(x-width/2, y+height/2, z+length/2);  // Top Left
+
+            rlVertex3f(x+width/2, y+height/2, z+length/2);  // Top Right
+            rlVertex3f(x-width/2, y+height/2, z+length/2);  // Top Left
+            rlVertex3f(x+width/2, y-height/2, z+length/2);  // Bottom Right
+
+            // Back Face ------------------------------------------------------
+            rlVertex3f(x-width/2, y-height/2, z-length/2);  // Bottom Left
+            rlVertex3f(x-width/2, y+height/2, z-length/2);  // Top Left
+            rlVertex3f(x+width/2, y-height/2, z-length/2);  // Bottom Right
+
+            rlVertex3f(x+width/2, y+height/2, z-length/2);  // Top Right
+            rlVertex3f(x+width/2, y-height/2, z-length/2);  // Bottom Right
+            rlVertex3f(x-width/2, y+height/2, z-length/2);  // Top Left
+
+            // Top Face -------------------------------------------------------
+            rlVertex3f(x-width/2, y+height/2, z-length/2);  // Top Left
+            rlVertex3f(x-width/2, y+height/2, z+length/2);  // Bottom Left
+            rlVertex3f(x+width/2, y+height/2, z+length/2);  // Bottom Right
+
+            rlVertex3f(x+width/2, y+height/2, z-length/2);  // Top Right
+            rlVertex3f(x-width/2, y+height/2, z-length/2);  // Top Left
+            rlVertex3f(x+width/2, y+height/2, z+length/2);  // Bottom Right
+
+            // Bottom Face ----------------------------------------------------
+            rlVertex3f(x-width/2, y-height/2, z-length/2);  // Top Left
+            rlVertex3f(x+width/2, y-height/2, z+length/2);  // Bottom Right
+            rlVertex3f(x-width/2, y-height/2, z+length/2);  // Bottom Left
+
+            rlVertex3f(x+width/2, y-height/2, z-length/2);  // Top Right
+            rlVertex3f(x+width/2, y-height/2, z+length/2);  // Bottom Right
+            rlVertex3f(x-width/2, y-height/2, z-length/2);  // Top Left
+
+            // Right face -----------------------------------------------------
+            rlVertex3f(x+width/2, y-height/2, z-length/2);  // Bottom Right
+            rlVertex3f(x+width/2, y+height/2, z-length/2);  // Top Right
+            rlVertex3f(x+width/2, y+height/2, z+length/2);  // Top Left
+
+            rlVertex3f(x+width/2, y-height/2, z+length/2);  // Bottom Left
+            rlVertex3f(x+width/2, y-height/2, z-length/2);  // Bottom Right
+            rlVertex3f(x+width/2, y+height/2, z+length/2);  // Top Left
+
+            // Left Face ------------------------------------------------------
+            rlVertex3f(x-width/2, y-height/2, z-length/2);  // Bottom Right
+            rlVertex3f(x-width/2, y+height/2, z+length/2);  // Top Left
+            rlVertex3f(x-width/2, y+height/2, z-length/2);  // Top Right
+
+            rlVertex3f(x-width/2, y-height/2, z+length/2);  // Bottom Left
+            rlVertex3f(x-width/2, y+height/2, z+length/2);  // Top Left
+            rlVertex3f(x-width/2, y-height/2, z-length/2);  // Bottom Right
+        rlEnd();
+    rlPopMatrix();
+}
+
 class MyViewer : public tk::gui::Viewer {
     private:
-        object3D_t carObj;
-
         tk::common::Tfpose tf = tk::common::Tfpose::Identity();
         float   angle;
-        float   speedometer_speed = 5.0;
         Eigen::MatrixXf *cloud = nullptr;
 
         bool show_demo_window = true;
@@ -18,10 +91,6 @@ class MyViewer : public tk::gui::Viewer {
 
         void init() {
             tk::gui::Viewer::init();
-
-            tkLoadOBJ(std::string(TKPROJ_PATH) + "data/levante", carObj);
-
-            plotManger->addLinePlot("test", tk::gui::color::WHITE, 1000, 1);
         }
 
         void draw() {
@@ -29,95 +98,18 @@ class MyViewer : public tk::gui::Viewer {
 
             // Arrow
             tkSetColor(tk::gui::color::RED);
-            tkDrawArrow(tk::common::Vector3<float>{0.0, 0.0, 3.0}, angle, 2.0);
+            //tkDrawArrow(tk::common::Vector3<float>{0.0, 0.0, 3.0}, angle, 2.0);
 
             // Cube
             tk::common::Vector3<float>p(0.0, 4.0, 1.0);
             tk::common::Vector3<float>s(4.0, 2.0, 2.0);
             tk::gui::Color_t col = tk::gui::color::PINK;
             tkSetColor(col);
-            tkDrawCube(p, s, false);
-            col.a /= 4;
-            tkSetColor(col);
             tkDrawCube(p, s, true);
-
-            // Circle
-            tkSetColor(tk::gui::color::PINK);
-            tkDrawCircle(tk::common::Vector3<float>{0.0, 0.0, 0.0}, 8.0, 100);
-   
-            // text
-            tkSetColor(tk::gui::color::LIME);
-            tkDrawText("tkGUI", tk::common::Vector3<float>{-5, 10.0, 0.0},
-                                tk::common::Vector3<float>{M_PI/2, 0, 0},
-                                tk::common::Vector3<float>{5.0, 5.0, 5.0});
-
-            // tornado cloud
-            glPushMatrix(); {
-                tkApplyTf(tf);
-                glTranslatef(8, 0, 0);
-
-                if(cloud != nullptr) {
-                    tkSetColor(tk::gui::color::ORANGE);
-                    glPointSize(1.0f);
-
-                    tkDrawCloud(cloud);
-
-                    // Sphere
-                    col = tk::gui::color::CYAN;
-                    tkSetColor(col);
-                    tkDrawSphere(tk::common::Vector3<float>{0.0, 0.0, 13.0}, 5.0, 16, false);
-                    col.a /= 4;
-                    tkSetColor(col);
-                    tkDrawSphere(tk::common::Vector3<float>{0.0, 0.0, 13.0}, 5.0, 16, true);
-                }
-            } glPopMatrix();
-
-            // levante
-            glPushMatrix(); {        
-                tkDrawObject3D(&carObj, 1, false);
-            } glPopMatrix();
-
-            // alpha blended object must be drawn at the end
-            // hipert logo as pavement
-            glPushMatrix(); {
-                glTranslatef(0, -4, 0);
-                glColor4f(1,1,1,1);
-                tkDrawTexture(hipertTex, 10, 10);
-            } glPopMatrix();
-            
-            // draw 2D HUD
-            tkViewport2D(width, height);
-
-            tkDrawSpeedometer(tk::common::Vector2<float>(-0.75, -0.75), speedometer_speed, 0.2);
-            
-            glPushMatrix(); {
-                tkSetColor(tk::gui::color::WHITE);
-                glTranslatef(0.7, -0.85, 0);
-                //tkDrawTexture(hipertTex, 0.5, 0.5);
-            } glPopMatrix();
-            
-
-            glPushMatrix(); {
-                tkSetColor(tk::gui::color::LIME);
-                char fps_str[256];
-                sprintf(fps_str, "FPS: %.2f", ImGui::GetIO().Framerate);
-                tkDrawText(fps_str, tk::common::Vector3<float>{0.62, +0.9, 0},
-                                    tk::common::Vector3<float>{0, 0, 0},
-                                    tk::common::Vector3<float>{0.06, 0.06, 0.0});
-            } glPopMatrix();
-
-                       
-            // draw 2d GUI 1
-            ImGui::SetNextWindowCollapsed(true, ImGuiCond_FirstUseEver);
-            if (show_demo_window)
-                ImGui::ShowDemoWindow(&show_demo_window);
-
-
         }
 
         void setCloud(Eigen::MatrixXf *cloud) { this->cloud = cloud; }
         void setAngle(float angle) { this->angle = angle; tf = tk::common::odom2tf(0, 0, angle); }
-        void setSpeed(float speed) { this->speedometer_speed = speed; }
 
 };
 
@@ -151,9 +143,7 @@ void *update_th(void *data) {
         }
 
         viewer->setAngle(angle);
-        viewer->setSpeed(speed);
-
-        viewer->plotManger->addPoint("test", tk::common::Vector3<float>{3.0f*cos(angle), 3.0f*sin(angle), 0});
+        //viewer->plotManger->addPoint("test", tk::common::Vector3<float>{3.0f*cos(angle), 3.0f*sin(angle), 0});
 
 
         rate.wait();
@@ -194,9 +184,6 @@ int main( int argc, char** argv){
     // update thread
     pthread_t       t0;
     pthread_create(&t0, NULL, update_th, NULL);
-
-    // fake loading
-    sleep(2);
 
     viewer->joinThread();
     pthread_join(t0, NULL);
