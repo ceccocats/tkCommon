@@ -87,7 +87,7 @@ add_library(tkMath SHARED src/math/CSpline.cpp src/math/CSpline2D.cpp src/math/C
 #-------------------------------------------------------------------------------
 add_executable(tkGUI_simple app/tkGUI_simple.cpp)
 target_link_libraries(tkGUI_simple tkCommon ${GUI_LIBS})
-
+#[[
 add_executable(tkCommon_cmd app/tkCommon_cmd.cpp)
 target_link_libraries(tkCommon_cmd tkCommon)
 
@@ -132,6 +132,4 @@ install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" # source directory
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/data/" # source directory
         DESTINATION "share/tkCommon/data"
 )
-
-
-
+#]]
