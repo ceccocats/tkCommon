@@ -192,7 +192,7 @@ typedef enum { OPENGL_11 = 1, OPENGL_21, OPENGL_33, OPENGL_ES_20 } GlVersion;
 typedef unsigned char byte;
 
 #if defined(RLGL_STANDALONE)
-   #include "tkrlgl.h"
+   #include "rlgl_data.h"
 #endif
 
 namespace rl {
