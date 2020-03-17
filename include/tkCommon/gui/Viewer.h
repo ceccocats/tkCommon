@@ -1,6 +1,5 @@
 #pragma once
 #include <tkCommon/gui/raylib/tkrlgl.h>
-
 #include <GLFW/glfw3.h>
 #include <stdlib.h>
 #include <stdio.h>

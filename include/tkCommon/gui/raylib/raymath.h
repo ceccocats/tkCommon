@@ -99,7 +99,7 @@
 //----------------------------------------------------------------------------------
 // Types and Structures Definition
 //----------------------------------------------------------------------------------
-
+namespace rl {
 #if defined(RAYMATH_STANDALONE)
     // Vector2 type
     typedef struct Vector2 {
@@ -134,13 +134,13 @@
 // NOTE: Helper types to be used instead of array return types for *ToFloat functions
 typedef struct float3 { float v[3]; } float3;
 typedef struct float16 { float v[16]; } float16;
-
+}
 #include <math.h>       // Required for: sinf(), cosf(), sqrtf(), tan(), fabs()
 
 //----------------------------------------------------------------------------------
 // Module Functions Definition - Utils math
 //----------------------------------------------------------------------------------
-
+namespace rl {
 // Clamp float value
 RMDEF float Clamp(float value, float min, float max)
 {
@@ -1402,5 +1402,5 @@ RMDEF Quaternion QuaternionTransform(Quaternion q, Matrix mat)
 
     return result;
 }
-
+}
 #endif  // RAYMATH_H
