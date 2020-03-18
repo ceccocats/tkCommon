@@ -229,6 +229,8 @@ RLAPI void rlNormal3f(float x, float y, float z);     // Define one vertex (norm
 RLAPI void rlColor4ub(byte r, byte g, byte b, byte a);    // Define one vertex (color) - 4 byte
 RLAPI void rlColor3f(float x, float y, float z);          // Define one vertex (color) - 3 float
 RLAPI void rlColor4f(float x, float y, float z, float w); // Define one vertex (color) - 4 float
+RLAPI void rlLineWidth(float x);                          // Change LineWidth
+RLAPI void rlPointSize(float x);                          // Change LineWidth
 
 //------------------------------------------------------------------------------------
 // Functions Declaration - OpenGL equivalent functions (common to 1.1, 3.3+, ES2)
@@ -833,6 +835,9 @@ void rlNormal3f(float x, float y, float z) { glNormal3f(x, y, z); }
 void rlColor4ub(byte r, byte g, byte b, byte a) { glColor4ub(r, g, b, a); }
 void rlColor3f(float x, float y, float z) { glColor3f(x, y, z); }
 void rlColor4f(float x, float y, float z, float w) { glColor4f(x, y, z, w); }
+void rlLineWidth(float x){ glLineWidth(x); }
+void rlPointSize(float x){ glPointSize(x); }
+
 
 #elif defined(GRAPHICS_API_OPENGL_33) || defined(GRAPHICS_API_OPENGL_ES2)
 
@@ -999,6 +1004,13 @@ void rlColor3f(float x, float y, float z)
     rlColor4ub((byte)(x*255), (byte)(y*255), (byte)(z*255), 255);
 }
 
+void rlLineWidth(float x){ 
+    glLineWidth(x); 
+}
+
+void rlPointSize(float x) {
+    glPointSize(x);
+}
 #endif
 
 //----------------------------------------------------------------------------------
