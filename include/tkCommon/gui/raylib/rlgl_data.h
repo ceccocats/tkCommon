@@ -107,6 +107,19 @@ namespace rl {
         float fovy;             // Camera field-of-view apperture in Y (degrees)
     } Camera;
 
+    // Model type
+    typedef struct Model {
+        Matrix transform;       // Local transform matrix
+
+        int meshCount;          // Number of meshes
+        Mesh *meshes;           // Meshes array
+
+        int materialCount;      // Number of materials
+        Material *materials;    // Materials array
+        int *meshMaterial;      // Mesh material number
+
+    } Model;
+
     // Head-Mounted-Display device parameters
     typedef struct VrDeviceInfo {
         int hResolution;                // HMD horizontal resolution in pixels

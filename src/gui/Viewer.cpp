@@ -2,9 +2,10 @@
 #define RLGL_STANDALONE
 #define GRAPHICS_API_OPENGL_33
 #include "tkCommon/gui/raylib/rlgl.h" 
+#include "tkCommon/gui/raylib/rlgl_data.h"
+#include "tkCommon/gui/raylib/rlgl_utils.h"
 
 #include "tkCommon/gui/Viewer.h"
-#include "tkCommon/gui/OBJ_Loader.h"
 
 extern bool gRun;
 using namespace tk::gui;

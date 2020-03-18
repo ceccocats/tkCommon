@@ -18,6 +18,11 @@
 namespace tk { namespace gui {
 
     class PlotManager;
+
+    struct Manip_t {
+        tk::common::Vector3<float> pose, rot, scale;
+    };
+
     class Viewer {
 
     public:
@@ -72,51 +77,38 @@ namespace tk { namespace gui {
         static void tkSetColor(tk::gui::Color_t c, float alpha = -1);
         static void tkDrawAxis(float s = 1.0);
 
-
-        struct object3D_t {
-            GLuint tex;
-            std::vector<Eigen::MatrixXf> triangles;
-            std::vector<tk::common::Vector3<float>> colors;
-        };
-        static int  tkLoadTexture(std::string filename, GLuint &tex) {}
-        static int  tkLoadOBJ(std::string filename, object3D_t &obj) {}
-        static void tkLoadLogo(std::string filename, std::vector<common::Vector3<float>> &logo) {}
-        
+        // change coord
         static void tkApplyTf(tk::common::Tfpose tf) {}
-        static void tkDrawCircle(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = false) {}
-        static void tkDrawSphere(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = true) {}
-        static void tkDrawCloud(Eigen::MatrixXf *data) {}
-        static void tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx) {}
-        static void tkDrawCloudRGB(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int r, int g, int b) {}
-        static void tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght, float radius = -1.0, int nbSubdivisions = 12) {}
-        static void tkDrawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true) {}
-        static void tkDrawRectangle(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true) {}
+        static void tkApplyManip(Manip_t manip) {}
+
+        // load
+        static int  tkLoadTexture(std::string filename, rl::Texture2D &tex) {}
+        static int  tkLoadOBJ(std::string filename, rl::Model &obj) {}
+        static int  tkLoadShader(std::string filename, rl::Shader &shader) {}
+
+        // draw
+        static void tkDrawModel(rl::Model &obj, Manip_t manip = { {0,0,0}, {0,0,0}, {1,1,1} }) {}
+        static void tkDrawCloud(Eigen::MatrixXf points, Eigen::MatrixXf features, Manip_t manip = { {0,0,0}, {0,0,0}, {1,1,1} }) {}
         static void tkDrawLine(tk::common::Vector3<float> p0, tk::common::Vector3<float> p1) {}
         static void tkDrawLine(std::vector<tk::common::Vector3<float>> poses) {}
-        static void tkDrawPoses(std::vector<tk::common::Vector3<float>> poses, tk::common::Vector3<float> size = tk::common::Vector3<float>{0.2, 0.2, 0.2}) {}
-        static void tkDrawObject3D(object3D_t *obj, float size = 1.0, bool textured = false) {}
-        static void tkDrawTexture(GLuint tex, float sx, float sy) {}
-        static void tkDrawText(std::string text, tk::common::Vector3<float> pose,
-                           tk::common::Vector3<float> rot = tk::common::Vector3<float>{0.0, 0.0, 0.0},
-                           tk::common::Vector3<float> scale = tk::common::Vector3<float>{1.0, 1.0, 1.0}) {}
-        static void tkRainbowColor(float hue, uint8_t &r, uint8_t &g, uint8_t &b) {}
-        static void tkSetRainbowColor(float hue) {}
-        static void tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float radius) {}
-        static void tkDrawArrow(float length = 1.0, float radius = -1.0, int nbSubdivisions = 12) {}
-        static void tkViewport2D(int width, int height, int x=0, int y=0) {}
+        static void tkDrawTexture(rl::Texture2D &tex, Manip_t manip = { {0,0,0}, {0,0,0}, {1,1,1} }) {}
+        static void tkDrawText(std::string text, Manip_t manip = { {0,0,0}, {0,0,0}, {1,1,1} }) {}
+            
+        // gen
+        static void tkGenCubeModel(rl::Model &obj) {}
+        static void tkGenCloudModel(Eigen::MatrixXf points, Eigen::MatrixXf features, rl::Model &obj) {}
+        // etc etc
 
-        // data 
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        static void tkDrawTf(std::string name, tk::common::Tfpose tf) {}
-        static void tkDrawLogo(std::string file, double scale) {}
-        static void tkDrawRadarData(tk::data::RadarData *data) {}
-
-        static void tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture) {}
-        static void tkSplitPanel(int count, float ratio, float xLim, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y) {}
-
-        static void tkDrawLiDARData(tk::data::LidarData *data) {}
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+        // draw pregenerated primitives
+        void tkDrawCube(Manip_t manip = { {0,0,0}, {0,0,0}, {1,1,1} }) {
+            tkDrawModel(primitives[TK_CUBE]);
+        }
+        void tkDrawCircle(Manip_t manip = { {0,0,0}, {0,0,0}, {1,1,1} }) {
+            tkDrawModel(primitives[TK_CIRCLE]);
+        }
+        void tkDrawSphere(Manip_t manip = { {0,0,0}, {0,0,0}, {1,1,1} }) {
+            tkDrawModel(primitives[TK_SPHERE]);
+        }
 
     public:
         int   width = 800, height = 800;
@@ -139,6 +131,10 @@ namespace tk { namespace gui {
         Color_t                 background = tk::gui::color::DARK_GRAY;
         bool                    splash = false; // true if splash screen
         GLFWwindow*             window;
+
+        rl::Model               primitives[256];
+        enum Primitives_t { TK_CUBE = 0, TK_CIRCLE = 1, TK_SPHERE = 2 }; // etc.
+
 
         const char*             glsl_version = "#version 130";
 
