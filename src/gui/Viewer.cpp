@@ -11,6 +11,8 @@ extern bool gRun;
 using namespace tk::gui;
 using namespace rl;
 
+rl::Color tkCurrentColor;
+
 Viewer::Viewer() {
     // this must stay in the constructor because the file is loaded in the init function
     icon_fname = std::string(std::string(TKPROJ_PATH)+"/data/tkLogo.png");
@@ -74,13 +76,19 @@ Viewer::init() {
     rlEnableDepthTest();                                // Enable DEPTH_TEST for 3D
 
     camera = { 0 };
-    camera.position = (Vector3){ 5.0f, 5.0f, 5.0f };    // Camera position
+    camera.position = (Vector3){ 15.0f, 15.0f, 15.0f };    // Camera position
     camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };      // Camera looking at point
     camera.up = (Vector3){ 0.0f, 0.0f, 1.0f };          // Camera up vector (rotation towards target)
     camera.fovy = 60.0f;                                // Camera field-of-view Y
 
     glfwGetFramebufferSize(window, &width, &height);
     clsSuc("init with resolution " + std::to_string(width) + "x" + std::to_string(height) + "\n");
+
+    tkGenCubeModel(primitives[TK_CUBE]);
+    tkGenCircleModel(primitives[TK_CIRCLE]);
+    tkGenSphereModel(primitives[TK_SPHERE]);
+
+    tkSetColor(tk::gui::color::WHITE);
 }
 
 
@@ -170,10 +178,13 @@ Viewer::setBackground(tk::gui::Color_t c) {
 
 void 
 Viewer::tkSetColor(tk::gui::Color_t c, float alpha) {
-    if(alpha >= 0)
+    if(alpha >= 0) {
         rlColor4ub(c.r, c.g, c.b, alpha*255);
-    else
+        tkCurrentColor = { c.r, c.g, c.b, alpha*255 };
+    } else {
         rlColor4ub(c.r, c.g, c.b, c.a);
+        tkCurrentColor = { c.r, c.g, c.b, c.a };
+    }
 }
 
 void 
@@ -209,11 +220,151 @@ Viewer::errorCallback(int error, const char* description) {
     tk::tformat::printErr("Viewer", std::string{"error: "}+std::to_string(error)+" "+description+"\n");
 }
 
+void
+Viewer::tkGenModel(float *vertices, int n, rl::Model &obj) {
+    const int MAX_MESH_VBO = 7;
+    Mesh mesh = {0};
+    mesh.vboId = (unsigned int *)RL_CALLOC(MAX_MESH_VBO, sizeof(unsigned int));
+    
+    mesh.vertices = (float *)RL_MALLOC(n*3*sizeof(float));
+    memcpy(mesh.vertices, vertices, n*3*sizeof(float));
 
+    mesh.vertexCount = n;
+    mesh.triangleCount = n/3;
 
+    rl::rlLoadMesh(&mesh, false);
+    obj = rl::LoadModelFromMesh(mesh);
+}
 
+void
+Viewer::tkGenCubeModel(rl::Model &obj) {
+    const int n = 3*12;  
+    float vertices[n*3] = {
+        -0.5, -0.5, +0.5, +0.5, -0.5, +0.5, -0.5, +0.5, +0.5,
+        +0.5, +0.5, +0.5, -0.5, +0.5, +0.5, +0.5, -0.5, +0.5,
+        -0.5, -0.5, -0.5, -0.5, +0.5, -0.5, +0.5, -0.5, -0.5,
+        +0.5, +0.5, -0.5, +0.5, -0.5, -0.5, -0.5, +0.5, -0.5,
+        -0.5, +0.5, -0.5, -0.5, +0.5, +0.5, +0.5, +0.5, +0.5,
+        +0.5, +0.5, -0.5, -0.5, +0.5, -0.5, +0.5, +0.5, +0.5,
+        -0.5, -0.5, -0.5, +0.5, -0.5, +0.5, -0.5, -0.5, +0.5,
+        +0.5, -0.5, -0.5, +0.5, -0.5, +0.5, -0.5, -0.5, -0.5,
+        +0.5, -0.5, -0.5, +0.5, +0.5, -0.5, +0.5, +0.5, +0.5,
+        +0.5, -0.5, +0.5, +0.5, -0.5, -0.5, +0.5, +0.5, +0.5,
+        -0.5, -0.5, -0.5, -0.5, +0.5, +0.5, -0.5, +0.5, -0.5,
+        -0.5, -0.5, +0.5, -0.5, +0.5, +0.5, -0.5, -0.5, -0.5
+    };
+    tkGenModel(vertices, n, obj);
+}
 
+void
+Viewer::tkGenCircleModel(rl::Model &obj, int res) {
 
+    float vertices[res*9];
+    for (int j = 0; j < res; j++)   {
+        float theta = 2.0f * 3.1415926f * float(j) / float(res);//get the current angle 
+        float xr0 = 1.0 * cosf(theta);//calculate the x component 
+        float yr0 = 1.0 * sinf(theta);//calculate the y component
+        
+        theta = 2.0f * 3.1415926f * float(j+1%res) / float(res);//get the current angle 
+        float xr1 = 1.0 * cosf(theta);//calculate the x component 
+        float yr1 = 1.0 * sinf(theta);//calculate the y component
+        
+        vertices[j*9+0] = xr0;
+        vertices[j*9+1] = yr0;
+        vertices[j*9+2] = 0;
+        vertices[j*9+3] = xr1;
+        vertices[j*9+4] = yr1;
+        vertices[j*9+5] = 0;
+        vertices[j*9+6] = 0;
+        vertices[j*9+7] = 0;
+        vertices[j*9+8] = 0;
+    }
+    tkGenModel(vertices, res*3, obj);
+}
 
+void
+Viewer::tkGenSphereModel(rl::Model &obj, int res) {
 
+    std::vector<float> vertices;
+    int rings = res;
+    int slices = res;
 
+    for (int i = 0; i < (rings +2); i++) {
+        for (int j = 0; j < slices; j++) {
+            vertices.push_back(cosf(DEG2RAD*(270+(180/(rings + 1))*i))*sinf(DEG2RAD*(j*360/slices)));
+            vertices.push_back(sinf(DEG2RAD*(270+(180/(rings + 1))*i)));
+            vertices.push_back(cosf(DEG2RAD*(270+(180/(rings + 1))*i))*cosf(DEG2RAD*(j*360/slices)));
+            
+            vertices.push_back(cosf(DEG2RAD*(270+(180/(rings + 1))*(i+1)))*sinf(DEG2RAD*((j+1)*360/slices)));
+            vertices.push_back(sinf(DEG2RAD*(270+(180/(rings + 1))*(i+1))));
+            vertices.push_back(cosf(DEG2RAD*(270+(180/(rings + 1))*(i+1)))*cosf(DEG2RAD*((j+1)*360/slices)));
+            
+            vertices.push_back(cosf(DEG2RAD*(270+(180/(rings + 1))*(i+1)))*sinf(DEG2RAD*(j*360/slices)));
+            vertices.push_back(sinf(DEG2RAD*(270+(180/(rings + 1))*(i+1))));
+            vertices.push_back(cosf(DEG2RAD*(270+(180/(rings + 1))*(i+1)))*cosf(DEG2RAD*(j*360/slices)));
+            
+            vertices.push_back(cosf(DEG2RAD*(270+(180/(rings + 1))*i))*sinf(DEG2RAD*(j*360/slices)));
+            vertices.push_back(sinf(DEG2RAD*(270+(180/(rings + 1))*i)));
+            vertices.push_back(cosf(DEG2RAD*(270+(180/(rings + 1))*i))*cosf(DEG2RAD*(j*360/slices)));
+            
+            vertices.push_back(cosf(DEG2RAD*(270+(180/(rings + 1))*(i)))*sinf(DEG2RAD*((j+1)*360/slices)));
+            vertices.push_back(sinf(DEG2RAD*(270+(180/(rings + 1))*(i))));
+            vertices.push_back(cosf(DEG2RAD*(270+(180/(rings + 1))*(i)))*cosf(DEG2RAD*((j+1)*360/slices)));
+            
+            vertices.push_back(cosf(DEG2RAD*(270+(180/(rings + 1))*(i+1)))*sinf(DEG2RAD*((j+1)*360/slices)));
+            vertices.push_back(sinf(DEG2RAD*(270+(180/(rings + 1))*(i+1))));
+            vertices.push_back(cosf(DEG2RAD*(270+(180/(rings + 1))*(i+1)))*cosf(DEG2RAD*((j+1)*360/slices)));
+        }
+    }
+
+    tkGenModel(vertices.data(), vertices.size()/3, obj);
+}
+
+void
+Viewer::tkApplyManip(Manip_t manip) {
+    rlPushMatrix();
+
+    rlTranslatef(manip.pose.x, manip.pose.y, manip.pose.z);
+    rlRotatef(RAD2DEG*manip.rot.x, 1, 0, 0);
+    rlRotatef(RAD2DEG*manip.rot.y, 0, 1, 0);
+    rlRotatef(RAD2DEG*manip.rot.z, 0, 0, 1);
+    rlScalef(manip.scale.x, manip.scale.y, manip.scale.z);
+}
+
+void
+Viewer::tkApplyTf(tk::common::Tfpose tf) {
+    rlPushMatrix();
+    rlMultMatrixf(tf.matrix().data());
+}
+
+void
+Viewer::tkDeApply() {
+    rlPopMatrix();
+}
+
+void 
+Viewer::tkDrawModel(rl::Model &obj, Manip_t manip) {
+
+    tkApplyManip(manip);
+
+    rl::Color tint = tkCurrentColor;
+
+    for(int i=0; i<obj.meshCount && i<obj.materialCount; i++) {
+        
+        rl::Color color = obj.materials[obj.meshMaterial[i]].maps[MAP_DIFFUSE].color;
+
+        rl::Color colorTint = {255,255,255,255};
+        colorTint.r = (((float)color.r/255.0)*((float)tint.r/255.0))*255;
+        colorTint.g = (((float)color.g/255.0)*((float)tint.g/255.0))*255;
+        colorTint.b = (((float)color.b/255.0)*((float)tint.b/255.0))*255;
+        colorTint.a = (((float)color.a/255.0)*((float)tint.a/255.0))*255;
+
+        obj.materials[obj.meshMaterial[i]].maps[MAP_DIFFUSE].color = colorTint;
+        rl::rlDrawMesh(obj.meshes[i], obj.materials[i], obj.transform);
+
+        // restore
+        obj.materials[obj.meshMaterial[i]].maps[MAP_DIFFUSE].color = color;
+    }
+
+    tkDeApply();
+}

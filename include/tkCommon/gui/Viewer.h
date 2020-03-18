@@ -78,8 +78,9 @@ namespace tk { namespace gui {
         static void tkDrawAxis(float s = 1.0);
 
         // change coord
-        static void tkApplyTf(tk::common::Tfpose tf) {}
-        static void tkApplyManip(Manip_t manip) {}
+        static void tkApplyTf(tk::common::Tfpose tf);
+        static void tkApplyManip(Manip_t manip);
+        static void tkDeApply();
 
         // load
         static int  tkLoadTexture(std::string filename, rl::Texture2D &tex) {}
@@ -87,7 +88,7 @@ namespace tk { namespace gui {
         static int  tkLoadShader(std::string filename, rl::Shader &shader) {}
 
         // draw
-        static void tkDrawModel(rl::Model &obj, Manip_t manip = { {0,0,0}, {0,0,0}, {1,1,1} }) {}
+        static void tkDrawModel(rl::Model &obj, Manip_t manip = { {0,0,0}, {0,0,0}, {1,1,1} });
         static void tkDrawCloud(Eigen::MatrixXf points, Eigen::MatrixXf features, Manip_t manip = { {0,0,0}, {0,0,0}, {1,1,1} }) {}
         static void tkDrawLine(tk::common::Vector3<float> p0, tk::common::Vector3<float> p1) {}
         static void tkDrawLine(std::vector<tk::common::Vector3<float>> poses) {}
@@ -95,19 +96,23 @@ namespace tk { namespace gui {
         static void tkDrawText(std::string text, Manip_t manip = { {0,0,0}, {0,0,0}, {1,1,1} }) {}
             
         // gen
-        static void tkGenCubeModel(rl::Model &obj) {}
+        static void tkGenModel(float *vertices, int n, rl::Model &obj);
+        static void tkGenCircleModel(rl::Model &obj, int res = 24);
+        static void tkGenCubeModel(rl::Model &obj);
+        static void tkGenSphereModel(rl::Model &obj, int res = 16);
+
         static void tkGenCloudModel(Eigen::MatrixXf points, Eigen::MatrixXf features, rl::Model &obj) {}
         // etc etc
 
         // draw pregenerated primitives
         void tkDrawCube(Manip_t manip = { {0,0,0}, {0,0,0}, {1,1,1} }) {
-            tkDrawModel(primitives[TK_CUBE]);
+            tkDrawModel(primitives[TK_CUBE], manip);
         }
         void tkDrawCircle(Manip_t manip = { {0,0,0}, {0,0,0}, {1,1,1} }) {
-            tkDrawModel(primitives[TK_CIRCLE]);
+            tkDrawModel(primitives[TK_CIRCLE], manip);
         }
         void tkDrawSphere(Manip_t manip = { {0,0,0}, {0,0,0}, {1,1,1} }) {
-            tkDrawModel(primitives[TK_SPHERE]);
+            tkDrawModel(primitives[TK_SPHERE], manip);
         }
 
     public:

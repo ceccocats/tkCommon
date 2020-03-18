@@ -13,6 +13,11 @@ class MyViewer : public tk::gui::Viewer {
 
         void draw() {
             tk::gui::Viewer::draw();
+
+            tkSetColor(tk::gui::color::CYAN);
+            static float a = 0;
+            a+=0.01;
+            tkDrawSphere({ {0,0,0}, {0,0,a}, {6, 6, 6} });
         }
 };
 
