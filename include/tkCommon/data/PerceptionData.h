@@ -80,7 +80,8 @@ struct LinesData_t {
 public:
 
     tk::data::HeaderData header;
-    std::vector<LineData2D_t> data;
+    std::vector<LineData2D_t> data;   // filled by detection
+    std::vector<LineData3D_t> data3d; // filled by fusion
 
     static const int LINE_FIELDS = 3;
     const char  *fields[LINE_FIELDS] = {"camIdx", "type", "data"};

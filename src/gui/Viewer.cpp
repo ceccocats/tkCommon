@@ -535,10 +535,8 @@ Viewer::tkDrawCloud(Eigen::MatrixXf *points) {
 }
 
 void Viewer::tkRainbowColor(float hue, uint8_t &r, uint8_t &g, uint8_t &b) {
-    if(hue <= 0.0)
-        hue = 0.000001;
-    if(hue >= 1.0)
-        hue = 0.999999;
+
+    hue = fmod(fabs(hue), 1);
 
     int h = int(hue * 256 * 6);
     int x = h % 0x100;
@@ -567,7 +565,7 @@ void
 Viewer::tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx) {
     glBegin(GL_POINTS);
     for (int p = 0; p < points->cols(); p++) {
-        float i = float(features->coeff(idx, p))/255.0;
+        float i = float(features->coeff(idx, p))/2;
         tkSetRainbowColor(i);
 
         Eigen::Vector4f v = points->col(p);
