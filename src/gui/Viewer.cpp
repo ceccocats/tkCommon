@@ -1073,8 +1073,8 @@ Viewer::tkDrawTf(std::string name, tk::common::Tfpose tf) {
     tk::gui::Viewer::tkDrawText(name,
                                 tk::common::Vector3<float>{0.01,0.01,0},
                                 tk::common::Vector3<float>{M_PI/2,0,0},
-                                tk::common::Vector3<float>{0.15,0.15,0});
-    tk::gui::Viewer::tkDrawAxis(0.2);
+                                tk::common::Vector3<float>{0.08,0.08,0});
+    tk::gui::Viewer::tkDrawAxis(0.1);
     glPopMatrix();
 }
 

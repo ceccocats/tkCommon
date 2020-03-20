@@ -8,8 +8,9 @@
 #include <fstream>
 #include <tkCommon/terminalFormat.h>
 
-#define tkASSERT(X) tk::exceptions::check_error(X,__FILE__,__FUNCTION__,__LINE__);
-#define tkFATAL(X) tk::exceptions::raise_error(X,__FILE__,__FUNCTION__,__LINE__);
+
+#define tkASSERT(...) tk::exceptions::check_error(__FILE__,__FUNCTION__,__LINE__,__VA_ARGS__);
+#define tkFATAL(X) tk::exceptions::raise_error(__FILE__,__FUNCTION__,__LINE__,X);
 
 namespace tk{
 
@@ -28,22 +29,21 @@ namespace tk{
                 sigaction(SIGSEGV, &sa, NULL);
             }
 
-            inline static void check_error(bool status,const char *file, const char *funz, int line){
+            inline static void check_error(const char *file, const char *funz, int line, bool status, std::string msg = ""){
                 
                 if(status == false){
-
-                    tk::tformat::printErr("tkAssert",std::string{"Error at line "}+std::to_string(line)+" in funtion "+funz+" at "+file+"\n");
-                    sign_handler(0, 0, 0);
+                    if(msg != "")
+                        tk::tformat::printErr("tkAssert", msg+"\n");
+                    tk::tformat::printErr("tkAssert", "function: "+std::string(funz)+" at "+file+":"+ std::to_string(line)+"\n");
                     exit(-1);
                 }
             }
 
-            inline static void raise_error(std::string msg, const char *file, const char *funz, int line) {
-                std::cout<<msg<<"\n";
-                std::cout<<"file: "<<file<<" function: "<<funz<<" line: "<<line<<"\n";
+            inline static void raise_error(const char *file, const char *funz, int line, std::string msg) {
+                tk::tformat::printErr("tkFatal", msg+"\nfunction: "+std::string(funz)+" at "+file+":"+ std::to_string(line)+"\n");
                 exit(-1);
             }
-            
+        
         private:
 
             static std::string ssystem (std::string command) {

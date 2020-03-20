@@ -203,10 +203,10 @@ namespace tk { namespace communication {
         }else{
             int err = ::close(soc);
             if(err == -1) {
-                printf("CAN close ERROR: %s\n", strerror(errno));
+                clsErr(std::string("CAN close ERROR: ") + strerror(errno) + "\n");
                 return false;
             } else {
-                printf("CAN closed\n");
+                clsMsg("CAN closed\n");
                 return true;
             }
         }
