@@ -63,12 +63,14 @@ add_library(tkGUI SHARED
     src/gui/imgui_impl_glfw.cpp
     src/gui/imgui_impl_opengl3.cpp
     src/common.cpp
+    src/version.cpp
 )
 target_link_libraries(tkGUI tklibDrawText ${GUI_LIBS})
 
 add_library(tkCommon SHARED
     src/common.cpp
-    src/CmdParser.cpp
+    src/version.cpp
+    src/CmdParser.cpp    
 )
 target_link_libraries(tkCommon tkGUI yaml-cpp matio dl)
 
@@ -81,6 +83,30 @@ add_library(tkCommunication SHARED
 target_link_libraries(tkCommunication pcap)
 
 add_library(tkMath SHARED src/math/CSpline.cpp src/math/CSpline2D.cpp src/math/CSpline3D.cpp)
+
+
+#-------------------------------------------------------------------------------
+# GIT version autoupdate
+#-------------------------------------------------------------------------------
+include_directories(${CMAKE_CURRENT_BINARY_DIR}) # to find the file on build dir
+
+set(defineCMD "\\\#define TKVERSION_GIT \\\"") 
+execute_process(COMMAND git status RESULT_VARIABLE ISNT_GIT_REPO)
+if( NOT ${ISNT_GIT_REPO})
+    message("GIT VERSIONING SYSTEM")
+    # write git version to file
+    add_custom_target(tkversiongit_tmp COMMAND echo ${defineCMD}`git log --format="%h" -n 1`"\\\"" > tkversion_git.tmp)
+else()
+    message("THIS IS NOT A GIT REPO, VERSIONING IS DISABLED")
+    add_custom_target(tkversiongit_tmp COMMAND echo ${defineCMD}"000000\\\"" > tkversion_git.tmp)
+endif()
+
+# copy only if it is changed (this solves useless recompiles)
+add_custom_target(tkversiongit COMMAND rsync --checksum tkversion_git.tmp tkversion_git.h)
+add_dependencies(tkversiongit tkversiongit_tmp)
+add_dependencies(tkCommon tkversiongit)
+add_dependencies(tkGUI tkversiongit)
+
 
 #-------------------------------------------------------------------------------
 # Build apps

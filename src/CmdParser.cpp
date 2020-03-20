@@ -111,7 +111,8 @@ void CmdParser::printUsage(std::string name) {
         std::cout << opts[i].info << "\n";
     }
 
-    std::cout<<"Version: "<<tk::common::tkVersionGit()<<" (git)\n";
+    std::string ver = tk::common::tkVersionGit();
+    std::cout<<"Version (git): "<<ver<<"\n";
 }
 
 void CmdParser::print() {

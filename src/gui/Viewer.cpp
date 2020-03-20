@@ -276,7 +276,7 @@ Viewer::run() {
                                 logo[i].y * 0.2f - yLim + margin,
                                 -0.9f}, 0.005, 50, true);
 
-                    tkDrawText("version: " + std::to_string(tk::common::tkVersionGit()),
+                    tkDrawText("version: " + tk::common::tkVersionGit(),
                             tk::common::Vector3<float>{xLim - margin*1.55f, -yLim + margin/10, -0.9f},
                             tk::common::Vector3<float>{0,0,0},
                             tk::common::Vector3<float>{0.035,0.035,0});
@@ -1071,8 +1071,8 @@ Viewer::tkDrawTf(std::string name, tk::common::Tfpose tf) {
     tk::gui::Viewer::tkDrawText(name,
                                 tk::common::Vector3<float>{0.01,0.01,0},
                                 tk::common::Vector3<float>{M_PI/2,0,0},
-                                tk::common::Vector3<float>{0.15,0.15,0});
-    tk::gui::Viewer::tkDrawAxis(0.2);
+                                tk::common::Vector3<float>{0.08,0.08,0});
+    tk::gui::Viewer::tkDrawAxis(0.1);
     glPopMatrix();
 }
 
