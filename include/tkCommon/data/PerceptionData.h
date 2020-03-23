@@ -1,6 +1,7 @@
 #pragma once
 #include "tkCommon/common.h"
-#include "tkCommon/data/HeaderData.h"
+#include "tkCommon/data/SensorData.h"
+#include "tkCommon/data/VehicleData.h"
 #include <vector>
 
 ///////////////////////////////////////////////in fondo la vecchia
@@ -362,6 +363,39 @@ typedef std::vector<rotatedBox3D> rotatedBox3DsData;
  * @brief road sign vector
  */
 typedef std::vector<roadSing> roadSingsData;
+
+
+class perceptionData : public tk::data::SensorData{
+    public:
+
+        std::vector<rotatedBox3DsData>  boxs;
+        std::vector<roadSingsData>      signs;
+        std::vector<lanesData>          lanes;
+        tk::data::VehicleData           veh;
+        
+
+        void init() override {
+            tk::data::SensorData::init();
+            veh.init();
+        }
+
+        void release() override {}
+
+        bool checkDimension(SensorData *s) override {
+            return true;//TODO
+        }
+
+        perceptionData& operator=(const perceptionData &s) {
+            SensorData::operator=(s);
+
+            this->boxs  = s.boxs;
+            this->signs = s.signs;
+            this->lanes = s.lanes;
+            this->veh   = s.veh;
+
+            return *this;
+         }
+};
 
 
 }
