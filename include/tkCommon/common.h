@@ -154,6 +154,8 @@ namespace tk { namespace common {
                 os << "v4(" << v.x <<", "<< v.y <<", "<< v.z <<", "<< v.i <<")";
                 return os;
             }  
+
+            bool isZero() { return x == 0 && y == 0 && z == 0 && i == 0; } 
     };
 
 
@@ -223,6 +225,8 @@ namespace tk { namespace common {
                 os << "v3(" << v.x <<", "<< v.y <<", "<< v.z <<")";
                 return os;
             }  
+
+            bool isZero() { return x == 0 && y == 0 && z == 0; }
     };
 
     /**
@@ -263,6 +267,8 @@ namespace tk { namespace common {
                 os << "v2(" << v.x <<", "<< v.y <<")";
                 return os;
             }  
+
+            bool isZero() { return x == 0 && y == 0; } 
     };
 
     /**

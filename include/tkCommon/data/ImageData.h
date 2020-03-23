@@ -116,6 +116,7 @@ namespace tk{namespace data{
                     data[i*width*4 + j*4 + 0] = tmp[j*height + i + height*width*0];
                     data[i*width*4 + j*4 + 1] = tmp[j*height + i + height*width*1];
                     data[i*width*4 + j*4 + 2] = tmp[j*height + i + height*width*2];
+                    data[i*width*4 + j*4 + 3] = 255;
             }
             return true;
         }
