@@ -94,5 +94,30 @@ namespace tk{namespace data{
             }
             return var;
         }
+
+        bool fromMatVar(matvar_t *var) {
+            tkASSERT(var->data_type == MAT_T_UINT8);
+            tkASSERT(var->rank == 3);
+            int h = var->dims[0];
+            int w = var->dims[1];
+            int c = var->dims[2];
+            tkASSERT(h>0);
+            tkASSERT(w>0);
+            tkASSERT(c==3);
+            release();
+            init(w, h, 4);
+            
+            // allocated by libmatio
+            uint8_t *tmp = (uint8_t *)var->data;
+
+            // RRR...,GGG...,BBB..., -> RGBA,RGBA,RGBA,...
+            for(int i=0; i<height; i++)
+            for(int j=0; j<width; j++) {
+                    data[i*width*4 + j*4 + 0] = tmp[j*height + i + height*width*0];
+                    data[i*width*4 + j*4 + 1] = tmp[j*height + i + height*width*1];
+                    data[i*width*4 + j*4 + 2] = tmp[j*height + i + height*width*2];
+            }
+            return true;
+        }
     };
 }}

@@ -79,33 +79,6 @@ T clamp(T val, T min, T max) {
 }
 
 /**
- * Load YAML node from file
- * @param conf_file
- * @return
- */
-inline YAML::Node loadYAMLconf(std::string conf_file) {
-    return YAML::LoadFile(conf_file);
-}
-
-/**
- * Get configuration from YAML node
- * @tparam T
- * @param conf yaml node
- * @param key configuration KEY
- * @param defaultVal defalt value in case of no KEY found
- * @return conf value
- */
-template<typename T>
-inline T getYAMLconf(YAML::Node conf, std::string key, T defaultVal) {
-    T val = defaultVal;
-    if(conf && conf[key]) {
-        val = conf[key].as<T>();
-    }
-    //std::cout<<"YAML "<<key<<", val: "<<val<<"\n";
-    return val;
-}
-
-/**
  *   Class for loop rate at a certain delta time
  *   in microsecs
  */
