@@ -10,19 +10,19 @@ namespace tk { namespace data {
 class ActuationData{
     public:
         double steerAngle;
-        double accelX;
+        double accel;
         double speed;
         double torque;
 
-        void init(double steerAngle, double accelX, double speed, double torque)
+        void init(double steerAngle, double accel, double speed, double torque)
 	    : steerAngle(steerAngle)
-        , accelX(accelX)
+        , accel(accel)
         , speed(speed)
         , torque(torque){};
 
         ActuationData& operator=(const ActuationData& a){
             this->steerAngle = a.steerAngle;
-            this->accelX = a.accelX;
+            this->accel = a.accel;
             this->speed = a.speed;
             this->torque = a.torque;
 
