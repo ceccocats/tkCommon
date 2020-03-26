@@ -4,24 +4,61 @@
 
 namespace tk { namespace data {
 
+    class sensorName{
+
+    public:
+        enum Value : uint8_t{
+        NOT_SPEC    = 0,
+        LIDAR       = 1
+        };
+
+        /**
+         * @brief   method for convert id to lane string name
+         */
+        std::string toString(){
+            if(value == sensorName::NOT_SPEC)   return std::string{"not specified"};
+            if(value == sensorName::LIDAR)      return std::string{"lidar"};
+            //if(value == sensorName::OTHER)   return std::string{"other"};
+            //if(value == sensorName::SOLID)   return std::string{"solid"};
+            return std::string{"type error"};
+        }
+
+        bool operator!=(sensorName::Value v) noexcept {
+            return v != value;
+        }
+
+        bool operator==(sensorName::Value v) noexcept {
+            return v == value;
+        }
+
+        void operator=(sensorName::Value v) noexcept {
+            value = v;
+        }
+
+    private:
+        sensorName::Value value;
+    };
+
+
     /**
      * @brief Header data class.
      * Standard metadata for higher-level data class.
      */
     class HeaderData {
     public:
+        sensorName          sensor;
         timeStamp_t         stamp = 0;      /**< Time stamp, expressed in millisecond. */
-        std::string         name;       /**< Name of the sensor. */
-        tk::common::Tfpose  tf;         /**< TF in respect to back axel, @see tk::common::Tfpose. */
-        int                 sensorID;   /**< ID of the sensor. */
-        int                 messageID;  /**< Incremental message counter. */
+        std::string         name;           /**< Name of the sensor. */
+        tk::common::Tfpose  tf;             /**< TF in respect to back axel, @see tk::common::Tfpose. */
+        int                 sensorID;       /**< ID of the sensor. */
+        int                 messageID;      /**< Incremental message counter. */
 
         void init() {
             this->stamp         = 0;
             this->tf            = tk::common::Tfpose::Identity();
             this->sensorID      = 0;
             this->messageID     = 0;
-            this->name          = "sensor";
+            this->sensor        = sensorName::NOT_SPEC;
         }
 
         /**
