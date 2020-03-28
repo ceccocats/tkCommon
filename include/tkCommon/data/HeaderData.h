@@ -9,7 +9,9 @@ namespace tk { namespace data {
     public:
         enum Value : uint8_t{
         NOT_SPEC    = 0,
-        LIDAR       = 1
+        LIDAR       = 1,
+        VEHICLE     = 2,
+        GPS         = 3
         };
 
         /**
@@ -18,6 +20,7 @@ namespace tk { namespace data {
         std::string toString(){
             if(value == sensorName::NOT_SPEC)   return std::string{"not specified"};
             if(value == sensorName::LIDAR)      return std::string{"lidar"};
+            if(value == sensorName::VEHICLE)    return std::string{"vehicle"};
             //if(value == sensorName::OTHER)   return std::string{"other"};
             //if(value == sensorName::SOLID)   return std::string{"solid"};
             return std::string{"type error"};
