@@ -11,7 +11,8 @@ namespace tk { namespace data {
         NOT_SPEC    = 0,
         LIDAR       = 1,
         VEHICLE     = 2,
-        GPS         = 3
+        GPS         = 3,
+        CAMDATA     = 4,
         };
 
         /**
