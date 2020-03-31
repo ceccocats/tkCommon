@@ -13,6 +13,7 @@ namespace tk { namespace data {
         VEHICLE     = 2,
         GPS         = 3,
         CAMDATA     = 4,
+        RADAR       = 5
         };
 
         /**
@@ -22,8 +23,9 @@ namespace tk { namespace data {
             if(value == sensorName::NOT_SPEC)   return std::string{"not specified"};
             if(value == sensorName::LIDAR)      return std::string{"lidar"};
             if(value == sensorName::VEHICLE)    return std::string{"vehicle"};
-            //if(value == sensorName::OTHER)   return std::string{"other"};
-            //if(value == sensorName::SOLID)   return std::string{"solid"};
+            if(value == sensorName::GPS)        return std::string{"gps"};
+            if(value == sensorName::CAMDATA)    return std::string{"camera"};
+            if(value == sensorName::RADAR)      return std::string{"radar"};
             return std::string{"type error"};
         }
 
@@ -33,6 +35,10 @@ namespace tk { namespace data {
 
         bool operator==(sensorName::Value v) noexcept {
             return v == value;
+        }
+
+        bool operator==(sensorName &s) noexcept {
+            return s.value == value;
         }
 
         void operator=(sensorName::Value v) noexcept {
