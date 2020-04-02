@@ -13,7 +13,8 @@ namespace tk { namespace data {
         VEHICLE     = 2,
         GPS         = 3,
         CAMDATA     = 4,
-        RADAR       = 5
+        RADAR       = 5,
+        LINES       = 6
         };
 
         /**
@@ -35,6 +36,10 @@ namespace tk { namespace data {
 
         bool operator==(sensorName::Value v) noexcept {
             return v == value;
+        }
+
+        bool operator!=(sensorName &s) noexcept {
+            return s.value != value;
         }
 
         bool operator==(sensorName &s) noexcept {

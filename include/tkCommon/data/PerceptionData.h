@@ -474,10 +474,22 @@ typedef LineData_t<tk::common::Vector3<float>> LineData3D_t;
 typedef BoundaryData_t<tk::common::Vector2<float>> BoundaryData2D_t;
 typedef BoundaryData_t<tk::common::Vector3<float>> BoundaryData3D_t;
 
-struct LinesData_t {
+class LinesData_t : public tk::data::SensorData {
 public:
-    tk::data::HeaderData header;
     std::vector<LineData3D_t> data;
+
+        void init() {
+            SensorData::init();
+            header.sensor = tk::data::sensorName::LINES;
+        }
+
+        void release(){
+            return;
+        }
+
+        bool checkDimension(SensorData *s){
+            return true;
+        }
 
     matvar_t *toMatVar(std::string name = "lines") {
         size_t dims[] = {data.size(), 1};
