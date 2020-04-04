@@ -8,6 +8,7 @@
 #include <iomanip>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include "utils.h"
 
 #define clsName(X) (tk::tformat::printErr(abi::__cxa_demangle(typeid(*this).name());
 
