@@ -490,6 +490,26 @@ Viewer::tkDrawAxis(float s) {
 }
 
 void 
+Viewer::tkDrawTriangle(tk::common::Vector3<float> a, tk::common::Vector3<float> b, tk::common::Vector3<float> c, bool filled) {
+
+    if(filled) {
+        glBegin(GL_TRIANGLES);
+        glVertex3f(a.x, a.y, a.z);
+        glVertex3f(b.x, b.y, b.z);
+        glVertex3f(c.x, c.y, c.z);
+        glEnd();
+    } else {
+        glBegin(GL_LINES);
+        glVertex3f(a.x, a.y, a.z);
+        glVertex3f(b.x, b.y, b.z);
+        glVertex3f(c.x, c.y, c.z);
+        glVertex3f(a.x, a.y, a.z);
+        glEnd();
+    }
+}
+
+
+void 
 Viewer::tkDrawCircle(tk::common::Vector3<float> pose, float r, int res, bool filled) {
 
     int res_1 = res;

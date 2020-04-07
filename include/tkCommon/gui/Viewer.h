@@ -98,6 +98,7 @@ namespace tk { namespace gui {
         static void tkSetColor(tk::gui::Color_t c, float alpha = -1);
         static void tkApplyTf(tk::common::Tfpose tf);
         static void tkDrawAxis(float s = 1.0);
+        static void tkDrawTriangle(tk::common::Vector3<float> a, tk::common::Vector3<float> b, tk::common::Vector3<float> c, bool filled = false);
         static void tkDrawCircle(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = false);
         static void tkDrawSphere(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = true);
         static void tkDrawCloud(Eigen::MatrixXf *data);
