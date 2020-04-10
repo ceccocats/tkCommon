@@ -67,6 +67,38 @@ namespace tk { namespace common {
         else
             return false;
     }
+    
+
+    /**
+     * Convert odometry to TfPose
+     * @param x   translation forward
+     * @param y   translation sideways
+     * @param yaw rotation
+     * @return transform
+     */
+    Tfpose odom2tf(float x, float y, float yaw);
+
+    /**
+     * Convert odometry to TfPose
+     * @param x   translation forward
+     * @param y   translation sideways
+     * @param yaw rotation
+     * @return transform
+     */
+    Tfpose odom2tf(float x, float y, float z, float yaw);
+
+    /**
+     * Convert odometry to TfPose
+     * @param x   translation forward
+     * @param y   translation sideways
+     * @param z   translation upward
+     * @param roll  rotation x axle
+     * @param pitch rotation y axle
+     * @param yaw   rotation z axle
+     * @return transform
+     */
+    Tfpose odom2tf(float x, float y, float z, float roll, float pitch, float yaw);
+
 
     /**
      * Rect [ x y w h ]
@@ -227,7 +259,16 @@ namespace tk { namespace common {
             }  
 
             bool isZero() { return x == 0 && y == 0 && z == 0; }
-    };
+
+            void applyTf(tk::common::Tfpose tf) {
+                tk::common::Tfpose ptf = tk::common::odom2tf(x, y, z, 0, 0, 0);
+                ptf = tf * ptf;
+                x = ptf.matrix()(0, 3);
+                y = ptf.matrix()(1, 3);
+                z = ptf.matrix()(2, 3);
+                return;
+            }
+     };
 
     /**
      * Vector of 2 elements [ x y ]
@@ -270,36 +311,6 @@ namespace tk { namespace common {
 
             bool isZero() { return x == 0 && y == 0; } 
     };
-
-    /**
-     * Convert odometry to TfPose
-     * @param x   translation forward
-     * @param y   translation sideways
-     * @param yaw rotation
-     * @return transform
-     */
-    Tfpose odom2tf(float x, float y, float yaw);
-
-    /**
-     * Convert odometry to TfPose
-     * @param x   translation forward
-     * @param y   translation sideways
-     * @param yaw rotation
-     * @return transform
-     */
-    Tfpose odom2tf(float x, float y, float z, float yaw);
-
-    /**
-     * Convert odometry to TfPose
-     * @param x   translation forward
-     * @param y   translation sideways
-     * @param z   translation upward
-     * @param roll  rotation x axle
-     * @param pitch rotation y axle
-     * @param yaw   rotation z axle
-     * @return transform
-     */
-    Tfpose odom2tf(float x, float y, float z, float roll, float pitch, float yaw);
 
     /**
      * Read odometry from ifstream as a TfPose

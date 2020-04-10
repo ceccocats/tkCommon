@@ -66,6 +66,11 @@ namespace tk { namespace gui {
         void addPoint(std::string id, tk::common::Vector3<float> pt) {
             plots[id].points.add(pt);
         }
+        
+        void addPoints(std::string id, std::vector<tk::common::Vector3<float>> pts) {
+            for(int i=0; i<pts.size(); i++)
+                plots[id].points.add(pts[i]);
+        }
 
         void drawPlots() {
             // Iterate through all elements in std::map

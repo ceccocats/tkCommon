@@ -31,6 +31,8 @@ public:
 
     tk::common::Vector3<float> calc_position(double s, double d=0);
 
+    std::vector<tk::common::Vector3<float>> calc_points(double step);
+
 private:
     /**
         calc s

@@ -83,4 +83,15 @@ tk::common::Vector3<float> CSpline3D::calc_position(double s, double d) {
     return p;
 }
 
+std::vector<tk::common::Vector3<float>> CSpline3D::calc_points(double step) {
+
+    std::vector<tk::common::Vector3<float>> pts;
+
+    for(float s = s_start; s<s_end; s+=step) {
+        pts.push_back(calc_position(s));
+    }
+    return pts;
+}
+
+
 }}
