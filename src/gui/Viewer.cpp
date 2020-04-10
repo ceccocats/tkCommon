@@ -42,7 +42,7 @@ Viewer::init() {
 
 #if GLFW_VERSION_MAJOR >= 3
 #if GLFW_VERSION_MINOR >= 2
-    glfwMaximizeWindow(window);
+    //glfwMaximizeWindow(window);
 
     unsigned w, h;
     unsigned err = lodepng_decode32_file(&(icons[0].pixels), &w, &h, icon_fname.c_str());
