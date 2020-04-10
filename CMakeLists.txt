@@ -117,6 +117,9 @@ target_link_libraries(tkGUI_simple tkCommon ${GUI_LIBS})
 add_executable(tkCommon_cmd app/tkCommon_cmd.cpp)
 target_link_libraries(tkCommon_cmd tkCommon)
 
+add_executable(tkCommon_matio app/tkCommon_matio.cpp)
+target_link_libraries(tkCommon_matio tkCommon)
+
 add_executable(tkCommon_eth_pcap app/tkCommon_eth_pcap.cpp)
 target_link_libraries(tkCommon_eth_pcap tkCommon tkCommunication)
 
