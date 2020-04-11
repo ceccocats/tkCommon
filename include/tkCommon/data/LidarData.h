@@ -37,6 +37,7 @@ namespace tk { namespace data {
             this->nPoints = 0;
             this->points.resize(4,CLOUD_MAX_POINTS);
             this->intensity.resize(1,CLOUD_MAX_POINTS);
+            this->idMatrix.resize(0,0);
             header.sensor = sensorName::LIDAR;
             MAX_INTENSITY = 255;
         }
@@ -57,8 +58,8 @@ namespace tk { namespace data {
          * @param v_layers vertical layers
          */
         void initIdMatrix(int o_layers, int v_layers){
-            this->idMatrix.resize(v_layers,o_layers);
-            this->idMatrix.setConstant(v_layers,o_layers,-1);
+            this->idMatrix.resize(o_layers,v_layers);
+            this->idMatrix.setConstant(o_layers,v_layers,-1);
             header.name = sensorName::LIDAR;
         }
         /**
