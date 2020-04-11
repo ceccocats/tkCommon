@@ -49,7 +49,7 @@ namespace tk { namespace data {
          */
         void init(int o_layers, int v_layers){
             this->init();
-            this->initIdMatrix(v_layers,o_layers);
+            this->initIdMatrix(o_layers,v_layers);
         }
         /**
          * @brief Initialization method for idMatrix and setting to -1
