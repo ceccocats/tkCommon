@@ -56,9 +56,24 @@ public:
         std::map<std::string, var_t> fields;
 
         void print(int level = 0) {
+            if(var->name == NULL)
+                return;
+
             for(int i=0; i<level; i++)
                 std::cout<<"|   ";
-            std::cout<<var->name<<"\n";
+            std::cout<<var->name;
+
+            if(var->class_type == MAT_C_STRUCT) {
+                std::cout<<":";
+            } else if(var->class_type == MAT_C_CELL) {
+                std::cout<<" {"<<var->dims[0]<<", "<<var->dims[1]<<"}";
+
+            } else if(var->rank == 2) {
+                if(var->dims[0] != 1 || var->dims[1] != 1)
+                    std::cout<<" ("<<var->dims[0]<<", "<<var->dims[1]<<")";
+            }
+            std::cout<<"\n";
+
             for(auto f: fields)
                 f.second.print(level+1);
         }
@@ -154,10 +169,17 @@ public:
                     parseMatVar(ivar, v.fields[names[i]]);
             }
         }
-
-        // parse data
-        if(var->class_type >= MAT_C_DOUBLE && var->class_type <= MAT_C_UINT64) {
-
+        // parse cell
+        else if(var->class_type == MAT_C_CELL) {
+            int n = var->dims[0];
+            for(int i=0; i<n; i++) {
+                matvar_t *ivar = Mat_VarGetCell(var, i);
+                if(ivar != NULL) {
+                    if(ivar->name == NULL)
+                        ivar->name = strdup( std::to_string(i).c_str() );
+                    parseMatVar(ivar, v.fields[std::to_string(i)]);
+                }
+            }
         }
     }
 
@@ -176,13 +198,16 @@ public:
         var_t v;
         parseMatVar(var, v);
         v.print();
+
+        /*
         double id = 0;
         if(v["data"]["gps"]["accX"].get(id))
             std::cout<<id<<"\n";
 
         Eigen::MatrixXf tf;
         if(v["tf"].get(tf))
-            std::cout<<tf<<"\n";     
+            std::cout<<tf<<"\n";  
+        */   
 
         Mat_VarFree(var);
         return true;
