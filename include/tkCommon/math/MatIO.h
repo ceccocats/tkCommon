@@ -28,17 +28,18 @@ struct _mat_t {
 namespace tk { namespace  math {
 
 template <typename Tp> struct matio_type;
-template <> struct matio_type<int8_t>   { typedef int8_t type;   static const matio_types tid = MAT_T_INT8; };
-template <> struct matio_type<uint8_t>  { typedef uint8_t type;  static const matio_types tid = MAT_T_UINT8; };
-template <> struct matio_type<int16_t>  { typedef int16_t type;  static const matio_types tid = MAT_T_INT16; };
-template <> struct matio_type<uint16_t> { typedef uint16_t type; static const matio_types tid = MAT_T_UINT16; };
-template <> struct matio_type<int32_t>  { typedef int32_t type;  static const matio_types tid = MAT_T_INT32; };
-template <> struct matio_type<uint32_t> { typedef uint32_t type; static const matio_types tid = MAT_T_UINT32; };
-template <> struct matio_type<float>    { typedef float type;    static const matio_types tid = MAT_T_SINGLE; };
-template <> struct matio_type<double>   { typedef double type;   static const matio_types tid = MAT_T_DOUBLE; };
-template <> struct matio_type<long double> { typedef double type; static const matio_types tid = MAT_T_DOUBLE; };
-template <> struct matio_type<int64_t>  { typedef int64_t type;  static const matio_types tid = MAT_T_INT64; };
-template <> struct matio_type<uint64_t> { typedef uint64_t type; static const matio_types tid = MAT_T_UINT64; };
+template <> struct matio_type<int8_t>   { typedef int8_t type;    static const matio_types tid = MAT_T_INT8;   static const matio_classes cid = MAT_C_INT8;   };
+template <> struct matio_type<uint8_t>  { typedef uint8_t type;   static const matio_types tid = MAT_T_UINT8;  static const matio_classes cid = MAT_C_UINT8;  };
+template <> struct matio_type<int16_t>  { typedef int16_t type;   static const matio_types tid = MAT_T_INT16;  static const matio_classes cid = MAT_C_INT16;  };
+template <> struct matio_type<uint16_t> { typedef uint16_t type;  static const matio_types tid = MAT_T_UINT16; static const matio_classes cid = MAT_C_UINT16; };
+template <> struct matio_type<int32_t>  { typedef int32_t type;   static const matio_types tid = MAT_T_INT32;  static const matio_classes cid = MAT_C_INT32;  };
+template <> struct matio_type<uint32_t> { typedef uint32_t type;  static const matio_types tid = MAT_T_UINT32; static const matio_classes cid = MAT_C_UINT32; };
+template <> struct matio_type<int64_t>  { typedef int64_t type;   static const matio_types tid = MAT_T_INT64;  static const matio_classes cid = MAT_C_INT64;  };
+template <> struct matio_type<uint64_t> { typedef uint64_t type;  static const matio_types tid = MAT_T_UINT64; static const matio_classes cid = MAT_C_UINT64; };
+template <> struct matio_type<float>    { typedef float type;     static const matio_types tid = MAT_T_SINGLE; static const matio_classes cid = MAT_C_SINGLE; };
+template <> struct matio_type<double>   { typedef double type;    static const matio_types tid = MAT_T_DOUBLE; static const matio_classes cid = MAT_C_DOUBLE; };
+template <> struct matio_type<long double> { typedef double type; static const matio_types tid = MAT_T_DOUBLE; static const matio_classes cid = MAT_C_DOUBLE; };
+
 
 /**
     Mat reader class
@@ -52,10 +53,12 @@ private:
 public:
 
     struct var_t {
-        matvar_t *var;
+        matvar_t *var = NULL;
         std::map<std::string, var_t> fields;
 
         void print(int level = 0) {
+            if(var == NULL)
+                return;
             if(var->name == NULL)
                 return;
 
@@ -68,14 +71,26 @@ public:
             } else if(var->class_type == MAT_C_CELL) {
                 std::cout<<" {"<<var->dims[0]<<", "<<var->dims[1]<<"}";
 
-            } else if(var->rank == 2) {
-                if(var->dims[0] != 1 || var->dims[1] != 1)
-                    std::cout<<" ("<<var->dims[0]<<", "<<var->dims[1]<<")";
+            } else if(var->dims[0] != 1 || var->dims[1] != 1) {
+                std::cout<<" (";
+                for(int i=0; i<var->rank; i++) {
+                    std::cout<<var->dims[i];
+                    if(i < var->rank-1)
+                        std::cout<<", ";
+                }
+                std::cout<<")";
             }
             std::cout<<"\n";
 
             for(auto f: fields)
                 f.second.print(level+1);
+        }
+
+        void release() {
+            if(var != NULL)
+                Mat_VarFree(var);
+            var = NULL;
+            fields.clear();
         }
 
         var_t& operator[](std::string s) {
@@ -111,7 +126,6 @@ public:
             memcpy(&val, var->data, var->data_size);
             return true;
         }
-
         bool get(Eigen::MatrixXf &mat) {
             if(!check(var, MAT_T_SINGLE, 2))
                 return false;
@@ -126,8 +140,65 @@ public:
             memcpy(mat.data(), var->data, mat.size()*var->data_size);
             return true;
         }
+        bool get(tk::common::MatrixXu8 &mat) {
+            if(!check(var, MAT_T_UINT8, 2))
+                return false;
+            mat.resize(var->dims[0], var->dims[1]);
+            memcpy(mat.data(), var->data, mat.size()*var->data_size);
+            return true;
+        }     
 
+        template <class T>
+        bool set(std::string name, T &val) {
+            matio_type<T> mat_type;
+            release();
+            size_t dim[2] = { 1, 1 }; // 1x1, single value
+            var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, &val, 0);
+            return true;
+        }   
+        bool set(std::string name, Eigen::MatrixXf &mat) {
+            release();
+            size_t dim[2] = { mat.rows(), mat.cols() }; // 1x1, single value
+            var = Mat_VarCreate(name.c_str(), MAT_C_SINGLE, MAT_T_SINGLE, 2, dim, mat.data(), 0);
+            return true;
+        }
+        bool set(std::string name, Eigen::MatrixXd &mat) {
+            release();
+            size_t dim[2] = { mat.rows(), mat.cols() }; // 1x1, single value
+            var = Mat_VarCreate(name.c_str(), MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dim, mat.data(), 0);
+            return true;
+        }
+        bool set(std::string name, tk::common::MatrixXu8 &mat) {
+            release();
+            size_t dim[2] = { mat.rows(), mat.cols() }; // 1x1, single value
+            var = Mat_VarCreate(name.c_str(), MAT_C_UINT8, MAT_T_UINT8, 2, dim, mat.data(), 0);
+            return true;
+        }
+
+        bool setStruct(std::string name, std::vector<var_t> fields) {
+            release();
+            size_t dim[2] = { 1, 1 }; // create 1x1 struct
+            const char *names[fields.size()];
+            for(int i=0; i<fields.size(); i++) 
+                names[i] = fields[i].var->name;
+            var = Mat_VarCreateStruct(name.c_str(), 2, dim, names, fields.size()); //main struct: Data
+
+            for(int i=0; i<fields.size(); i++) {
+                Mat_VarSetStructFieldByName(var, fields[i].var->name, 0, fields[i].var); //0 for first row
+                this->fields[std::string(fields[i].var->name)] = fields[i];
+            }
+        }
     };
+
+    bool create(std::string mat_dir) {
+        
+        matfp = Mat_CreateVer(mat_dir.c_str(), NULL, MAT_FT_MAT5);
+        if(matfp == NULL) {
+            clsErr("can't create file: " + mat_dir + "\n");
+            return false;
+        }
+        return true;
+    }
 
     bool open(std::string mat_dir) {
 
@@ -153,6 +224,8 @@ public:
 
     void close() {
         if(matfp != NULL) Mat_Close(matfp);
+        matfp = NULL;
+        fposes.clear();
     }
 
     void parseMatVar(matvar_t *var, var_t &v) {
@@ -183,7 +256,10 @@ public:
         }
     }
 
-    bool readVar(std::string key) {
+    bool readVar(std::string key, var_t &v) {
+        if(matfp == NULL)
+            return false;
+
         if(fposes.count(key) == 0)
             return false;
         
@@ -195,22 +271,14 @@ public:
         if(var == NULL)
             return false;
 
-        var_t v;
         parseMatVar(var, v);
-        v.print();
-
-        /*
-        double id = 0;
-        if(v["data"]["gps"]["accX"].get(id))
-            std::cout<<id<<"\n";
-
-        Eigen::MatrixXf tf;
-        if(v["tf"].get(tf))
-            std::cout<<tf<<"\n";  
-        */   
-
-        Mat_VarFree(var);
         return true;
+    }
+
+    bool writeVar(var_t &var) {
+        if(matfp == NULL)
+            return false;
+        Mat_VarWrite(matfp, var.var, MAT_COMPRESSION_NONE);
     }
 
     void stats() {
