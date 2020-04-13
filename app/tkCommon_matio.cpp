@@ -19,15 +19,27 @@ int main( int argc, char** argv){
     Eigen::MatrixXf c; c.resize(2, 2); c << 1, 2, 3, 4;
     structFields[0].set("a", a);
     structFields[1].set("b", b);
-    //structFields[2].set("c", c.matrix());
+    structFields[2].set("c", c);
 
     tk::math::MatIO::var_t structVar;
     structVar.setStruct("lol", structFields);
     structVar.print();
 
+    int readA;
+    double readB;
+    Eigen::MatrixXf readC;
+    structVar["a"].get(readA);
+    structVar["b"].get(readB);
+    structVar["c"].get(readC);
+    std::cout<<readA<<"\n";
+    std::cout<<readB<<"\n";
+    std::cout<<readC<<"\n";
+
+
     mat.writeVar(structVar);
     structVar.release();
 
+    
     /*
     mat.open(matfile);
     mat.stats();

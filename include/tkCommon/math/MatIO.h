@@ -118,7 +118,7 @@ public:
             }
         }
 
-        template <class T>
+        template <typename T>
         bool get(T &val) {
             matio_type<T> mat_type;
             if(!check(var, mat_type.tid, 2, true))
@@ -126,29 +126,18 @@ public:
             memcpy(&val, var->data, var->data_size);
             return true;
         }
-        bool get(Eigen::MatrixXf &mat) {
-            if(!check(var, MAT_T_SINGLE, 2))
+        template<typename T>
+        bool get(Eigen::Matrix<T,-1,-1> &mat) {
+            matio_type<T> mat_type;
+            if(!check(var, mat_type.tid, 2))
                 return false;
             mat.resize(var->dims[0], var->dims[1]);
             memcpy(mat.data(), var->data, mat.size()*var->data_size);
             return true;
         }
-        bool get(Eigen::MatrixXd &mat) {
-            if(!check(var, MAT_T_DOUBLE, 2))
-                return false;
-            mat.resize(var->dims[0], var->dims[1]);
-            memcpy(mat.data(), var->data, mat.size()*var->data_size);
-            return true;
-        }
-        bool get(tk::common::MatrixXu8 &mat) {
-            if(!check(var, MAT_T_UINT8, 2))
-                return false;
-            mat.resize(var->dims[0], var->dims[1]);
-            memcpy(mat.data(), var->data, mat.size()*var->data_size);
-            return true;
-        }     
+   
 
-        template <class T>
+        template <typename T>
         bool set(std::string name, T &val) {
             matio_type<T> mat_type;
             release();
@@ -156,22 +145,12 @@ public:
             var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, &val, 0);
             return true;
         }   
-        bool set(std::string name, Eigen::MatrixXf &mat) {
+        template<typename T>
+        bool set(std::string name, Eigen::Matrix<T,-1,-1> &mat) {
+            matio_type<T> mat_type;
             release();
             size_t dim[2] = { mat.rows(), mat.cols() }; // 1x1, single value
-            var = Mat_VarCreate(name.c_str(), MAT_C_SINGLE, MAT_T_SINGLE, 2, dim, mat.data(), 0);
-            return true;
-        }
-        bool set(std::string name, Eigen::MatrixXd &mat) {
-            release();
-            size_t dim[2] = { mat.rows(), mat.cols() }; // 1x1, single value
-            var = Mat_VarCreate(name.c_str(), MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dim, mat.data(), 0);
-            return true;
-        }
-        bool set(std::string name, tk::common::MatrixXu8 &mat) {
-            release();
-            size_t dim[2] = { mat.rows(), mat.cols() }; // 1x1, single value
-            var = Mat_VarCreate(name.c_str(), MAT_C_UINT8, MAT_T_UINT8, 2, dim, mat.data(), 0);
+            var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, mat.data(), 0);
             return true;
         }
 
@@ -179,8 +158,13 @@ public:
             release();
             size_t dim[2] = { 1, 1 }; // create 1x1 struct
             const char *names[fields.size()];
-            for(int i=0; i<fields.size(); i++) 
+            for(int i=0; i<fields.size(); i++) {
+                if(fields[i].var == NULL) {
+                    clsErr("provided NULL field while creating struct: " + name  + "\n");
+                    return false;
+                }
                 names[i] = fields[i].var->name;
+            }
             var = Mat_VarCreateStruct(name.c_str(), 2, dim, names, fields.size()); //main struct: Data
 
             for(int i=0; i<fields.size(); i++) {
