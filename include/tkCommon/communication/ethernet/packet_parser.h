@@ -68,7 +68,7 @@ bool parse_UDP_packet(const unsigned char *packet, unsigned int capture_len, PCA
     }
 
 	if (ip->ip_p != IPPROTO_UDP) {
-	    std::cout<<"NON UDP packet: "<<int(ip->ip_p)<<"\n";
+	    //std::cout<<"NON UDP packet: "<<int(ip->ip_p)<<"\n";
 		return false;
     }
 

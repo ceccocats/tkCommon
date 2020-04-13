@@ -31,6 +31,8 @@ namespace tk { namespace data {
         void init() override {
             SensorData::init();
 
+            header.sensor = sensorName::GPS;
+
             // GPS
             lat     = 0;
             lon     = 0;

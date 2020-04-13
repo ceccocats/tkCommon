@@ -102,6 +102,7 @@ namespace tk { namespace data {
 
         void init() override{
             tk::data::SensorData::init();
+            header.sensor = sensorName::VEHICLE;
         }
 
         void release() override {}
