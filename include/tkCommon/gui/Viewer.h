@@ -58,11 +58,11 @@ namespace tk { namespace gui {
 
             ts = getTimeStamp();
 
-            clsSuc("start viz thread\n");
+            //clsSuc("start viz thread\n");
             init_mutex.lock();
             pthread_create(&thread, NULL, threadCaller, (void*)this);
             init_mutex.lock();
-            clsSuc("viz thread initted\n");
+            //clsSuc("viz thread initted\n");
             init_mutex.unlock();
         }
 
@@ -80,7 +80,7 @@ namespace tk { namespace gui {
             splash = false;
 
             pthread_join(thread, NULL);
-            clsSuc("end viz thread\n");
+            clsSuc("closed\n");
         }
 
         void setSplashTime(float t) {
