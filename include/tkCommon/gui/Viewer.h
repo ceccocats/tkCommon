@@ -15,9 +15,11 @@
 #include "tkCommon/gui/imgui_impl_glfw.h"
 #include "tkCommon/gui/imgui_impl_opengl3.h"
 
-#include "tkCommon/data/RadarData.h"
-#include "tkCommon/data/LidarData.h"
-#include "tkCommon/data/ImageData.h"
+//#include "tkCommon/data/RadarData.h"
+//#include "tkCommon/data/LidarData.h"
+//#include "tkCommon/data/ImageData.h"
+
+#include <tkCommon/gui/Drawable.h>
 
 #include "tkCommon/gui/libdrawtext/drawtext.h"
 
@@ -122,12 +124,14 @@ namespace tk { namespace gui {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         static void tkDrawTf(std::string name, tk::common::Tfpose tf);
         static void tkDrawLogo(std::string file, double scale);
-        static void tkDrawRadarData(tk::data::RadarData *data);
+        //static void tkDrawRadarData(tk::data::RadarData *data);
 
-        static void tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture);
+        //static void tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture);
         static void tkSplitPanel(int count, float ratio, float xLim, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y);
 
-        static void tkDrawLiDARData(tk::data::LidarData *data);
+		void add(std::string name, Drawable *data);
+
+        //static void tkDrawLiDARData(tk::data::LidarData *data);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         static void tkViewport2D(int width, int height, int x=0, int y=0);
@@ -166,6 +170,11 @@ namespace tk { namespace gui {
 
         // tex
         GLuint                  hipertTex;
+
+		//std::vector<tk::gui::Drawable *> 	drawBuffer;
+		//std::vector<bool> 					drawFlags;
+
+		std::map<std::string, Drawable*> drawBuffer;
 
 
     private:

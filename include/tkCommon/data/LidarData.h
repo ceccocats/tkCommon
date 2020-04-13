@@ -99,5 +99,23 @@ namespace tk { namespace data {
         bool checkDimension(SensorData *s){
             return true;
         }
+
+        void draw(){
+        	glPushMatrix();{
+				tk::gui::Viewer::tkApplyTf(header.tf);
+				glPointSize(1.0);
+				glBegin(GL_POINTS);
+				//white
+				tk::gui::Viewer::tkSetColor(tk::gui::color::WHITE);
+
+				for (int p = 0; p < nPoints; p++) {
+					float i = float(intensity(p))/MAX_INTENSITY;
+					tk::gui::Viewer::tkSetRainbowColor(i);
+					glVertex3f(points.coeff(0,p),points.coeff(1,p),points.coeff(2,p));
+				}
+				glEnd();
+        	}
+        	glPopMatrix();
+        }
     };
 }}
