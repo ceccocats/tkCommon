@@ -163,7 +163,7 @@ public:
             return true;
         }
         bool get(std::string &vec) {
-            matio_type<int8_t> mat_type;
+            matio_type<uint8_t> mat_type;
             if(!check(var, mat_type.tid, 2))
                 return false;
             vec.resize(var->dims[0]*var->dims[1]);

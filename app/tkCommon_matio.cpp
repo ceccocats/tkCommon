@@ -24,7 +24,7 @@ int main( int argc, char** argv){
     structFields[3].set("d", d);
 
     tk::math::MatIO::var_t structVar;
-    structVar.setCells("lol", structFields);
+    structVar.setStruct("lol", structFields);
     structVar.print();
     mat.writeVar(structVar);
     structVar.release();
@@ -43,12 +43,20 @@ int main( int argc, char** argv){
     structVar["b"].get(readB);
     structVar["c"].get(readC);
     structVar["d"].get(readD);
+
     std::cout<<readA<<"\n";
     std::cout<<readB<<"\n";
     std::cout<<readC<<"\n";
     std::cout<<readD<<"\n";
 
-    
+    /*
+    // img2buffer 
+    std::vector<uint8_t> buf;
+    cv::imencode(".jpg", m, buf);
+    // buffer2img
+    cv::Mat readM = cv::imdecode(buf, cv::IMREAD_UNCHANGED);
+    */
+   
     /*
     mat.open(matfile);
     mat.stats();
