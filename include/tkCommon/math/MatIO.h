@@ -135,6 +135,23 @@ public:
             memcpy(mat.data(), var->data, mat.size()*var->data_size);
             return true;
         }
+        template<typename T>
+        bool get(std::vector<T> &vec) {
+            matio_type<T> mat_type;
+            if(!check(var, mat_type.tid, 2))
+                return false;
+            vec.resize(var->dims[0]*var->dims[1]);
+            memcpy(vec.data(), var->data, vec.size()*var->data_size);
+            return true;
+        }
+        bool get(std::string &vec) {
+            matio_type<int8_t> mat_type;
+            if(!check(var, mat_type.tid, 2))
+                return false;
+            vec.resize(var->dims[0]*var->dims[1]);
+            memcpy( (void*)vec.data(), var->data, vec.size()*var->data_size);
+            return true;
+        }
    
 
         template <typename T>
@@ -151,6 +168,20 @@ public:
             release();
             size_t dim[2] = { mat.rows(), mat.cols() }; // 1x1, single value
             var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, mat.data(), 0);
+            return true;
+        }
+        template<typename T>
+        bool set(std::string name, std::vector<T> &vec) {
+            matio_type<T> mat_type;
+            release();
+            size_t dim[2] = { vec.size(), 1 }; // 1x1, single value
+            var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, vec.data(), 0);
+            return true;
+        }
+        bool set(std::string name, std::string &vec) {
+            release();
+            size_t dim[2] = { 1, vec.size() }; // 1x1, single value
+            var = Mat_VarCreate(name.c_str(), MAT_C_CHAR, MAT_T_INT8, 2, dim, (void*)vec.data(), 0);
             return true;
         }
 
