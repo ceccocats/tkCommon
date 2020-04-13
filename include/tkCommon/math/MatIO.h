@@ -93,6 +93,22 @@ public:
             fields.clear();
         }
 
+        std::string name() {
+            if(var == NULL)
+                return "null";
+            return var->name;
+        }
+
+        int size() {
+            return fields.size();
+        }
+
+        var_t& operator()(int i) {
+            std::string s = std::to_string(i);
+            tkASSERT(fields.count(s) > 0);
+            return fields[s];   
+        }
+
         var_t& operator[](std::string s) {
             tkASSERT(fields.count(s) > 0);
             return fields[s];
@@ -100,6 +116,8 @@ public:
 
         bool check(matvar_t *var, matio_types tid, int rank, bool unary = false) {
             if(var == NULL)
+                return false;
+            if(var->data == NULL)
                 return false;
             if(var->data_type != tid) {
                 clsErr("Unable to read value in var " + std::string(var->name) +"\n");
@@ -187,7 +205,6 @@ public:
 
         bool setStruct(std::string name, std::vector<var_t> fields) {
             release();
-            size_t dim[2] = { 1, 1 }; // create 1x1 struct
             const char *names[fields.size()];
             for(int i=0; i<fields.size(); i++) {
                 if(fields[i].var == NULL) {
@@ -196,12 +213,37 @@ public:
                 }
                 names[i] = fields[i].var->name;
             }
+            size_t dim[2] = { 1, 1 }; // create 1x1 struct
             var = Mat_VarCreateStruct(name.c_str(), 2, dim, names, fields.size()); //main struct: Data
+            if(var == NULL)
+                return false;
 
             for(int i=0; i<fields.size(); i++) {
                 Mat_VarSetStructFieldByName(var, fields[i].var->name, 0, fields[i].var); //0 for first row
                 this->fields[std::string(fields[i].var->name)] = fields[i];
             }
+            return true;
+        }
+
+        bool setCells(std::string name, std::vector<var_t> fields) {
+            release();
+            matvar_t *cells[fields.size()];
+            for(int i=0; i<fields.size(); i++) {
+                if(fields[i].var == NULL) {
+                    clsErr("provided NULL field while creating struct: " + name  + "\n");
+                    return false;
+                }
+                cells[i] = fields[i].var;
+            }
+            size_t dim[2] = { fields.size(), 1 }; // create 1x1 struct
+            var = Mat_VarCreate(name.c_str(),MAT_C_CELL,MAT_T_CELL,2,dim,cells,0);
+            if(var == NULL)
+                return false;
+                
+            for(int i=0; i<fields.size(); i++) {
+                this->fields[std::to_string(i)] = fields[i];
+            }
+            return true;
         }
     };
 
@@ -259,7 +301,7 @@ public:
         }
         // parse cell
         else if(var->class_type == MAT_C_CELL) {
-            int n = var->dims[0];
+            int n = var->dims[0]*var->dims[1];
             for(int i=0; i<n; i++) {
                 matvar_t *ivar = Mat_VarGetCell(var, i);
                 if(ivar != NULL) {

@@ -24,9 +24,17 @@ int main( int argc, char** argv){
     structFields[3].set("d", d);
 
     tk::math::MatIO::var_t structVar;
-    structVar.setStruct("lol", structFields);
+    structVar.setCells("lol", structFields);
     structVar.print();
+    mat.writeVar(structVar);
+    structVar.release();
+    mat.close();
 
+    
+    mat.open(matfile);
+    mat.readVar("lol", structVar);
+    structVar.print();
+ 
     int readA;
     double readB;
     Eigen::MatrixXf readC;
@@ -39,10 +47,6 @@ int main( int argc, char** argv){
     std::cout<<readB<<"\n";
     std::cout<<readC<<"\n";
     std::cout<<readD<<"\n";
-
-
-    mat.writeVar(structVar);
-    structVar.release();
 
     
     /*
