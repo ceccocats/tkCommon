@@ -33,7 +33,7 @@ set(CUDA_nppisu_LIBRARY ${CUDA_TOOLKIT_ROOT_DIR}/targets/${cuda_target_full_path
 set(CUDA_nppitc_LIBRARY ${CUDA_TOOLKIT_ROOT_DIR}/targets/${cuda_target_full_path}/lib/stubs/libnppitc.so)
 set(CUDA_npps_LIBRARY ${CUDA_TOOLKIT_ROOT_DIR}/targets/${cuda_target_full_path}/lib/stubs/libnpps.so)
 set(CUDA_cusolver_LIBRARY ${CUDA_TOOLKIT_ROOT_DIR}/targets/${cuda_target_full_path}/lib/stubs/libcusolver.so)
-set(CUDA_cudadevrt_LIBRARY ${CUDA_TOOLKIT_ROOT_DIR}/targets/${cuda_target_full_path}/libcudadevrt.a)
+set(CUDA_cudadevrt_LIBRARY ${CUDA_TOOLKIT_ROOT_DIR}/targets/${cuda_target_full_path}/lib/libcudadevrt.a)
 
 include_directories(/usr/include/aarch64-linux-gnu/)
 include_directories(${CMAKE_SYSROOT}/usr/local/include)
