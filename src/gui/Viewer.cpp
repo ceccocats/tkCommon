@@ -129,6 +129,17 @@ Viewer::init() {
     clsSuc("init with resolution " + std::to_string(width) + "x" + std::to_string(height) + "\n");
 }
 
+void
+Viewer::add(std::string name, Drawable *data){
+	auto search = drawBuffer.find(name);
+	if (search != drawBuffer.end()) {
+		drawBuffer[name] = data;
+	} else {
+		drawBuffer.insert(std::pair<std::string,Drawable*>(name,data));
+	}
+
+}
+
 
 void 
 Viewer::draw() {
@@ -146,6 +157,14 @@ Viewer::draw() {
     tkDrawAxis();
     glPopMatrix();
 
+	for (std::map<std::string,Drawable*>::iterator it = drawBuffer.begin(); it!=drawBuffer.end(); ++it){
+		it->second->draw();
+	}
+
+	tk::gui::Viewer::tkViewport2D(width, height);
+	for (std::map<std::string,Drawable*>::iterator it = drawBuffer.begin(); it!=drawBuffer.end(); ++it){
+		it->second->draw2D(width,height,xLim,yLim);
+	}
 
 }
 
@@ -779,7 +798,7 @@ Viewer::tkDrawText(std::string text, tk::common::Vector3<float> pose, tk::common
     
     glPopMatrix();
 }
-
+/*
 void 
 Viewer::tkDrawRadarData(tk::data::RadarData *data) {
     tk::common::Vector3<float> pose;
@@ -877,7 +896,7 @@ Viewer::tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture)
         }
     }
 }
-
+*/
 
 void
 Viewer::tkSplitPanel(int count, float ratio, float xLim, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y){
