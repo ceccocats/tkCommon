@@ -153,7 +153,7 @@ void *update_th(void *data) {
         viewer->setAngle(angle);
         viewer->setSpeed(speed);
 
-        viewer->plotManger->addPoint("test", tk::common::Vector3<float>{3.0f*cos(angle), 3.0f*sin(angle), 0});
+        viewer->plotManger->addPoint("test", tk::common::Vector3<float>{3.0f*(float)cos(angle), 3.0f*(float)sin(angle), 0});
 
 
         rate.wait();

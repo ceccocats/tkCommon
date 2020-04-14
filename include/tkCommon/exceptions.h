@@ -50,7 +50,7 @@ namespace tk{
                 std::string tmpname = "temp.txt";
                 std::string scommand = command;
                 std::string cmd = scommand + " >> " + tmpname;
-                std::system(cmd.c_str());
+                int err = std::system(cmd.c_str());
                 std::ifstream file(tmpname, std::ios::in | std::ios::binary );
                 std::string result;
                 if (file) {
