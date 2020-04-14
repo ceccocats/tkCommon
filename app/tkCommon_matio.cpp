@@ -22,7 +22,6 @@ int main( int argc, char** argv){
     cmd.print();
 
     tk::math::MatIO mat;
-    /*
     mat.create(matfile);
 
     //tk::math::MatIO::var_t var;
@@ -30,21 +29,30 @@ int main( int argc, char** argv){
     //mat.write(var);
     //var.release();
 
-    std::vector<tk::math::MatIO::var_t> structFields(4);
-    int a = 24;
-    double b = 2.5564;
-    Eigen::MatrixXf c; c.resize(2, 2); c << 1, 2, 3, 4;
-    std::string d = "Ciao ciao !!! lol";
-    structFields[0].set("a", a);
-    structFields[1].set("b", b);
-    structFields[2].set("c", c);
-    structFields[3].set("d", d);
+    //std::vector<tk::math::MatIO::var_t> structFields(4);
+    //int a = 24;
+    //double b = 2.5564;
+    //Eigen::MatrixXf c; c.resize(2, 2); c << 1, 2, 3, 4;
+    //std::string d = "Ciao ciao !!! lol";
+    //structFields[0].set("a", a);
+    //structFields[1].set("b", b);
+    //structFields[2].set("c", c);
+    //structFields[3].set("d", d);
 
-    tk::math::MatIO::var_t structVar;
-    structVar.setStruct("lol", structFields);
-    mat.write(structVar);
+    //tk::math::MatIO::var_t structVar;
+    //structVar.setStruct("lol", structFields);
+    //mat.write(structVar);
+
+    tk::common::Tfpose tf = tk::common::Tfpose::Identity();
+    Eigen::MatrixXd matProva; matProva.resize(30, 40);
+    tk::math::MatIO::var_t tfVar;
+    tfVar.set("tf", tf.matrix());
+    tfVar.set("tf", matProva);
+
+    mat.write(tfVar);
+    tfVar.release();
     mat.close();
-*/
+
     
     mat.open(matfile);
     mat.stats();

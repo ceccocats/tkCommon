@@ -197,8 +197,8 @@ public:
             memcpy(&val, var->data, var->data_size);
             return true;
         }
-        template<typename T>
-        bool get(Eigen::Matrix<T,-1,-1> &mat) {
+        template<typename T, int A, int B>
+        bool get(Eigen::Matrix<T, A, B> &mat) {
             matio_type<T> mat_type;
             if(!check(var, mat_type.tid, 2))
                 return false;
@@ -233,8 +233,8 @@ public:
             var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, &val, 0);
             return true;
         }   
-        template<typename T>
-        bool set(std::string name, Eigen::Matrix<T,-1,-1> &mat) {
+        template<typename T, int A, int B>
+        bool set(std::string name, Eigen::Matrix<T, A, B> &mat) {
             matio_type<T> mat_type;
             release();
             size_t dim[2] = { mat.rows(), mat.cols() }; // 1x1, single value
