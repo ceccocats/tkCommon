@@ -21,7 +21,10 @@ namespace tk{namespace data{
         static bool fullscreen;
         int index = 0;
 
-        void init(){}
+        void init(){
+            SensorData::init();
+            header.name = sensorName::CAMDATA;
+        }
 
         void init(int w, int h, int ch){
         	SensorData::init();
@@ -32,6 +35,7 @@ namespace tk{namespace data{
             channels = ch;
             data = new T[width*height*channels];
             mtx->unlock();
+            header.name = sensorName::CAMDATA;
         }
 
         bool empty() {return channels == 0 || width == 0 || height == 0 || data == nullptr; }

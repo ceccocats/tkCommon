@@ -6,7 +6,7 @@ static void HandleError( cudaError_t err,
                          const char *file,
                          int line ) {
     if (err != cudaSuccess) {
-        printf( "%s in %s at line %d\n", cudaGetErrorString( err ),
+        printf( "%s in %s:%d:0\n", cudaGetErrorString( err ),
                 file, line );
         exit( EXIT_FAILURE );
     }
@@ -50,8 +50,8 @@ class tkMatrixCuda{
             HANDLE_ERROR( cudaMalloc(&d_rows, sizeof(int)) );
             HANDLE_ERROR( cudaMalloc(&d_cols, sizeof(int)) );
 
-            HANDLE_ERROR( cudaMemcpy(&d_rows, &rows, sizeof(int), cudaMemcpyHostToDevice) );
-            HANDLE_ERROR( cudaMemcpy(&d_cols, &cols, sizeof(int), cudaMemcpyHostToDevice) );
+            HANDLE_ERROR( cudaMemcpy(d_rows, &rows, sizeof(int), cudaMemcpyHostToDevice) );
+            HANDLE_ERROR( cudaMemcpy(d_cols, &cols, sizeof(int), cudaMemcpyHostToDevice) );
 
             return true;
         }
@@ -79,8 +79,8 @@ class tkMatrixCuda{
                 HANDLE_ERROR( cudaMalloc(&data, max_size * sizeof(T)) );
             }
 
-            HANDLE_ERROR( cudaMemcpy(&d_rows, &rows, sizeof(int), cudaMemcpyHostToDevice) );
-            HANDLE_ERROR( cudaMemcpy(&d_cols, &cols, sizeof(int), cudaMemcpyHostToDevice) );
+            HANDLE_ERROR( cudaMemcpy(d_rows, &rows, sizeof(int), cudaMemcpyHostToDevice) );
+            HANDLE_ERROR( cudaMemcpy(d_cols, &cols, sizeof(int), cudaMemcpyHostToDevice) );
             h_rows = rows;
             h_cols = cols;
         }
@@ -174,7 +174,7 @@ class tkPinnedMatrix{
         set(int r, int c,T value ){ data[r+c*h_rows] = value; }
 
         __host__ void
-        close(){ HANDLE_ERROR( cudaFree(data) ); }
+        close(){ delete data; }
 
 };
 

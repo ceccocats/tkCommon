@@ -16,6 +16,8 @@ namespace tk{namespace gui{
 
 	class DrawBuffer : public Drawable{
 
+	public:
+
 		std::vector<Drawable *> buffer;
 
 		virtual void draw() {

@@ -2,7 +2,7 @@
 
 #include "tkCommon/gui/Viewer.h"
 
-namespace tk{ namespace commmon{
+namespace tk{ namespace common{
 
 	class Polygon : public tk::gui::Drawable{
 	public:
