@@ -4,6 +4,17 @@
 #include <thread>
 #include <signal.h>
 
+class TestDump : public tk::math::MatDump {
+
+    public:
+    bool fromVar(tk::math::MatIO::var_t &var) { }
+
+    bool toVar(std::string name, tk::math::MatIO::var_t &var) {
+        std::string a = "ciao";
+        var.set(name, a);
+    }
+};
+
 int main( int argc, char** argv){
 
     tk::common::CmdParser cmd(argv, "test matio");
@@ -12,6 +23,11 @@ int main( int argc, char** argv){
     
     tk::math::MatIO mat;
     mat.create(matfile);
+
+    //tk::math::MatIO::var_t var;
+    //TestDump t; t.toVar("test", var);
+    //mat.write(var);
+    //var.release();
 
     std::vector<tk::math::MatIO::var_t> structFields(4);
     int a = 24;
@@ -25,13 +41,26 @@ int main( int argc, char** argv){
 
     tk::math::MatIO::var_t structVar;
     structVar.setStruct("lol", structFields);
-    structVar.print();
     mat.write(structVar);
-    structVar.release();
     mat.close();
 
     
     mat.open(matfile);
+    mat.stats();
+
+    for(int i=0; i<mat.size(); i++) {
+        std::cout<<mat[i]<<"\n";
+
+        tk::math::MatIO::var_t var;
+        mat.read(mat[i], var);
+
+        var.print(1);
+        var.release();
+    }
+
+    mat.close();
+
+    /*
     mat.read("lol", structVar);
     structVar.print();
  
@@ -47,7 +76,7 @@ int main( int argc, char** argv){
     std::cout<<readA<<"\n";
     std::cout<<readB<<"\n";
     std::cout<<readC<<"\n";
-    std::cout<<readD<<"\n";
+    std::cout<<readD<<"\n";*/
 
     /*
     // img2buffer 

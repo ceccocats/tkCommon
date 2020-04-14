@@ -47,14 +47,22 @@ template <> struct matio_type<long double> { typedef double type; static const m
 class MatIO {
 
 private:
-    std::map<std::string, long> fposes; // map var name to position in file
+    // WARNING: fposes and fposesMas should always be updated togheder
+    std::vector<std::string> fposes;       // list of vars in file
+    std::map<std::string, long> fposesMap; // map var name to position in file
     mat_t *matfp = NULL;
 
 public:
 
     struct var_t {
-        matvar_t *var = NULL;
-        std::map<std::string, var_t> fields;
+    private:
+        matvar_t *var = NULL;  // matio raw data pointer
+
+        // WARNING: fieldMap and fields should always be updated togheder
+        std::vector<std::string> fields;        // list of fieldMap keys (for easy iteration)
+        std::map<std::string, var_t> fieldMap;  // key -> var mapping
+
+    public:
 
         void print(int level = 0) {
             if(var == NULL)
@@ -82,14 +90,27 @@ public:
             }
             std::cout<<"\n";
 
-            for(auto f: fields)
+            for(auto f: fieldMap)
                 f.second.print(level+1);
+        }
+
+        matvar_t* getRawData() {
+            return var;
+        }
+
+        void setRawData(matvar_t *var) {
+            this->var = var;
+        }
+
+        bool empty() {
+            return var == NULL;
         }
 
         void release() {
             if(var != NULL)
                 Mat_VarFree(var);
             var = NULL;
+            fieldMap.clear();
             fields.clear();
         }
 
@@ -100,18 +121,18 @@ public:
         }
 
         int size() {
-            return fields.size();
+            tkASSERT(fieldMap.size() == fields.size());
+            return fieldMap.size();
         }
 
-        var_t& operator()(int i) {
-            std::string s = std::to_string(i);
-            tkASSERT(fields.count(s) > 0);
-            return fields[s];   
+        std::string operator[](int i) {
+            tkASSERT(i < fields.size());
+            return fields[i];
         }
 
         var_t& operator[](std::string s) {
-            tkASSERT(fields.count(s) > 0);
-            return fields[s];
+            tkASSERT(fieldMap.count(s) > 0);
+            return fieldMap[s];
         }
 
         bool check(matvar_t *var, matio_types tid, int rank, bool unary = false) {
@@ -220,8 +241,11 @@ public:
 
             for(int i=0; i<fields.size(); i++) {
                 Mat_VarSetStructFieldByName(var, fields[i].var->name, 0, fields[i].var); //0 for first row
-                this->fields[std::string(fields[i].var->name)] = fields[i];
+                std::string key = std::string(fields[i].var->name);
+                this->fieldMap[key] = fields[i];
+                this->fields.push_back(key);
             }
+            tkASSERT(this->fieldMap.size() == this->fields.size());
             return true;
         }
 
@@ -241,13 +265,17 @@ public:
                 return false;
                 
             for(int i=0; i<fields.size(); i++) {
-                this->fields[std::to_string(i)] = fields[i];
+                std::string key = std::to_string(i);
+                this->fieldMap[key] = fields[i];
+                this->fields.push_back(key);
             }
+            tkASSERT(this->fieldMap.size() == this->fields.size());
             return true;
         }
     };
 
     bool create(std::string mat_dir) {
+        close();
         
         matfp = Mat_CreateVer(mat_dir.c_str(), NULL, MAT_FT_MAT5);
         if(matfp == NULL) {
@@ -258,6 +286,7 @@ public:
     }
 
     bool open(std::string mat_dir) {
+        close();
 
         matfp = Mat_Open(mat_dir.c_str(), MAT_ACC_RDWR);
         if(matfp == NULL) {
@@ -265,17 +294,21 @@ public:
             return false;
         }
 
-        // build fposes map
+        // build fposesMap map
         while(true) {
             long fpos = ftell((FILE*)matfp->fp);
             matvar_t *var = Mat_VarReadNextInfo(matfp);
             if(var == NULL)
                 break;
-            fposes[var->name] = fpos;
+
+            std::string key = var->name; 
+            fposes.push_back(key);
+            fposesMap[key] = fpos;
 
             Mat_VarFree(var);
         } 
 
+        tkASSERT(fposes.size() == fposesMap.size());
         return true;
     }
 
@@ -283,45 +316,18 @@ public:
         if(matfp != NULL) Mat_Close(matfp);
         matfp = NULL;
         fposes.clear();
-    }
-
-    void parseMatVar(matvar_t *var, var_t &v) {
-        v.var = var;
-
-        // parse struct
-        if(var->class_type == MAT_C_STRUCT) {
-            int n = Mat_VarGetNumberOfFields(var);
-            char* const* names = Mat_VarGetStructFieldnames(var);
-
-            for(int i=0; i<n; i++) {
-                matvar_t *ivar = Mat_VarGetStructFieldByIndex(var, i, 0);
-                if(ivar != NULL)
-                    parseMatVar(ivar, v.fields[names[i]]);
-            }
-        }
-        // parse cell
-        else if(var->class_type == MAT_C_CELL) {
-            int n = var->dims[0]*var->dims[1];
-            for(int i=0; i<n; i++) {
-                matvar_t *ivar = Mat_VarGetCell(var, i);
-                if(ivar != NULL) {
-                    if(ivar->name == NULL)
-                        ivar->name = strdup( std::to_string(i).c_str() );
-                    parseMatVar(ivar, v.fields[std::to_string(i)]);
-                }
-            }
-        }
+        fposesMap.clear();        
     }
 
     bool read(std::string key, var_t &v) {
         if(matfp == NULL)
             return false;
 
-        if(fposes.count(key) == 0)
+        if(fposesMap.count(key) == 0)
             return false;
         
         // seek to var position 
-        long fpos = fposes[key];
+        long fpos = fposesMap[key];
         (void)fseek((FILE*)matfp->fp, fpos, SEEK_SET);
 
         matvar_t *var = Mat_VarReadNext(matfp);
@@ -335,7 +341,7 @@ public:
     bool write(var_t &var) {
         if(matfp == NULL)
             return false;
-        Mat_VarWrite(matfp, var.var, MAT_COMPRESSION_NONE);
+        Mat_VarWrite(matfp, var.getRawData(), MAT_COMPRESSION_NONE);
     }
 
     void stats() {
@@ -343,9 +349,21 @@ public:
             clsWrn("Matfile not opened\n");
             return;
         }
+        tkASSERT(fposes.size() == fposesMap.size());
+
         clsMsg(std::string(matfp->header) + "\n");
         clsMsg("file: " + std::string(matfp->filename) + "  ( " 
-               + std::to_string(fposes.size()) + " vars )\n");
+               + std::to_string(fposesMap.size()) + " vars )\n");
+    }
+
+    int size() {
+        tkASSERT(fposes.size() == fposesMap.size());
+        return fposesMap.size();
+    }
+
+    std::string operator[](int i) {
+        tkASSERT(i < fposes.size());
+        return fposes[i];
     }
 
     template<typename T>
@@ -360,13 +378,57 @@ public:
     }
 
     template<typename T>
-    bool write(T &v) {
+    bool write(std::string key, T &v) {
         var_t var;
-        var.set(v);
-        bool ok = write(v);
+        var.set(key, v);
+        bool ok = write(var);
         var.release();
         return ok;
     }
+
+private:
+
+    void parseMatVar(matvar_t *var, var_t &v) {
+        v.setRawData(var);
+
+        // parse struct
+        if(var->class_type == MAT_C_STRUCT) {
+            int n = Mat_VarGetNumberOfFields(var);
+            char* const* names = Mat_VarGetStructFieldnames(var);
+
+            for(int i=0; i<n; i++) {
+                matvar_t *ivar = Mat_VarGetStructFieldByIndex(var, i, 0);
+                if(ivar != NULL)
+                    parseMatVar(ivar, v[names[i]]);
+            }
+        }
+        // parse cell
+        else if(var->class_type == MAT_C_CELL) {
+            int n = var->dims[0]*var->dims[1];
+            for(int i=0; i<n; i++) {
+                matvar_t *ivar = Mat_VarGetCell(var, i);
+                if(ivar != NULL) {
+                    if(ivar->name == NULL)
+                        ivar->name = strdup( std::to_string(i).c_str() );
+
+                    std::string i_str = std::to_string(i);
+                    parseMatVar(ivar, v[i_str]);
+                }
+            }
+        }
+    }
 };
+
+class MatDump {
+    public: 
+
+    virtual bool fromVar(MatIO::var_t &var) {
+        tkFATAL("Not implemented");
+    }
+    virtual bool   toVar(std::string name, MatIO::var_t &var) {
+        tkFATAL("Not implemented");
+    }
+};
+
 
 }}
