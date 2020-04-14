@@ -88,6 +88,8 @@ namespace tk { namespace data {
             this->sensorID      = s.sensorID;
             this->messageID     = s.messageID;
             this->name          = s.name;
+
+            return *this;
         }
     };
 }}

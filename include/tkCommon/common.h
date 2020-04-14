@@ -491,6 +491,8 @@ namespace tk { namespace common {
 
         //Close file
         Mat_Close(matfp);
+
+        return true;
     }
 
 

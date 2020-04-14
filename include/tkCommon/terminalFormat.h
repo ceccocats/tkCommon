@@ -83,7 +83,7 @@ namespace tk { namespace tformat{
     inline std::string
     formatName(std::string s){
 
-        if(s.find("::") != -1){
+        if(s.find("::") != 0){
             s = s.substr(s.find_last_of("::")+1);
         }
 
