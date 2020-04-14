@@ -20,8 +20,9 @@ int main( int argc, char** argv){
     tk::common::CmdParser cmd(argv, "test matio");
     std::string matfile = cmd.addArg("matfile", "matlab.mat", "path of the mat file");
     cmd.print();
-    
+
     tk::math::MatIO mat;
+    /*
     mat.create(matfile);
 
     //tk::math::MatIO::var_t var;
@@ -43,18 +44,15 @@ int main( int argc, char** argv){
     structVar.setStruct("lol", structFields);
     mat.write(structVar);
     mat.close();
-
+*/
     
     mat.open(matfile);
     mat.stats();
 
+    tk::math::MatIO::var_t var;
     for(int i=0; i<mat.size(); i++) {
-        std::cout<<mat[i]<<"\n";
-
-        tk::math::MatIO::var_t var;
         mat.read(mat[i], var);
-
-        var.print(1);
+        var.print();
         var.release();
     }
 

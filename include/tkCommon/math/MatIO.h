@@ -62,6 +62,28 @@ public:
         std::vector<std::string> fields;        // list of fieldMap keys (for easy iteration)
         std::map<std::string, var_t> fieldMap;  // key -> var mapping
 
+        bool check(matvar_t *var, matio_types tid, int rank, bool unary = false) {
+            if(var == NULL)
+                return false;
+            if(var->data == NULL)
+                return false;
+            if(var->data_type != tid) {
+                clsErr("Unable to read value in var " + std::string(var->name) +"\n");
+                clsErr("type check failed: " + std::to_string(var->data_type) + " != " + std::to_string(tid) + "\n");
+                return false;
+            }
+            if(var->rank != rank) {
+                clsErr("Unable to read value in var " + std::string(var->name) +"\n");
+                clsErr("Rank missmatch " + std::to_string(var->rank) + " != " + std::to_string(rank) + "\n");
+                return false;
+            }
+            if(unary && (var->dims[0] != 1 || var->dims[1] != 1) ) {
+                clsErr("Unable to read value in var " + std::string(var->name) +"\n");
+                clsErr("Dims are not unary: (" + std::to_string(var->dims[0]) + ", " + std::to_string(var->dims[1]) +")\n");
+                return false;
+            }
+        }
+
     public:
 
         void print(int level = 0) {
@@ -94,12 +116,40 @@ public:
                 f.second.print(level+1);
         }
 
-        matvar_t* getRawData() {
-            return var;
-        }
+        void parse(matvar_t *var) {
+            release();
 
-        void setRawData(matvar_t *var) {
             this->var = var;
+
+            // parse struct
+            if(var->class_type == MAT_C_STRUCT) {
+                int n = Mat_VarGetNumberOfFields(var);
+                char* const* names = Mat_VarGetStructFieldnames(var);
+
+                for(int i=0; i<n; i++) {
+                    matvar_t *ivar = Mat_VarGetStructFieldByIndex(var, i, 0);
+                    if(ivar != NULL) {
+                        std::string key = names[i];
+                        fieldMap[key].parse(ivar);
+                        fields.push_back(key);
+                    }
+                }
+            }
+            // parse cell
+            else if(var->class_type == MAT_C_CELL) {
+                int n = var->dims[0]*var->dims[1];
+                for(int i=0; i<n; i++) {
+                    matvar_t *ivar = Mat_VarGetCell(var, i);
+                    if(ivar != NULL) {
+                        if(ivar->name == NULL)
+                            ivar->name = strdup( std::to_string(i).c_str() );
+
+                        std::string key = std::to_string(i);
+                        fieldMap[key].parse(ivar);
+                        fields.push_back(key);
+                    }
+                }
+            }        
         }
 
         bool empty() {
@@ -112,6 +162,10 @@ public:
             var = NULL;
             fieldMap.clear();
             fields.clear();
+        }
+
+        matvar_t* getRawData() {
+            return var;
         }
 
         std::string name() {
@@ -133,28 +187,6 @@ public:
         var_t& operator[](std::string s) {
             tkASSERT(fieldMap.count(s) > 0);
             return fieldMap[s];
-        }
-
-        bool check(matvar_t *var, matio_types tid, int rank, bool unary = false) {
-            if(var == NULL)
-                return false;
-            if(var->data == NULL)
-                return false;
-            if(var->data_type != tid) {
-                clsErr("Unable to read value in var " + std::string(var->name) +"\n");
-                clsErr("type check failed: " + std::to_string(var->data_type) + " != " + std::to_string(tid) + "\n");
-                return false;
-            }
-            if(var->rank != rank) {
-                clsErr("Unable to read value in var " + std::string(var->name) +"\n");
-                clsErr("Rank missmatch " + std::to_string(var->rank) + " != " + std::to_string(rank) + "\n");
-                return false;
-            }
-            if(unary && (var->dims[0] != 1 || var->dims[1] != 1) ) {
-                clsErr("Unable to read value in var " + std::string(var->name) +"\n");
-                clsErr("Dims are not unary: (" + std::to_string(var->dims[0]) + ", " + std::to_string(var->dims[1]) +")\n");
-                return false;
-            }
         }
 
         template <typename T>
@@ -319,31 +351,6 @@ public:
         fposesMap.clear();        
     }
 
-    bool read(std::string key, var_t &v) {
-        if(matfp == NULL)
-            return false;
-
-        if(fposesMap.count(key) == 0)
-            return false;
-        
-        // seek to var position 
-        long fpos = fposesMap[key];
-        (void)fseek((FILE*)matfp->fp, fpos, SEEK_SET);
-
-        matvar_t *var = Mat_VarReadNext(matfp);
-        if(var == NULL)
-            return false;
-
-        parseMatVar(var, v);
-        return true;
-    }
-
-    bool write(var_t &var) {
-        if(matfp == NULL)
-            return false;
-        Mat_VarWrite(matfp, var.getRawData(), MAT_COMPRESSION_NONE);
-    }
-
     void stats() {
         if(matfp == NULL) {
             clsWrn("Matfile not opened\n");
@@ -366,6 +373,33 @@ public:
         return fposes[i];
     }
 
+    bool read(std::string key, var_t &v) {
+        if(matfp == NULL)
+            return false;
+
+        if(fposesMap.count(key) == 0)
+            return false;
+        
+        // seek to var position 
+        long fpos = fposesMap[key];
+        (void)fseek((FILE*)matfp->fp, fpos, SEEK_SET);
+
+        matvar_t *var = Mat_VarReadNext(matfp);
+        if(var == NULL)
+            return false;
+
+        v.parse(var);
+        return true;
+    }
+
+    bool write(var_t &var) {
+        if(matfp == NULL)
+            return false;
+        if(var.empty())
+            return false;
+        Mat_VarWrite(matfp, var.getRawData(), MAT_COMPRESSION_NONE);
+    }
+
     template<typename T>
     bool read(std::string key, T &v) {
         var_t var;
@@ -386,37 +420,6 @@ public:
         return ok;
     }
 
-private:
-
-    void parseMatVar(matvar_t *var, var_t &v) {
-        v.setRawData(var);
-
-        // parse struct
-        if(var->class_type == MAT_C_STRUCT) {
-            int n = Mat_VarGetNumberOfFields(var);
-            char* const* names = Mat_VarGetStructFieldnames(var);
-
-            for(int i=0; i<n; i++) {
-                matvar_t *ivar = Mat_VarGetStructFieldByIndex(var, i, 0);
-                if(ivar != NULL)
-                    parseMatVar(ivar, v[names[i]]);
-            }
-        }
-        // parse cell
-        else if(var->class_type == MAT_C_CELL) {
-            int n = var->dims[0]*var->dims[1];
-            for(int i=0; i<n; i++) {
-                matvar_t *ivar = Mat_VarGetCell(var, i);
-                if(ivar != NULL) {
-                    if(ivar->name == NULL)
-                        ivar->name = strdup( std::to_string(i).c_str() );
-
-                    std::string i_str = std::to_string(i);
-                    parseMatVar(ivar, v[i_str]);
-                }
-            }
-        }
-    }
 };
 
 class MatDump {
