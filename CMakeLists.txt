@@ -76,9 +76,11 @@ target_link_libraries(tkCommon tkGUI yaml-cpp matio dl)
 
 add_library(tkCommunication SHARED
     src/communication/ethernet/UDPSocket.cpp
+    src/communication/ethernet/TCPSocket.cpp
     src/communication/ethernet/PCAPHandler.cpp
     src/communication/EthInterface.cpp
     src/communication/CanInterface.cpp
+    src/communication/serial/SerialPort.cpp
 )
 target_link_libraries(tkCommunication pcap)
 
@@ -116,6 +118,9 @@ target_link_libraries(tkGUI_simple tkCommon ${GUI_LIBS})
 
 add_executable(tkCommon_cmd app/tkCommon_cmd.cpp)
 target_link_libraries(tkCommon_cmd tkCommon)
+
+add_executable(tkCommon_matio app/tkCommon_matio.cpp)
+target_link_libraries(tkCommon_matio tkCommon)
 
 add_executable(tkCommon_eth_pcap app/tkCommon_eth_pcap.cpp)
 target_link_libraries(tkCommon_eth_pcap tkCommon tkCommunication)

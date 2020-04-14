@@ -17,6 +17,18 @@ namespace tk { namespace data {
          */
         Eigen::MatrixXi idMatrix;
 
+
+        /**
+         * @brief PolarCloud
+         */
+        Eigen::MatrixXi polarCloud;
+
+        /**
+         * @brief max intensity number
+         * 
+         */
+        int MAX_INTENSITY;
+
         /**
          * @brief Initialization method only for Eigen points and intensity.
          */
@@ -25,6 +37,8 @@ namespace tk { namespace data {
             this->nPoints = 0;
             this->points.resize(4,CLOUD_MAX_POINTS);
             this->intensity.resize(1,CLOUD_MAX_POINTS);
+            header.sensor = sensorName::LIDAR;
+            MAX_INTENSITY = 255;
         }
         /**
          * @brief Initialization method for all data
@@ -45,6 +59,18 @@ namespace tk { namespace data {
         void initIdMatrix(int o_layers, int v_layers){
             this->idMatrix.resize(v_layers,o_layers);
             this->idMatrix.setConstant(v_layers,o_layers,-1);
+            header.name = sensorName::LIDAR;
+        }
+        /**
+         * @brief Initialization method for idMatrix and setting to -1
+         * 
+         * @param o_layers horizzontal layers
+         * @param v_layers vertical layers
+         */
+        void initPolarCloud(int n, int dim){
+            this->idMatrix.resize(n,dim);
+            this->idMatrix.setConstant(n,dim,-1);
+            header.name = sensorName::LIDAR;
         }
         /**
          * @brief release method

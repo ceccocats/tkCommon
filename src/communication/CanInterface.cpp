@@ -198,7 +198,10 @@ namespace tk { namespace communication {
     CanInterface::close(){
 
         if(offlineMode){
-            pcap.close();
+            if(pcapmode)
+                pcap.close();
+            else
+                logstream.close();
             return true;
         }else{
             int err = ::close(soc);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tkCommon/data/DataHeader.h"
+#include "tkCommon/data/SensorData.h"
 #include <tkCommon/common.h>
 
 namespace tk { namespace data {
@@ -8,46 +8,46 @@ namespace tk { namespace data {
     /**
      *  Vehicle data definition
      */
-    struct VehicleData_t {
+    class VehicleData : public SensorData {
+        
+        public:
 
-        tk::data::DataHeader_t header;
+        double CAR_WHEELBASE;                   /** car wheelbase        [m]*/
+        double CAR_DIM_X, CAR_DIM_Y, CAR_DIM_Z; /** car dimensions       [m]*/
+        double CAR_BACK2AXLE;                   /** from back to axle    [m]*/
+        double CAR_MASS;                        /** car weight           [kg]*/
+        double CAR_FRONTAXLE_W;                 /** width of front axle  [m]*/
+        double CAR_BACKAXLE_W;                  /** width of back axle   [m]*/
+        double CAR_WHEEL_R;                     /** wheel radius         [m]*/
 
-        double CAR_WHEELBASE;                   // car wheelbase [m]
-        double CAR_DIM_X, CAR_DIM_Y, CAR_DIM_Z; // car dimensions [m]
-        double CAR_BACK2AXLE;                   // from back to axle [m]
-        double CAR_MASS;                        // car weight [kg]
-        double CAR_FRONTAXLE_W;                 // width of front axle [m]
-        double CAR_BACKAXLE_W;                  // width of back axle [m]
-        double CAR_WHEEL_R;                     // wheel radius [m]
+        double     speed    = 0;                /** speed                [ m/s   ]*/
+        double     speedKMH = 0;                /** speed                [ Km/h  ]*/
 
-        double     speed    = 0;  // speed                [ m/s   ]
-        double     speedKMH = 0;  // speed                [ Km/h  ]
+        double     yawRate = 0;                 /** yaw rate             [ rad/s ]*/
+        double     accelX  = 0;                 /** longitudinal acc     [ m/s2  ]*/
+        double     accelY  = 0;                 /** lateral acc          [ m/s2  ]*/
 
-        double     yawRate = 0;        // yaw rate             [ rad/s ]
-        double     accelX  = 0;        // longitudinal acc     [ m/s2  ]
-        double     accelY  = 0;        // lateral acc          [ m/s2  ]
+        double     steerAngle     = 0;          /** steering wheel angle [ rad   ]*/
+        double     steerAngleRate = 0;          /** steering wheel angle [ rad/s ]*/
+        double     wheelAngle     = 0;          /** wheel angle          [ rad   ]*/
 
-        double     steerAngle     = 0;    // steering wheel angle [ rad   ]
-        double     steerAngleRate = 0;    // steering wheel angle [ rad/s ]
-        double     wheelAngle     = 0;    // wheel angle          [ rad   ]
+        uint8_t    brakePedalSts        = 0;    /** brake status         [ on/off ]*/
+        double     brakeMasterPressure  = 0;    /** brake pressure       [ bar ]*/
+        double     gasPedal             = 0;    /** gas padal percentage [ 0-1 ]*/
+        double     engineTorque         = 0;    /** engine torque        [ % ]*/
+        double     engineFrictionTorque = 0;    /** friction torque      [ % ]*/
 
-        uint8_t    brakePedalSts        = 0;    // brake status   [ on/off ]
-        double     brakeMasterPressure  = 0;    // brake pressure [ bar ]
-        double     gasPedal             = 0;    // gas padal percentage [ 0-1 ]
-        double     engineTorque         = 0;    // engine torque  [ % ]
-        double     engineFrictionTorque = 0;    // friction torque[ % ]
+        uint8_t    actualGear = 0;              /** current Gear         [ int ]*/
+        uint16_t   RPM = 0;                     /** RPM                  [ int ]*/
 
-        uint8_t    actualGear = 0;    // current Gear          [ int ]
-        uint16_t   RPM = 0;           // RPM
-
-        // wheel speeds [ m/s ]
+        /**wheel speeds         [ m/s ]*/
         double     wheelFLspeed =0, wheelFRspeed =0, wheelRLspeed =0, wheelRRspeed =0;
+        /**wheel dir            [int] ** 0:no_dir   1:forward   2:backward   4:invalid*/
         uint8_t    wheelFLDir =0, wheelFRDir =0, wheelRLDir =0, wheelRRDir =0;
 
 
-        double     sideSlip = 0;      // beta angle            [ rad   ]
-        uint8_t    tractionGrip = 0;  // traction control grip [ ? ]
-
+        double     sideSlip     = 0;        /** beta angle               [ rad   ]*/
+        uint8_t    tractionGrip = 0;        /** traction control grip    [ ? ]*/
 
         // faults
         uint8_t ESPFault = 0;
@@ -55,17 +55,14 @@ namespace tk { namespace data {
         // inputs
         uint8_t activateDrive = 0, activateSteer = 0;
 
-        /**
-         * Odometry vales
-         */
-        // x e y position of car in space
+        /** Odometry vales in space*/
         long double x = 0;
         long double y = 0;
 
-        // Direction of car in space
+        /** Direction of car in space*/
         long double carDirection = 0;
 
-        // Boolean variable for know if new data is arrived
+        /** Boolean variable for know if new data is arrived*/
         bool Bspeed = 0, Bsteer = 0;
         int  posBuffer = 0;
 
@@ -103,12 +100,77 @@ namespace tk { namespace data {
             return status;
         }
 
-        void init(){
-            //TODO:
+        void init() override{
+            tk::data::SensorData::init();
+            header.sensor = sensorName::VEHICLE;
         }
 
+        void release() override {}
 
-        friend std::ostream& operator<<(std::ostream& os, const VehicleData_t& m) {
+        bool checkDimension(SensorData *s) override {
+            return true;
+        }
+
+        VehicleData& operator=(const VehicleData &s) {
+            SensorData::operator=(s);
+
+            this->CAR_WHEELBASE         = s.CAR_WHEELBASE;             
+            this->CAR_DIM_X             = s.CAR_DIM_X;    
+            this->CAR_DIM_Y             = s.CAR_DIM_Y;
+            this->CAR_DIM_Z             = s.CAR_DIM_Z;
+            this->CAR_BACK2AXLE         = s.CAR_BACK2AXLE;          
+            this->CAR_MASS              = s.CAR_MASS;      
+            this->CAR_FRONTAXLE_W       = s.CAR_FRONTAXLE_W;         
+            this->CAR_BACKAXLE_W        = s.CAR_BACKAXLE_W;        
+            this->CAR_WHEEL_R           = s.CAR_WHEEL_R;
+            this->speed                 = s.speed;
+            this->speedKMH              = s.speedKMH;
+            this->yawRate               = s.yawRate;
+            this->accelX                = s.accelX;
+            this->accelY                = s.accelY;
+            this->steerAngle            = s.steerAngle;
+            this->steerAngleRate        = s.steerAngleRate;
+            this->wheelAngle            = s.wheelAngle;
+            this->brakePedalSts         = s.brakePedalSts;
+            this->brakeMasterPressure   = s.brakeMasterPressure;
+            this->gasPedal              = s.gasPedal;
+            this->engineTorque          = s.engineTorque;
+            this->engineFrictionTorque  = s.engineFrictionTorque;
+            this->actualGear            = s.actualGear;
+            this->RPM                   = s.RPM;
+            this->wheelFLspeed          = s.wheelFLspeed;
+            this->wheelFRspeed          = s.wheelFRspeed;
+            this->wheelRLspeed          = s.wheelRLspeed;
+            this->wheelRRspeed          = s.wheelRRspeed;
+            this->wheelFLDir            = s.wheelFLDir;
+            this->wheelFRDir            = s.wheelFRDir;
+            this->wheelRLDir            = s.wheelRLDir;
+            this->wheelRRDir            = s.wheelRRDir;
+            this->sideSlip              = s.sideSlip;
+            this->tractionGrip          = s.tractionGrip;
+            this->ESPFault              = s.ESPFault;
+            this->activateDrive         = s.activateDrive;
+            this->activateSteer         = s.activateSteer;
+            this->x                     = s.x;
+            this->y                     = s.y;
+            this->carDirection          = s.carDirection;
+            this->Bspeed                = s.Bspeed;
+            this->Bsteer                = s.Bsteer;
+            this->posBuffer             = s.posBuffer;
+
+            for(int i=0; i < ODOM_BUFFER_SIZE; i++){
+                this->odometryBuffer[i].x   = s.odometryBuffer[i].x;
+                this->odometryBuffer[i].y   = s.odometryBuffer[i].y;
+                this->odometryBuffer[i].z   = s.odometryBuffer[i].z;
+                this->odometryBuffer[i].yaw = s.odometryBuffer[i].yaw;
+                this->odometryBuffer[i].t   = s.odometryBuffer[i].t;
+            }
+
+            return *this;
+         }
+
+
+        friend std::ostream& operator<<(std::ostream& os, const VehicleData& m) {
             os << m.header.stamp<< " speed: "<<m.speed<<" wheelangle: "<<m.wheelAngle;
             return os;
         }

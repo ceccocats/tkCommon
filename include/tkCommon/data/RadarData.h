@@ -55,6 +55,7 @@ namespace tk { namespace data {
                 this->near_features[i].resize(RADAR_MAX_FEATURES, RADAR_MAX_PONINTS);
                 this->far_features[i].resize(RADAR_MAX_FEATURES, RADAR_MAX_PONINTS);
             }
+            header.sensor = tk::data::sensorName::RADAR;
         }
 
         /**
