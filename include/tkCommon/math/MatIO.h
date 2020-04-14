@@ -313,7 +313,7 @@ public:
         }
     }
 
-    bool readVar(std::string key, var_t &v) {
+    bool read(std::string key, var_t &v) {
         if(matfp == NULL)
             return false;
 
@@ -332,7 +332,7 @@ public:
         return true;
     }
 
-    bool writeVar(var_t &var) {
+    bool write(var_t &var) {
         if(matfp == NULL)
             return false;
         Mat_VarWrite(matfp, var.var, MAT_COMPRESSION_NONE);
@@ -348,6 +348,25 @@ public:
                + std::to_string(fposes.size()) + " vars )\n");
     }
 
+    template<typename T>
+    bool read(std::string key, T &v) {
+        var_t var;
+        bool ok  = read(key, var);
+        if(ok) {
+            ok = var.get(v);
+        }
+        var.release();
+        return ok;
+    }
+
+    template<typename T>
+    bool write(T &v) {
+        var_t var;
+        var.set(v);
+        bool ok = write(v);
+        var.release();
+        return ok;
+    }
 };
 
 }}

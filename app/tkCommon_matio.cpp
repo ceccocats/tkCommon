@@ -26,13 +26,13 @@ int main( int argc, char** argv){
     tk::math::MatIO::var_t structVar;
     structVar.setStruct("lol", structFields);
     structVar.print();
-    mat.writeVar(structVar);
+    mat.write(structVar);
     structVar.release();
     mat.close();
 
     
     mat.open(matfile);
-    mat.readVar("lol", structVar);
+    mat.read("lol", structVar);
     structVar.print();
  
     int readA;
