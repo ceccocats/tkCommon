@@ -102,6 +102,7 @@ namespace tk { namespace data {
 
         void draw(){
         	glPushMatrix();{
+        		tk::gui::Viewer::tkDrawTf(header.name, header.tf);
 				tk::gui::Viewer::tkApplyTf(header.tf);
 				glPointSize(1.0);
 				glBegin(GL_POINTS);
