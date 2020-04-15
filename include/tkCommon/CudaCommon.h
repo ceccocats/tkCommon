@@ -57,10 +57,10 @@ class tkMatrixCuda{
         }
 
         __host__ void
-        DeviceToHostMemcpy(T* p){ HANDLE_ERROR( cudaMemcpy(p, &data, hostSize() * sizeof(T), cudaMemcpyDeviceToHost) ); }
+        DeviceToHostMemcpy(T* p){ HANDLE_ERROR( cudaMemcpy(p, data, hostSize() * sizeof(T), cudaMemcpyDeviceToHost) ); }
 
         __host__ void
-        HostToDeviceMemcpy(T* p){ HANDLE_ERROR( cudaMemcpy(&data, p, hostSize() * sizeof(T), cudaMemcpyHostToDevice) ); }
+        HostToDeviceMemcpy(T* p){ HANDLE_ERROR( cudaMemcpy(data, p, hostSize() * sizeof(T), cudaMemcpyHostToDevice) ); }
 
         __host__ int
         hostCols(){ return h_cols; }
@@ -86,7 +86,7 @@ class tkMatrixCuda{
         }
 
         __host__ void
-        close(){ 
+        close(){
             HANDLE_ERROR( cudaFree(data) ); 
             HANDLE_ERROR( cudaFree(d_rows) ); 
             HANDLE_ERROR( cudaFree(d_cols) ); 
@@ -142,10 +142,10 @@ class tkPinnedMatrix{
         }
 
         __host__ void
-        DeviceToHostMemcpy(T* p){ HANDLE_ERROR( cudaMemcpy(p, &data, size() * sizeof(T), cudaMemcpyDeviceToHost) ); }
+        DeviceToHostMemcpy(T* p){ HANDLE_ERROR( cudaMemcpy(p, data, size() * sizeof(T), cudaMemcpyDeviceToHost) ); }
 
         __host__ void
-        HostToDeviceMemcpy(T* p){ HANDLE_ERROR( cudaMemcpy(&data, p, size() * sizeof(T), cudaMemcpyHostToDevice) ); }
+        HostToDeviceMemcpy(T* p){ HANDLE_ERROR( cudaMemcpy(data, p, size() * sizeof(T), cudaMemcpyDeviceToHost) ); }
 
         __host__ int
         cols(){ return h_cols; }
@@ -174,7 +174,7 @@ class tkPinnedMatrix{
         set(int r, int c,T value ){ data[r+c*h_rows] = value; }
 
         __host__ void
-        close(){ delete data; }
+        close(){ /*HANDLE_ERROR( cudaFree(data) );*/ }
 
 };
 
