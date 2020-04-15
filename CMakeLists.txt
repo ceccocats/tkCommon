@@ -93,13 +93,13 @@ add_library(tkMath SHARED src/math/CSpline.cpp src/math/CSpline2D.cpp src/math/C
 include_directories(${CMAKE_CURRENT_BINARY_DIR}) # to find the file on build dir
 
 set(defineCMD "\\\#define TKVERSION_GIT \\\"") 
-execute_process(COMMAND git status RESULT_VARIABLE ISNT_GIT_REPO)
+execute_process(COMMAND "git status > /dev/null" RESULT_VARIABLE ISNT_GIT_REPO)
 if( NOT ${ISNT_GIT_REPO})
-    message("GIT VERSIONING SYSTEM")
+    message("-- Found GIT")
     # write git version to file
     add_custom_target(tkversiongit_tmp COMMAND echo ${defineCMD}`git log --format="%h" -n 1`"\\\"" > tkversion_git.tmp)
 else()
-    message("THIS IS NOT A GIT REPO, VERSIONING IS DISABLED")
+    message("-- GIT: THIS IS NOT A REPO, VERSIONING IS DISABLED")
     add_custom_target(tkversiongit_tmp COMMAND echo ${defineCMD}"000000\\\"" > tkversion_git.tmp)
 endif()
 

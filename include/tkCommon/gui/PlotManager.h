@@ -116,7 +116,7 @@ namespace tk { namespace gui {
 
                     ImGui::Checkbox(it->first.c_str(), &p->conf.show);
                     ImGui::SameLine(0, 10);
-                    ImGui::TextColored(ImVec4(float_t(col.r)/255.0f, float_t(col.g)/255.0f, float_t(col.b)/255.0f, float_t(col.a)/255.0f), type_str.c_str());
+                    ImGui::TextColored(ImVec4(float_t(col.r)/255.0f, float_t(col.g)/255.0f, float_t(col.b)/255.0f, float_t(col.a)/255.0f), "%s", type_str.c_str());
 
                     it++;
                 }
