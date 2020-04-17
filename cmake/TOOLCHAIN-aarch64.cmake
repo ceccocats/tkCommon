@@ -38,6 +38,19 @@ set(CUDA_cudadevrt_LIBRARY ${CUDA_TOOLKIT_ROOT_DIR}/targets/${cuda_target_full_p
 include_directories(/usr/include/aarch64-linux-gnu/)
 include_directories(${CMAKE_SYSROOT}/usr/local/include)
 
+
+# copy all libraries to install dir
+if(NOT TARGET install-deps)
+    add_custom_target(install-deps
+        COMMAND echo "install external libraries"
+        COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/libEXT/
+        COMMAND rsync -avh --ignore-errors ${CMAKE_SYSROOT}/usr/local/lib/ ${CMAKE_INSTALL_PREFIX}/libEXT/
+        COMMAND rsync -avh --ignore-errors ${CMAKE_SYSROOT}/usr/lib/ ${CMAKE_INSTALL_PREFIX}/libEXT/
+        COMMAND rsync -avh --ignore-errors ${CMAKE_SYSROOT}/opt/pdk/lib/ ${CMAKE_INSTALL_PREFIX}/libEXT/
+        COMMAND rsync -avh --ignore-errors ${CMAKE_SYSROOT}/opt/ros/*/lib/ ${CMAKE_INSTALL_PREFIX}/libEXT/
+    )
+endif()
+
 if(NOT TARGET upload)
     # set UPLOAD to target
     set(TK_USER nvidia)
