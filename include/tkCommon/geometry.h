@@ -69,6 +69,8 @@ namespace tk{ namespace common{
 		}
 	};
 
+	typedef std::vector<Prism> Prisms;
+
 	class Polyhedron : public tk::gui::Drawable{
 	public:
 		tk::gui::Viewer::object3D_t obj;

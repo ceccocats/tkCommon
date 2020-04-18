@@ -1,6 +1,7 @@
 #pragma once
 #include <cuda.h>
 #include <cuda_runtime.h>
+#include <stdio.h>
 
 static void inline HandleError( cudaError_t err,
                          const char *file,
