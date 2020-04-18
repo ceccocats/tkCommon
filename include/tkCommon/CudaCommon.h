@@ -53,10 +53,10 @@ class tkMatrixCuda{
         }
 
         __host__ void
-        deviceToHostMemcpy(T* p){ HANDLE_ERROR( cudaMemcpy(p, data, size * sizeof(T), cudaMemcpyDeviceToHost) ); }
+        fromDevice(T* p){ HANDLE_ERROR( cudaMemcpy(p, data, size * sizeof(T), cudaMemcpyDeviceToHost) ); }
 
         __host__ void
-        hostToDeviceMemcpy(T* p){ HANDLE_ERROR( cudaMemcpy(data, p, size * sizeof(T), cudaMemcpyHostToDevice) ); }
+        fromHost(T* p){ HANDLE_ERROR( cudaMemcpy(data, p, size * sizeof(T), cudaMemcpyHostToDevice) ); }
 
         __host__ void
         memset(T v){ HANDLE_ERROR( cudaMemset(data,v, size * sizeof(T)) );}
