@@ -582,7 +582,7 @@ Viewer::tkDrawCloudRGB(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int r
     for (int p = 0; p < points->cols(); p++) {
         if(features->coeff(r, p) == 0 && features->coeff(g, p) == 0 && features->coeff(b, p) == 0)
             continue;
-        glColor3f(features->coeff(r, p), features->coeff(g, p), features->coeff(b, p));
+        glColor3f(fabs(features->coeff(r, p)), fabs(features->coeff(g, p)), fabs(features->coeff(b, p)));
 
         Eigen::Vector4f v = points->col(p);
         glVertex3f(v(0), v(1), v(2));
