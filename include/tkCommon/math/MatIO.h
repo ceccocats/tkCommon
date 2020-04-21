@@ -42,7 +42,7 @@ template <> struct matio_type<long double> { typedef double type; static const m
 
 
 /**
-    Mat reader class
+    Mat file reader class
 */
 class MatIO {
 
@@ -116,6 +116,9 @@ public:
                 f.second.print(level+1);
         }
 
+        /**
+         * @brief recursively parse raw matvar_t
+         */
         void parse(matvar_t *var) {
             release();
 
@@ -152,10 +155,16 @@ public:
             }        
         }
 
+        /**
+         * @brief true if no data
+         */
         bool empty() {
             return var == NULL;
         }
 
+        /**
+         * @brief deallocate data and clear structure
+         */
         void release() {
             if(var != NULL)
                 Mat_VarFree(var);
@@ -164,26 +173,42 @@ public:
             fields.clear();
         }
 
+        /**
+         * @brief Raw matvar_t pointer
+         */
         matvar_t* getRawData() {
             return var;
         }
 
+        /**
+         * @brief this var name
+         */
         std::string name() {
             if(var == NULL)
                 return "null";
             return var->name;
         }
 
+        /**
+         * @brief Number of fields. works with structure and cells array
+         */
         int size() {
             tkASSERT(fieldMap.size() == fields.size());
             return fieldMap.size();
         }
 
+        /**
+         * @brief iterate fields name
+         */
         std::string operator[](int i) {
             tkASSERT(i < fields.size());
             return fields[i];
         }
 
+        /**
+         * @brief get field var
+         * @param s field name
+         */
         var_t& operator[](std::string s) {
             tkASSERT(fieldMap.count(s) > 0);
             return fieldMap[s];
@@ -256,6 +281,11 @@ public:
             return true;
         }
 
+        /**
+         * @brief Set this var as a Struct 
+         * @param name var name
+         * @param fields vector of fields as var_t
+         */
         bool setStruct(std::string name, std::vector<var_t> fields) {
             release();
             const char *names[fields.size()];
@@ -281,6 +311,11 @@ public:
             return true;
         }
 
+        /**
+         * @brief Set this var as a CellArray 
+         * @param name var name
+         * @param fields vector of fields as var_t
+         */
         bool setCells(std::string name, std::vector<var_t> fields) {
             release();
             matvar_t *cells[fields.size()];
@@ -306,6 +341,10 @@ public:
         }
     };
 
+    /**
+     * @brief Create new mat file. Override existing one.
+     * @param mat_dir path of the mat file
+     */
     bool create(std::string mat_dir) {
         close();
         
@@ -317,6 +356,10 @@ public:
         return true;
     }
 
+    /**
+     * @brief Open a mat file
+     * @param mat_dir path of the mat file
+     */
     bool open(std::string mat_dir) {
         close();
 
@@ -344,6 +387,9 @@ public:
         return true;
     }
 
+    /**
+     * @brief Close matfile
+     */
     void close() {
         if(matfp != NULL) Mat_Close(matfp);
         matfp = NULL;
@@ -351,6 +397,9 @@ public:
         fposesMap.clear();        
     }
 
+    /**
+     * @brief Print mat statistics
+     */
     void stats() {
         if(matfp == NULL) {
             clsWrn("Matfile not opened\n");
@@ -363,16 +412,27 @@ public:
                + std::to_string(fposesMap.size()) + " vars )\n");
     }
 
+    /**
+     * @brief get number of vars in file
+     */
     int size() {
         tkASSERT(fposes.size() == fposesMap.size());
         return fposesMap.size();
     }
 
+    /**
+     * @brief Iterate vars names 
+     */
     std::string operator[](int i) {
         tkASSERT(i < fposes.size());
         return fposes[i];
     }
 
+    /**
+     * @brief Read var from file
+     * @param key var name
+     * @param v ouput filled var_t
+     */
     bool read(std::string key, var_t &v) {
         if(matfp == NULL)
             return false;
@@ -392,6 +452,10 @@ public:
         return true;
     }
 
+    /**
+     * @brief write var to file
+     * @param var input var to write
+     */
     bool write(var_t &var) {
         if(matfp == NULL)
             return false;
@@ -422,6 +486,9 @@ public:
 
 };
 
+/**
+ * @brief Interface to extends in class
+ */
 class MatDump {
     public: 
 
