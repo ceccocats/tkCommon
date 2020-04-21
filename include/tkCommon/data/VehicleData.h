@@ -1,14 +1,14 @@
 #pragma once
-
 #include "tkCommon/data/SensorData.h"
-#include <tkCommon/common.h>
+#include "tkCommon/common.h"
+#include "tkCommon/math/MatIO.h"
 
 namespace tk { namespace data {
 
     /**
      *  Vehicle data definition
      */
-    class VehicleData : public SensorData {
+    class VehicleData : public SensorData, public tk::math::MatDump {
         
         public:
 
@@ -175,99 +175,80 @@ namespace tk { namespace data {
             return os;
         }
 
-        static const int VEHICLE_FIELDS = 25;
-        const char  *fields[VEHICLE_FIELDS] = {"stamp",
-           "CAR_WHEELBASE", "CAR_DIM_X", "CAR_DIM_Y", "CAR_DIM_Z", "CAR_BACK2AXLE", "CAR_MASS", "CAR_FRONTAXLE_W", "CAR_BACKAXLE_W",
-           "CAR_WHEEL_R", "speed", "yawRate", "accelX", "accelY", "wheelAngle", "brakeMasterPressure", "gasPedal", "engineTorque",
-           "actualGear_d", "wheelFLspeed", "wheelFRspeed", "wheelRLspeed", "wheelRRspeed", "sideSlip", "tractionGrip_d"};
+  
+        bool toVar(std::string name, tk::math::MatIO::var_t &var) {
 
-        /**
-         *
-         * @param name
-         * @return
-         */
-        matvar_t *toMatVar(std::string name = "gps") {
-
-            #define TK_VEHDATA_MATVAR_DOUBLE(x) var = Mat_VarCreate(#x, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dim, &x, 0); \
-                                                Mat_VarSetStructFieldByName(matstruct, #x, 0, var); //0 for first row
-
-            size_t dim[2] = { 1, 1 }; // create 1x1 struct
-            matvar_t* matstruct = Mat_VarCreateStruct(name.c_str(), 2, dim, fields, VEHICLE_FIELDS); //main struct: Data
-
-            matvar_t *var = Mat_VarCreate("stamp", MAT_C_UINT64, MAT_T_UINT64, 2, dim, &header.stamp, 0);
-            Mat_VarSetStructFieldByName(matstruct, "stamp", 0, var); //0 for first row
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_WHEELBASE);
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_DIM_X);
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_DIM_Y);
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_DIM_Z);
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_BACK2AXLE);
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_MASS);
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_FRONTAXLE_W);
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_BACKAXLE_W);
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_WHEEL_R);
-            TK_VEHDATA_MATVAR_DOUBLE(speed);
-            TK_VEHDATA_MATVAR_DOUBLE(yawRate);
-            TK_VEHDATA_MATVAR_DOUBLE(accelX);
-            TK_VEHDATA_MATVAR_DOUBLE(accelY);
-            TK_VEHDATA_MATVAR_DOUBLE(wheelAngle);
-            TK_VEHDATA_MATVAR_DOUBLE(brakeMasterPressure);
-            TK_VEHDATA_MATVAR_DOUBLE(gasPedal);
-            TK_VEHDATA_MATVAR_DOUBLE(engineTorque);
+            // save uint8 in matlab as double
             double actualGear_d = actualGear;
-            TK_VEHDATA_MATVAR_DOUBLE(actualGear_d);
-            TK_VEHDATA_MATVAR_DOUBLE(wheelFLspeed);
-            TK_VEHDATA_MATVAR_DOUBLE(wheelFRspeed);
-            TK_VEHDATA_MATVAR_DOUBLE(wheelRLspeed);
-            TK_VEHDATA_MATVAR_DOUBLE(wheelRRspeed);
-            TK_VEHDATA_MATVAR_DOUBLE(sideSlip);
             double tractionGrip_d = tractionGrip;
-            TK_VEHDATA_MATVAR_DOUBLE(tractionGrip_d);
-            return matstruct;
+
+            std::vector<tk::math::MatIO::var_t> structVars(25);
+            structVars[ 0].set("stamp",              header.stamp);
+            structVars[ 1].set("CAR_WHEELBASE",      CAR_WHEELBASE); 
+            structVars[ 2].set("CAR_DIM_X",          CAR_DIM_X);
+            structVars[ 3].set("CAR_DIM_Y",          CAR_DIM_Y);
+            structVars[ 4].set("CAR_DIM_Z",          CAR_DIM_Z);
+            structVars[ 5].set("CAR_BACK2AXLE",      CAR_BACK2AXLE);
+            structVars[ 6].set("CAR_MASS",           CAR_MASS);
+            structVars[ 7].set("CAR_FRONTAXLE_W",    CAR_FRONTAXLE_W);
+            structVars[ 8].set("CAR_BACKAXLE_W",     CAR_BACKAXLE_W);
+            structVars[ 9].set("CAR_WHEEL_R",        CAR_WHEEL_R);
+            structVars[10].set("speed",              speed);
+            structVars[11].set("yawRate",            yawRate);
+            structVars[12].set("accelX",             accelX);
+            structVars[13].set("accelY",             accelY);
+            structVars[14].set("wheelAngle",         wheelAngle);
+            structVars[15].set("brakeMasterPressure",brakeMasterPressure);
+            structVars[16].set("gasPedal",           gasPedal);
+            structVars[17].set("engineTorque",       engineTorque);
+            structVars[18].set("actualGear_d",       actualGear_d);
+            structVars[19].set("wheelFLspeed",       wheelFLspeed);
+            structVars[20].set("wheelFRspeed",       wheelFRspeed);
+            structVars[21].set("wheelRLspeed",       wheelRLspeed);
+            structVars[22].set("wheelRLspeed",       wheelRLspeed);
+            structVars[23].set("sideSlip",           sideSlip);
+            structVars[25].set("tractionGrip_d",     tractionGrip_d);
+            return var.setStruct(name, structVars);
         }
 
-        /**
-         *
-         * @param var
-         * @return
-         */
-        bool fromMatVar(matvar_t *var) {
+ 
+        bool fromVar(tk::math::MatIO::var_t &var) {
+            if(var.empty())
+                return false;
 
-            matvar_t *pvar = Mat_VarGetStructFieldByName(var, "stamp", 0);
-            tkASSERT(pvar->class_type == MAT_C_UINT64);
-            memcpy(&header.stamp, pvar->data, sizeof(uint64_t));
-
-            #define TK_VEHDATA_MATVAR_READ_DOUBLE(x) pvar = Mat_VarGetStructFieldByName(var, #x, 0); \
-                                                     tkASSERT(pvar != 0); \
-                                                     tkASSERT(pvar->class_type == MAT_C_DOUBLE); \
-                                                     memcpy(&x, pvar->data, sizeof(double));
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_WHEELBASE);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_DIM_X);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_DIM_Y);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_DIM_Z);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_BACK2AXLE);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_MASS);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_FRONTAXLE_W);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_BACKAXLE_W);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_WHEEL_R);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(speed);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(yawRate);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(accelX);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(accelY);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(wheelAngle);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(brakeMasterPressure);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(gasPedal);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(engineTorque);
+            // saved in matlab as double
             double actualGear_d;
-            TK_VEHDATA_MATVAR_READ_DOUBLE(actualGear_d);
-            actualGear = actualGear_d;
-            TK_VEHDATA_MATVAR_READ_DOUBLE(wheelFLspeed);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(wheelFRspeed);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(wheelRLspeed);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(wheelRRspeed);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(sideSlip);
             double tractionGrip_d;
-            TK_VEHDATA_MATVAR_READ_DOUBLE(tractionGrip_d);
+
+            var["stamp"              ].get(header.stamp);
+            var["CAR_WHEELBASE"      ].get(CAR_WHEELBASE); 
+            var["CAR_DIM_X"          ].get(CAR_DIM_X);
+            var["CAR_DIM_Y"          ].get(CAR_DIM_Y);
+            var["CAR_DIM_Z"          ].get(CAR_DIM_Z);
+            var["CAR_BACK2AXLE"      ].get(CAR_BACK2AXLE);
+            var["CAR_MASS"           ].get(CAR_MASS);
+            var["CAR_FRONTAXLE_W"    ].get(CAR_FRONTAXLE_W);
+            var["CAR_BACKAXLE_W"     ].get(CAR_BACKAXLE_W);
+            var["CAR_WHEEL_R"        ].get(CAR_WHEEL_R);
+            var["speed"              ].get(speed);
+            var["yawRate"            ].get(yawRate);
+            var["accelX"             ].get(accelX);
+            var["accelY"             ].get(accelY);
+            var["wheelAngle"         ].get(wheelAngle);
+            var["brakeMasterPressure"].get(brakeMasterPressure);
+            var["gasPedal"           ].get(gasPedal);
+            var["engineTorque"       ].get(engineTorque);
+            var["actualGear_d"       ].get(actualGear_d);
+            var["wheelFLspeed"       ].get(wheelFLspeed);
+            var["wheelFRspeed"       ].get(wheelFRspeed);
+            var["wheelRLspeed"       ].get(wheelRLspeed);
+            var["wheelRLspeed"       ].get(wheelRLspeed);
+            var["sideSlip"           ].get(sideSlip);
+            var["tractionGrip_d"     ].get(tractionGrip_d);
+
+            actualGear = actualGear_d;
             tractionGrip = tractionGrip_d;
+            return true;
         }
     };
 }
