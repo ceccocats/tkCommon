@@ -2,6 +2,7 @@
 #include "tkCommon/common.h"
 #include "tkCommon/data/SensorData.h"
 #include "tkCommon/data/GPSData.h"
+#include "tkCommon/data/VehicleData.h"
 #include <vector>
 
 ///////////////////////////////////////////////in fondo la vecchia
@@ -44,6 +45,18 @@ class lane_type{
             return std::string{"type error"};
         }
 
+        bool operator!=(lane_type::Value v) noexcept {
+            return v != value;
+        }
+
+        bool operator==(lane_type::Value v) noexcept {
+            return v == value;
+        }
+
+        void operator=(lane_type::Value v) noexcept {
+            value = v;
+        }
+
     private:
         lane_type::Value value;
 };
@@ -54,12 +67,13 @@ class lane_type{
 class box_type{
 
     public:
+        //Setted like masa-protocol
         enum Value : uint8_t{
         NOT_CLS     = 0,
-        PEDESTRIAN  = 1,
-        CAR         = 2,
-        MOTOBIKE    = 3,
-        CYCLE       = 4};
+        PEDESTRIAN  = 14,
+        CAR         = 6,
+        MOTOBIKE    = 13,
+        CYCLE       = 1};
 
         /**
          * @brief   method for convert id to box detection string name
@@ -73,7 +87,19 @@ class box_type{
             return std::string{"type error"};
         }
 
-    private:
+        bool operator!=(box_type::Value v) noexcept {
+            return v != value;
+        }
+
+        bool operator==(box_type::Value v) noexcept {
+            return v == value;
+        }
+
+        void operator=(box_type::Value v) noexcept {
+            value = v;
+        }
+
+    public:
         box_type::Value value;
 };
 
@@ -138,7 +164,19 @@ class sign_type{
             return std::string{"type error"};
         }
 
-    private:
+        bool operator!=(sign_type::Value v) noexcept {
+            return v != value;
+        }
+
+        bool operator==(sign_type::Value v) noexcept {
+            return v == value;
+        }
+
+        void operator=(sign_type::Value v) noexcept {
+            value = v;
+        }
+
+    public:
         sign_type::Value value;
 };
 
@@ -147,11 +185,12 @@ class sign_type{
  */
 class semaphore_status{
     public:
+        //Setted like masa-protocol
         enum Value : uint8_t{
         NOT_CLS     = 0,
-        RED         = 1,
+        RED         = 3,
         YELLOW      = 2,
-        GREEN       = 3,
+        GREEN       = 1,
         BLINK       = 4};
 
         /**
@@ -166,7 +205,7 @@ class semaphore_status{
             return std::string{"type error"};
         }
     
-    private:
+    public:
         semaphore_status::Value value;
 };
 
@@ -368,15 +407,17 @@ typedef std::vector<roadSing> roadSingsData;
 class perceptionData : public tk::data::SensorData{
     public:
 
-        std::vector<rotatedBox3DsData>  boxs;
+        std::vector<rotatedBox3DsData>  boxes;
         std::vector<roadSingsData>      signs;
         std::vector<lanesData>          lanes;
         tk::data::GPSData               gps;
+        tk::data::VehicleData           veh;
         
 
         void init() override {
             tk::data::SensorData::init();
             gps.init();
+            veh.init();
             header.sensorID = tk::data::sensorName::PERCEPTION;
         }
 
@@ -389,7 +430,7 @@ class perceptionData : public tk::data::SensorData{
         perceptionData& operator=(const perceptionData &s) {
             SensorData::operator=(s);
 
-            this->boxs  = s.boxs;
+            this->boxes  = s.boxes;
             this->signs = s.signs;
             this->lanes = s.lanes;
             this->gps   = s.gps;
