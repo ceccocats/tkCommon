@@ -1,7 +1,7 @@
 #pragma once
 #include "tkCommon/common.h"
 #include "tkCommon/data/SensorData.h"
-#include "tkCommon/data/VehicleData.h"
+#include "tkCommon/data/GPSData.h"
 #include <vector>
 
 ///////////////////////////////////////////////in fondo la vecchia
@@ -371,12 +371,13 @@ class perceptionData : public tk::data::SensorData{
         std::vector<rotatedBox3DsData>  boxs;
         std::vector<roadSingsData>      signs;
         std::vector<lanesData>          lanes;
-        tk::data::VehicleData           veh;
+        tk::data::GPSData               gps;
         
 
         void init() override {
             tk::data::SensorData::init();
-            veh.init();
+            gps.init();
+            header.sensorID = tk::data::sensorName::PERCEPTION;
         }
 
         void release() override {}
@@ -391,7 +392,7 @@ class perceptionData : public tk::data::SensorData{
             this->boxs  = s.boxs;
             this->signs = s.signs;
             this->lanes = s.lanes;
-            this->veh   = s.veh;
+            this->gps   = s.gps;
 
             return *this;
          }
