@@ -115,7 +115,7 @@ void CmdParser::printUsage(std::string name) {
     std::cout<<"Version (git): "<<ver<<"\n";
 }
 
-void CmdParser::print() {
+void CmdParser::parse() {
     argh::parser cmdl(argv_ptr, argv_mode);
 
     // check unknown flags

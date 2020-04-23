@@ -65,7 +65,7 @@ int main(int argc, char* argv[]){
     file                    = cmd.addOpt("-file", "", "reciver, recorder, sender");
     filter                  = cmd.addOpt("-filter", "", "pcap filter");
     interface               = cmd.addOpt("-interface", "eth0", "iface");
-    cmd.print();
+    cmd.parse();
 
     if( recorder == true){
 

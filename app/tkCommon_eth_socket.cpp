@@ -72,7 +72,7 @@ int main(int argc, char* argv[]){
     std::string  ip         = cmd.addOpt("-ip", "", "ip");
     int port                = cmd.addIntOpt("-port", 40000, "port");
     int srcport             = cmd.addIntOpt("-srcport", 40000, "source port");
-    cmd.print();
+    cmd.parse();
 
     if( type == "reciver"){
         std::cout<<"Reciver...\n";

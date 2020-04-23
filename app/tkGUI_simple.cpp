@@ -163,7 +163,7 @@ void *update_th(void *data) {
 int main( int argc, char** argv){
 
     tk::common::CmdParser cmd(argv, "tkGUI sample gui app");
-    cmd.print();
+    cmd.parse();
 
     signal(SIGINT, sig_handler);
     gRun = true;

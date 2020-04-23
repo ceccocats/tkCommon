@@ -104,7 +104,7 @@ namespace tk { namespace common {
         /**
          * print nice report
          */
-        void print();
+        void parse();
 
         void printUsage(std::string name);
     };
