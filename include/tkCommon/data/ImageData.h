@@ -75,51 +75,5 @@ namespace tk{namespace data{
             delete mtx;
         }
 
-        matvar_t *toMatVar(std::string name = "image") {
-            tkASSERT(sizeof(T) == sizeof(uint8_t))
-            tkASSERT(channels == 4)
-
-            size_t dim[3] = { height, width, 3 }; // create 1x1 struct
-            matvar_t *var = Mat_VarCreate(name.c_str(), MAT_C_UINT8, MAT_T_UINT8, 3, dim, data, 0);
-
-            // allocated by libmatio
-            uint8_t *tmp = (uint8_t *)var->data;
-
-            // RGBA,RGBA,RGBA,... -> RRR...,GGG...,BBB...,
-            for(int i=0; i<height; i++)
-            for(int j=0; j<width; j++) {
-                    tmp[j*height + i + height*width*0] = data[i*width*4 + j*4 + 0];
-                    tmp[j*height + i + height*width*1] = data[i*width*4 + j*4 + 1];
-                    tmp[j*height + i + height*width*2] = data[i*width*4 + j*4 + 2];
-            }
-            return var;
-        }
-
-        bool fromMatVar(matvar_t *var) {
-            tkASSERT(var->data_type == MAT_T_UINT8);
-            tkASSERT(var->rank == 3);
-            int h = var->dims[0];
-            int w = var->dims[1];
-            int c = var->dims[2];
-            tkASSERT(h>0);
-            tkASSERT(w>0);
-            tkASSERT(c==3);
-            release();
-            init(w, h, 4);
-            
-            // allocated by libmatio
-            uint8_t *tmp = (uint8_t *)var->data;
-
-            // RRR...,GGG...,BBB..., -> RGBA,RGBA,RGBA,...
-            #pragma omp parallel for
-            for(int i=0; i<height; i++)
-            for(int j=0; j<width; j++) {
-                    data[i*width*4 + j*4 + 0] = tmp[j*height + i + height*width*0];
-                    data[i*width*4 + j*4 + 1] = tmp[j*height + i + height*width*1];
-                    data[i*width*4 + j*4 + 2] = tmp[j*height + i + height*width*2];
-                    data[i*width*4 + j*4 + 3] = 255;
-            }
-            return true;
-        }
     };
 }}

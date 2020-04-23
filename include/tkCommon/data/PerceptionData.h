@@ -485,9 +485,6 @@ public:
     std::vector<LineData2D_t> data;   // filled by detection
     std::vector<LineData3D_t> data3d; // filled by fusion
 
-    static const int LINE_FIELDS = 3;
-    const char  *fields[LINE_FIELDS] = {"camIdx", "type", "data"};
-
     void init() {
         SensorData::init();
         header.sensor = tk::data::sensorName::LINES;
@@ -501,61 +498,54 @@ public:
         return true;
     }
 
-    matvar_t *toMatVar(std::string name = "lines") {
+    bool toVar(std::string name, tk::math::MatIO::var_t &var) {
 
-        size_t dims[] = {data.size(), 1};
-        matvar_t *array = Mat_VarCreate(name.c_str(),MAT_C_CELL,MAT_T_CELL,2,dims,NULL,0);
+        std::vector<tk::math::MatIO::var_t> cellsVars(data.size());
 
         for(int i=0; i<data.size(); i++) {
-            size_t dim[2] = { 1, 1 }; // create 1x1 struct
-            matvar_t* matstruct = Mat_VarCreateStruct("lineData", 2, dim, fields, LINE_FIELDS);
+            std::vector<tk::math::MatIO::var_t> structVars(3);
 
-            // camIdx
-            matvar_t *var;
-            var = Mat_VarCreate(fields[0], MAT_C_INT32, MAT_T_INT32, 2, dim, &data[i].camIdx, 0);
-            Mat_VarSetStructFieldByName(matstruct, fields[0], 0, var); 
-            // line type
-            var = Mat_VarCreate(fields[1], MAT_C_UINT8, MAT_T_UINT8, 2, dim, &data[i].type, 0);
-            Mat_VarSetStructFieldByName(matstruct, fields[1], 0, var); 
+            structVars[0].set("camIdx", data[i].camIdx);
+            int type = data[i].type;
+            structVars[1].set("type", type);
+ 
             // line data
             Eigen::MatrixXf p(2, data[i].points.size());
             for(int j=0; j<p.cols(); j++) {
                 p(0, j) = data[i].points[j].x;
                 p(1, j) = data[i].points[j].y;
             }
-            var = tk::common::eigenXf2matvar(p, "line");
-            Mat_VarSetStructFieldByName(matstruct, fields[2], 0, var); 
+            structVars[2].set("data", p);
 
-            Mat_VarSetCell(array, i, matstruct);
+            cellsVars[i].setStruct("lineData", structVars);
         }
-        return array;
+
+        return var.setCells(name, cellsVars);
     }
 
-    bool fromMatVar(matvar_t *var) {
+    bool fromVar(tk::math::MatIO::var_t &var) {
+        if(var.empty())
+            return false;
 
-        int n = var->dims[0];
-        for(int i=0; i<n; i++) {
+        for(int i=0; i<var.size(); i++) {
             LineData2D_t line;
-
-            matvar_t *pvar = Mat_VarGetCell(var, i);
-
-            matvar_t *jvar;
-            jvar = Mat_VarGetStructFieldByName(pvar, fields[0], 0);
-            tkASSERT(jvar->class_type == MAT_C_INT32);
-            memcpy(&line.camIdx, jvar->data, sizeof(int));
             
-            jvar = Mat_VarGetStructFieldByName(pvar, fields[1], 0);
-            tkASSERT(jvar->class_type == MAT_C_UINT8);
-            memcpy(&line.type, jvar->data, sizeof(char));
+            std::string key = var[i];
+            var[key]["camIdx"].get(line.camIdx);
+
+            int type;
+            var[key]["type"].get(type);
+            line.type = type;
             
-            jvar = Mat_VarGetStructFieldByName(pvar, fields[2], 0);
-            Eigen::MatrixXf mat = tk::common::matvar2eigenXf(jvar);
+            Eigen::MatrixXf mat; 
+            var[key]["data"].get(mat);
             for(int j=0; j<mat.cols(); j++) {
                 tk::common::Vector2<float> p;
                 p.x = mat(0, j);
                 p.y = mat(1, j);
                 line.points.push_back(p);
             }
+
             data.push_back(line);
         }
         return true;

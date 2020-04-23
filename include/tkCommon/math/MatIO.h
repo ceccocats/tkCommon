@@ -1,4 +1,5 @@
 #pragma once
+#include <matio.h>
 #include "tkCommon/common.h"
 
 /** @if mat_devman
