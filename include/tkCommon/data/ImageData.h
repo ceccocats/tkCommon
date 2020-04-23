@@ -17,8 +17,6 @@ namespace tk{namespace data{
 
         bool gen_tex = false;
         unsigned int texture;
-        static int n;
-        static bool fullscreen;
         int index = 0;
 
         void init(){
@@ -58,6 +56,10 @@ namespace tk{namespace data{
             mtx->lock();
             memcpy(data, s.data, width * height * channels * sizeof(T));
             mtx->unlock();
+
+            texture = s.texture;
+            gen_tex = s.gen_tex;
+
             return *this;
         }
 
@@ -151,50 +153,23 @@ namespace tk{namespace data{
 				gen_tex = true;
 				glGenTextures(1, &texture);
         	}
-
-			int col = 0, row = 0;
-			int num_rows, num_cols;
-			float x, y, w, h;
-			float ratio = -1;
-
-			if(!fullscreen)
-				ratio = float(this->width) / float(this->height);
-
-			tk::gui::Viewer::tkSplitPanel(n, ratio, xLim, num_cols, num_rows, w, h, x, y);
-
-			if(fullscreen){
-				x = x * ((float)width/(float)height);
-				w = w * ((float)width/(float)height);
-			}
-			else{
-				x = x + ((float)width/(float)height) - xLim;
-			}
-
 			this->toGL();
 
-			int i = index;
-			col = num_cols - i / num_rows - 1;
-			row = i % num_rows;
-			// draw 2D HUD
-			int dimW = width/num_rows;
-			int dimH = height/num_rows;
+        	if(tk::gui::Viewer::image_width != this->width)
+				tk::gui::Viewer::image_width = this->width;
+			if(tk::gui::Viewer::image_height != this->height)
+				tk::gui::Viewer::image_height = this->height;
+
+        	float w,h;
 
 			glPushMatrix(); {
-
-				tk::gui::Viewer::tkViewport2D(dimW, dimH, col * dimW, height - dimH*((i%num_rows)+1));
-
-				glTranslatef(x + ( col * w ), y + ( row * h ), 0);
+				tk::gui::Viewer::tkViewportImage(width, height, xLim, yLim, index, w, h);
 
 				glColor4f(1,1,1,1);
-				tk::gui::Viewer::tkDrawTexture(texture, h, w);
+				tk::gui::Viewer::tkDrawTexture(texture, 1, 1);
 
 			} glPopMatrix();
 
         }
     };
-
-    template <class T>
-    int ImageData<T>::n = 1;
-	template <class T>
-	bool ImageData<T>::fullscreen = false;
 }}

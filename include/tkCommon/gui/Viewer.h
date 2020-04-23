@@ -15,10 +15,6 @@
 #include "tkCommon/gui/imgui_impl_glfw.h"
 #include "tkCommon/gui/imgui_impl_opengl3.h"
 
-//#include "tkCommon/data/RadarData.h"
-//#include "tkCommon/data/LidarData.h"
-//#include "tkCommon/data/ImageData.h"
-
 #include <tkCommon/gui/Drawable.h>
 
 #include "tkCommon/gui/libdrawtext/drawtext.h"
@@ -128,6 +124,7 @@ namespace tk { namespace gui {
 
         //static void tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture);
         static void tkSplitPanel(int count, float ratio, float xLim, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y);
+        static void tkViewportImage(int width, int height, float xLim, float yLim, int im_id, float &im_width, float &im_height);
 
 		void add(std::string name, Drawable *data);
 
@@ -151,6 +148,11 @@ namespace tk { namespace gui {
         static const int        MAX_KEYS = 1024;
         static bool             keys[MAX_KEYS];
         static std::vector<tk::gui::Color_t> colors;
+
+        static int image_count;
+        static int image_fullscreen;
+        static int image_width;
+        static int image_height;
 
         bool drawLogo = true;
         std::vector<tk::common::Vector3<float>> logo;

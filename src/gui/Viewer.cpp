@@ -6,6 +6,10 @@ using namespace tk::gui;
 bool            Viewer::keys[MAX_KEYS];
 MouseView3D     Viewer::mouseView;
 GLUquadric*     Viewer::quadric;
+int 			Viewer::image_count = 1;
+int 			Viewer::image_fullscreen = false;
+int 			Viewer::image_width = 1920;
+int 			Viewer::image_height = 1208;
 
 std::vector<Color_t> tk::gui::Viewer::colors = std::vector<Color_t>{color::RED, color::PINK, 
                                                                     color::BLUE, color::YELLOW, 
@@ -925,6 +929,44 @@ Viewer::tkSplitPanel(int count, float ratio, float xLim, int &num_cols, int &num
         x = -w * ((float) num_cols / 2) + w / 2;
         y = -1.0f + h / 2;
     }
+}
+
+void
+Viewer::tkViewportImage(int width, int height, float xLim, float yLim, int im_id, float &im_width, float &im_height){
+
+	int col = 0, row = 0;
+	int num_rows, num_cols;
+	float x, y, w, h;
+	float ratio = -1;
+
+	if(!image_fullscreen){
+		ratio = float(image_width) / float(image_height);
+	}
+
+	tk::gui::Viewer::tkSplitPanel(image_count, ratio, xLim, num_cols, num_rows, w, h, x, y);
+
+	if(image_fullscreen){
+		x = x * ((float)width/(float)height);
+		w = w * ((float)width/(float)height);
+	}
+	else{
+		x = x + ((float)width/(float)height) - xLim;
+	}
+
+	int i = im_id;
+	col = num_cols - i / num_rows - 1;
+	row = i % num_rows;
+	// draw 2D HUD
+	int dimW = width/num_rows;
+	int dimH = height/num_rows;
+
+	tkViewport2D(dimW, dimH, col * dimW, height - dimH*((i%num_rows)+1));
+
+	glTranslatef(x + ( col * w ), y + ( row * h ), 0);
+	glScalef( w, h, 1);
+
+	im_width = w;
+	im_height = h;
 }
 
 void

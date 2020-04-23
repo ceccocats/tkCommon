@@ -2,6 +2,7 @@
 #include "tkCommon/common.h"
 #include "tkCommon/data/SensorData.h"
 #include "tkCommon/data/VehicleData.h"
+#include "tkCommon/data/ImageData.h"
 #include <vector>
 
 ///////////////////////////////////////////////in fondo la vecchia
@@ -12,13 +13,14 @@ namespace tk{ namespace perception{
  * @brief enum perception type used for polymorphism
  */
 enum class type{
-    NOT_SET = 0,
-    LANE    = 1,
-    BOX2D   = 2,
-    RT2DBOX = 3,
-    BOX3D   = 4,
-    RT3DBOX = 5,
-    SIGN    = 6
+    NOT_SET  = 0,
+    LANE     = 1,
+    BOX2D    = 2,
+    RT2DBOX  = 3,
+    BOX3D    = 4,
+    RT3DBOX  = 5,
+    SIGN     = 6,
+	BOUNDARY = 7
 };
 
 /**
@@ -44,14 +46,18 @@ class lane_type{
             return std::string{"type error"};
         }
 
-    private:
+        lane_type& operator=(const Value & s){
+			this->value = s;
+			return *this;
+		}
+
         lane_type::Value value;
 };
 
 /**
- * @brief box type
+ * @brief detected object type
  */
-class box_type{
+class obj_class{
 
     public:
         enum Value : uint8_t{
@@ -59,22 +65,31 @@ class box_type{
         PEDESTRIAN  = 1,
         CAR         = 2,
         MOTOBIKE    = 3,
-        CYCLE       = 4};
+        CYCLE       = 4,
+        ROADSIGN	= 5,
+        LIGHT		= 6};
 
         /**
          * @brief   method for convert id to box detection string name
          */
         std::string toString(){
-            if(value == box_type::NOT_CLS)      return std::string{"not classified"};
-            if(value == box_type::PEDESTRIAN)   return std::string{"pedestrian"};
-            if(value == box_type::CAR)          return std::string{"car"};
-            if(value == box_type::MOTOBIKE)     return std::string{"motobike"};
-            if(value == box_type::CYCLE)        return std::string{"cycle"};
+            if(value == obj_class::NOT_CLS)      return std::string{"not classified"};
+            if(value == obj_class::PEDESTRIAN)   return std::string{"pedestrian"};
+            if(value == obj_class::CAR)          return std::string{"car"};
+            if(value == obj_class::MOTOBIKE)     return std::string{"motobike"};
+            if(value == obj_class::CYCLE)        return std::string{"cycle"};
+			if(value == obj_class::ROADSIGN)     return std::string{"road sign"};
+			if(value == obj_class::LIGHT)     	 return std::string{"traffic light"};
             return std::string{"type error"};
         }
 
+		obj_class& operator=(const Value & s){
+			this->value = s;
+			return *this;
+		}
+
     private:
-        box_type::Value value;
+		obj_class::Value value;
 };
 
 /**
@@ -137,6 +152,11 @@ class sign_type{
             if(value == sign_type::NO_ENTRY)            return std::string{"no entry"};
             return std::string{"type error"};
         }
+		sign_type& operator=(const Value & s){
+			this->value = s;
+			return *this;
+		}
+
 
     private:
         sign_type::Value value;
@@ -165,19 +185,60 @@ class semaphore_status{
             if(value == semaphore_status::BLINK)    return std::string{"blink"};
             return std::string{"type error"};
         }
+
+		semaphore_status& operator=(const Value & s){
+			this->value = s;
+			return *this;
+		}
     
     private:
         semaphore_status::Value value;
 };
 
 /**
+ * @brief boundary point type
+ */
+class boundary_type {
+public:
+	enum Value : uint8_t{
+		OTHER     	= 0,
+		CURB      	= 1,
+		VEHICLE		= 2,
+		PERSON		= 3,
+		UNDEFINED	= 4};
+
+	/**
+	 * @brief   method for convert id to semaphore status string name
+	 */
+	std::string toString(){
+		if(value == boundary_type::OTHER)     	return std::string{"other"};
+		if(value == boundary_type::CURB)   		return std::string{"curb"};
+		if(value == boundary_type::VEHICLE)    	return std::string{"vehicle"};
+		if(value == boundary_type::PERSON)    	return std::string{"person"};
+		if(value == boundary_type::UNDEFINED)   return std::string{"undefined"};
+		return std::string{"type error"};
+	}
+
+	boundary_type& operator=(const Value & s){
+		this->value = s;
+		return *this;
+	}
+
+private:
+	boundary_type::Value value;
+};
+
+/**
  * @brief generic perception class used for polymorphism
  */
-class generic{
+class generic : public tk::gui::Drawable{
     protected:
         type classtype;
-    
+
     public:
+		int sensorID = 0;
+		double confidence;
+
         bool init(){
             classtype = type::NOT_SET;
             return true;
@@ -190,9 +251,9 @@ class generic{
 /**
  * @brief single lane data
  */
-class lane : public generic{
+class lane2D : public generic{
     public:
-        std::vector<tk::common::Vector3<float>> points;
+        std::vector<tk::common::Vector2<float>> points;
         lane_type                          laneType;
     
     public:
@@ -200,35 +261,126 @@ class lane : public generic{
             classtype = type::LANE;
             return true;
         }
-        lane& operator=(const lane& s){
+        lane2D& operator=(const lane2D& s){
 
             this->points    = s.points;
             this->laneType  = s.laneType;
             return *this;
         }
+		void draw2D(int width, int height, float xLim, float yLim){
+			float w,h;
+
+			glPushMatrix(); {
+				tk::gui::Viewer::tkViewportImage(width, height, xLim, yLim, sensorID, w, h);
+
+				glTranslatef(-0.5, 0.5, 0);
+				glScalef(1.0f/tk::gui::Viewer::image_width, -1.0f/tk::gui::Viewer::image_height, 1);
+
+				glColor4f(0,0,1,1);
+				for(int i = 0; i < points.size()-1; i++){
+					tk:gui::Viewer::tkDrawLine(
+						tk::common::Vector3<float>(points[i].x, points[i].y, 0),
+						tk::common::Vector3<float>(points[i+1].x, points[i+1].y, 0)
+				);
+				}
+
+			} glPopMatrix();
+		}
 };
 
 /**
  * @brief single 2D box data
  */
-class box2D : public generic{
+class box2D {
+	public:
+		int x=0, y=0, w=0, h=0;
+		box2D& operator=(const box2D& s){
+
+			this->x   = s.x;
+			this->y   = s.y;
+			this->w   = s.w;
+			this->h   = s.h;
+			return *this;
+		}
+};
+
+/**
+ * @brief detected 2D object
+ */
+class object2D : public generic{
     public:
-        tk::common::Vector2<float>  pos;
-        tk::common::Vector2<float>  dim;
-        box_type                    objType;
-    
-    public:
+        box2D 		box;
+        obj_class   objType;
+
         bool init(){
             classtype = type::BOX2D;
             return true;
         }
-        box2D& operator=(const box2D& s){
+		object2D& operator=(const object2D& s){
 
-            this->pos       = s.pos;
-            this->dim       = s.dim;
+            this->box 		= s.box;
             this->objType   = s.objType;
             return *this;
         }
+
+        void draw2D(int width, int height, float xLim, float yLim){
+			float w,h;
+
+			glPushMatrix(); {
+				tk::gui::Viewer::tkViewportImage(width, height, xLim, yLim, sensorID, w, h);
+
+				glTranslatef(-0.5, 0.5, 0);
+				glScalef(1.0f/tk::gui::Viewer::image_width, -1.0f/tk::gui::Viewer::image_height, 1);
+
+				glColor4f(0,1,0,1);
+				tk::gui::Viewer::tkDrawRectangle(
+						tk::common::Vector3<float>( (float)box.x + (float)box.w/2, (float)box.y + (float)box.h/2, 0),
+						tk::common::Vector3<float>( (float)box.w, (float)box.h, 0),
+						false
+						);
+
+			} glPopMatrix();
+        }
+};
+
+/**
+ * @brief boundary data
+ */
+class boundary : public generic{
+	public:
+		std::vector<tk::common::Vector3<float>> points;
+		std::vector<boundary_type> types;
+
+		bool init(){
+			classtype = type::BOUNDARY;
+		}
+
+		boundary& operator=(const boundary& s){
+
+			this->points  = s.points;
+			this->types   = s.types;
+			return *this;
+		}
+
+		void draw2D(int width, int height, float xLim, float yLim){
+			float w,h;
+
+			glPushMatrix(); {
+				tk::gui::Viewer::tkViewportImage(width, height, xLim, yLim, sensorID, w, h);
+
+				glTranslatef(-0.5, 0.5, 0);
+				glScalef(1.0f/tk::gui::Viewer::image_width, -1.0f/tk::gui::Viewer::image_height, 1);
+
+				glColor4f(1,0,0,1);
+				for(int i = 0; i < points.size()-1; i++){
+					tk:gui::Viewer::tkDrawLine(
+							tk::common::Vector3<float>(points[i].x, points[i].y, points[i].z),
+							tk::common::Vector3<float>(points[i+1].x, points[i+1].y, points[i+1].z)
+							);
+				}
+
+			} glPopMatrix();
+		}
 };
 
 /**
@@ -239,7 +391,7 @@ class rotatedBox2D : public generic{
         tk::common::Vector2<float>  pos;
         tk::common::Vector2<float>  dim;
         tk::common::Vector2<float>  rot;
-        box_type                    objType;
+        obj_class                   objType;
     
     public:
         bool init(){
@@ -263,7 +415,7 @@ class box3D : public generic{
     public:
         tk::common::Vector3<float>  pos;
         tk::common::Vector2<float>  dim;
-        box_type                    objType;
+		obj_class                    objType;
     
     public:
         bool init(){
@@ -287,7 +439,7 @@ class rotatedBox3D : public generic{
         tk::common::Vector3<float>  pos;
         tk::common::Vector3<float>  dim;
         tk::common::Vector3<float>  rot;
-        box_type                    objType;
+		obj_class                    objType;
     
     public:
         bool init(){
@@ -337,7 +489,7 @@ typedef std::vector<generic*> genericsdata;
 /**
  * @brief lane vector
  */
-typedef std::vector<lane> lanesData;
+typedef std::vector<lane2D> lanesData;
 
 /**
  * @brief 2D box vector
