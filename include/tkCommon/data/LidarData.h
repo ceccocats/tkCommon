@@ -24,12 +24,6 @@ namespace tk { namespace data {
         Eigen::MatrixXi polarCloud;
 
         /**
-         * @brief max intensity number
-         * 
-         */
-        int MAX_INTENSITY;
-
-        /**
          * @brief Initialization method only for Eigen points and intensity.
          */
         void init(){
@@ -39,7 +33,6 @@ namespace tk { namespace data {
             this->intensity.resize(1,CLOUD_MAX_POINTS);
             this->idMatrix.resize(0,0);
             header.sensor = sensorName::LIDAR;
-            MAX_INTENSITY = 255;
         }
         /**
          * @brief Initialization method for all data
@@ -110,7 +103,7 @@ namespace tk { namespace data {
 				tk::gui::Viewer::tkSetColor(tk::gui::color::WHITE);
 
 				for (int p = 0; p < nPoints; p++) {
-					float i = float(intensity(p))/MAX_INTENSITY;
+					float i = float(intensity(p));
 					tk::gui::Viewer::tkSetRainbowColor(i);
 					glVertex3f(points.coeff(0,p),points.coeff(1,p),points.coeff(2,p));
 				}
