@@ -303,7 +303,7 @@ namespace tk { namespace data {
 
 			tk::common::Vector2<float> pos;
 			float size;
-			pos = tk::common::Vector2<float>{0,-yLim+0.25};
+			pos = tk::common::Vector2<float>{0,-yLim+0.25f};
 			size = 0.2;
 			double speed = this->speedKMH;
 			int gear = actualGear;
