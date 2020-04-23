@@ -3,7 +3,6 @@
 
 #include <math.h>
 #include "tkCommon/common.h"
-#include <Eigen/Dense>
 
 namespace tk { namespace gui  {
 

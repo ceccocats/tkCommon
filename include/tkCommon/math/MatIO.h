@@ -262,7 +262,7 @@ public:
         bool set(std::string name, Eigen::Matrix<T, A, B> &mat) {
             matio_type<T> mat_type;
             release();
-            size_t dim[2] = { mat.rows(), mat.cols() }; // 1x1, single value
+            size_t dim[2] = { (size_t) mat.rows(), (size_t) mat.cols() }; 
             var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, mat.data(), 0);
             return true;
         }
@@ -270,13 +270,13 @@ public:
         bool set(std::string name, std::vector<T> &vec) {
             matio_type<T> mat_type;
             release();
-            size_t dim[2] = { vec.size(), 1 }; // 1x1, single value
+            size_t dim[2] = { (size_t) vec.size(), 1 }; 
             var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, vec.data(), 0);
             return true;
         }
         bool set(std::string name, std::string &vec) {
             release();
-            size_t dim[2] = { 1, vec.size() }; // 1x1, single value
+            size_t dim[2] = { 1, (size_t) vec.size() }; 
             var = Mat_VarCreate(name.c_str(), MAT_C_CHAR, MAT_T_INT8, 2, dim, (void*)vec.data(), 0);
             return true;
         }
@@ -492,10 +492,10 @@ public:
 class MatDump {
     public: 
 
-    virtual bool fromVar(MatIO::var_t &var) {
+    virtual bool   toVar(std::string name, MatIO::var_t &var) {
         tkFATAL("Not implemented");
     }
-    virtual bool   toVar(std::string name, MatIO::var_t &var) {
+    virtual bool fromVar(MatIO::var_t &var) {
         tkFATAL("Not implemented");
     }
 };

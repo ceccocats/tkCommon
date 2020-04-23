@@ -106,7 +106,7 @@ struct LoopRate {
     void wait(bool print = true) {
         T = getTimeStamp();
 
-        timeStamp_t delta = T - lastT;
+        int64_t delta = T - lastT;
         if(delta >= 0 && delta < dt) {
             usleep(dt - delta);
         } else if(lastT > 0) {

@@ -8,7 +8,7 @@ namespace tk { namespace data {
     /**
      *  Vehicle data definition
      */
-    class VehicleData : public SensorData, public tk::math::MatDump {
+    class VehicleData : public SensorData {
         
         public:
 

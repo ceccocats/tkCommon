@@ -7,7 +7,7 @@ namespace tk { namespace data {
     /**
      *  GPS message frame definition
      */
-    class GPSData : public SensorData, public tk::math::MatDump {
+    class GPSData : public SensorData {
     public:
         // GPS
         double lat, lon, hdop, height;
