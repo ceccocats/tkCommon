@@ -1,8 +1,7 @@
 #pragma once
-#undef Success  // stupid X11
-#include "Eigen/Dense"
+
+#include <tkCommon/common.h>
 using namespace Eigen;
-#include "tkCommon/common.h"
 
 namespace tk { namespace  math {
 

@@ -1,8 +1,6 @@
 #pragma once
 #include "CSpline2D.h"
 
-#undef Success  // stupid X11
-#include "Eigen/Dense"
 using namespace Eigen;
 
 namespace tk { namespace  math {

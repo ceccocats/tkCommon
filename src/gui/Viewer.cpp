@@ -94,8 +94,8 @@ Viewer::init() {
     // font
     {
         int foo = 1;
-        char* bar[1] = {" "}; 
-        glutInit(&foo, bar);
+        const char* bar[1] = {" "}; 
+        glutInit(&foo, (char**)bar);
 
 
         /* XXX dtx_open_font opens a font file and returns a pointer to dtx_font */
@@ -1036,12 +1036,12 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
     tkSetColor(tk::gui::color::YELLOW);
     char speedStr[256];
     sprintf(speedStr, "%.2f", speed/3.6);
-    tkDrawText(speedStr, tk::common::Vector3<float>{pose.x, pose.y - 0.08, 0},
+    tkDrawText(speedStr, tk::common::Vector3<float>{pose.x, pose.y - 0.08f, 0},
                          tk::common::Vector3<float>{0, 0, 0},
-                         tk::common::Vector3<float>{0.05, 0.05, 0.0});
-    tkDrawText("km/h", tk::common::Vector3<float>{pose.x, pose.y - 0.12, 0},
+                         tk::common::Vector3<float>{0.05f, 0.05f, 0.0f});
+    tkDrawText("km/h", tk::common::Vector3<float>{pose.x, pose.y - 0.12f, 0},
                        tk::common::Vector3<float>{0, 0, 0},
-                       tk::common::Vector3<float>{0.03, 0.03, 0.0});
+                       tk::common::Vector3<float>{0.03f, 0.03f, 0.0f});
 
     // danger zone
     tkSetColor(tk::gui::color::RED);

@@ -3,7 +3,7 @@
 namespace tk { namespace communication {
 
     #pragma pack(push, 1)
-    typedef struct AutosarHeader_t {
+    struct AutosarHeader_t {
         uint32_t id;
         uint32_t datalenght;
     };

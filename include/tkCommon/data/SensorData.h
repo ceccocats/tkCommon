@@ -28,9 +28,9 @@ namespace tk { namespace data {
          * @brief Release method.
          * Must be implemented by child classes, and will handle the deallocation of member variables, if any,
          */
-        virtual void release() = 0;
+        virtual void release() { clsErr("release method not implemented"); tkFATAL("abort"); };
 
-        virtual bool checkDimension(SensorData *s) = 0;
+        virtual bool checkDimension(SensorData *s) { clsErr("check dimension method not implemented"); tkFATAL("abort"); };
 
         /**
          * @brief Overloading of operator =
@@ -41,9 +41,7 @@ namespace tk { namespace data {
          */
         SensorData& operator=(const SensorData &s) {
             tkASSERT(checkDimension((SensorData*)&s));
-
             this->header        = s.header;
-
             return *this;
         }
     };

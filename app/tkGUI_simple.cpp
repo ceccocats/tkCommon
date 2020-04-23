@@ -185,8 +185,7 @@ void *update_th(void *data) {
         arrow.angle = angle;
 		tornado.angle = angle;
         speedometer.speed = speed;
-
-        tornado.plotManger.addPoint("test", tk::common::Vector3<float>{3.0f*cos(angle), 3.0f*sin(angle), 0});
+	    tornado.plotManger.addPoint("test", tk::common::Vector3<float>{3.0f*cos(angle), 3.0f*sin(angle), 0});
 
         viewer->add("levante", &levante);
 		viewer->add("arrow", &arrow);

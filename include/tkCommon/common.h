@@ -7,9 +7,11 @@
 #include <iomanip>
 #include <csignal>
 
+#undef Success // defined by X11 cause conflicts with Eigen
 #include <Eigen/Dense>
 #include "matio.h"
 
+#undef None // defined by X11 cause conflicts with YAML
 #include "tkCommon/utils.h"
 #include "tkCommon/timer.h"
 #include "tkCommon/geodetic_conv.h"
