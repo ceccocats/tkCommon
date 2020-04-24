@@ -5,6 +5,15 @@
 #include "tkCommon/data/VehicleData.h"
 
 namespace tk { namespace communication {
+
+    static inline uint64_t reverse_byte_order(uint64_t x)
+    {
+        x = (x & 0x00000000FFFFFFFF) << 32 | (x & 0xFFFFFFFF00000000) >> 32;
+        x = (x & 0x0000FFFF0000FFFF) << 16 | (x & 0xFFFF0000FFFF0000) >> 16;
+        x = (x & 0x00FF00FF00FF00FF) << 8  | (x & 0xFF00FF00FF00FF00) >> 8;
+        return x;
+    }
+
     class VehicleCanParser {
     public:
         std::map<int, Message> msgs;
@@ -53,12 +62,19 @@ namespace tk { namespace communication {
                 return;
 
             for(auto sig : msgs[frame.id()]) {
-                std::cout<<sig.getName()<<"\n";
                 uint64_t x = *frame.data();
-                
-                double val = x;
-                std::cout<<x<<"\n";
+
+                // decode
+                x = reverse_byte_order(x);
+                uint64_t lmask = 0xffffffffffffffff >> 64 - sig.getLength();
+                int      shift = 64 - (7 - sig.getStartbit()%8 + 8*(sig.getStartbit()/8) + sig.getLength());
+                x = (x >> shift) & lmask;
+
+                double val = double(x)*sig.getFactor() + sig.getOffset();
+            
+                //std::cout<<sig.getName()<<": "<<val<<"\n";
             }
+
         }
     };
 }}
