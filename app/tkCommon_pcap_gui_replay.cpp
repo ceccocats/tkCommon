@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
     tk::common::CmdParser   cmd(argv, "Samples for handle ethernet packets");
     fileLog                 = cmd.addArg("file", "", "pcap replay file");
     port                    = cmd.addIntOpt("-port", 2368, "pcap replay file");
-    cmd.print();
+    cmd.parse();
 
     if(fileLog == ""){
         return 0;

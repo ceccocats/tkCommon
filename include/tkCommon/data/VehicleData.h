@@ -34,8 +34,8 @@ namespace tk { namespace data {
         uint8_t    brakePedalSts        = 0;    /** brake status         [ on/off ]*/
         double     brakeMasterPressure  = 0;    /** brake pressure       [ bar ]*/
         double     gasPedal             = 0;    /** gas padal percentage [ 0-1 ]*/
-        double     engineTorque         = 0;    /** engine torque        [ % ]*/
-        double     engineFrictionTorque = 0;    /** friction torque      [ % ]*/
+        double     engineTorque         = 0;    /** engine torque        [ 0-1 ]*/
+        double     engineFrictionTorque = 0;    /** friction torque      [ 0-1 ]*/
 
         uint8_t    actualGear = 0;              /** current Gear         [ int ]*/
         uint16_t   RPM = 0;                     /** RPM                  [ int ]*/
@@ -47,7 +47,7 @@ namespace tk { namespace data {
 
 
         double     sideSlip     = 0;        /** beta angle               [ rad   ]*/
-        uint8_t    tractionGrip = 0;        /** traction control grip    [ ? ]*/
+        uint8_t    tractionGrip = 0;        /** traction control grip    [ 0-1 ]*/
 
         // faults
         uint8_t ESPFault = 0;
@@ -64,38 +64,24 @@ namespace tk { namespace data {
 
         /** Boolean variable for know if new data is arrived*/
         bool Bspeed = 0, Bsteer = 0;
-        int  posBuffer = 0;
-
-        #define ODOM_BUFFER_SIZE 10
         struct odom_t {
             long double x = 0;
             long double y = 0;
             long double z = 0;
             long double yaw = 0;
-            uint64_t t = 0;
-        } odometryBuffer[ODOM_BUFFER_SIZE];
+        } odom;
 
-        bool carOdometry(odom_t &odom, uint64_t time = 0){
-
-            int bufPos = posBuffer;
-            for(int i=1; i<ODOM_BUFFER_SIZE; i++) {
-                int c = (bufPos - i) % ODOM_BUFFER_SIZE;
-                if(c <0)
-                    c += ODOM_BUFFER_SIZE;
-
-                if(odometryBuffer[c].t < time || time == 0){
-                    odom = odometryBuffer[c];
-                    //if(odom.t == 0)
-                    //    return false;
-                    return true;
-                }
-            }
+        bool carOdometry(odom_t &out_odom){
+            if(odom.x != 0 || odom.y != 0 || odom.z != 0 || odom.yaw != 0) {
+                out_odom = odom;
+                return true;
+            } 
             return false;
         }
 
-        bool carOdometry(tk::common::Tfpose &tf, uint64_t time = 0){
+        bool carOdometry(tk::common::Tfpose &tf){
             odom_t odom;
-            bool status = carOdometry(odom, time);
+            bool status = carOdometry(odom);
             tf = tk::common::odom2tf(odom.x, odom.y, odom.yaw);
             return status;
         }
@@ -156,15 +142,7 @@ namespace tk { namespace data {
             this->carDirection          = s.carDirection;
             this->Bspeed                = s.Bspeed;
             this->Bsteer                = s.Bsteer;
-            this->posBuffer             = s.posBuffer;
-
-            for(int i=0; i < ODOM_BUFFER_SIZE; i++){
-                this->odometryBuffer[i].x   = s.odometryBuffer[i].x;
-                this->odometryBuffer[i].y   = s.odometryBuffer[i].y;
-                this->odometryBuffer[i].z   = s.odometryBuffer[i].z;
-                this->odometryBuffer[i].yaw = s.odometryBuffer[i].yaw;
-                this->odometryBuffer[i].t   = s.odometryBuffer[i].t;
-            }
+            this->odom                  = s.odom;
 
             return *this;
          }

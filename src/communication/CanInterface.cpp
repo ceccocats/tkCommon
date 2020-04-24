@@ -200,7 +200,7 @@ namespace tk { namespace communication {
         if(offlineMode){
             if(pcapmode)
                 pcap.close();
-            else
+            else 
                 logstream.close();
             return true;
         }else{
