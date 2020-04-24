@@ -13,8 +13,58 @@ namespace tk { namespace communication {
         x = (x & 0x00FF00FF00FF00FF) << 8  | (x & 0xFF00FF00FF00FF00) >> 8;
         return x;
     }
+    void vehicleCalculateOdometry(tk::data::VehicleData *veh, float freq = 0.02){
+        //data read
+        veh->Bspeed=veh->Bsteer=false;
+
+        //actual angle of immaginary central wheel
+        double wheelsAngle = veh->wheelAngle;
+        //distance from car velocity
+        double dist = (veh->speed)*freq;
+        //radius of steering circle
+        double radius = veh->CAR_WHEELBASE/sin(wheelsAngle);
+        radius=fabs(radius);
+
+        //circumference
+        double circumference = radius * 2 * M_PI;
+        if(dist != 0){
+            if(wheelsAngle > -0.001 && wheelsAngle < 0.001){
+                veh->x += sin(veh->carDirection)*dist;
+                veh->y += cos(veh->carDirection)*dist;
+            }else{
+                //angle of car rotation
+                double angle = (dist / circumference)  * 2 * M_PI;
+                //distance from last and new point
+                double di = sin(angle/2)*2*radius;
+                //tempo of last carDirection
+                double temp = veh->carDirection;
+
+                if(wheelsAngle > 0){
+                    //destra
+                    veh->carDirection-=angle;
+                }else{
+                    //sinistra
+                    veh->carDirection+=angle;
+                }
+
+                //direction of car
+                double dir = (temp+veh->carDirection)/2;
+                veh->x += sin(dir)*di;
+                veh->y += cos(dir)*di;
+            }
+        }
+
+        //write data
+        veh->odom.x = veh->x;
+        veh->odom.y = veh->y;
+        veh->odom.yaw = -veh->carDirection +M_PI/2;
+    }
+
 
     class VehicleCanParser {
+    private:
+        tk::data::VehicleData tmpVeh;
+
     public:
         std::map<int, Message> msgs;
 
@@ -58,8 +108,6 @@ namespace tk { namespace communication {
             
             if(msgs.count(frame.id()) == 0)
                 return;
-            if(frame.id() != 326)
-                return;
 
             for(auto sig : msgs[frame.id()]) {
                 uint64_t x = *frame.data();
@@ -73,6 +121,42 @@ namespace tk { namespace communication {
                 double val = double(x)*sig.getFactor() + sig.getOffset();
             
                 //std::cout<<sig.getName()<<": "<<val<<"\n";
+
+                // TODO: faster impl
+                if(sig.getName() == "speedKMH") { 
+                    vehData.speedKMH = val; 
+                    vehData.speed = val/3.6;
+                    vehData.Bspeed = true;
+                    
+                    //odometry calculation
+                    if(vehData.Bspeed && vehData.Bsteer){
+                        vehicleCalculateOdometry(&vehData);
+                    }
+                } else if(sig.getName() == "wheelAngle")  {
+                    vehData.wheelAngle = val/180.0*M_PI;
+                    vehData.Bsteer = true;
+                }      
+                else if(sig.getName() == "yawRate")             vehData.yawRate = val/180.0*M_PI;
+                else if(sig.getName() == "accelX")              vehData.accelX = val;
+                else if(sig.getName() == "accelY")              vehData.accelY = val;
+                else if(sig.getName() == "steerAngle")          vehData.steerAngle = val/180.0*M_PI;
+                else if(sig.getName() == "steerAngleRate")      vehData.steerAngleRate = val/180.0*M_PI;
+                else if(sig.getName() == "brakePedalSts")       vehData.brakePedalSts = val;
+                else if(sig.getName() == "brakeMasterPressure") vehData.brakeMasterPressure = val;
+                else if(sig.getName() == "gasPedal")            vehData.gasPedal = val;
+                else if(sig.getName() == "engineTorque")        vehData.engineTorque = val;
+                else if(sig.getName() == "actualGear")          vehData.actualGear = val;
+                else if(sig.getName() == "RPM")                 vehData.RPM = val;
+                else if(sig.getName() == "wheelFLspeed")        vehData.wheelFLspeed = val/3.6;
+                else if(sig.getName() == "wheelFRspeed")        vehData.wheelFRspeed = val/3.6;
+                else if(sig.getName() == "wheelRLspeed")        vehData.wheelRLspeed = val/3.6;
+                else if(sig.getName() == "wheelRRspeed")        vehData.wheelRRspeed = val/3.6;
+                else if(sig.getName() == "wheelFLDir")          vehData.wheelFLDir = val;
+                else if(sig.getName() == "wheelFRDir")          vehData.wheelFRDir = val;
+                else if(sig.getName() == "wheelRLDir")          vehData.wheelRLDir = val;
+                else if(sig.getName() == "wheelRRDir")          vehData.wheelRRDir = val;   
+                else if(sig.getName() == "sideSlip")            vehData.sideSlip = val;   
+                else if(sig.getName() == "tractionGrip")        vehData.tractionGrip = val;   
             }
 
         }
