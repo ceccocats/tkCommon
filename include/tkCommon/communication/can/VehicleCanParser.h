@@ -13,7 +13,7 @@ namespace tk { namespace communication {
         x = (x & 0x00FF00FF00FF00FF) << 8  | (x & 0xFF00FF00FF00FF00) >> 8;
         return x;
     }
-    void vehicleCalculateOdometry(tk::data::VehicleData *veh, float freq = 0.02){
+    static inline void vehicleCalculateOdometry(tk::data::VehicleData *veh, uint64_t t, float freq = 0.02){
         //data read
         veh->Bspeed=veh->Bsteer=false;
 
@@ -58,6 +58,7 @@ namespace tk { namespace communication {
         veh->odom.x = veh->x;
         veh->odom.y = veh->y;
         veh->odom.yaw = -veh->carDirection +M_PI/2;
+        veh->odom.t = t;
     }
 
 
@@ -130,7 +131,7 @@ namespace tk { namespace communication {
                     
                     //odometry calculation
                     if(vehData.Bspeed && vehData.Bsteer){
-                        vehicleCalculateOdometry(&vehData);
+                        vehicleCalculateOdometry(&vehData, frame.stamp);
                     }
                 } else if(sig.getName() == "wheelAngle")  {
                     vehData.wheelAngle = val/180.0*M_PI;

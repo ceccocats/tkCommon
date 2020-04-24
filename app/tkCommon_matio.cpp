@@ -19,7 +19,7 @@ int main( int argc, char** argv){
 
     tk::common::CmdParser cmd(argv, "test matio");
     std::string matfile = cmd.addArg("matfile", "matlab.mat", "path of the mat file");
-    cmd.print();
+    cmd.parse();
 
     tk::math::MatIO mat;
     mat.create(matfile);

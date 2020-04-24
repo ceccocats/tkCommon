@@ -31,23 +31,23 @@ namespace tk { namespace data {
         double     steerAngleRate = 0;          /** steering wheel angle [ rad/s ]*/
         double     wheelAngle     = 0;          /** wheel angle          [ rad   ]*/
 
-        uint8_t    brakePedalSts        = 0;    /** brake status         [ on/off ]*/
+        int        brakePedalSts        = 0;    /** brake status         [ on/off ]*/
         double     brakeMasterPressure  = 0;    /** brake pressure       [ bar ]*/
         double     gasPedal             = 0;    /** gas padal percentage [ 0-1 ]*/
         double     engineTorque         = 0;    /** engine torque        [ 0-1 ]*/
         double     engineFrictionTorque = 0;    /** friction torque      [ 0-1 ]*/
 
-        uint8_t    actualGear = 0;              /** current Gear         [ int ]*/
-        uint16_t   RPM = 0;                     /** RPM                  [ int ]*/
+        int    actualGear = 0;              /** current Gear         [ int ]*/
+        int    RPM = 0;                     /** RPM                  [ int ]*/
 
         /**wheel speeds         [ m/s ]*/
         double     wheelFLspeed =0, wheelFRspeed =0, wheelRLspeed =0, wheelRRspeed =0;
         /**wheel dir            [int] ** 0:no_dir   1:forward   2:backward   4:invalid*/
-        uint8_t    wheelFLDir =0, wheelFRDir =0, wheelRLDir =0, wheelRRDir =0;
+        int        wheelFLDir =0, wheelFRDir =0, wheelRLDir =0, wheelRRDir =0;
 
 
         double     sideSlip     = 0;        /** beta angle               [ rad   ]*/
-        uint8_t    tractionGrip = 0;        /** traction control grip    [ 0-1 ]*/
+        int        tractionGrip = 0;        /** traction control grip    [ 0-1 ]*/
 
         // faults
         uint8_t ESPFault = 0;
@@ -69,6 +69,7 @@ namespace tk { namespace data {
             long double y = 0;
             long double z = 0;
             long double yaw = 0;
+            uint64_t t = 0;
         } odom;
 
         bool carOdometry(odom_t &out_odom){
@@ -156,10 +157,6 @@ namespace tk { namespace data {
   
         bool toVar(std::string name, tk::math::MatIO::var_t &var) {
 
-            // save uint8 in matlab as double
-            double actualGear_d = actualGear;
-            double tractionGrip_d = tractionGrip;
-
             std::vector<tk::math::MatIO::var_t> structVars(25);
             structVars[ 0].set("stamp",              header.stamp);
             structVars[ 1].set("CAR_WHEELBASE",      CAR_WHEELBASE); 
@@ -179,13 +176,13 @@ namespace tk { namespace data {
             structVars[15].set("brakeMasterPressure",brakeMasterPressure);
             structVars[16].set("gasPedal",           gasPedal);
             structVars[17].set("engineTorque",       engineTorque);
-            structVars[18].set("actualGear_d",       actualGear_d);
+            structVars[18].set("actualGear",         actualGear);
             structVars[19].set("wheelFLspeed",       wheelFLspeed);
             structVars[20].set("wheelFRspeed",       wheelFRspeed);
             structVars[21].set("wheelRLspeed",       wheelRLspeed);
             structVars[22].set("wheelRLspeed",       wheelRLspeed);
             structVars[23].set("sideSlip",           sideSlip);
-            structVars[25].set("tractionGrip_d",     tractionGrip_d);
+            structVars[25].set("tractionGrip",       tractionGrip);
             return var.setStruct(name, structVars);
         }
 
@@ -193,10 +190,6 @@ namespace tk { namespace data {
         bool fromVar(tk::math::MatIO::var_t &var) {
             if(var.empty())
                 return false;
-
-            // saved in matlab as double
-            double actualGear_d;
-            double tractionGrip_d;
 
             var["stamp"              ].get(header.stamp);
             var["CAR_WHEELBASE"      ].get(CAR_WHEELBASE); 
@@ -216,16 +209,13 @@ namespace tk { namespace data {
             var["brakeMasterPressure"].get(brakeMasterPressure);
             var["gasPedal"           ].get(gasPedal);
             var["engineTorque"       ].get(engineTorque);
-            var["actualGear_d"       ].get(actualGear_d);
+            var["actualGear"         ].get(actualGear);
             var["wheelFLspeed"       ].get(wheelFLspeed);
             var["wheelFRspeed"       ].get(wheelFRspeed);
             var["wheelRLspeed"       ].get(wheelRLspeed);
             var["wheelRLspeed"       ].get(wheelRLspeed);
             var["sideSlip"           ].get(sideSlip);
-            var["tractionGrip_d"     ].get(tractionGrip_d);
-
-            actualGear = actualGear_d;
-            tractionGrip = tractionGrip_d;
+            var["tractionGrip"       ].get(tractionGrip);
             return true;
         }
     };
