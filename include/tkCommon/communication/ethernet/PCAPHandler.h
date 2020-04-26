@@ -6,6 +6,7 @@
 #include <pcap.h>
 
 namespace tk { namespace communication {
+
     class PCAPHandler {
     public:
         PCAPHandler();

@@ -96,9 +96,16 @@ int tk::communication::PCAPHandler::getPacket(uint8_t* buffer, timeStamp_t& stam
         return -1;
     }
 
-    struct pcap_pkthdr *header;
+    /*struct pcap_pkthdr *header;
     const u_char *pkt_data;
     int returnValue = pcap_next_ex(this->pcapFile, &header, &pkt_data);
+
+    struct sniff_ip* ip_header = (struct sniff_ip*)(pkt_data + SIZE_ETHERNET);
+
+    std::cout<<"-----"<<std::endl;
+    
+    std::cout<<"******"<<std::endl;
+
 
     if (returnValue < 0){
         clsWrn("end of packet file.\n");
@@ -112,10 +119,14 @@ int tk::communication::PCAPHandler::getPacket(uint8_t* buffer, timeStamp_t& stam
         HEADER_LEN = pcap_header.headerLen;
     }
     std::memcpy(buffer,pkt_data + HEADER_LEN,header->len - HEADER_LEN);
-
     //stamp = header->ts.tv_sec;
-    stamp = header->ts.tv_sec * 1e6 + header->ts.tv_usec;
-    return header->len - HEADER_LEN;
+    stamp = header->ts.tv_sec * 1e6 + header->ts.tv_usec;*/
+
+    int n = skipHeaderAndUnfrag(pcapFile,buffer,stamp);
+
+    //std::cout<<"stamp:"<<stamp<<std::endl;
+
+    return n;
 }
 
 bool tk::communication::PCAPHandler::close(){
