@@ -20,7 +20,15 @@ tk::communication::PacketParser::firstFrame(pcap_t* pcapFile, timeStamp_t& stamp
     if (size_ip < 20) return -1;
 
     // if is fragmented ?
-    if(ip->ip_off != 32 &&  ip->ip_off != 64){
+    if(ip->ip_off != FRAGMENT_MASK){
+
+        if(ip->ip_off == 64){
+            return header->len - size_ip - SIZE_ETHERNET;
+        }
+
+        if(ip->ip_off == 0){
+            return header->len - size_ip - SIZE_ETHERNET;
+        }
 
         if(detectFragment == false){
             clsMsg("IP Fragment detected, auto defragment active\n");

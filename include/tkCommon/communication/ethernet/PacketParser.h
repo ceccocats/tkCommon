@@ -95,6 +95,8 @@ namespace tk { namespace communication {
             int     size_ip;
             bool    detectFragment = false;
 
+            static const int FRAGMENT_MASK = 32;
+
             int firstFrame(pcap_t* pcapFile, timeStamp_t& stamp);
             int defragment(pcap_t* pcapFile,uint8_t* buffer, timeStamp_t& stamp, int len_buffer, int total_lenght);
 
