@@ -307,7 +307,10 @@ public:
                 std::string key = std::string(fields[i].var->name);
                 this->fieldMap[key] = fields[i];
                 this->fields.push_back(key);
+                //std::cout<<"key: "<<key<<"\n";
             }
+
+            //std::cout<<"field missmatch: "<<this->fieldMap.size()<<" "<<this->fields.size()<<"\n";
             tkASSERT(this->fieldMap.size() == this->fields.size());
             return true;
         }

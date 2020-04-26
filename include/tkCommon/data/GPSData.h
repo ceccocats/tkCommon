@@ -116,9 +116,11 @@ namespace tk { namespace data {
 
 
         bool toVar(std::string name, tk::math::MatIO::var_t &var) {
+            tk::math::MatIO::var_t hvar;
+            tk::data::SensorData::toVar("header", hvar);
 
             std::vector<tk::math::MatIO::var_t> structVars(15);
-            structVars[ 0].set("stamp",      header.stamp);
+            structVars[ 0] = hvar;
             structVars[ 1].set("lat",        lat);
             structVars[ 2].set("lon",        lon);
             structVars[ 3].set("height",     height);
@@ -141,7 +143,7 @@ namespace tk { namespace data {
             if(var.empty())
                 return false;
 
-            var["stamp"     ].get(header.stamp);
+            tk::data::SensorData::fromVar(var["header"]);
             var["lat"       ].get(lat);
             var["lon"       ].get(lon);
             var["height"    ].get(height);

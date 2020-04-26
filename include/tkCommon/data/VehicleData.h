@@ -33,7 +33,7 @@ namespace tk { namespace data {
 
         int        brakePedalSts        = 0;    /** brake status         [ on/off ]*/
         double     brakeMasterPressure  = 0;    /** brake pressure       [ bar ]*/
-        double     gasPedal             = 0;    /** gas padal percentage [ 0-1 ]*/
+        double     gasPedal             = 0;    /** gas padal            [ 0-1 ]*/
         double     engineTorque         = 0;    /** engine torque        [ 0-1 ]*/
         double     engineFrictionTorque = 0;    /** friction torque      [ 0-1 ]*/
 
@@ -46,8 +46,8 @@ namespace tk { namespace data {
         int        wheelFLDir =0, wheelFRDir =0, wheelRLDir =0, wheelRRDir =0;
 
 
-        double     sideSlip     = 0;        /** beta angle               [ rad   ]*/
-        int        tractionGrip = 0;        /** traction control grip    [ 0-1 ]*/
+        double     sideSlip     = 0;        /** beta angle               [ rad ]*/
+        int        tractionGrip = 0;        /** traction control grip    [ 0-255 ]*/
 
         // faults
         uint8_t ESPFault = 0;
@@ -55,15 +55,11 @@ namespace tk { namespace data {
         // inputs
         uint8_t activateDrive = 0, activateSteer = 0;
 
-        /** Odometry vales in space*/
+        // Odometry vales in space
         long double x = 0;
         long double y = 0;
-
-        /** Direction of car in space*/
-        long double carDirection = 0;
-
-        /** Boolean variable for know if new data is arrived*/
-        bool Bspeed = 0, Bsteer = 0;
+        long double carDirection = 0; // Direction of car in space
+        bool Bspeed = 0, Bsteer = 0;  // Boolean variable for know if new data is arrived
         struct odom_t {
             long double x = 0;
             long double y = 0;
@@ -156,9 +152,11 @@ namespace tk { namespace data {
 
   
         bool toVar(std::string name, tk::math::MatIO::var_t &var) {
+            tk::math::MatIO::var_t hvar;
+            tk::data::SensorData::toVar("header", hvar);
 
             std::vector<tk::math::MatIO::var_t> structVars(25);
-            structVars[ 0].set("stamp",              header.stamp);
+            structVars[ 0] = hvar;
             structVars[ 1].set("CAR_WHEELBASE",      CAR_WHEELBASE); 
             structVars[ 2].set("CAR_DIM_X",          CAR_DIM_X);
             structVars[ 3].set("CAR_DIM_Y",          CAR_DIM_Y);
@@ -180,9 +178,9 @@ namespace tk { namespace data {
             structVars[19].set("wheelFLspeed",       wheelFLspeed);
             structVars[20].set("wheelFRspeed",       wheelFRspeed);
             structVars[21].set("wheelRLspeed",       wheelRLspeed);
-            structVars[22].set("wheelRLspeed",       wheelRLspeed);
+            structVars[22].set("wheelRRspeed",       wheelRRspeed);
             structVars[23].set("sideSlip",           sideSlip);
-            structVars[25].set("tractionGrip",       tractionGrip);
+            structVars[24].set("tractionGrip",       tractionGrip);
             return var.setStruct(name, structVars);
         }
 
@@ -190,8 +188,7 @@ namespace tk { namespace data {
         bool fromVar(tk::math::MatIO::var_t &var) {
             if(var.empty())
                 return false;
-
-            var["stamp"              ].get(header.stamp);
+            tk::data::SensorData::fromVar(var["header"]);
             var["CAR_WHEELBASE"      ].get(CAR_WHEELBASE); 
             var["CAR_DIM_X"          ].get(CAR_DIM_X);
             var["CAR_DIM_Y"          ].get(CAR_DIM_Y);
@@ -216,6 +213,8 @@ namespace tk { namespace data {
             var["wheelRLspeed"       ].get(wheelRLspeed);
             var["sideSlip"           ].get(sideSlip);
             var["tractionGrip"       ].get(tractionGrip);
+
+            speedKMH = speed * 3.6;
             return true;
         }
     };
