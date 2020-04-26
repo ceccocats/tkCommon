@@ -1,9 +1,10 @@
 #pragma once
-
-#include <tkCommon/common.h>
-#include <tkCommon/utils.h>
-#include <tkCommon/terminalFormat.h>
 #include <pcap.h>
+
+#include "tkCommon/common.h"
+#include "tkCommon/utils.h"
+#include "tkCommon/terminalFormat.h"
+#include "tkCommon/communication/ethernet/PacketParser.h"
 
 namespace tk { namespace communication {
 
@@ -60,6 +61,7 @@ namespace tk { namespace communication {
         bool                replayMode;
         pcap_dumper_t       *pcapDumper;
         pcap_t      	    *pcapFile;
+        PacketParser        parser;
 
     };
 }}

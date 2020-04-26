@@ -1,5 +1,4 @@
 #include "tkCommon/communication/ethernet/PCAPHandler.h"
-#include "tkCommon/communication/ethernet/packet_parser.h"
 
 tk::communication::PCAPHandler::PCAPHandler() = default;
 tk::communication::PCAPHandler::~PCAPHandler() = default;
@@ -96,37 +95,14 @@ int tk::communication::PCAPHandler::getPacket(uint8_t* buffer, timeStamp_t& stam
         return -1;
     }
 
-    /*struct pcap_pkthdr *header;
-    const u_char *pkt_data;
-    int returnValue = pcap_next_ex(this->pcapFile, &header, &pkt_data);
+    int len = parser.computeNextPacket(pcapFile,buffer,stamp);
 
-    struct sniff_ip* ip_header = (struct sniff_ip*)(pkt_data + SIZE_ETHERNET);
-
-    std::cout<<"-----"<<std::endl;
-    
-    std::cout<<"******"<<std::endl;
-
-
-    if (returnValue < 0){
-        clsWrn("end of packet file.\n");
+    if(len < 0){
+        clsWrn("Reading error.\n");
         return -1;
     }
 
-    int HEADER_LEN = 0;
-    PCAP_header pcap_header;
-    if(parse_UDP_packet(pkt_data, header->caplen, pcap_header)) {
-        //dump_PCAP_header(pcap_header);
-        HEADER_LEN = pcap_header.headerLen;
-    }
-    std::memcpy(buffer,pkt_data + HEADER_LEN,header->len - HEADER_LEN);
-    //stamp = header->ts.tv_sec;
-    stamp = header->ts.tv_sec * 1e6 + header->ts.tv_usec;*/
-
-    int n = skipHeaderAndUnfrag(pcapFile,buffer,stamp);
-
-    //std::cout<<"stamp:"<<stamp<<std::endl;
-
-    return n;
+    return len;
 }
 
 bool tk::communication::PCAPHandler::close(){
