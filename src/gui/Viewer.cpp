@@ -829,7 +829,7 @@ Viewer::tkDrawLiDARData(tk::data::LidarData *data){
     tkSetColor(tk::gui::color::WHITE);
 
     for (int p = 0; p < data->nPoints; p++) {
-        float i = float(data->intensity(p))/data->MAX_INTENSITY;
+        float i = float(data->intensity(p));
         tkSetRainbowColor(i);
         glVertex3f(data->points.coeff(0,p),data->points.coeff(1,p),data->points.coeff(2,p));
     }
