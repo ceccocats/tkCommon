@@ -15,8 +15,6 @@ namespace tk { namespace communication {
     }
     static inline void vehicleCalculateOdometry(tk::data::VehicleData *veh, uint64_t t, float freq = 0.02){
         //data read
-        veh->Bspeed=veh->Bsteer=false;
-
         //actual angle of immaginary central wheel
         double wheelsAngle = veh->wheelAngle;
         //distance from car velocity
@@ -113,14 +111,33 @@ namespace tk { namespace communication {
             for(auto sig : msgs[frame.id()]) {
                 uint64_t x = *frame.data();
 
+                // check dlc
+                tkASSERT(frame.frame.can_dlc == msgs[frame.id()].getDlc());
+                tkASSERT(sig.getByteOrder() == tk::communication::ByteOrder::MOTOROLA);
+
                 // decode
+                int sigLength = sig.getLength();
                 x = reverse_byte_order(x);
-                uint64_t lmask = 0xffffffffffffffff >> 64 - sig.getLength();
-                int      shift = 64 - (7 - sig.getStartbit()%8 + 8*(sig.getStartbit()/8) + sig.getLength());
+                uint64_t lmask = 0xffffffffffffffff >> 64 - sigLength;
+                int      shift = 64 - (7 - sig.getStartbit()%8 + 8*(sig.getStartbit()/8) + sigLength);
                 x = (x >> shift) & lmask;
 
-                double val = double(x)*sig.getFactor() + sig.getOffset();
-            
+                double val;
+                if(sig.getSign() == tk::communication::Sign::UNSIGNED) {
+                    val = x;
+                } else {
+                    switch(sigLength) {
+                    case  8: val =  int8_t(x); break;
+                    case 16: val = int16_t(x); break;
+                    case 32: val = int32_t(x); break;
+                    case 64: val = int64_t(x); break;
+                    default:                         
+                        tkFATAL("SIGNED integer not supported with lenght: " + std::to_string(sigLength) + "\n");
+                        break;
+                    }
+                }
+                val = val*sig.getFactor() + sig.getOffset();
+
                 //std::cout<<sig.getName()<<": "<<val<<"\n";
 
                 // TODO: faster impl
@@ -132,6 +149,8 @@ namespace tk { namespace communication {
                     //odometry calculation
                     if(vehData.Bspeed && vehData.Bsteer){
                         vehicleCalculateOdometry(&vehData, frame.stamp);
+                        vehData.Bspeed = false;
+                        vehData.Bsteer = false;
                     }
                 } else if(sig.getName() == "wheelAngle")  {
                     vehData.wheelAngle = val/180.0*M_PI;
