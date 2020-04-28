@@ -31,7 +31,9 @@ namespace tk { namespace communication {
 
             //Socket
             int len = this->socket.receive(buffer,20000);
-            stamp           = getTimeStamp();
+            stamp   = getTimeStamp();
+
+            tkASSERT(len != 20000)
             return len;
 
         }

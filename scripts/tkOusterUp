@@ -44,12 +44,12 @@ if [ $# != "0" ]; then
 fi
 
 #set destination ip (this pc)
-echo "set_config_param udp_ip $(hostname -I)" | nc 192.168.1.100 7501
+echo "set_config_param udp_ip $(hostname -I | cut -f 1 -d " ")" | nc 192.168.1.100 7501
 
 if [ $? != "0" ]; then
-	echo -e"\e[41mError setting ip dest $(hostname -I)\e[0m"
+	echo -e"\e[41mError setting ip dest $(hostname -I | cut -f 1 -d " ")\e[0m"
 else
-	echo -e "\e[42mSet ip dest $(hostname -I) (this pc)\e[0m"
+	echo -e "\e[42mSet ip dest $(hostname -I | cut -f 1 -d " ") (this pc)\e[0m"
 fi
 
 #set lidar mode
