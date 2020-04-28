@@ -107,7 +107,6 @@ class obj_class{
 			return v == value;
 		}
 
-    private:
 		obj_class::Value value;
 };
 

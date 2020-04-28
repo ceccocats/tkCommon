@@ -582,7 +582,7 @@ void Viewer::tkSetRainbowColor(float hue) {
     
     uint8_t r = 0, g = 0, b = 0;
     tkRainbowColor(hue, r, g, b);
-    glColor3f(float(r)/255.0, float(g)/255.0, float(b)/255.0);
+    glColor4f(float(r)/255.0, float(g)/255.0, float(b)/255.0, 1.0f);
 }
 
 
@@ -605,7 +605,7 @@ Viewer::tkDrawCloudRGB(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int r
     for (int p = 0; p < points->cols(); p++) {
         if(features->coeff(r, p) == 0 && features->coeff(g, p) == 0 && features->coeff(b, p) == 0)
             continue;
-        glColor3f(features->coeff(r, p), features->coeff(g, p), features->coeff(b, p));
+        glColor4f(features->coeff(r, p), features->coeff(g, p), features->coeff(b, p), 1.0f);
 
         Eigen::Vector4f v = points->col(p);
         glVertex3f(v(0), v(1), v(2));
@@ -748,7 +748,7 @@ Viewer::tkDrawObject3D(object3D_t *obj, float size, bool textured) {
     glBegin(GL_TRIANGLES);
     for(int o=0; o<obj->triangles.size(); o++) {
         if(!textured)
-            glColor3f(obj->colors[o].x, obj->colors[o].y, obj->colors[o].z);
+            glColor4f(obj->colors[o].x, obj->colors[o].y, obj->colors[o].z, 1.0f);
 
         for(int i=0; i<obj->triangles[o].cols(); i++) {
             glTexCoord2f(obj->triangles[o](3,i), obj->triangles[o](4,i)); 

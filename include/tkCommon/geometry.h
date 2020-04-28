@@ -29,6 +29,7 @@ namespace tk{ namespace common{
 		void draw2D(int width, int height, float xLim, float yLim){}
 		void draw(){
 			glPushMatrix();{
+				glDepthMask(GL_FALSE);
 				tk::gui::Viewer::tkSetColor(color);
 				glBegin(GL_POLYGON);
 				for(int i = points.size()-1;i >=0; i--){
@@ -48,6 +49,7 @@ namespace tk{ namespace common{
 					glVertex3f(points[i].x, points[i].y, base_z + height);
 				}
 				glEnd();
+				glDepthMask(GL_TRUE);
 
 				tk::gui::Viewer::tkSetColor(color, 1);
 				glLineWidth(2);
