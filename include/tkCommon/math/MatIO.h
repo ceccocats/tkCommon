@@ -64,10 +64,14 @@ public:
         std::map<std::string, var_t> fieldMap;  // key -> var mapping
 
         bool check(matvar_t *var, matio_types tid, int rank, bool unary = false) {
-            if(var == NULL)
+            if(var == NULL) {
+                clsErr("unable to read var is NULL");
                 return false;
-            if(var->data == NULL)
+            }
+            if(var->data == NULL) {
+                clsErr("unable to read var->data is NULL");
                 return false;
+            }
             if(var->data_type != tid) {
                 clsErr("Unable to read value in var " + std::string(var->name) +"\n");
                 clsErr("type check failed: " + std::to_string(var->data_type) + " != " + std::to_string(tid) + "\n");
@@ -83,6 +87,7 @@ public:
                 clsErr("Dims are not unary: (" + std::to_string(var->dims[0]) + ", " + std::to_string(var->dims[1]) +")\n");
                 return false;
             }
+            return true;
         }
 
     public:
@@ -138,7 +143,9 @@ public:
                         fields.push_back(key);
                     }
                 }
+                tkASSERT(this->fieldMap.size() == this->fields.size());
             }
+            /*
             // parse cell
             else if(var->class_type == MAT_C_CELL) {
                 int n = var->dims[0]*var->dims[1];
@@ -153,7 +160,9 @@ public:
                         fields.push_back(key);
                     }
                 }
-            }        
+                tkASSERT(this->fieldMap.size() == this->fields.size());
+            }   
+            */     
         }
 
         /**
@@ -167,7 +176,7 @@ public:
          * @brief deallocate data and clear structure
          */
         void release() {
-            if(var != NULL)
+            if(var != NULL) 
                 Mat_VarFree(var);
             var = NULL;
             fieldMap.clear();
