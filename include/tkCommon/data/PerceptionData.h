@@ -342,6 +342,7 @@ class object2D : public generic{
     public:
         box2D 		box;
         obj_class   objType;
+        float       orientation;
 
         bool init(){
             classtype = type::BOX2D;
