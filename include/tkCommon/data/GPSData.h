@@ -18,6 +18,7 @@ namespace tk { namespace data {
         // IMU
         double angleX, angleY, angleZ;
         double angleRateX, angleRateY, angleRateZ;
+	    double speedX, speedY, speedZ;
         double accX, accY, accZ;
         double sideSlip;
 
@@ -51,6 +52,9 @@ namespace tk { namespace data {
             angleRateX  = 0;
             angleRateY  = 0;
             angleRateZ  = 0;
+            speedX      = 0;
+            speedY      = 0;
+		    speedZ      = 0;
             accX        = 0;
             accY        = 0;
             accZ        = 0;
@@ -98,6 +102,9 @@ namespace tk { namespace data {
             this->angleRateX  = s.angleRateX;
             this->angleRateY  = s.angleRateY;
             this->angleRateZ  = s.angleRateZ;
+            this->speedX      = s.speedX;
+            this->speedY      = s.speedY;
+            this->speedZ      = s.speedZ;
             this->accX        = s.accX;
             this->accY        = s.accY;
             this->accZ        = s.accZ;
@@ -114,7 +121,8 @@ namespace tk { namespace data {
          */
         friend std::ostream& operator<<(std::ostream& os, const GPSData& m) {
             os << std::setprecision(10) << m.header.stamp<< " Lat/Lon: " << m.lat <<"°/" << m.lon
-               <<"°, Height: "<<m.height<<" Nsats: "<<m.sats<<" quality: "<<m.quality<<"\n";
+               <<"°, Height: "<<m.height<<"\nNsats: "<<m.sats<<" quality: "<<m.quality<<"\nSpeed (x,y,z) "
+               <<m.speedX<<", "<<m.speedY<<", "<<m.speedZ<<"\n";
             return os;
         }
 
@@ -143,6 +151,9 @@ namespace tk { namespace data {
             TK_GPSDATA_MATVAR_DOUBLE(angleRateX);
             TK_GPSDATA_MATVAR_DOUBLE(angleRateY);
             TK_GPSDATA_MATVAR_DOUBLE(angleRateZ);
+            TK_GPSDATA_MATVAR_DOUBLE(speedX);
+            TK_GPSDATA_MATVAR_DOUBLE(speedY);
+            TK_GPSDATA_MATVAR_DOUBLE(speedZ);
             TK_GPSDATA_MATVAR_DOUBLE(accX);
             TK_GPSDATA_MATVAR_DOUBLE(accY);
             TK_GPSDATA_MATVAR_DOUBLE(accZ);
@@ -175,6 +186,9 @@ namespace tk { namespace data {
             TK_GPSDATA_MATVAR_READ_DOUBLE(angleRateX);
             TK_GPSDATA_MATVAR_READ_DOUBLE(angleRateY);
             TK_GPSDATA_MATVAR_READ_DOUBLE(angleRateZ);
+            TK_GPSDATA_MATVAR_READ_DOUBLE(speedX);
+            TK_GPSDATA_MATVAR_READ_DOUBLE(speedY);
+            TK_GPSDATA_MATVAR_READ_DOUBLE(speedZ);
             TK_GPSDATA_MATVAR_READ_DOUBLE(accX);
             TK_GPSDATA_MATVAR_READ_DOUBLE(accY);
             TK_GPSDATA_MATVAR_READ_DOUBLE(accZ);
