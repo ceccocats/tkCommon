@@ -145,7 +145,6 @@ public:
                 }
                 tkASSERT(this->fieldMap.size() == this->fields.size());
             }
-            /*
             // parse cell
             else if(var->class_type == MAT_C_CELL) {
                 int n = var->dims[0]*var->dims[1];
@@ -161,8 +160,7 @@ public:
                     }
                 }
                 tkASSERT(this->fieldMap.size() == this->fields.size());
-            }   
-            */     
+            }       
         }
 
         /**

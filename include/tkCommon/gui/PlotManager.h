@@ -88,7 +88,7 @@ namespace tk { namespace gui {
                         }
 
                     } else if (p->conf.type == plot_t::plottype_t::CIRCLES) {
-                        for (int i = 0; i < p->points.size() - 1; i++) {
+                        for (int i = 0; i < p->points.size(); i++) {
                             tk::gui::Viewer::tkDrawCircle(p->points.head(i), p->conf.circleRay, p->conf.circleRes);
                         }
                     }
