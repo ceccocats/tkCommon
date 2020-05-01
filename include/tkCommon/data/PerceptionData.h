@@ -1,5 +1,6 @@
 #pragma once
 #include "tkCommon/common.h"
+#include "tkCommon/gui/Color.h"
 #include "tkCommon/data/SensorData.h"
 #include "tkCommon/data/GPSData.h"
 #include "tkCommon/data/VehicleData.h"
@@ -80,6 +81,8 @@ class obj_class{
 		ROADSIGN	= 5,
 		LIGHT		= 7};
 
+		static tk::gui::Color_t objects_colors[15];
+
         /**
          * @brief   method for convert id to box detection string name
          */
@@ -99,6 +102,11 @@ class obj_class{
 			return *this;
 		}
 
+		obj_class& operator=(const obj_class & s){
+			this->value = s.value;
+			return *this;
+		}
+
 		bool operator!=(obj_class::Value v) noexcept {
 			return v != value;
 		}
@@ -106,6 +114,28 @@ class obj_class{
 		bool operator==(obj_class::Value v) noexcept {
 			return v == value;
 		}
+
+		static tk::gui::Color_t& getColor(obj_class c){
+        	switch((int)c.value){
+        		case 0:
+					return tk::gui::color::BLACK;	// black (not classified)
+        		case 1:
+					return tk::gui::color::CYAN;	// cyan	 (cycle)
+        		case 5:
+					return tk::gui::color::PURPLE;	// magenta (road sign)
+        		case 6:
+					return tk::gui::color::GREEN;	// green   (car)
+        		case 7:
+					return tk::gui::color::YELLOW;	// yellow  (traffic lights)
+        		case 13:
+					return tk::gui::color::BLUE;	// blue    (motor bike)
+        		case 14:
+					return tk::gui::color::ORANGE;	// orange  (pedestrian)
+        		default:
+					return tk::gui::color::RED;		// red (unused)
+        	}
+
+        }
 
 		obj_class::Value value;
 };
@@ -364,7 +394,8 @@ class object2D : public generic{
 				glTranslatef(-0.5, 0.5, 0);
 				glScalef(1.0f/tk::gui::Viewer::image_width, -1.0f/tk::gui::Viewer::image_height, 1);
 
-				glColor4f(0,1,0,1);
+				tk::gui::Color_t color = obj_class::getColor(objType);
+				glColor4f((float)color.r/255, (float)color.g/255, (float)color.b/255, (float)color.a/255);
 				tk::gui::Viewer::tkDrawRectangle(
 						tk::common::Vector3<float>( (float)box.x + (float)box.w/2, (float)box.y + (float)box.h/2, 0),
 						tk::common::Vector3<float>( (float)box.w, (float)box.h, 0),
@@ -592,7 +623,7 @@ class perceptionData : public tk::data::SensorData{
 			for(int i = 0; i < boxes.size(); i++){
 				glPushMatrix();
 				{
-					glColor4f(0,1,0,0.5);
+					tk::gui::Viewer::tkSetColor(obj_class::getColor(boxes[i].objType), 150);
 					glTranslatef(boxes[i].pos.x, boxes[i].pos.y, boxes[i].pos.z);
 					glRotatef(boxes[i].rot.z, 0,0,1);
 					glRotatef(boxes[i].rot.y, 0,1,0);
