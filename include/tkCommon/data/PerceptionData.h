@@ -552,17 +552,13 @@ typedef std::vector<roadSing> roadSingsData;
 class perceptionData : public tk::data::SensorData{
     public:
 
-        std::vector<rotatedBox3DsData>  boxes;
-        std::vector<roadSingsData>      signs;
-        std::vector<lanesData>          lanes;
-        tk::data::GPSData               gps;
-        tk::data::VehicleData           veh;
-        
+        std::vector<rotatedBox3D>   boxes;
+        std::vector<object2D>       camera_objects;
+        std::vector<roadSing>       signs;
+        std::vector<lane2D>         camera_lanes;
 
         void init() override {
             tk::data::SensorData::init();
-            gps.init();
-            veh.init();
             header.sensorID = tk::data::sensorName::PERCEPTION;
         }
 
@@ -577,11 +573,35 @@ class perceptionData : public tk::data::SensorData{
 
             this->boxes  = s.boxes;
             this->signs = s.signs;
-            this->lanes = s.lanes;
-            this->gps   = s.gps;
+            this->camera_lanes = s.camera_lanes;
+            this->camera_objects = s.camera_objects;
 
             return *this;
-         }
+        }
+
+		void draw2D(int width, int height, float xLim, float yLim){
+        	for(int i = 0; i < camera_objects.size(); i++){
+        		camera_objects[i].draw2D(width, height, xLim, yLim);
+        	}
+			for(int i = 0; i < camera_lanes.size(); i++){
+				camera_lanes[i].draw2D(width, height, xLim, yLim);
+			}
+        }
+
+		void draw(){
+			for(int i = 0; i < boxes.size(); i++){
+				glPushMatrix();
+				{
+					glColor4f(0,1,0,0.5);
+					glTranslatef(boxes[i].pos.x, boxes[i].pos.y, boxes[i].pos.z);
+					glRotatef(boxes[i].rot.z, 0,0,1);
+					glRotatef(boxes[i].rot.y, 0,1,0);
+					glRotatef(boxes[i].rot.x, 1,0,0);
+					tk::gui::Viewer::tkDrawCube(tk::common::Vector3<float>(0,0,0), boxes[i].dim);
+				}
+				glPopMatrix();
+			}
+		}
 };
 
 
