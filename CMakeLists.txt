@@ -78,6 +78,7 @@ add_library(tkCommunication SHARED
     src/communication/ethernet/UDPSocket.cpp
     src/communication/ethernet/TCPSocket.cpp
     src/communication/ethernet/PCAPHandler.cpp
+    src/communication/ethernet/PacketParser.cpp
     src/communication/EthInterface.cpp
     src/communication/CanInterface.cpp
     src/communication/serial/SerialPort.cpp
