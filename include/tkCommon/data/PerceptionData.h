@@ -588,6 +588,9 @@ class perceptionData : public tk::data::SensorData{
         std::vector<roadSing>       signs;
         std::vector<lane2D>         camera_lanes;
 
+        float rotation = 0;
+        bool draw_masa_style = false;
+
         void init() override {
             tk::data::SensorData::init();
             header.sensorID = tk::data::sensorName::PERCEPTION;
@@ -620,18 +623,60 @@ class perceptionData : public tk::data::SensorData{
         }
 
 		void draw(){
-			for(int i = 0; i < boxes.size(); i++){
-				glPushMatrix();
-				{
-					tk::gui::Viewer::tkSetColor(obj_class::getColor(boxes[i].objType), 150);
-					glTranslatef(boxes[i].pos.x, boxes[i].pos.y, boxes[i].pos.z);
-					glRotatef(boxes[i].rot.z, 0,0,1);
-					glRotatef(boxes[i].rot.y, 0,1,0);
-					glRotatef(boxes[i].rot.x, 1,0,0);
-					tk::gui::Viewer::tkDrawCube(tk::common::Vector3<float>(0,0,0), boxes[i].dim);
+        	if(!draw_masa_style){
+				for(int i = 0; i < boxes.size(); i++){
+					glPushMatrix();
+					{
+						tk::gui::Viewer::tkSetColor(obj_class::getColor(boxes[i].objType), 150);
+						glTranslatef(boxes[i].pos.x, boxes[i].pos.y, boxes[i].pos.z);
+						glRotatef(boxes[i].rot.z, 0,0,1);
+						glRotatef(boxes[i].rot.y, 0,1,0);
+						glRotatef(boxes[i].rot.x, 1,0,0);
+						tk::gui::Viewer::tkDrawCube(tk::common::Vector3<float>(0,0,0), boxes[i].dim);
+					}
+					glPopMatrix();
 				}
-				glPopMatrix();
-			}
+        	}
+        	else{
+        		for(int i = 0; i < boxes.size(); i++){
+					glPushMatrix();
+					{
+						tk::gui::Color_t c = obj_class::getColor(boxes[i].objType);
+						glColor4f((float)c.r/255, (float)c.g/255, (float)c.b/255, 0.7);
+						glTranslatef(boxes[i].pos.x, boxes[i].pos.y, boxes[i].pos.z + 1.5);
+						glScalef(1.5,1.5,1.5);
+						glRotatef(rotation, 0,0,1);
+						glBegin(GL_POLYGON);
+						glVertex3f(-0.5,-0.5, 1);
+						glVertex3f(-0.5,0.5, 1);
+						glVertex3f(0.5,0.5, 1);
+						glVertex3f(0.5,-0.5, 1);
+						glEnd();
+
+						glBegin(GL_TRIANGLES);
+						glVertex3f(-0.5,-0.5, 1);
+						glVertex3f(-0.5,0.5, 1);
+						glVertex3f(0,0,0);
+
+						glVertex3f(-0.5,0.5, 1);
+						glVertex3f(0.5,0.5, 1);
+						glVertex3f(0,0,0);
+
+						glVertex3f(0.5,0.5, 1);
+						glVertex3f(0.5,-0.5, 1);
+						glVertex3f(0,0,0);
+
+						glVertex3f(0.5,-0.5, 1);
+						glVertex3f(-0.5,-0.5, 1);
+						glVertex3f(0,0,0);
+						glEnd();
+					}
+					glPopMatrix();
+        		}
+
+        		rotation += 1;
+        	}
+
 		}
 };
 
