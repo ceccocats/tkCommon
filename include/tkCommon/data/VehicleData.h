@@ -46,7 +46,7 @@ namespace tk { namespace data {
         int        wheelFLDir =0, wheelFRDir =0, wheelRLDir =0, wheelRRDir =0;
 
 
-        double     sideSlip     = 0;        /** beta angle               [ rad ]*/
+        double     sideSlip     = 0;        /** beta angle               [ grad ]*/
         int        tractionGrip = 0;        /** traction control grip    [ 0-255 ]*/
 
         // faults
