@@ -11,7 +11,7 @@ namespace tk { namespace gui {
 
         struct plot_t {
             enum plottype_t {
-                LINE, CIRCLES
+                LINE, CIRCLES, POSES
             };
 
             struct conf_t {
@@ -23,9 +23,10 @@ namespace tk { namespace gui {
                 float pointW = 1;
                 int maxPoints = 10000;
                 bool show = true;
+                float poseW = 1;
             } conf;
 
-            CircularArray<tk::common::Vector3<float>> points;
+            CircularArray<tk::common::Tfpose> points;
         };
 
         std::map<std::string, plot_t> plots;
@@ -58,18 +59,31 @@ namespace tk { namespace gui {
             addPlot(id, plot.conf);
         }
 
+        void addPosesPlot(std::string id, Color_t color = tk::gui::color::WHITE, int maxpts = 10000, float poseW = 1) {
+            plot_t plot;
+            plot.conf.type = plot_t::plottype_t::POSES;
+            plot.conf.color = color;
+            plot.conf.poseW = poseW;
+            plot.conf.maxPoints = maxpts;
+            addPlot(id, plot.conf);
+        }
+
         bool plotExist(std::string id) {
             // key alread present
             return plots.find(id) != plots.end();
         }
 
         void addPoint(std::string id, tk::common::Vector3<float> pt) {
+            plots[id].points.add(tk::common::odom2tf(pt.x, pt.y, pt.z, 0, 0, 0));
+        }
+
+        void addPoint(std::string id, tk::common::Tfpose pt) {
             plots[id].points.add(pt);
         }
         
         void addPoints(std::string id, std::vector<tk::common::Vector3<float>> pts) {
             for(int i=0; i<pts.size(); i++)
-                plots[id].points.add(pts[i]);
+                plots[id].points.add(tk::common::odom2tf(pts[i].x, pts[i].y, pts[i].z, 0, 0, 0));
         }
 
         void drawPlots() {
@@ -84,12 +98,19 @@ namespace tk { namespace gui {
 
                     if (p->conf.type == plot_t::plottype_t::LINE) {
                         for (int i = 0; i < p->points.size() - 1; i++) {
-                            tk::gui::Viewer::tkDrawLine(p->points.head(i), p->points.head(i + 1));
+                            tk::gui::Viewer::tkDrawLine(tk::common::tf2pose(p->points.head(i)), tk::common::tf2pose(p->points.head(i + 1)));
                         }
 
                     } else if (p->conf.type == plot_t::plottype_t::CIRCLES) {
                         for (int i = 0; i < p->points.size(); i++) {
-                            tk::gui::Viewer::tkDrawCircle(p->points.head(i), p->conf.circleRay, p->conf.circleRes);
+                            tk::gui::Viewer::tkDrawCircle(tk::common::tf2pose(p->points.head(i)), p->conf.circleRay, p->conf.circleRes);
+                        }
+                    } else if (p->conf.type == plot_t::plottype_t::POSES) {
+                        for (int i = 0; i < p->points.size(); i++) {
+                            tk::gui::Viewer::tkDrawArrow(
+                                tk::common::tf2pose(p->points.head(i)), 
+                                tk::common::tf2rot(p->points.head(i)).z, 
+                                p->conf.poseW);
                         }
                     }
 
