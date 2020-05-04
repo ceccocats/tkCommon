@@ -121,19 +121,19 @@ class obj_class{
 
 		static tk::gui::Color_t& getColor(obj_class::Value c){
         	switch((int)c){
-        		case 0:
+        		case tk::perception::obj_class::NOT_CLS:
 					return tk::gui::color::BLACK;	// black (not classified)
-        		case 1:
+        		case tk::perception::obj_class::CYCLE:
 					return tk::gui::color::CYAN;	// cyan	 (cycle)
-        		case 5:
+        		case tk::perception::obj_class::ROADSIGN:
 					return tk::gui::color::PURPLE;	// magenta (road sign)
-        		case 6:
+        		case tk::perception::obj_class::CAR:
 					return tk::gui::color::GREEN;	// green   (car)
-        		case 7:
+        		case tk::perception::obj_class::LIGHT:
 					return tk::gui::color::YELLOW;	// yellow  (traffic lights)
-        		case 13:
+        		case tk::perception::obj_class::MOTOBIKE:
 					return tk::gui::color::BLUE;	// blue    (motor bike)
-        		case 14:
+        		case tk::perception::obj_class::PEDESTRIAN:
 					return tk::gui::color::ORANGE;	// orange  (pedestrian)
         		default:
 					return tk::gui::color::RED;		// red (unused)
@@ -628,6 +628,8 @@ class perceptionData : public tk::data::SensorData{
 
 		void draw(){
 
+        	glDisable(GL_DEPTH_TEST);
+
 			for(int i = 0; i < signs.size(); i++){
 				glPushMatrix();
 				{
@@ -715,6 +717,8 @@ class perceptionData : public tk::data::SensorData{
 					glPopMatrix();
         		}
         	}
+
+			glEnable(GL_DEPTH_TEST);
 
 			rotation += 1;
 
