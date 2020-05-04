@@ -78,7 +78,7 @@ class obj_class{
         MOTOBIKE    = 13,
         CYCLE       = 1,
         // Added later
-		ROADSIGN	= 5,
+		ROADSIGN	= 8,
 		LIGHT		= 7};
 
 		static tk::gui::Color_t objects_colors[15];
@@ -116,7 +116,11 @@ class obj_class{
 		}
 
 		static tk::gui::Color_t& getColor(obj_class c){
-        	switch((int)c.value){
+        	return getColor(c.value);
+        }
+
+		static tk::gui::Color_t& getColor(obj_class::Value c){
+        	switch((int)c){
         		case 0:
 					return tk::gui::color::BLACK;	// black (not classified)
         		case 1:
@@ -522,7 +526,7 @@ class rotatedBox3D : public generic{
 /**
  * @brief single road sign data
  */
-class roadSing : public generic{
+class roadSign : public generic{
     public:
         tk::common::Vector3<float>  pos;
         sign_type                   sign;
@@ -534,7 +538,7 @@ class roadSing : public generic{
             classtype = type::SIGN;
             return true;
         }
-        roadSing& operator=(const roadSing& s){
+        roadSign& operator=(const roadSign& s){
 
             this->pos       = s.pos;
             this->sign      = s.sign;
@@ -577,7 +581,7 @@ typedef std::vector<rotatedBox3D> rotatedBox3DsData;
 /**
  * @brief road sign vector
  */
-typedef std::vector<roadSing> roadSingsData;
+typedef std::vector<roadSign> roadSingsData;
 
 
 class perceptionData : public tk::data::SensorData{
@@ -585,8 +589,11 @@ class perceptionData : public tk::data::SensorData{
 
         std::vector<rotatedBox3D>   boxes;
         std::vector<object2D>       camera_objects;
-        std::vector<roadSing>       signs;
+        std::vector<roadSign>       signs;
         std::vector<lane2D>         camera_lanes;
+
+        float rotation = 0;
+        bool draw_masa_style = false;
 
         void init() override {
             tk::data::SensorData::init();
@@ -620,18 +627,97 @@ class perceptionData : public tk::data::SensorData{
         }
 
 		void draw(){
-			for(int i = 0; i < boxes.size(); i++){
+
+			for(int i = 0; i < signs.size(); i++){
 				glPushMatrix();
 				{
-					tk::gui::Viewer::tkSetColor(obj_class::getColor(boxes[i].objType), 150);
-					glTranslatef(boxes[i].pos.x, boxes[i].pos.y, boxes[i].pos.z);
-					glRotatef(boxes[i].rot.z, 0,0,1);
-					glRotatef(boxes[i].rot.y, 0,1,0);
-					glRotatef(boxes[i].rot.x, 1,0,0);
-					tk::gui::Viewer::tkDrawCube(tk::common::Vector3<float>(0,0,0), boxes[i].dim);
+					tk::gui::Color_t c = obj_class::getColor(obj_class::ROADSIGN);
+					glColor4f((float)c.r/255, (float)c.g/255, (float)c.b/255, 0.7);
+					glTranslatef(signs[i].pos.x, signs[i].pos.y, signs[i].pos.z + 1.5);
+					glScalef(1.5,1.5,1.5);
+					glRotatef(rotation, 0,0,1);
+					glBegin(GL_POLYGON);
+					glVertex3f(-0.5,-0.5, 1);
+					glVertex3f(-0.5,0.5, 1);
+					glVertex3f(0.5,0.5, 1);
+					glVertex3f(0.5,-0.5, 1);
+					glEnd();
+
+					glBegin(GL_TRIANGLES);
+					glVertex3f(-0.5,-0.5, 1);
+					glVertex3f(-0.5,0.5, 1);
+					glVertex3f(0,0,0);
+
+					glVertex3f(-0.5,0.5, 1);
+					glVertex3f(0.5,0.5, 1);
+					glVertex3f(0,0,0);
+
+					glVertex3f(0.5,0.5, 1);
+					glVertex3f(0.5,-0.5, 1);
+					glVertex3f(0,0,0);
+
+					glVertex3f(0.5,-0.5, 1);
+					glVertex3f(-0.5,-0.5, 1);
+					glVertex3f(0,0,0);
+					glEnd();
 				}
 				glPopMatrix();
 			}
+
+        	if(!draw_masa_style){
+				for(int i = 0; i < boxes.size(); i++){
+					glPushMatrix();
+					{
+						tk::gui::Viewer::tkSetColor(obj_class::getColor(boxes[i].objType), 150);
+						glTranslatef(boxes[i].pos.x, boxes[i].pos.y, boxes[i].pos.z);
+						glRotatef(boxes[i].rot.z, 0,0,1);
+						glRotatef(boxes[i].rot.y, 0,1,0);
+						glRotatef(boxes[i].rot.x, 1,0,0);
+						tk::gui::Viewer::tkDrawCube(tk::common::Vector3<float>(0,0,0), boxes[i].dim);
+					}
+					glPopMatrix();
+				}
+        	}
+        	else{
+        		for(int i = 0; i < boxes.size(); i++){
+					glPushMatrix();
+					{
+						tk::gui::Color_t c = obj_class::getColor(boxes[i].objType);
+						glColor4f((float)c.r/255, (float)c.g/255, (float)c.b/255, 0.7);
+						glTranslatef(boxes[i].pos.x, boxes[i].pos.y, boxes[i].pos.z + 1.5);
+						glScalef(1.5,1.5,1.5);
+						glRotatef(rotation, 0,0,1);
+						glBegin(GL_POLYGON);
+						glVertex3f(-0.5,-0.5, 1);
+						glVertex3f(-0.5,0.5, 1);
+						glVertex3f(0.5,0.5, 1);
+						glVertex3f(0.5,-0.5, 1);
+						glEnd();
+
+						glBegin(GL_TRIANGLES);
+						glVertex3f(-0.5,-0.5, 1);
+						glVertex3f(-0.5,0.5, 1);
+						glVertex3f(0,0,0);
+
+						glVertex3f(-0.5,0.5, 1);
+						glVertex3f(0.5,0.5, 1);
+						glVertex3f(0,0,0);
+
+						glVertex3f(0.5,0.5, 1);
+						glVertex3f(0.5,-0.5, 1);
+						glVertex3f(0,0,0);
+
+						glVertex3f(0.5,-0.5, 1);
+						glVertex3f(-0.5,-0.5, 1);
+						glVertex3f(0,0,0);
+						glEnd();
+					}
+					glPopMatrix();
+        		}
+        	}
+
+			rotation += 1;
+
 		}
 };
 
