@@ -78,7 +78,7 @@ class obj_class{
         MOTOBIKE    = 13,
         CYCLE       = 1,
         // Added later
-		ROADSIGN	= 5,
+		ROADSIGN	= 8,
 		LIGHT		= 7};
 
 		static tk::gui::Color_t objects_colors[15];
@@ -526,7 +526,7 @@ class rotatedBox3D : public generic{
 /**
  * @brief single road sign data
  */
-class roadSing : public generic{
+class roadSign : public generic{
     public:
         tk::common::Vector3<float>  pos;
         sign_type                   sign;
@@ -538,7 +538,7 @@ class roadSing : public generic{
             classtype = type::SIGN;
             return true;
         }
-        roadSing& operator=(const roadSing& s){
+        roadSign& operator=(const roadSign& s){
 
             this->pos       = s.pos;
             this->sign      = s.sign;
@@ -581,7 +581,7 @@ typedef std::vector<rotatedBox3D> rotatedBox3DsData;
 /**
  * @brief road sign vector
  */
-typedef std::vector<roadSing> roadSingsData;
+typedef std::vector<roadSign> roadSingsData;
 
 
 class perceptionData : public tk::data::SensorData{
@@ -589,7 +589,7 @@ class perceptionData : public tk::data::SensorData{
 
         std::vector<rotatedBox3D>   boxes;
         std::vector<object2D>       camera_objects;
-        std::vector<roadSing>       signs;
+        std::vector<roadSign>       signs;
         std::vector<lane2D>         camera_lanes;
 
         float rotation = 0;
