@@ -7,9 +7,10 @@ bool            Viewer::keys[MAX_KEYS];
 MouseView3D     Viewer::mouseView;
 GLUquadric*     Viewer::quadric;
 
-std::vector<Color_t> tk::gui::Viewer::colors = std::vector<Color_t>{color::RED, color::PINK, 
+std::vector<Color_t> tk::gui::Viewer::colors = std::vector<Color_t>{color::RED, color::GREEN, 
                                                                     color::BLUE, color::YELLOW, 
-                                                                    color::WHITE, color::ORANGE
+                                                                    color::WHITE, color::ORANGE,
+                                                                    color::PINK, color::GREY
                                                                     };
 int Viewer::TK_FONT_SIZE = 256;
 
