@@ -42,7 +42,7 @@ Viewer::init() {
 
 #if GLFW_VERSION_MAJOR >= 3
 #if GLFW_VERSION_MINOR >= 2
-    glfwMaximizeWindow(window);
+    //glfwMaximizeWindow(window);
 
     unsigned w, h;
     unsigned err = lodepng_decode32_file(&(icons[0].pixels), &w, &h, icon_fname.c_str());
@@ -490,6 +490,26 @@ Viewer::tkDrawAxis(float s) {
 }
 
 void 
+Viewer::tkDrawTriangle(tk::common::Vector3<float> a, tk::common::Vector3<float> b, tk::common::Vector3<float> c, bool filled) {
+
+    if(filled) {
+        glBegin(GL_TRIANGLES);
+        glVertex3f(a.x, a.y, a.z);
+        glVertex3f(b.x, b.y, b.z);
+        glVertex3f(c.x, c.y, c.z);
+        glEnd();
+    } else {
+        glBegin(GL_LINES);
+        glVertex3f(a.x, a.y, a.z);
+        glVertex3f(b.x, b.y, b.z);
+        glVertex3f(c.x, c.y, c.z);
+        glVertex3f(a.x, a.y, a.z);
+        glEnd();
+    }
+}
+
+
+void 
 Viewer::tkDrawCircle(tk::common::Vector3<float> pose, float r, int res, bool filled) {
 
     int res_1 = res;
@@ -535,10 +555,8 @@ Viewer::tkDrawCloud(Eigen::MatrixXf *points) {
 }
 
 void Viewer::tkRainbowColor(float hue, uint8_t &r, uint8_t &g, uint8_t &b) {
-    if(hue <= 0.0)
-        hue = 0.000001;
-    if(hue >= 1.0)
-        hue = 0.999999;
+
+    hue = fmod(fabs(hue), 1);
 
     int h = int(hue * 256 * 6);
     int x = h % 0x100;
@@ -550,7 +568,7 @@ void Viewer::tkRainbowColor(float hue, uint8_t &r, uint8_t &g, uint8_t &b) {
     case 2: g = 255; b = x;       break;
     case 3: b = 255; g = 255 - x; break;
     case 4: b = 255; r = x;       break;
-    case 5: r = 255; b = 255 - x; break;
+    case 5: r = 255; g = x;       break;
     }
 }
 
@@ -564,10 +582,10 @@ void Viewer::tkSetRainbowColor(float hue) {
 
 
 void
-Viewer::tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx) {
+Viewer::tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx, float maxval) {
     glBegin(GL_POINTS);
     for (int p = 0; p < points->cols(); p++) {
-        float i = float(features->coeff(idx, p))/255.0;
+        float i = float(features->coeff(idx, p))/maxval;
         tkSetRainbowColor(i);
 
         Eigen::Vector4f v = points->col(p);
@@ -829,7 +847,7 @@ Viewer::tkDrawLiDARData(tk::data::LidarData *data){
     tkSetColor(tk::gui::color::WHITE);
 
     for (int p = 0; p < data->nPoints; p++) {
-        float i = float(data->intensity(p))/data->MAX_INTENSITY;
+        float i = float(data->intensity(p));
         tkSetRainbowColor(i);
         glVertex3f(data->points.coeff(0,p),data->points.coeff(1,p),data->points.coeff(2,p));
     }

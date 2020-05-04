@@ -55,7 +55,7 @@ int main(int argc, char* argv[]){
     std::string filter      = cmd.addOpt("-filter", "", "pcap filter");
     std::string ip          = cmd.addOpt("-ip", "127.0.0.1", "pcap filter");
     int port                = cmd.addIntOpt("-port", 2368, "pcap replay file");
-    cmd.print();
+    cmd.parse();
 
     tk::exceptions::handleSegfault();
 

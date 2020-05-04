@@ -9,7 +9,6 @@
 
 #undef Success // defined by X11 cause conflicts with Eigen
 #include <Eigen/Dense>
-#include "matio.h"
 
 #undef None // defined by X11 cause conflicts with YAML
 #include "tkCommon/utils.h"
@@ -69,6 +68,38 @@ namespace tk { namespace common {
         else
             return false;
     }
+    
+
+    /**
+     * Convert odometry to TfPose
+     * @param x   translation forward
+     * @param y   translation sideways
+     * @param yaw rotation
+     * @return transform
+     */
+    Tfpose odom2tf(float x, float y, float yaw);
+
+    /**
+     * Convert odometry to TfPose
+     * @param x   translation forward
+     * @param y   translation sideways
+     * @param yaw rotation
+     * @return transform
+     */
+    Tfpose odom2tf(float x, float y, float z, float yaw);
+
+    /**
+     * Convert odometry to TfPose
+     * @param x   translation forward
+     * @param y   translation sideways
+     * @param z   translation upward
+     * @param roll  rotation x axle
+     * @param pitch rotation y axle
+     * @param yaw   rotation z axle
+     * @return transform
+     */
+    Tfpose odom2tf(float x, float y, float z, float roll, float pitch, float yaw);
+
 
     /**
      * Rect [ x y w h ]
@@ -156,6 +187,8 @@ namespace tk { namespace common {
                 os << "v4(" << v.x <<", "<< v.y <<", "<< v.z <<", "<< v.i <<")";
                 return os;
             }  
+
+            bool isZero() { return x == 0 && y == 0 && z == 0 && i == 0; } 
     };
 
 
@@ -225,7 +258,18 @@ namespace tk { namespace common {
                 os << "v3(" << v.x <<", "<< v.y <<", "<< v.z <<")";
                 return os;
             }  
-    };
+
+            bool isZero() { return x == 0 && y == 0 && z == 0; }
+
+            void applyTf(tk::common::Tfpose tf) {
+                tk::common::Tfpose ptf = tk::common::odom2tf(x, y, z, 0, 0, 0);
+                ptf = tf * ptf;
+                x = ptf.matrix()(0, 3);
+                y = ptf.matrix()(1, 3);
+                z = ptf.matrix()(2, 3);
+                return;
+            }
+     };
 
     /**
      * Vector of 2 elements [ x y ]
@@ -265,37 +309,9 @@ namespace tk { namespace common {
                 os << "v2(" << v.x <<", "<< v.y <<")";
                 return os;
             }  
+
+            bool isZero() { return x == 0 && y == 0; } 
     };
-
-    /**
-     * Convert odometry to TfPose
-     * @param x   translation forward
-     * @param y   translation sideways
-     * @param yaw rotation
-     * @return transform
-     */
-    Tfpose odom2tf(float x, float y, float yaw);
-
-    /**
-     * Convert odometry to TfPose
-     * @param x   translation forward
-     * @param y   translation sideways
-     * @param yaw rotation
-     * @return transform
-     */
-    Tfpose odom2tf(float x, float y, float z, float yaw);
-
-    /**
-     * Convert odometry to TfPose
-     * @param x   translation forward
-     * @param y   translation sideways
-     * @param z   translation upward
-     * @param roll  rotation x axle
-     * @param pitch rotation y axle
-     * @param yaw   rotation z axle
-     * @return transform
-     */
-    Tfpose odom2tf(float x, float y, float z, float roll, float pitch, float yaw);
 
     /**
      * Read odometry from ifstream as a TfPose
@@ -410,7 +426,7 @@ namespace tk { namespace common {
         int size[2];
         size[0] = m.rows();
         size[1] = m.cols();
-        std::cout<<"Matrix serialize: ("<<size[0]<<"x"<<size[1]<<")";
+        //std::cout<<"Matrix serialize: ("<<size[0]<<"x"<<size[1]<<")";
 
         os.write((char *)size, 2*sizeof(int));
         os.write((char *)m.data(), m.size() * sizeof(T));
@@ -431,70 +447,11 @@ namespace tk { namespace common {
     inline bool deserializeMatrix(Eigen::Matrix<T, R, C> &m, std::ifstream &is) {
         int size[2] = { 0, 0 };
         is.read((char*)size, 2*sizeof(int));
-        std::cout<<"Matrix deserialize: ("<<size[0]<<"x"<<size[1]<<")\n";
+        //std::cout<<"Matrix deserialize: ("<<size[0]<<"x"<<size[1]<<")\n";
         m.resize(size[0], size[1]);
         is.read((char *)m.data(), m.size() * sizeof(T));
         return is.is_open();
     }
-
-    /**
-     * generate matvar from eigen matrix
-     */
-    inline matvar_t *eigenXf2matvar(Eigen::MatrixXf mat, std::string name = "mat") {
-        size_t dim[2];
-        dim[0] = mat.rows();
-        dim[1] = mat.cols();
-        return Mat_VarCreate(name.c_str(), MAT_C_SINGLE, MAT_T_SINGLE, 2, dim, mat.data(), 0);
-    }
-    /**
-     * generate matvar from eigen matrix
-     */
-    inline matvar_t *eigenXd2matvar(Eigen::MatrixXd mat, std::string name = "mat") {
-        size_t dim[2];
-        dim[0] = mat.rows();
-        dim[1] = mat.cols();
-        return Mat_VarCreate(name.c_str(), MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dim, mat.data(), 0);
-    }
-
-    /**
-     * generate eigen matrix from matvar
-     */
-    inline Eigen::MatrixXf matvar2eigenXf(matvar_t *var) {
-        tkASSERT(var != NULL)
-        tkASSERT(var->class_type == MAT_C_SINGLE)
-        Eigen::MatrixXf mat(var->dims[0], var->dims[1]);
-        memcpy(mat.data(), var->data, mat.size()*var->data_size);
-        return mat;
-    }
-    /**
-     * generate eigen matrix from matvar
-     */
-    inline Eigen::MatrixXd matvar2eigenXd(matvar_t *var) {
-        tkASSERT(var != NULL)
-        tkASSERT(var->class_type == MAT_C_DOUBLE)
-        Eigen::MatrixXd mat(var->dims[0], var->dims[1]);
-        memcpy(mat.data(), var->data, mat.size()*var->data_size);
-        return mat;
-    }
-
-    /**
-     * write matvar to file
-     */
-    inline bool matvarWrite(std::string filename, matvar_t *m) {
-        //Open file
-        mat_t *matfp;
-        matfp = Mat_CreateVer(filename.c_str(), NULL, MAT_FT_MAT5);
-
-        //save main struct
-        Mat_VarWrite(matfp, m, MAT_COMPRESSION_ZLIB);
-
-        //cleanup
-        //Mat_VarFree(m);
-
-        //Close file
-        Mat_Close(matfp);
-    }
-
 
 
     /**
@@ -530,4 +487,61 @@ namespace tk { namespace common {
      * @return
      */
     tk::common::Tfpose planeCoeffs2tf(Eigen::VectorXf coeffs);
+
+
+    /**
+     * Load YAML node from file
+     * @param conf_file
+     * @return
+     */
+    inline YAML::Node YAMLloadConf(std::string conf_file) {
+        return YAML::LoadFile(conf_file);
+    }
+
+    /**
+     * Get configuration from YAML node
+     * @tparam T
+     * @param conf yaml node
+     * @param key configuration KEY
+     * @param defaultVal defalt value in case of no KEY found
+     * @return conf value
+     */
+    template<typename T>
+    inline T YAMLgetConf(YAML::Node conf, std::string key, T defaultVal) {
+        T val = defaultVal;
+        if(conf && conf[key]) {
+            val = conf[key].as<T>();
+        }
+        //std::cout<<"YAML "<<key<<", val: "<<val<<"\n";
+        return val;
+    }
+
+    /**
+     * @brief Read TF from yaml NODE, tf format [ x y z poll pitch yaw ] ( mt mt mt deg deg deg )
+     * 
+     * @param conf 
+     * @return std::vector<tk::common::Tfpose> 
+     */
+    inline std::vector<tk::common::Tfpose> YAMLreadTf(YAML::Node conf) {
+
+        std::vector<tk::common::Tfpose> tf;
+
+        int size = conf.size();
+        if(!conf[0].IsSequence())
+            size = 1;
+
+        std::vector<float> tmp;
+        tf.resize(size);
+        for (int i = 0; i < size; i++) {
+            if(conf[i].IsSequence())
+                tmp = conf[i].as<std::vector<float>>();
+            else
+                tmp = conf.as<std::vector<float>>();
+            tf[i] = tk::common::odom2tf(tmp[0], tmp[1], tmp[2], toRadians(tmp[3]), toRadians(tmp[4]), toRadians(tmp[5]));
+
+            tmp.clear();
+        }
+
+        return tf;
+    }
 }}
