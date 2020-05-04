@@ -116,7 +116,11 @@ class obj_class{
 		}
 
 		static tk::gui::Color_t& getColor(obj_class c){
-        	switch((int)c.value){
+        	return getColor(c.value);
+        }
+
+		static tk::gui::Color_t& getColor(obj_class::Value c){
+        	switch((int)c){
         		case 0:
 					return tk::gui::color::BLACK;	// black (not classified)
         		case 1:
@@ -623,6 +627,43 @@ class perceptionData : public tk::data::SensorData{
         }
 
 		void draw(){
+
+			for(int i = 0; i < signs.size(); i++){
+				glPushMatrix();
+				{
+					tk::gui::Color_t c = obj_class::getColor(obj_class::ROADSIGN);
+					glColor4f((float)c.r/255, (float)c.g/255, (float)c.b/255, 0.7);
+					glTranslatef(signs[i].pos.x, signs[i].pos.y, signs[i].pos.z + 1.5);
+					glScalef(1.5,1.5,1.5);
+					glRotatef(rotation, 0,0,1);
+					glBegin(GL_POLYGON);
+					glVertex3f(-0.5,-0.5, 1);
+					glVertex3f(-0.5,0.5, 1);
+					glVertex3f(0.5,0.5, 1);
+					glVertex3f(0.5,-0.5, 1);
+					glEnd();
+
+					glBegin(GL_TRIANGLES);
+					glVertex3f(-0.5,-0.5, 1);
+					glVertex3f(-0.5,0.5, 1);
+					glVertex3f(0,0,0);
+
+					glVertex3f(-0.5,0.5, 1);
+					glVertex3f(0.5,0.5, 1);
+					glVertex3f(0,0,0);
+
+					glVertex3f(0.5,0.5, 1);
+					glVertex3f(0.5,-0.5, 1);
+					glVertex3f(0,0,0);
+
+					glVertex3f(0.5,-0.5, 1);
+					glVertex3f(-0.5,-0.5, 1);
+					glVertex3f(0,0,0);
+					glEnd();
+				}
+				glPopMatrix();
+			}
+
         	if(!draw_masa_style){
 				for(int i = 0; i < boxes.size(); i++){
 					glPushMatrix();
@@ -673,9 +714,9 @@ class perceptionData : public tk::data::SensorData{
 					}
 					glPopMatrix();
         		}
-
-        		rotation += 1;
         	}
+
+			rotation += 1;
 
 		}
 };
