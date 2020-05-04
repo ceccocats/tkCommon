@@ -14,6 +14,9 @@ namespace tk { namespace data {
 
         // stat
         double age, quality, sats;
+        
+        // time
+        timeStamp_t gpsStamp;
 
         // IMU
         double angleX, angleY, angleZ;
@@ -59,6 +62,8 @@ namespace tk { namespace data {
             accY        = 0;
             accZ        = 0;
             sideSlip    = 0;
+
+            gpsStamp    = 0;
         }
 
         /**
@@ -110,6 +115,8 @@ namespace tk { namespace data {
             this->accZ        = s.accZ;
             this->sideSlip    = s.sideSlip;
 
+            this->gpsStamp    = s.gpsStamp;
+
             return *this;
         }
 
@@ -120,7 +127,7 @@ namespace tk { namespace data {
          * @return
          */
         friend std::ostream& operator<<(std::ostream& os, const GPSData& m) {
-            os << std::setprecision(10) << m.header.stamp<< " Lat/Lon: " << m.lat <<"°/" << m.lon
+            os << std::setprecision(10) << "GPS stamp: " << m.gpsStamp << "\nLocal stamp: " << m.header.stamp<< "\nLat/Lon: " << m.lat <<"°/" << m.lon
                <<"°, Height: "<<m.height<<"\nNsats: "<<m.sats<<" quality: "<<m.quality<<"\nSpeed (x,y,z) "
                <<m.speedX<<", "<<m.speedY<<", "<<m.speedZ<<"\n";
             return os;
