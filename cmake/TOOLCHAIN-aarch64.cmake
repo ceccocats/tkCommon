@@ -55,7 +55,7 @@ if(NOT TARGET upload)
     # set UPLOAD to target
     set(TK_USER nvidia)
     set(TK_PASS nvidia)
-    #set(TK_IP 192.168.1.207)
+    set(TK_IP 192.168.1.207)
     set(TK_TARGET_INSTALL_PATH /home/${TK_USER}/build)
     add_custom_target(upload
         # create installation folder on target
