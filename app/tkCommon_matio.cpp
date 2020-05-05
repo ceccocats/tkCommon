@@ -21,6 +21,7 @@ int main( int argc, char** argv){
     std::string matfile = cmd.addArg("matfile", "matlab.mat", "path of the mat file");
     cmd.parse();
 
+/*
     tk::math::MatIO mat;
     mat.create(matfile);
 
@@ -52,18 +53,27 @@ int main( int argc, char** argv){
     mat.write(tfVar);
     tfVar.release();
     mat.close();
-
+*/
     
+    tk::math::MatIO mat;
     mat.open(matfile);
     mat.stats();
 
+    for(int i=0; i<mat.size(); i++){
+        tk::math::MatIO::var_t var;
+        mat.read(mat[i], var);
+        var.print();
+        var.release();
+    }
+
+/*
     tk::math::MatIO::var_t var;
     for(int i=0; i<mat.size(); i++) {
         mat.read(mat[i], var);
         var.print();
         var.release();
     }
-
+*/
     mat.close();
 
     /*
