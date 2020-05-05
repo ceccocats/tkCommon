@@ -262,7 +262,16 @@ Viewer::run() {
 
             plotManger->drawPlots();
             draw();
-            plotManger->drawLegend();
+
+            {
+                float plotSize = 0.35;
+                int plotW = plotSize*height;
+                int plotH = plotSize*height;
+                int plotX = width - plotW - 10;
+                int plotY = height - plotH - 10;
+                tkViewport2D( plotW, plotH, plotX, plotY);
+                plotManger->drawLegend();
+            }
 
             // draw tk LOGO
             if(drawLogo) {
@@ -1068,9 +1077,9 @@ void
 Viewer::tkViewport2D(int width, int height, int x, int y) {
     float ar = (float)width / (float)height;
 
-    //glViewport(x, y, width, height);
-    //glOrtho(0, width, 0, height, -1, 1);
-    //glLoadIdentity();
+    glViewport(x, y, width, height);
+    glOrtho(0, width, 0, height, -1, 1);
+    glLoadIdentity();
     
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();

@@ -53,6 +53,7 @@ add_library(tklibDrawText SHARED
 
 add_library(tkGUI SHARED
     src/gui/Viewer.cpp
+    src/gui/PlotManager.cpp
     src/gui/lodepng.cpp
     src/gui/MouseView3D.cpp
     src/gui/MathUtils.cpp
