@@ -544,4 +544,10 @@ namespace tk { namespace common {
 
         return tf;
     }
+
+    inline tk::common::Tfpose geodetic2tf(GeodeticConverter &geoconv, double lat, double lon, double height, double roll, double pitch, double yaw) {
+        double x, y, z;
+        geoconv.geodetic2Enu(lat, lon, height, &x, &y, &z);
+        return tk::common::odom2tf(x,y,z,roll,pitch,yaw);
+    }
 }}
