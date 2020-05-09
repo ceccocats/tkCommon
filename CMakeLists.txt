@@ -56,13 +56,12 @@ add_library(tkGUI SHARED
     src/gui/PlotManager.cpp
     src/gui/lodepng.cpp
     src/gui/MouseView3D.cpp
-    src/gui/MathUtils.cpp
-    src/gui/imgui_demo.cpp
-    src/gui/imgui_draw.cpp
-    src/gui/imgui_widgets.cpp
-    src/gui/imgui.cpp
-    src/gui/imgui_impl_glfw.cpp
-    src/gui/imgui_impl_opengl3.cpp
+    src/gui/imgui/imgui_demo.cpp
+    src/gui/imgui/imgui_draw.cpp
+    src/gui/imgui/imgui_widgets.cpp
+    src/gui/imgui/imgui.cpp
+    src/gui/imgui/imgui_impl_glfw.cpp
+    src/gui/imgui/imgui_impl_opengl3.cpp
     src/common.cpp
     src/version.cpp
 )

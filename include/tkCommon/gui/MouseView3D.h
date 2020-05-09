@@ -1,6 +1,7 @@
 #pragma once 
 #include "tkCommon/common.h"
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 namespace tk { namespace gui  {
 
@@ -10,18 +11,18 @@ class MouseView3D
     MouseView3D();
 
     //4x4 matrix in col-major format
-    const Eigen::Matrix4f *getModelView() const
+    const glm::mat4x4 &getModelView() const
     {
-        return &m_modelView;
+        return m_modelView;
     }
 
     //4x4 matrix in col-major format
-    const Eigen::Matrix4f *getProjection() const
+    const glm::mat4x4 &getProjection() const
     {
-        return &m_projection;
+        return m_projection;
     }
 
-    const float *getEye() const {
+    const glm::vec3 &getEye() const {
         return m_eye;
     }
 
@@ -36,8 +37,8 @@ class MouseView3D
     void mouseMove(float x, float y);
     void mouseWheel(float dx, float dy);
 
-    void setCenter(float x, float y, float z);
-    const float* getCenter() const {
+    void setCenter(glm::vec3 center);
+    const glm::vec3 &getCenter() const {
         return m_center;
     }
 
@@ -49,8 +50,9 @@ class MouseView3D
         return p;
     }
     void setWorldPos(tk::common::Vector3<float> p) {
-        setCenter(p.x, p.y, p.z);
+        setCenter({p.x, p.y, p.z});
     }
+
     void setAngle(tk::common::Vector3<float> a) {
         m_angles[0] = a.z;
         m_angles[1] = a.y;
@@ -63,7 +65,7 @@ class MouseView3D
         return a;
     }
     tk::common::Vector3<float> unproject(float zplane);
-    tk::common::Vector2<float> project(tk::common::Vector3<float> point);
+    tk::common::Vector3<float> project(tk::common::Vector3<float> point);
 
 
     tk::common::Vector3<float> getPointOnGround();
@@ -82,28 +84,30 @@ class MouseView3D
     }
 
   private:
-    Eigen::Matrix4f m_modelView;
-    Eigen::Matrix4f m_projection;
+    glm::mat4x4 m_modelView;
+    glm::mat4x4 m_projection;
 
     float m_windowAspect; // width/height
     float m_fovRads;
-    float m_center[3];
-    float m_up[3];
-    float m_eye[3];
+    glm::vec3 m_eye;
+    glm::vec3 m_center;
+    glm::vec3 m_up;
+
+    float vangleMin = -M_PI/2 + 0.0001;
+    float vangleMax = +M_PI/2 - 0.0001;
 
     float m_zNear;
     float m_zFar;
 
-    // MOUSE NAVIGATION VARIABLES
-    float m_startAngles[2];
-    float m_startCenter[3];
-
     float m_radius;
-    float m_angles[2];
+    glm::vec2 m_angles;
 
     bool m_mouseLeft;
     bool m_mouseRight;
-    float m_currentPos[2];
+    glm::vec2 m_currentPos;
+
+    glm::vec2 m_startAngles;
+    glm::vec3 m_startCenter;
 
     void updateEye();
     void updateMatrices();

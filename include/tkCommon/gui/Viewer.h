@@ -11,9 +11,9 @@
 #include "tkCommon/gui/MouseView3D.h"
 #include "tkCommon/gui/Color.h"
 #include "tkCommon/gui/lodepng.h"
-#include "tkCommon/gui/imgui.h"
-#include "tkCommon/gui/imgui_impl_glfw.h"
-#include "tkCommon/gui/imgui_impl_opengl3.h"
+#include "tkCommon/gui/imgui/imgui.h"
+#include "tkCommon/gui/imgui/imgui_impl_glfw.h"
+#include "tkCommon/gui/imgui/imgui_impl_opengl3.h"
 
 #include "tkCommon/data/RadarData.h"
 #include "tkCommon/data/LidarData.h"

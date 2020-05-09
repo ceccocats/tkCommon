@@ -1,5 +1,8 @@
 #include "tkCommon/gui/Viewer.h"
 #include "tkCommon/gui/OBJ_Loader.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include "glm/gtc/matrix_transform.hpp"
 
 extern bool gRun;
 using namespace tk::gui;
@@ -251,8 +254,13 @@ Viewer::run() {
             drawSplash();
         } else {
             // apply matrix
-            glMultMatrixf(Viewer::mouseView.getProjection()->data());
-            glMultMatrixf(Viewer::mouseView.getModelView()->data());
+            float *proj  = (float*) glm::value_ptr(Viewer::mouseView.getProjection());
+            float *model  = (float*) glm::value_ptr(Viewer::mouseView.getModelView());
+            glMultMatrixf(proj);
+            glMultMatrixf(model);
+
+            //glMultMatrixf(Viewer::mouseView.getProjection().data());
+            //glMultMatrixf(Viewer::mouseView.getModelView().data());
 
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();

@@ -1,30 +1,37 @@
 #include "tkCommon/gui/MouseView3D.h"
-#include "tkCommon/gui/MathUtils.h"
 
 #include <math.h>
 #include "tkCommon/common.h"
+#include "glm/gtc/matrix_transform.hpp"
 
 namespace tk { namespace gui  {
 
-MouseView3D::MouseView3D()
-    : m_windowAspect(1.0f)
-    , m_fovRads(DEG2RAD(60.0f))
-    , m_zNear(0.1f)
-    , m_zFar(10000.f)
-    , m_radius(25)
-    , m_mouseLeft(false)
-    , m_mouseRight(false)
-{
+MouseView3D::MouseView3D() {
+
+    // window
+    m_windowAspect = 1.0f;
+    m_fovRads = 60.0f/180.0f*M_PI;
+    m_zNear =      0.1f;
+    m_zFar  =  10000.0f;
+
+    // mouse
+    m_radius = 25.0f;
+    m_mouseLeft  = false;
+    m_mouseRight = false;
+
+    // center of scene position
     m_center[0] = 0;
     m_center[1] = 0;
-    m_center[2] = 0.0;
+    m_center[2] = 0;
 
+    // axes 
     m_up[0] = 0;
     m_up[1] = 0;
     m_up[2] = 1;
 
-    m_angles[0] = DEG2RAD(-90.0f);
-    m_angles[1] = DEG2RAD(45.0f);
+    // start angles
+    m_angles[0] = (-90.0f)/180.0f*M_PI;
+    m_angles[1] = (45.0f )/180.0f*M_PI;
 
     m_currentPos[0] = 0.0f;
     m_currentPos[1] = 0.0f;
@@ -79,12 +86,12 @@ void MouseView3D::mouseMove(float x, float y)
         m_angles[0] = m_startAngles[0] - 0.01f * (pos[0] - m_currentPos[0]);
         m_angles[1] = m_startAngles[1] + 0.01f * (pos[1] - m_currentPos[1]);
 
-        // Limit the vertical angle (5 to 85 degrees)
-        if (m_angles[1] > DEG2RAD(85))
-            m_angles[1] = DEG2RAD(85);
+        // Limit the vertical angle 
+        if (m_angles[1] > vangleMax)
+            m_angles[1] = vangleMax;
 
-        if (m_angles[1] < DEG2RAD(-85))
-            m_angles[1] = DEG2RAD(-85);
+        if (m_angles[1] < vangleMin)
+            m_angles[1] = vangleMin;
 
         updateEye();
         updateMatrices();
@@ -119,24 +126,25 @@ void MouseView3D::setWindowAspect(float aspect)
     updateMatrices();
 }
 
-void MouseView3D::setCenter(float x, float y, float z)
+void MouseView3D::setCenter(glm::vec3 center)
 {
-    m_center[0] = x;
-    m_center[1] = y;
-    m_center[2] = z;
+    this->m_center = center;
     updateEye();
     updateMatrices();
 }
 
 void MouseView3D::updateMatrices()
 {
-    lookAt(m_modelView.data(), m_eye, m_center, m_up);
-    perspective(m_projection.data(), m_fovRads, 1.0f * m_windowAspect, m_zNear, m_zFar);
+    m_modelView = glm::lookAt(m_eye, m_center, m_up);
+    m_projection = glm::perspective(m_fovRads, 1.0f * m_windowAspect, m_zNear, m_zFar);
+
+    //lookAt(m_modelView.data(), m_eye, m_center, m_up);
+    //perspective(m_projection.data(), m_fovRads, 1.0f * m_windowAspect, m_zNear, m_zFar);
 }
 
 tk::common::Vector3<float> MouseView3D::unproject(float zplane) {
 
-
+/*
     Eigen::Matrix4f proj(m_projection);
     Eigen::Matrix4f view(m_modelView);
     Eigen::Vector3f pos;
@@ -145,16 +153,16 @@ tk::common::Vector3<float> MouseView3D::unproject(float zplane) {
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
     pos = tk::common::unproj_3d(proj, view, width, height, pos);
-
+*/
     tk::common::Vector3<float> p;
-    p.x = pos(0);
-    p.y = pos(1);
-    p.z = pos(2);
+    p.x = 0; //pos(0);
+    p.y = 0; //pos(1);
+    p.z = 0; //pos(2);
     return p;
 }
 
-tk::common::Vector2<float> MouseView3D::project(tk::common::Vector3<float> p3d) {
-
+tk::common::Vector3<float> MouseView3D::project(tk::common::Vector3<float> p3d) {
+/*
     Eigen::Matrix4f proj(m_projection);
     Eigen::Matrix4f view(m_modelView);
     Eigen::Vector4f point;
@@ -163,10 +171,11 @@ tk::common::Vector2<float> MouseView3D::project(tk::common::Vector3<float> p3d) 
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
     Eigen::Vector2f pos = tk::common::proj_2d(proj, view, width, height, point);
-
-    tk::common::Vector2<float> p;
-    p.x = pos(0);
-    p.y = pos(1);
+*/
+    tk::common::Vector3<float> p;
+    p.x = 0; //pos(0);
+    p.y = 0; //pos(1);
+    p.z = 0; //0;
     return p;
 }
 

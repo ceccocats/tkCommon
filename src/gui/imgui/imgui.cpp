@@ -968,11 +968,11 @@ CODE
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include "tkCommon/gui/imgui.h"
+#include "tkCommon/gui/imgui/imgui.h"
 #ifndef IMGUI_DEFINE_MATH_OPERATORS
 #define IMGUI_DEFINE_MATH_OPERATORS
 #endif
-#include "tkCommon/gui/imgui_internal.h"
+#include "tkCommon/gui/imgui/imgui_internal.h"
 
 #include <ctype.h>      // toupper
 #include <stdio.h>      // vsnprintf, sscanf, printf
