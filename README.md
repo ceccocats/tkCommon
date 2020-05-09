@@ -1,7 +1,17 @@
 # tkCommon
 ## Build
-in x86 please install:
- sudo apt-get install libgles2-mesa-dev
+#### install deps
+```
+sudo apt-get install libgles2-mesa-dev # NOT on aarch64
+sudo apt install git build-essential cmake rsync libeigen3-dev libglew-dev libglfw3-dev freeglut3-dev libfreetype6-dev libyaml-cpp-dev libpcap-dev libmatio-dev
+```
+#### compile
+```
+mkdir build
+cd build 
+cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo
+make -j8
+```
 
 ## Third party software
 | Repository | Author | LICENSE |
