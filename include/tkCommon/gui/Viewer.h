@@ -8,7 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include "tkCommon/common.h"
-#include "tkCommon/gui/MouseView3D.h"
+#include "tkCommon/gui/Camera3D.h"
 #include "tkCommon/gui/Color.h"
 #include "tkCommon/gui/lodepng.h"
 #include "tkCommon/gui/imgui/imgui.h"
@@ -105,6 +105,7 @@ namespace tk { namespace gui {
         static void tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx, float maxval=1.0);
         static void tkDrawCloudRGB(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int r, int g, int b);
         static void tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght, float radius = -1.0, int nbSubdivisions = 12);
+        static void tkDrawArrow(float length = 1.0, float radius = -1.0, int nbSubdivisions = 12);
         static void tkDrawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
         static void tkDrawRectangle(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
         static void tkDrawLine(tk::common::Vector3<float> p0, tk::common::Vector3<float> p1);
@@ -144,7 +145,7 @@ namespace tk { namespace gui {
         float                   xLim = 1.0; /**< 2d x coord screen limit (1.0 if quad) */  
         float                   yLim = 1.0; /**< 2d y coord screen limit (fixed to 1.0) */
 
-        static MouseView3D      mouseView;
+        static Camera3D         mouseView;
         static const int        MAX_KEYS = 1024;
         static bool             keys[MAX_KEYS];
         static std::vector<tk::gui::Color_t> colors;
@@ -186,7 +187,6 @@ namespace tk { namespace gui {
         static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
         static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
-        static void tkDrawArrow(float length = 1.0, float radius = -1.0, int nbSubdivisions = 12);
     };
 
 }}

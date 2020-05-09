@@ -55,7 +55,7 @@ add_library(tkGUI SHARED
     src/gui/Viewer.cpp
     src/gui/PlotManager.cpp
     src/gui/lodepng.cpp
-    src/gui/MouseView3D.cpp
+    src/gui/Camera3D.cpp
     src/gui/imgui/imgui_demo.cpp
     src/gui/imgui/imgui_draw.cpp
     src/gui/imgui/imgui_widgets.cpp

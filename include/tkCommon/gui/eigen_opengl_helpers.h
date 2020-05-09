@@ -12,7 +12,7 @@ Eigen::Matrix<Scalar,4,4> perspective(Scalar fovy, Scalar aspect, Scalar zNear, 
   assert(aspect > 0);
   assert(zFar > zNear);
   assert(zNear > 0);
-  Scalar radf = M_PI * fovy / 180.0;
+  Scalar radf = fovy;
   Scalar tan_half_fovy = std::tan(radf / 2.0);
   tr(0,0) = 1.0 / (aspect * tan_half_fovy);
   tr(1,1) = 1.0 / (tan_half_fovy);
@@ -51,10 +51,10 @@ Eigen::Matrix<typename Derived::Scalar,4,4> lookAt(Derived const & eye, Derived 
   typedef Eigen::Matrix<typename Derived::Scalar,4,4> Matrix4;
   typedef Eigen::Matrix<typename Derived::Scalar,3,1> Vector3;
   Vector3 f = (center - eye).normalized();
-  Vector3 u = up.normalized();
-  Vector3 s = f.cross(u).normalized();
-  u = s.cross(f);
-  Matrix4 mat = Matrix4::Zero();
+  Vector3 s = f.cross(up).normalized();
+  Vector3 u = s.cross(f);
+  
+  Matrix4 mat;
   mat(0,0) = s.x();
   mat(0,1) = s.y();
   mat(0,2) = s.z();
