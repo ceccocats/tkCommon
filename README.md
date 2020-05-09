@@ -23,5 +23,5 @@ make -j8
 |[lodepng](https://github.com/lvandeve/lodepng)|Lode Vandevenne| Zlib|
 |[OBJ-Loader](https://github.com/Bly7/OBJ-Loader)|Robert Smith| MIT|
 |[Argh!](https://github.com/adishavit/argh)| Adi Shavit| Argh! |
-|[geodetic_utils](https://github.com/ethz-asl/geodetic_utils)| Enric Galceran, Marija Popović |None|
+|[geodetic_utils](https://github.com/ethz-asl/geodetic_utils)| Enric Galceran, Marija Popović |BSD3|
 
