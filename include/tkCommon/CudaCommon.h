@@ -1,5 +1,5 @@
 #pragma once
-#include <cuda.h>
+//#include <cuda.h>
 #include <cuda_runtime.h>
 
 static void HandleError( cudaError_t err,

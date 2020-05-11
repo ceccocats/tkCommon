@@ -24,6 +24,11 @@
 #define COL_PURPLEB "\033[1;35m"
 #define COL_CYANB "\033[1;36m"
 
+#ifdef TIMER_START
+    #undef TIMER_START
+    #undef TIMER_STOP
+#endif
+
 // Simple Timer 
 //#define TIMER_ENABLE
 #ifdef TIMER_ENABLE 
