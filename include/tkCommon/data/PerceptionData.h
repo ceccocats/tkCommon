@@ -332,7 +332,12 @@ class lane2D : public generic{
             this->laneType  = s.laneType;
             return *this;
         }
-		void draw2D(int width, int height, float xLim, float yLim){
+		void draw2D(tk::gui::Viewer *viewer) {
+
+			int width = viewer->width;
+			int height = viewer->height;
+			float xLim = viewer->xLim;
+			float yLim = viewer->yLim;
 			float w,h;
 
 			glPushMatrix(); {
@@ -383,13 +388,18 @@ class object2D : public generic{
             return true;
         }
 		object2D& operator=(const object2D& s){
-
+			this->sensorID  = s.sensorID;
             this->box 		= s.box;
             this->objType   = s.objType;
             return *this;
         }
 
-        void draw2D(int width, int height, float xLim, float yLim){
+        void draw2D(tk::gui::Viewer *viewer) {
+
+			int width = viewer->width;
+			int height = viewer->height;
+			float xLim = viewer->xLim;
+			float yLim = viewer->yLim;
 			float w,h;
 
 			glPushMatrix(); {
@@ -429,7 +439,12 @@ class boundary : public generic{
 			return *this;
 		}
 
-		void draw2D(int width, int height, float xLim, float yLim){
+		void draw2D(tk::gui::Viewer *viewer) {
+
+			int width = viewer->width;
+			int height = viewer->height;
+			float xLim = viewer->xLim;
+			float yLim = viewer->yLim;
 			float w,h;
 
 			glPushMatrix(); {
@@ -617,16 +632,17 @@ class perceptionData : public tk::data::SensorData{
             return *this;
         }
 
-		void draw2D(int width, int height, float xLim, float yLim){
+		void draw2D(tk::gui::Viewer *viewer) {
+
         	for(int i = 0; i < camera_objects.size(); i++){
-        		camera_objects[i].draw2D(width, height, xLim, yLim);
+        		camera_objects[i].draw2D(viewer);
         	}
 			for(int i = 0; i < camera_lanes.size(); i++){
-				camera_lanes[i].draw2D(width, height, xLim, yLim);
+				camera_lanes[i].draw2D(viewer);
 			}
         }
 
-		void draw(){
+		void draw(tk::gui::Viewer *viewer){
 
         	glDisable(GL_DEPTH_TEST);
 

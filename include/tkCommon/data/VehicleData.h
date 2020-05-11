@@ -270,7 +270,7 @@ namespace tk { namespace data {
             tractionGrip = tractionGrip_d;
         }
 
-        void draw(){
+        void draw(tk::gui::Viewer *viewer){
 			tk::gui::Viewer::tkDrawTf(header.name, header.tf);
 			tk::gui::Viewer::tkSetColor(tk::gui::color::AMBER);
 			tk::common::Vector3<float> dim{(float) CAR_DIM_X, (float) CAR_DIM_Y,
@@ -299,7 +299,12 @@ namespace tk { namespace data {
 
         }
 
-        void draw2D(int width, int height, float xLim, float yLim){
+        void draw2D(tk::gui::Viewer *viewer) {
+
+			int width = viewer->width;
+			int height = viewer->height;
+			float xLim = viewer->xLim;
+			float yLim = viewer->yLim;
 
 			tk::common::Vector2<float> pos;
 			float size;

@@ -93,7 +93,7 @@ namespace tk { namespace data {
             return true;
         }
 
-        void draw(){
+        void draw(tk::gui::Viewer *viewer){
         	glPushMatrix();{
         		tk::gui::Viewer::tkDrawTf(header.name, header.tf);
 				tk::gui::Viewer::tkApplyTf(header.tf);

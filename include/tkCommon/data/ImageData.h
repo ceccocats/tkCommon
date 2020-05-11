@@ -57,8 +57,10 @@ namespace tk{namespace data{
             memcpy(data, s.data, width * height * channels * sizeof(T));
             mtx->unlock();
 
-            texture = s.texture;
-            gen_tex = s.gen_tex;
+            if(gen_tex == false){
+				texture = s.texture;
+				gen_tex = s.gen_tex;
+            }
 
             return *this;
         }
@@ -147,7 +149,12 @@ namespace tk{namespace data{
             return var;
         }
 
-		void draw2D(int width, int height, float xLim, float yLim) {
+		void draw2D(tk::gui::Viewer *viewer) {
+
+			int width = viewer->width;
+			int height = viewer->height;
+			float xLim = viewer->xLim;
+			float yLim = viewer->yLim;
 
         	if(!gen_tex){
 				gen_tex = true;

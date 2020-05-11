@@ -135,13 +135,7 @@ Viewer::init() {
 
 void
 Viewer::add(std::string name, Drawable *data){
-	auto search = drawBuffer.find(name);
-	if (search != drawBuffer.end()) {
-		drawBuffer[name] = data;
-	} else {
-		drawBuffer.insert(std::pair<std::string,Drawable*>(name,data));
-	}
-
+	buffer.add(name, data);
 }
 
 
@@ -161,14 +155,10 @@ Viewer::draw() {
     tkDrawAxis();
     glPopMatrix();
 
-	for (std::map<std::string,Drawable*>::iterator it = drawBuffer.begin(); it!=drawBuffer.end(); ++it){
-		it->second->draw();
-	}
+	buffer.draw(this);
 
 	tk::gui::Viewer::tkViewport2D(width, height);
-	for (std::map<std::string,Drawable*>::iterator it = drawBuffer.begin(); it!=drawBuffer.end(); ++it){
-		it->second->draw2D(width,height,xLim,yLim);
-	}
+	buffer.draw2D(this);
 
 }
 
