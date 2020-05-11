@@ -271,6 +271,9 @@ namespace tk { namespace data {
         }
 
         void draw(tk::gui::Viewer *viewer){
+
+        	// TODO: move to tk::gui::Viewer
+
 			tk::gui::Viewer::tkDrawTf(header.name, header.tf);
 			tk::gui::Viewer::tkSetColor(tk::gui::color::AMBER);
 			tk::common::Vector3<float> dim{(float) CAR_DIM_X, (float) CAR_DIM_Y,
@@ -301,9 +304,6 @@ namespace tk { namespace data {
 
         void draw2D(tk::gui::Viewer *viewer) {
 
-			int width = viewer->width;
-			int height = viewer->height;
-			float xLim = viewer->xLim;
 			float yLim = viewer->yLim;
 
 			tk::common::Vector2<float> pos;
@@ -314,10 +314,7 @@ namespace tk { namespace data {
 			int gear = actualGear;
 			double rpm = RPM;
 
-			glPushMatrix();{
-				tk::gui::Viewer::tkViewport2D(width, height);
-				tk::gui::Viewer::tkDrawSpeedometer(pos, speed, size);
-			}glPopMatrix();
+			tk::gui::Viewer::tkDrawSpeedometer(pos, speed, size);
         }
     };
 }

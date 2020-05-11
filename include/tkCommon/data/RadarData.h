@@ -114,6 +114,9 @@ namespace tk { namespace data {
         }
 
         void draw(tk::gui::Viewer *viewer){
+
+			// TODO: move to tk::gui::Viewer
+
 			tk::common::Vector3<float> pose;
 			tk::common::Tfpose  correction = tk::common::odom2tf(0, 0, 0, +M_PI/2);
 			for(int i = 0; i < nRadar; i++) {

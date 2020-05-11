@@ -24,6 +24,8 @@ namespace tk{namespace gui{
 
 		virtual void draw2D(tk::gui::Viewer *viewer) {}
 
+		~Drawable(){if(draw_mutex != nullptr) delete draw_mutex;}
+
 	};
 
 	template<typename T, typename = std::enable_if<std::is_base_of<Drawable, T>::value>>
@@ -138,6 +140,14 @@ namespace tk{namespace gui{
 				it->second->draw(viewer);
 				if(it->second->draw_mutex != nullptr)
 					it->second->draw_mutex->unlock();
+			}
+		}
+
+		~DrawMap(){
+			for (std::map<std::string,Drawable*>::iterator it = map.begin(); it!=map.end(); ++it){
+				Drawable *t = it->second;
+				it->second = nullptr;
+				delete t;
 			}
 		}
 	};

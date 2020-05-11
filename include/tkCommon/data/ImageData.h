@@ -151,11 +151,6 @@ namespace tk{namespace data{
 
 		void draw2D(tk::gui::Viewer *viewer) {
 
-			int width = viewer->width;
-			int height = viewer->height;
-			float xLim = viewer->xLim;
-			float yLim = viewer->yLim;
-
         	if(!gen_tex){
 				gen_tex = true;
 				glGenTextures(1, &texture);
@@ -167,16 +162,7 @@ namespace tk{namespace data{
 			if(tk::gui::Viewer::image_height != this->height)
 				tk::gui::Viewer::image_height = this->height;
 
-        	float w,h;
-
-			glPushMatrix(); {
-				tk::gui::Viewer::tkViewportImage(width, height, xLim, yLim, index, w, h);
-
-				glColor4f(1,1,1,1);
-				tk::gui::Viewer::tkDrawTexture(texture, 1, 1);
-
-			} glPopMatrix();
-
+			viewer->tkDrawTextureImage(texture, index);
         }
     };
 }}

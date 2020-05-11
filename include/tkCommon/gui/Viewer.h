@@ -146,10 +146,20 @@ namespace tk { namespace gui {
 
 		// data draw primitivies
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//virtual void tkDrawTextureImage(unsigned int texture, int index);
-		//virtual void tkDrawLineOnImage(std::vector<tk::common::Vector2<float>> points, tk::gui::Color_t color);
-		//virtual void tkDrawBoxOnImage(int x, int y, int w, int h, tk::gui::Color_t color);
 
+		virtual void tkDrawTextureImage(unsigned int texture, int index);
+
+		virtual void tkDrawLineOnImage(std::vector<tk::common::Vector3<float>> &points, int index, tk::gui::Color_t color);
+
+		virtual void tkDrawLineOnImage(std::vector<tk::common::Vector2<float>> &points, int index, tk::gui::Color_t color);
+
+		virtual void tkDrawBoxOnImage(float x, float y, float w, float h, int index, tk::gui::Color_t color);
+
+		virtual void tkDrawRotatedBox3D(tk::common::Vector3<float> &pose, tk::common::Vector3<float> &size, tk::common::Vector3<float> &rot, tk::gui::Color_t color, float alpha = 255);
+
+		virtual void tkDrawPerceptionPyramid(tk::common::Vector3<float> &pose, float rotation, tk::gui::Color_t color, float alpha = 255);
+
+		virtual void tkDrawLidarCloud(tk::common::Tfpose &tf, Eigen::MatrixXf &points, int nPoints, Eigen::MatrixXf &intensity);
 
         //static void tkDrawLiDARData(tk::data::LidarData *data);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

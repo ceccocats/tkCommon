@@ -1147,8 +1147,156 @@ Viewer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int m
     }
 }
 
+void
+Viewer::tkDrawTextureImage(unsigned int texture, int index){
+	glPushMatrix(); {
+		float w,h;
+		tk::gui::Viewer::tkViewportImage(width, height, xLim, yLim, index, w, h);
 
+		glColor4f(1,1,1,1);
+		tk::gui::Viewer::tkDrawTexture(texture, 1, 1);
 
+	} glPopMatrix();
+}
+
+void
+Viewer::tkDrawLineOnImage(std::vector<tk::common::Vector2<float>> &points, int index, tk::gui::Color_t color){
+	float w,h;
+
+	glPushMatrix(); {
+		tk::gui::Viewer::tkViewportImage(width, height, xLim, yLim, index, w, h);
+
+		glTranslatef(-0.5, 0.5, 0);
+		glScalef(1.0f/tk::gui::Viewer::image_width, -1.0f/tk::gui::Viewer::image_height, 1);
+
+		tkSetColor(color);
+		for(int i = 0; i < points.size()-1; i++){
+			tk::gui::Viewer::tkDrawLine(
+				tk::common::Vector3<float>(points[i].x, points[i].y, 0),
+				tk::common::Vector3<float>(points[i+1].x, points[i+1].y, 0)
+			);
+		}
+
+	} glPopMatrix();
+}
+
+void
+Viewer::tkDrawLineOnImage(std::vector<tk::common::Vector3<float>> &points, int index, tk::gui::Color_t color){
+	float w,h;
+
+	glPushMatrix(); {
+		tk::gui::Viewer::tkViewportImage(width, height, xLim, yLim, index, w, h);
+
+		glTranslatef(-0.5, 0.5, 0);
+		glScalef(1.0f/tk::gui::Viewer::image_width, -1.0f/tk::gui::Viewer::image_height, 1);
+
+		tkSetColor(color);
+		for(int i = 0; i < points.size()-1; i++){
+			tk::gui::Viewer::tkDrawLine(
+				tk::common::Vector3<float>(points[i].x, points[i].y, points[i].z),
+				tk::common::Vector3<float>(points[i+1].x, points[i+1].y, points[i+1].z)
+			);
+		}
+
+	} glPopMatrix();
+}
+
+void
+Viewer::tkDrawBoxOnImage(float x, float y, float w, float h, int index, tk::gui::Color_t color){
+	float viewer_w, viewer_h;
+
+	glPushMatrix(); {
+		tk::gui::Viewer::tkViewportImage(width, height, xLim, yLim, index, viewer_w, viewer_h);
+
+		glTranslatef(-0.5, 0.5, 0);
+		glScalef(1.0f/tk::gui::Viewer::image_width, -1.0f/tk::gui::Viewer::image_height, 1);
+
+		glColor4f((float)color.r/255, (float)color.g/255, (float)color.b/255, (float)color.a/255);
+		tk::gui::Viewer::tkDrawRectangle(
+				tk::common::Vector3<float>( x + w/2, y + h/2, 0),
+				tk::common::Vector3<float>( w, h, 0),
+				false
+		);
+
+	} glPopMatrix();
+}
+
+void
+Viewer::tkDrawRotatedBox3D(tk::common::Vector3<float> &pose, tk::common::Vector3<float> &size, tk::common::Vector3<float> &rot, tk::gui::Color_t color, float alpha){
+
+	glDisable(GL_DEPTH_TEST);
+	glPushMatrix();
+	{
+		tk::gui::Viewer::tkSetColor(color, alpha);
+		glTranslatef(pose.x, pose.y, pose.z);
+		glRotatef(rot.z, 0,0,1);
+		glRotatef(rot.y, 0,1,0);
+		glRotatef(rot.x, 1,0,0);
+		tk::gui::Viewer::tkDrawCube(tk::common::Vector3<float>(0,0,0), size);
+	}
+	glPopMatrix();
+
+	glEnable(GL_DEPTH_TEST);
+}
+
+void
+Viewer::tkDrawPerceptionPyramid(tk::common::Vector3<float> &pose, float rotation, tk::gui::Color_t color, float alpha){
+
+	glDisable(GL_DEPTH_TEST);
+	glPushMatrix();
+	{
+		tkSetColor(color, alpha);
+		glTranslatef(pose.x, pose.y, pose.z + 1.5);
+		glScalef(1.5,1.5,1.5);
+		glRotatef(rotation, 0,0,1);
+		glBegin(GL_POLYGON);
+		glVertex3f(-0.5,-0.5, 1);
+		glVertex3f(-0.5,0.5, 1);
+		glVertex3f(0.5,0.5, 1);
+		glVertex3f(0.5,-0.5, 1);
+		glEnd();
+
+		glBegin(GL_TRIANGLES);
+		glVertex3f(-0.5,-0.5, 1);
+		glVertex3f(-0.5,0.5, 1);
+		glVertex3f(0,0,0);
+
+		glVertex3f(-0.5,0.5, 1);
+		glVertex3f(0.5,0.5, 1);
+		glVertex3f(0,0,0);
+
+		glVertex3f(0.5,0.5, 1);
+		glVertex3f(0.5,-0.5, 1);
+		glVertex3f(0,0,0);
+
+		glVertex3f(0.5,-0.5, 1);
+		glVertex3f(-0.5,-0.5, 1);
+		glVertex3f(0,0,0);
+		glEnd();
+	}
+	glPopMatrix();
+
+	glEnable(GL_DEPTH_TEST);
+}
+
+void
+Viewer::tkDrawLidarCloud(tk::common::Tfpose &tf, Eigen::MatrixXf &points, int nPoints, Eigen::MatrixXf &intensity){
+	glPushMatrix();{
+		tk::gui::Viewer::tkApplyTf(tf);
+		glPointSize(1.0);
+		glBegin(GL_POINTS);
+		//white
+		tk::gui::Viewer::tkSetColor(tk::gui::color::WHITE);
+
+		for (int p = 0; p < nPoints; p++) {
+			float i = float(intensity(p));
+			tk::gui::Viewer::tkSetRainbowColor(i);
+			glVertex3f(points.coeff(0,p),points.coeff(1,p),points.coeff(2,p));
+		}
+		glEnd();
+	}
+	glPopMatrix();
+}
 
 
 
