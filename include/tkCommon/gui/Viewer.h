@@ -103,6 +103,7 @@ namespace tk { namespace gui {
         static void tkDrawSphere(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = true);
         static void tkDrawCloud(Eigen::MatrixXf *data);
         static void tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx, float maxval=1.0);
+        static void tkDrawCloudClass(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx);
         static void tkDrawCloudRGB(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int r, int g, int b);
         static void tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght, float radius = -1.0, int nbSubdivisions = 12);
         static void tkDrawArrow(float length = 1.0, float radius = -1.0, int nbSubdivisions = 12);
