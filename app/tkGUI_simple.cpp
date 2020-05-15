@@ -11,7 +11,7 @@ public:
 		tk::gui::Viewer::tkLoadOBJ(std::string(TKPROJ_PATH) + "data/levante", carObj);
 	}
 
-	void draw(){
+	void draw(tk::gui::Viewer *viewer){
 		// levante
 		glPushMatrix(); {
 			tk::gui::Viewer::tkDrawObject3D(&carObj, 1, false);
@@ -26,7 +26,7 @@ public:
 	float   angle;
 	float   length;
 
-	void draw(){
+	void draw(tk::gui::Viewer *viewer){
 		// Arrow
 		tk::gui::Viewer::tkSetColor(tk::gui::color::RED);
 		tk::gui::Viewer::tkDrawArrow(pose, angle, length);
@@ -39,7 +39,7 @@ public:
 	tk::common::Vector3<float>pose = tk::common::Vector3<float>{0.0, 4.0, 1.0};
 	tk::common::Vector3<float>size = tk::common::Vector3<float>{4.0, 2.0, 2.0};
 
-	void draw(){
+	void draw(tk::gui::Viewer *viewer){
 
 		tk::gui::Color_t col = tk::gui::color::PINK;
 		tk::gui::Viewer::tkSetColor(col);
@@ -57,7 +57,7 @@ public:
 	float radius = 8;
 	int res = 100;
 	bool filled = false;
-	void draw() {
+	void draw(tk::gui::Viewer *viewer) {
 		// Circle
 		tk::gui::Viewer::tkSetColor(tk::gui::color::PINK);
 		tk::gui::Viewer::tkDrawCircle(pose, radius, res);
@@ -71,7 +71,7 @@ public:
 	Eigen::MatrixXf *cloud = nullptr;
 	tk::common::Tfpose tf = tk::common::Tfpose::Identity();
 	float angle;
-	void draw(){
+	void draw(tk::gui::Viewer *viewer){
 		// tornado cloud
 		tf = tk::common::odom2tf(0, 0, angle);
 		glPushMatrix(); {
@@ -98,7 +98,7 @@ public:
 
 class TkGUIText : public tk::gui::Drawable {
 public:
-	void draw(){
+	void draw(tk::gui::Viewer *viewer){
 		// text
 		tk::gui::Viewer::tkSetColor(tk::gui::color::LIME);
 		tk::gui::Viewer::tkDrawText("tkGUI", tk::common::Vector3<float>{-5, 10.0, 0.0},
@@ -106,7 +106,7 @@ public:
 				   tk::common::Vector3<float>{5.0, 5.0, 5.0});
 	}
 
-	void draw2D(int width, int height, float xLim, float yLim){
+	void draw2D(tk::gui::Viewer *viewer){
 		glPushMatrix(); {
 			tk::gui::Viewer::tkSetColor(tk::gui::color::LIME);
 			char fps_str[256];
@@ -122,7 +122,7 @@ class Speedometer : public tk::gui::Drawable{
 public:
 	float speed;
 
-	void draw2D(int width, int height, float xLim, float yLim){
+	void draw2D(tk::gui::Viewer *viewer){
 		tk::gui::Viewer::tkDrawSpeedometer(tk::common::Vector2<float>(-0.75, -0.75), speed, 0.2);
 	};
 };
