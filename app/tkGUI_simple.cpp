@@ -3,12 +3,14 @@
 #include <signal.h>
 
 
-class Car : public tk::gui::Drawable {
+class Scene : public tk::gui::Drawable {
 public:
 	tk::gui::Viewer::object3D_t carObj;
+	float speed;
 
 	void init(){
 		tk::gui::Viewer::tkLoadOBJ(std::string(TKPROJ_PATH) + "data/levante", carObj);
+
 	}
 
 	void draw(tk::gui::Viewer *viewer){
@@ -16,58 +18,47 @@ public:
 		glPushMatrix(); {
 			tk::gui::Viewer::tkDrawObject3D(&carObj, 1, false);
 		} glPopMatrix();
-	}
-};
 
-class Arrow : public tk::gui::Drawable {
-public:
 
-	tk::common::Vector3<float> pose = tk::common::Vector3<float>{0.0, 0.0, 3.0};
-	float   angle;
-	float   length;
-
-	void draw(tk::gui::Viewer *viewer){
-		// Arrow
-		tk::gui::Viewer::tkSetColor(tk::gui::color::RED);
-		tk::gui::Viewer::tkDrawArrow(pose, angle, length);
-	}
-};
-
-class Cube : public tk::gui::Drawable {
-public:
-
-	tk::common::Vector3<float>pose = tk::common::Vector3<float>{0.0, 4.0, 1.0};
-	tk::common::Vector3<float>size = tk::common::Vector3<float>{4.0, 2.0, 2.0};
-
-	void draw(tk::gui::Viewer *viewer){
-
+		// draw nice cube
+		tk::common::Vector3<float>pose = tk::common::Vector3<float>{0.0, 4.0, 1.0};
+		tk::common::Vector3<float>size = tk::common::Vector3<float>{4.0, 2.0, 2.0};
 		tk::gui::Color_t col = tk::gui::color::PINK;
 		tk::gui::Viewer::tkSetColor(col);
 		tk::gui::Viewer::tkDrawCube(pose, size, false);
 		col.a /= 4;
 		tk::gui::Viewer::tkSetColor(col);
 		tk::gui::Viewer::tkDrawCube(pose, size, true);
-	}
 
-};
-
-class Circle : public tk::gui::Drawable {
-public:
-	tk::common::Vector3<float> pose = tk::common::Vector3<float>{0.0, 0.0, 0.0};
-	float radius = 8;
-	int res = 100;
-	bool filled = false;
-	void draw(tk::gui::Viewer *viewer) {
 		// Circle
 		tk::gui::Viewer::tkSetColor(tk::gui::color::PINK);
-		tk::gui::Viewer::tkDrawCircle(pose, radius, res);
+		tk::gui::Viewer::tkDrawCircle({0.0f, 0.0f, 0.0f}, 8, 100);
+
+		// text
+		tk::gui::Viewer::tkSetColor(tk::gui::color::LIME);
+		tk::gui::Viewer::tkDrawText("tkGUI", tk::common::Vector3<float>{-5, 10.0, 0.0},
+				   tk::common::Vector3<float>{M_PI/2, 0, 0},
+				   tk::common::Vector3<float>{5.0, 5.0, 5.0});
+	}
+
+	void draw2D(tk::gui::Viewer *viewer){
+		glPushMatrix(); {
+			tk::gui::Viewer::tkSetColor(tk::gui::color::LIME);
+			char fps_str[256];
+			sprintf(fps_str, "FPS: %.2f", ImGui::GetIO().Framerate);
+			tk::gui::Viewer::tkDrawText(fps_str, tk::common::Vector3<float>{0.62, +0.9, 0},
+					   tk::common::Vector3<float>{0, 0, 0},
+					   tk::common::Vector3<float>{0.06, 0.06, 0.0});
+		} glPopMatrix();
+
+		tk::gui::Viewer::tkDrawSpeedometer(tk::common::Vector2<float>(-0.75, -0.75), speed, 0.2);
 	}
 };
+
 
 class Tornado : public tk::gui::Drawable {
 public:
 	tk::gui::Color_t col;
-	tk::gui::PlotManager plotManger;
 	Eigen::MatrixXf *cloud = nullptr;
 	tk::common::Tfpose tf = tk::common::Tfpose::Identity();
 	float angle;
@@ -96,36 +87,6 @@ public:
 	}
 };
 
-class TkGUIText : public tk::gui::Drawable {
-public:
-	void draw(tk::gui::Viewer *viewer){
-		// text
-		tk::gui::Viewer::tkSetColor(tk::gui::color::LIME);
-		tk::gui::Viewer::tkDrawText("tkGUI", tk::common::Vector3<float>{-5, 10.0, 0.0},
-				   tk::common::Vector3<float>{M_PI/2, 0, 0},
-				   tk::common::Vector3<float>{5.0, 5.0, 5.0});
-	}
-
-	void draw2D(tk::gui::Viewer *viewer){
-		glPushMatrix(); {
-			tk::gui::Viewer::tkSetColor(tk::gui::color::LIME);
-			char fps_str[256];
-			sprintf(fps_str, "FPS: %.2f", ImGui::GetIO().Framerate);
-			tk::gui::Viewer::tkDrawText(fps_str, tk::common::Vector3<float>{0.62, +0.9, 0},
-					   tk::common::Vector3<float>{0, 0, 0},
-					   tk::common::Vector3<float>{0.06, 0.06, 0.0});
-		} glPopMatrix();
-	}
-};
-
-class Speedometer : public tk::gui::Drawable{
-public:
-	float speed;
-
-	void draw2D(tk::gui::Viewer *viewer){
-		tk::gui::Viewer::tkDrawSpeedometer(tk::common::Vector2<float>(-0.75, -0.75), speed, 0.2);
-	};
-};
 
 tk::gui::Viewer *viewer = nullptr;
 bool gRun = true;
@@ -137,15 +98,9 @@ void sig_handler(int signo) {
 }
 
 void *update_th(void *data) {
-	Car levante;
-	Arrow arrow;
-	Cube cube;
-	Circle circle;
+	Scene scene;
 	Tornado tornado;
-	TkGUIText text;
-	Speedometer speedometer;
-
-	levante.init();
+	scene.init();
 
 	int h_n = 100;
 	int N = 360*h_n;
@@ -182,18 +137,12 @@ void *update_th(void *data) {
                 speedUP = true;
         }
 
-        arrow.angle = angle;
 		tornado.angle = angle;
-        speedometer.speed = speed;
-	    tornado.plotManger.addPoint("test", tk::common::Vector3<float>{3.0f*cos(angle), 3.0f*sin(angle), 0});
+        scene.speed = speed;
+	    viewer->plotManger->addPoint("test", tk::common::Vector3<float>{3.0f*cos(angle), 3.0f*sin(angle), 0});
 
-        viewer->add("levante", &levante);
-		viewer->add("arrow", &arrow);
-		viewer->add("cube", &cube);
-		viewer->add("circle", &circle);
+        viewer->add("scene", &scene);
 		viewer->add("tornado", &tornado);
-		viewer->add("text", &text);
-		viewer->add("speedometer", &speedometer);
         rate.wait();
     }
 }

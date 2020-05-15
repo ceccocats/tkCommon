@@ -155,12 +155,6 @@ Viewer::draw() {
     tkApplyTf(tk::common::odom2tf(p.x, p.y, 0));
     tkDrawAxis();
     glPopMatrix();
-
-	buffer.draw(this);
-
-	tk::gui::Viewer::tkViewport2D(width, height);
-	buffer.draw2D(this);
-
 }
 
 void
@@ -274,7 +268,11 @@ Viewer::run() {
             Viewer::mouseView.mouseOnGUI = ImGui::IsMouseHoveringAnyWindow();
 
             plotManger->drawPlots();
+            buffer.draw(this);
             draw();
+	        
+            tk::gui::Viewer::tkViewport2D(width, height);
+            buffer.draw2D(this);
 
             {
                 float plotSize = 0.35;
@@ -285,6 +283,7 @@ Viewer::run() {
                 tkViewport2D( plotW, plotH, plotX, plotY);
                 plotManger->drawLegend();
             }
+
 
             // draw tk LOGO
             if(drawLogo) {
