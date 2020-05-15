@@ -923,12 +923,7 @@ Viewer::tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture)
 void
 Viewer::tkSplitPanel(int count, float ratio, float xLim, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y){
     num_rows = 4;
-    if(ratio <= 0) {
-        num_rows = ceil(sqrt(count));
-    }else{
-        num_rows = count > 4 ? num_rows : 4;
-        num_rows = count > 8 ? 8 : num_rows;
-    }
+
     num_cols = ceil((float)count/num_rows);
 
     h = 1.0f/((float)num_rows/2);
@@ -940,7 +935,7 @@ Viewer::tkSplitPanel(int count, float ratio, float xLim, int &num_cols, int &num
     }
 
     if(ratio > 0){
-        x = -xLim + w/2 + w * (num_cols-1);
+        x = -xLim + w/2;
         y = -1.0f + h/2;
     }
     else {
@@ -972,7 +967,7 @@ Viewer::tkViewportImage(int width, int height, float xLim, float yLim, int im_id
 	}
 
 	int i = im_id;
-	col = num_cols - i / num_rows - 1;
+	col = i / num_rows;
 	row = i % num_rows;
 	// draw 2D HUD
 	int dimW = width/num_rows;
