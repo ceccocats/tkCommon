@@ -968,11 +968,6 @@ Viewer::tkViewportImage(int width, int height, float xLim, float yLim, int im_id
 	int i = im_id;
 	col = i / num_rows;
 	row = i % num_rows;
-	// draw 2D HUD
-	int dimW = width/num_rows;
-	int dimH = height/num_rows;
-
-	tkViewport2D(dimW, dimH, col * dimW, height - dimH*((i%num_rows)+1));
 
 	glTranslatef(x + ( col * w ), y + ( row * h ), 0);
 	glScalef( w, h, 1);
