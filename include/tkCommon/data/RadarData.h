@@ -114,8 +114,10 @@ namespace tk { namespace data {
         }
 
         void draw(tk::gui::Viewer *viewer){
+            glPushMatrix();
 
 			// TODO: move to tk::gui::Viewer
+            tk::gui::Viewer::tkApplyTf(header.tf);
 
 			tk::common::Vector3<float> pose;
 			tk::common::Tfpose  correction = tk::common::odom2tf(0, 0, 0, +M_PI/2);
@@ -138,21 +140,22 @@ namespace tk { namespace data {
 					tk::gui::Viewer::tkDrawCircle(pose, 0.05);
 				}
 				//// draw far
-				//for (int j = 0; j < data->far_data[i].nPoints; j++) {
-				//    float rcs = data->far_data[i].features(tk::data::CloudFeatureType::RCS, j);
-//
-				//    //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
-				//    float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
-				//    tkSetRainbowColor(hue);
-//
-				//    pose.x = data->far_data[i].points(0, j);
-				//    pose.y = data->far_data[i].points(1, j);
-				//    pose.z = data->far_data[i].points(2, j);
-//
-				//    tkDrawCircle(pose, 0.05);
-				//}
+				for (int j = 0; j < far_data[i].nPoints; j++) {
+				    float rcs = far_features[i](tk::data::RadarFeatureType::RCS, j);
+
+			        //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+			        float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
+			        tk::gui::Viewer::tkSetRainbowColor(hue);
+
+				    pose.x = far_data[i].points(0, j);
+				    pose.y = far_data[i].points(1, j);
+				    pose.z = far_data[i].points(2, j);
+
+				    tk::gui::Viewer::tkDrawCircle(pose, 0.05);
+				}
 				glPopMatrix();
 			}
+            glPopMatrix();
         }
 
     };
