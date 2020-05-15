@@ -129,26 +129,6 @@ namespace tk{namespace data{
             delete mtx;
         }
 
-        matvar_t *toMatVar(std::string name = "image") {
-            tkASSERT(sizeof(T) == sizeof(uint8_t))
-            tkASSERT(channels == 4)
-
-            size_t dim[3] = { height, width, 3 }; // create 1x1 struct
-            matvar_t *var = Mat_VarCreate(name.c_str(), MAT_C_UINT8, MAT_T_UINT8, 3, dim, data, 0);
-
-            // allocated by libmatio
-            uint8_t *tmp = (uint8_t *)var->data;
-
-            // RGBA,RGBA,RGBA,... -> RRR...,GGG...,BBB...,
-            for(int i=0; i<height; i++)
-            for(int j=0; j<width; j++) {
-                    tmp[j*height + i + height*width*0] = data[i*width*4 + j*4 + 0];
-                    tmp[j*height + i + height*width*1] = data[i*width*4 + j*4 + 1];
-                    tmp[j*height + i + height*width*2] = data[i*width*4 + j*4 + 2];
-            }
-            return var;
-        }
-
 		void draw2D(tk::gui::Viewer *viewer) {
 
         	if(!gen_tex){
@@ -164,5 +144,6 @@ namespace tk{namespace data{
 
 			viewer->tkDrawTextureImage(texture, index);
         }
+
     };
 }}

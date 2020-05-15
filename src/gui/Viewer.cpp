@@ -4,16 +4,17 @@
 extern bool gRun;
 using namespace tk::gui;
 bool            Viewer::keys[MAX_KEYS];
-MouseView3D     Viewer::mouseView;
+Camera3D     Viewer::mouseView;
 GLUquadric*     Viewer::quadric;
 int 			Viewer::image_count = 1;
 int 			Viewer::image_fullscreen = false;
 int 			Viewer::image_width = 1920;
 int 			Viewer::image_height = 1208;
 
-std::vector<Color_t> tk::gui::Viewer::colors = std::vector<Color_t>{color::RED, color::PINK, 
+std::vector<Color_t> tk::gui::Viewer::colors = std::vector<Color_t>{color::RED, color::GREEN, 
                                                                     color::BLUE, color::YELLOW, 
-                                                                    color::WHITE, color::ORANGE
+                                                                    color::WHITE, color::ORANGE,
+                                                                    color::PINK, color::GREY
                                                                     };
 int Viewer::TK_FONT_SIZE = 256;
 
@@ -46,7 +47,7 @@ Viewer::init() {
 
 #if GLFW_VERSION_MAJOR >= 3
 #if GLFW_VERSION_MINOR >= 2
-    glfwMaximizeWindow(window);
+    //glfwMaximizeWindow(window);
 
     unsigned w, h;
     unsigned err = lodepng_decode32_file(&(icons[0].pixels), &w, &h, icon_fname.c_str());
@@ -263,8 +264,8 @@ Viewer::run() {
             drawSplash();
         } else {
             // apply matrix
-            glMultMatrixf(Viewer::mouseView.getProjection()->data());
-            glMultMatrixf(Viewer::mouseView.getModelView()->data());
+            glMultMatrixf(Viewer::mouseView.getProjection().data());
+            glMultMatrixf(Viewer::mouseView.getModelView().data());
 
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
@@ -274,7 +275,16 @@ Viewer::run() {
 
             plotManger->drawPlots();
             draw();
-            plotManger->drawLegend();
+
+            {
+                float plotSize = 0.35;
+                int plotW = plotSize*height;
+                int plotH = plotSize*height;
+                int plotX = width - plotW - 10;
+                int plotY = height - plotH - 10;
+                tkViewport2D( plotW, plotH, plotX, plotY);
+                plotManger->drawLegend();
+            }
 
             // draw tk LOGO
             if(drawLogo) {
@@ -503,6 +513,26 @@ Viewer::tkDrawAxis(float s) {
 }
 
 void 
+Viewer::tkDrawTriangle(tk::common::Vector3<float> a, tk::common::Vector3<float> b, tk::common::Vector3<float> c, bool filled) {
+
+    if(filled) {
+        glBegin(GL_TRIANGLES);
+        glVertex3f(a.x, a.y, a.z);
+        glVertex3f(b.x, b.y, b.z);
+        glVertex3f(c.x, c.y, c.z);
+        glEnd();
+    } else {
+        glBegin(GL_LINES);
+        glVertex3f(a.x, a.y, a.z);
+        glVertex3f(b.x, b.y, b.z);
+        glVertex3f(c.x, c.y, c.z);
+        glVertex3f(a.x, a.y, a.z);
+        glEnd();
+    }
+}
+
+
+void 
 Viewer::tkDrawCircle(tk::common::Vector3<float> pose, float r, int res, bool filled) {
 
     int res_1 = res;
@@ -548,10 +578,8 @@ Viewer::tkDrawCloud(Eigen::MatrixXf *points) {
 }
 
 void Viewer::tkRainbowColor(float hue, uint8_t &r, uint8_t &g, uint8_t &b) {
-    if(hue <= 0.0)
-        hue = 0.000001;
-    if(hue >= 1.0)
-        hue = 0.999999;
+
+    hue = fmod(fabs(hue), 1);
 
     int h = int(hue * 256 * 6);
     int x = h % 0x100;
@@ -563,7 +591,7 @@ void Viewer::tkRainbowColor(float hue, uint8_t &r, uint8_t &g, uint8_t &b) {
     case 2: g = 255; b = x;       break;
     case 3: b = 255; g = 255 - x; break;
     case 4: b = 255; r = x;       break;
-    case 5: r = 255; b = 255 - x; break;
+    case 5: r = 255; g = x;       break;
     }
 }
 
@@ -577,10 +605,10 @@ void Viewer::tkSetRainbowColor(float hue) {
 
 
 void
-Viewer::tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx) {
+Viewer::tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx, float maxval) {
     glBegin(GL_POINTS);
     for (int p = 0; p < points->cols(); p++) {
-        float i = float(features->coeff(idx, p))/255.0;
+        float i = float(features->coeff(idx, p))/maxval;
         tkSetRainbowColor(i);
 
         Eigen::Vector4f v = points->col(p);
@@ -1100,9 +1128,9 @@ void
 Viewer::tkViewport2D(int width, int height, int x, int y) {
     float ar = (float)width / (float)height;
 
-    //glViewport(x, y, width, height);
-    //glOrtho(0, width, 0, height, -1, 1);
-    //glLoadIdentity();
+    glViewport(x, y, width, height);
+    glOrtho(0, width, 0, height, -1, 1);
+    glLoadIdentity();
     
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();

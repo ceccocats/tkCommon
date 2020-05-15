@@ -1,4 +1,4 @@
-#include "tkSensors/serial/SerialPort.h"
+#include "tkCommon/communication/serial/SerialPort.h"
 #include <fcntl.h>
 #include <errno.h>
 #include <termios.h>

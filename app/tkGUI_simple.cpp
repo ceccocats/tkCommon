@@ -201,7 +201,7 @@ void *update_th(void *data) {
 int main( int argc, char** argv){
 
     tk::common::CmdParser cmd(argv, "tkGUI sample gui app");
-    cmd.print();
+    cmd.parse();
 
     signal(SIGINT, sig_handler);
     gRun = true;
@@ -216,7 +216,7 @@ int main( int argc, char** argv){
     pthread_create(&t0, NULL, update_th, NULL);
 
     // fake loading
-    sleep(2);
+    //sleep(2);
 
     viewer->joinThread();
     pthread_join(t0, NULL);

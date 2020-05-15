@@ -641,10 +641,14 @@ struct ObjectData3D_t{
 
 template <class T>
 struct LineData_t{
+    int camIdx;
+    char type;
     std::vector<T> points;
     tk::common::Vector4<float> color;
 
     LineData_t &operator=(const LineData_t& s){
+        camIdx = s.camIdx;
+        type =s.type;
         points = s.points;
         color = s.color;
     }
@@ -683,53 +687,72 @@ typedef BoundaryData_t<tk::common::Vector3<float>> BoundaryData3D_t;
 
 class LinesData_t : public tk::data::SensorData {
 public:
-    std::vector<LineData3D_t> data;
 
-        void init() {
-            SensorData::init();
-            header.sensor = tk::data::sensorName::LINES;
-        }
+    tk::data::HeaderData header;
+    std::vector<LineData2D_t> data;   // filled by detection
+    std::vector<LineData3D_t> data3d; // filled by fusion
 
-        void release(){
-            return;
-        }
+    void init() {
+        SensorData::init();
+        header.sensor = tk::data::sensorName::LINES;
+    }
 
-        bool checkDimension(SensorData *s){
-            return true;
-        }
+    void release(){
+        return;
+    }
 
-    matvar_t *toMatVar(std::string name = "lines") {
-        size_t dims[] = {data.size(), 1};
-        matvar_t *array = Mat_VarCreate(name.c_str(),MAT_C_CELL,MAT_T_CELL,2,dims,NULL,0);
+    bool checkDimension(SensorData *s){
+        return true;
+    }
+
+    bool toVar(std::string name, tk::math::MatIO::var_t &var) {
+
+        std::vector<tk::math::MatIO::var_t> cellsVars(data.size());
 
         for(int i=0; i<data.size(); i++) {
-            Eigen::MatrixXf p(3, data[i].points.size());
+            std::vector<tk::math::MatIO::var_t> structVars(3);
+
+            structVars[0].set("camIdx", data[i].camIdx);
+            int type = data[i].type;
+            structVars[1].set("type", type);
+ 
+            // line data
+            Eigen::MatrixXf p(2, data[i].points.size());
             for(int j=0; j<p.cols(); j++) {
                 p(0, j) = data[i].points[j].x;
                 p(1, j) = data[i].points[j].y;
-                p(2, j) = data[i].points[j].z;
             }
-            matvar_t *var = tk::common::eigenXf2matvar(p, "line");
-            Mat_VarSetCell(array, i,var);
+            structVars[2].set("data", p);
+
+            cellsVars[i].setStruct("lineData", structVars);
         }
-        return array;
+
+        return var.setCells(name, cellsVars);
     }
 
-    bool fromMatVar(matvar_t *var) {
+    bool fromVar(tk::math::MatIO::var_t &var) {
+        if(var.empty())
+            return false;
 
-        int n = var->dims[0];
-        for(int i=0; i<n; i++) {
-            matvar_t *pvar = Mat_VarGetCell(var, i);
-            Eigen::MatrixXf mat = tk::common::matvar2eigenXf(pvar);
+        for(int i=0; i<var.size(); i++) {
+            LineData2D_t line;
+            
+            std::string key = var[i];
+            var[key]["camIdx"].get(line.camIdx);
 
-            LineData3D_t line;
+            int type;
+            var[key]["type"].get(type);
+            line.type = type;
+            
+            Eigen::MatrixXf mat; 
+            var[key]["data"].get(mat);
             for(int j=0; j<mat.cols(); j++) {
-                tk::common::Vector3<float> p;
+                tk::common::Vector2<float> p;
                 p.x = mat(0, j);
                 p.y = mat(1, j);
-                p.z = mat(2, j);
                 line.points.push_back(p);
             }
+
             data.push_back(line);
         }
         return true;

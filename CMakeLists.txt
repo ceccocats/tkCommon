@@ -22,9 +22,7 @@ include_directories(${OPENGL_INCLUDE_DIR})
 find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
 find_package(glfw3 3 REQUIRED)
-if(NOT DEFINED GLFW3_LIBRARY)
-    set(GLFW3_LIBRARY glfw3)
-endif()
+find_library(GLFW3_LIBRARY NAMES glfw3 glfw)
 
 find_package(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
@@ -53,15 +51,15 @@ add_library(tklibDrawText SHARED
 
 add_library(tkGUI SHARED
     src/gui/Viewer.cpp
+    src/gui/PlotManager.cpp
     src/gui/lodepng.cpp
-    src/gui/MouseView3D.cpp
-    src/gui/MathUtils.cpp
-    src/gui/imgui_demo.cpp
-    src/gui/imgui_draw.cpp
-    src/gui/imgui_widgets.cpp
-    src/gui/imgui.cpp
-    src/gui/imgui_impl_glfw.cpp
-    src/gui/imgui_impl_opengl3.cpp
+    src/gui/Camera3D.cpp
+    src/gui/imgui/imgui_demo.cpp
+    src/gui/imgui/imgui_draw.cpp
+    src/gui/imgui/imgui_widgets.cpp
+    src/gui/imgui/imgui.cpp
+    src/gui/imgui/imgui_impl_glfw.cpp
+    src/gui/imgui/imgui_impl_opengl3.cpp
     src/common.cpp
     src/version.cpp
 )
@@ -120,6 +118,9 @@ target_link_libraries(tkGUI_simple tkCommon ${GUI_LIBS})
 add_executable(tkCommon_cmd app/tkCommon_cmd.cpp)
 target_link_libraries(tkCommon_cmd tkCommon)
 
+add_executable(tkCommon_matio app/tkCommon_matio.cpp)
+target_link_libraries(tkCommon_matio tkCommon)
+
 add_executable(tkCommon_eth_pcap app/tkCommon_eth_pcap.cpp)
 target_link_libraries(tkCommon_eth_pcap tkCommon tkCommunication)
 
@@ -141,8 +142,8 @@ target_link_libraries(tkCommon_segfault tkCommon)
 add_executable(tkCommon_geoconv app/tkCommon_geoconv.cpp)
 target_link_libraries(tkCommon_geoconv tkCommon)
 
-add_executable(tkCommon_canasc app/tkCommon_canasc.cpp)
-target_link_libraries(tkCommon_canasc tkCommon tkCommunication)
+add_executable(tkCommon_can app/tkCommon_can.cpp)
+target_link_libraries(tkCommon_can tkCommon tkCommunication)
 
 #-------------------------------------------------------------------------------
 # Install
