@@ -9,7 +9,7 @@ namespace tk{ namespace common{
 		std::vector<tk::common::Vector2<float>> points;
 		tk::gui::Color_t color;
 
-		void draw2D(int width, int height, float xLim, float yLim){
+		void draw2D(tk::gui::Viewer *viewer){
 			glPushMatrix();{
 				tk::gui::Viewer::tkSetColor(color);
 				glBegin(GL_POLYGON);
@@ -26,8 +26,8 @@ namespace tk{ namespace common{
 		float base_z;
 		float height;
 
-		void draw2D(int width, int height, float xLim, float yLim){}
-		void draw(){
+		void draw2D(tk::gui::Viewer *viewer){}
+		void draw(tk::gui::Viewer *viewer){
 			glPushMatrix();{
 				glDepthMask(GL_FALSE);
 				tk::gui::Viewer::tkSetColor(color);
@@ -86,7 +86,7 @@ namespace tk{ namespace common{
 			tk::gui::Viewer::tkLoadOBJ(path, obj);
 		}
 
-		void draw(){
+		void draw(tk::gui::Viewer *viewer){
 			glPushMatrix(); {
 				tk::gui::Viewer::tkSetColor(color);
 				tk::gui::Viewer::tkDrawObject3D(&obj, 1, textured);

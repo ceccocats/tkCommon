@@ -332,24 +332,8 @@ class lane2D : public generic{
             this->laneType  = s.laneType;
             return *this;
         }
-		void draw2D(int width, int height, float xLim, float yLim){
-			float w,h;
-
-			glPushMatrix(); {
-				tk::gui::Viewer::tkViewportImage(width, height, xLim, yLim, sensorID, w, h);
-
-				glTranslatef(-0.5, 0.5, 0);
-				glScalef(1.0f/tk::gui::Viewer::image_width, -1.0f/tk::gui::Viewer::image_height, 1);
-
-				glColor4f(0,0,1,1);
-				for(int i = 0; i < points.size()-1; i++){
-					tk:gui::Viewer::tkDrawLine(
-						tk::common::Vector3<float>(points[i].x, points[i].y, 0),
-						tk::common::Vector3<float>(points[i+1].x, points[i+1].y, 0)
-				);
-				}
-
-			} glPopMatrix();
+		void draw2D(tk::gui::Viewer *viewer) {
+        	viewer->tkDrawLineOnImage(points, sensorID, tk::gui::color::BLUE);
 		}
 };
 
@@ -383,30 +367,16 @@ class object2D : public generic{
             return true;
         }
 		object2D& operator=(const object2D& s){
-
+			this->sensorID  = s.sensorID;
             this->box 		= s.box;
             this->objType   = s.objType;
             return *this;
         }
 
-        void draw2D(int width, int height, float xLim, float yLim){
-			float w,h;
+        void draw2D(tk::gui::Viewer *viewer) {
 
-			glPushMatrix(); {
-				tk::gui::Viewer::tkViewportImage(width, height, xLim, yLim, sensorID, w, h);
+			viewer->tkDrawBoxOnImage(box.x, box.y, box.w, box.h, sensorID, obj_class::getColor(objType.value));
 
-				glTranslatef(-0.5, 0.5, 0);
-				glScalef(1.0f/tk::gui::Viewer::image_width, -1.0f/tk::gui::Viewer::image_height, 1);
-
-				tk::gui::Color_t color = obj_class::getColor(objType);
-				glColor4f((float)color.r/255, (float)color.g/255, (float)color.b/255, (float)color.a/255);
-				tk::gui::Viewer::tkDrawRectangle(
-						tk::common::Vector3<float>( (float)box.x + (float)box.w/2, (float)box.y + (float)box.h/2, 0),
-						tk::common::Vector3<float>( (float)box.w, (float)box.h, 0),
-						false
-						);
-
-			} glPopMatrix();
         }
 };
 
@@ -429,24 +399,8 @@ class boundary : public generic{
 			return *this;
 		}
 
-		void draw2D(int width, int height, float xLim, float yLim){
-			float w,h;
-
-			glPushMatrix(); {
-				tk::gui::Viewer::tkViewportImage(width, height, xLim, yLim, sensorID, w, h);
-
-				glTranslatef(-0.5, 0.5, 0);
-				glScalef(1.0f/tk::gui::Viewer::image_width, -1.0f/tk::gui::Viewer::image_height, 1);
-
-				glColor4f(1,0,0,1);
-				for(int i = 0; i < points.size()-1; i++){
-					tk:gui::Viewer::tkDrawLine(
-							tk::common::Vector3<float>(points[i].x, points[i].y, points[i].z),
-							tk::common::Vector3<float>(points[i+1].x, points[i+1].y, points[i+1].z)
-							);
-				}
-
-			} glPopMatrix();
+		void draw2D(tk::gui::Viewer *viewer) {
+			viewer->tkDrawLineOnImage(points, sensorID, tk::gui::color::RED);
 		}
 };
 
@@ -617,108 +571,33 @@ class perceptionData : public tk::data::SensorData{
             return *this;
         }
 
-		void draw2D(int width, int height, float xLim, float yLim){
+		void draw2D(tk::gui::Viewer *viewer) {
+
         	for(int i = 0; i < camera_objects.size(); i++){
-        		camera_objects[i].draw2D(width, height, xLim, yLim);
+        		camera_objects[i].draw2D(viewer);
         	}
 			for(int i = 0; i < camera_lanes.size(); i++){
-				camera_lanes[i].draw2D(width, height, xLim, yLim);
+				camera_lanes[i].draw2D(viewer);
 			}
         }
 
-		void draw(){
-
-        	glDisable(GL_DEPTH_TEST);
+		void draw(tk::gui::Viewer *viewer){
 
 			for(int i = 0; i < signs.size(); i++){
-				glPushMatrix();
-				{
-					tk::gui::Color_t c = obj_class::getColor(obj_class::ROADSIGN);
-					glColor4f((float)c.r/255, (float)c.g/255, (float)c.b/255, 0.7);
-					glTranslatef(signs[i].pos.x, signs[i].pos.y, signs[i].pos.z + 1.5);
-					glScalef(1.5,1.5,1.5);
-					glRotatef(rotation, 0,0,1);
-					glBegin(GL_POLYGON);
-					glVertex3f(-0.5,-0.5, 1);
-					glVertex3f(-0.5,0.5, 1);
-					glVertex3f(0.5,0.5, 1);
-					glVertex3f(0.5,-0.5, 1);
-					glEnd();
-
-					glBegin(GL_TRIANGLES);
-					glVertex3f(-0.5,-0.5, 1);
-					glVertex3f(-0.5,0.5, 1);
-					glVertex3f(0,0,0);
-
-					glVertex3f(-0.5,0.5, 1);
-					glVertex3f(0.5,0.5, 1);
-					glVertex3f(0,0,0);
-
-					glVertex3f(0.5,0.5, 1);
-					glVertex3f(0.5,-0.5, 1);
-					glVertex3f(0,0,0);
-
-					glVertex3f(0.5,-0.5, 1);
-					glVertex3f(-0.5,-0.5, 1);
-					glVertex3f(0,0,0);
-					glEnd();
-				}
-				glPopMatrix();
+				tk::gui::Color_t c = obj_class::getColor(obj_class::ROADSIGN);
+				viewer->tkDrawPerceptionPyramid(signs[i].pos, rotation, c, 100);
 			}
 
         	if(!draw_masa_style){
 				for(int i = 0; i < boxes.size(); i++){
-					glPushMatrix();
-					{
-						tk::gui::Viewer::tkSetColor(obj_class::getColor(boxes[i].objType), 150);
-						glTranslatef(boxes[i].pos.x, boxes[i].pos.y, boxes[i].pos.z);
-						glRotatef(boxes[i].rot.z, 0,0,1);
-						glRotatef(boxes[i].rot.y, 0,1,0);
-						glRotatef(boxes[i].rot.x, 1,0,0);
-						tk::gui::Viewer::tkDrawCube(tk::common::Vector3<float>(0,0,0), boxes[i].dim);
-					}
-					glPopMatrix();
+					viewer->tkDrawRotatedBox3D(boxes[i].pos, boxes[i].dim, boxes[i].rot, obj_class::getColor(boxes[i].objType), 150);
 				}
         	}
         	else{
         		for(int i = 0; i < boxes.size(); i++){
-					glPushMatrix();
-					{
-						tk::gui::Color_t c = obj_class::getColor(boxes[i].objType);
-						glColor4f((float)c.r/255, (float)c.g/255, (float)c.b/255, 0.7);
-						glTranslatef(boxes[i].pos.x, boxes[i].pos.y, boxes[i].pos.z + 1.5);
-						glScalef(1.5,1.5,1.5);
-						glRotatef(rotation, 0,0,1);
-						glBegin(GL_POLYGON);
-						glVertex3f(-0.5,-0.5, 1);
-						glVertex3f(-0.5,0.5, 1);
-						glVertex3f(0.5,0.5, 1);
-						glVertex3f(0.5,-0.5, 1);
-						glEnd();
-
-						glBegin(GL_TRIANGLES);
-						glVertex3f(-0.5,-0.5, 1);
-						glVertex3f(-0.5,0.5, 1);
-						glVertex3f(0,0,0);
-
-						glVertex3f(-0.5,0.5, 1);
-						glVertex3f(0.5,0.5, 1);
-						glVertex3f(0,0,0);
-
-						glVertex3f(0.5,0.5, 1);
-						glVertex3f(0.5,-0.5, 1);
-						glVertex3f(0,0,0);
-
-						glVertex3f(0.5,-0.5, 1);
-						glVertex3f(-0.5,-0.5, 1);
-						glVertex3f(0,0,0);
-						glEnd();
-					}
-					glPopMatrix();
+					viewer->tkDrawPerceptionPyramid(boxes[i].pos, rotation, obj_class::getColor(boxes[i].objType), 100);
         		}
         	}
-
-			glEnable(GL_DEPTH_TEST);
 
 			rotation += 1;
 

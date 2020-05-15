@@ -57,8 +57,10 @@ namespace tk{namespace data{
             memcpy(data, s.data, width * height * channels * sizeof(T));
             mtx->unlock();
 
-            texture = s.texture;
-            gen_tex = s.gen_tex;
+            if(gen_tex == false){
+				texture = s.texture;
+				gen_tex = s.gen_tex;
+            }
 
             return *this;
         }
@@ -147,7 +149,7 @@ namespace tk{namespace data{
             return var;
         }
 
-		void draw2D(int width, int height, float xLim, float yLim) {
+		void draw2D(tk::gui::Viewer *viewer) {
 
         	if(!gen_tex){
 				gen_tex = true;
@@ -160,16 +162,7 @@ namespace tk{namespace data{
 			if(tk::gui::Viewer::image_height != this->height)
 				tk::gui::Viewer::image_height = this->height;
 
-        	float w,h;
-
-			glPushMatrix(); {
-				tk::gui::Viewer::tkViewportImage(width, height, xLim, yLim, index, w, h);
-
-				glColor4f(1,1,1,1);
-				tk::gui::Viewer::tkDrawTexture(texture, 1, 1);
-
-			} glPopMatrix();
-
+			viewer->tkDrawTextureImage(texture, index);
         }
     };
 }}

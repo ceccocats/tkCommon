@@ -126,7 +126,40 @@ namespace tk { namespace gui {
         static void tkSplitPanel(int count, float ratio, float xLim, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y);
         static void tkViewportImage(int width, int height, float xLim, float yLim, int im_id, float &im_width, float &im_height);
 
+		template<typename T, typename = std::enable_if<std::is_base_of<Drawable, T>::value>>
+        void insert(std::string name, T *data = nullptr){
+			buffer.insert<T>(name, data);
+		}
+
+		/// Returns the requested element
+		template<typename T, typename = std::enable_if<std::is_base_of<Drawable, T>::value>>
+		T* element(std::string name){
+			return (T*)buffer.map[name];
+		}
+
+		template<typename T, typename = std::enable_if<std::is_base_of<Drawable, T>::value>>
+		void update(std::string name, T *data){
+			buffer.update<T>(name, data);
+		}
+
 		void add(std::string name, Drawable *data);
+
+		// data draw primitivies
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		virtual void tkDrawTextureImage(unsigned int texture, int index);
+
+		virtual void tkDrawLineOnImage(std::vector<tk::common::Vector3<float>> &points, int index, tk::gui::Color_t color);
+
+		virtual void tkDrawLineOnImage(std::vector<tk::common::Vector2<float>> &points, int index, tk::gui::Color_t color);
+
+		virtual void tkDrawBoxOnImage(float x, float y, float w, float h, int index, tk::gui::Color_t color);
+
+		virtual void tkDrawRotatedBox3D(tk::common::Vector3<float> &pose, tk::common::Vector3<float> &size, tk::common::Vector3<float> &rot, tk::gui::Color_t color, float alpha = 255);
+
+		virtual void tkDrawPerceptionPyramid(tk::common::Vector3<float> &pose, float rotation, tk::gui::Color_t color, float alpha = 255);
+
+		virtual void tkDrawLidarCloud(tk::common::Tfpose &tf, Eigen::MatrixXf &points, int nPoints, Eigen::MatrixXf &intensity);
 
         //static void tkDrawLiDARData(tk::data::LidarData *data);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -176,7 +209,9 @@ namespace tk { namespace gui {
 		//std::vector<tk::gui::Drawable *> 	drawBuffer;
 		//std::vector<bool> 					drawFlags;
 
-		std::map<std::string, Drawable*> drawBuffer;
+		//std::map<std::string, Drawable*> drawBuffer;
+
+		DrawMap buffer;
 
 
     private:

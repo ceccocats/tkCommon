@@ -93,23 +93,11 @@ namespace tk { namespace data {
             return true;
         }
 
-        void draw(){
-        	glPushMatrix();{
-        		tk::gui::Viewer::tkDrawTf(header.name, header.tf);
-				tk::gui::Viewer::tkApplyTf(header.tf);
-				glPointSize(1.0);
-				glBegin(GL_POINTS);
-				//white
-				tk::gui::Viewer::tkSetColor(tk::gui::color::WHITE);
+        void draw(tk::gui::Viewer *viewer){
 
-				for (int p = 0; p < nPoints; p++) {
-					float i = float(intensity(p));
-					tk::gui::Viewer::tkSetRainbowColor(i);
-					glVertex3f(points.coeff(0,p),points.coeff(1,p),points.coeff(2,p));
-				}
-				glEnd();
-        	}
-        	glPopMatrix();
+			tk::gui::Viewer::tkDrawTf(header.name, header.tf);
+
+			viewer->tkDrawLidarCloud(header.tf, points, nPoints, intensity);
         }
     };
 }}
