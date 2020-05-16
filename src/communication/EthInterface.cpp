@@ -7,10 +7,10 @@ namespace tk { namespace communication {
 
 
     bool
-    Ethinterface::initUDP(const int port, const std::string ip){
+    Ethinterface::initUDP(const int port, const std::string ip, time_t timeout_us){
         
         this->replayMode    = false;
-        return this->socket.initReceiver(port,ip);
+        return this->socket.initReceiver(port,ip, timeout_us);
     }
 
     bool
