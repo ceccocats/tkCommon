@@ -607,14 +607,14 @@ Viewer::tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, 
 void
 Viewer::tkDrawCloudClass(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx) {
 
-    glPointSize(1.0f);
-    tkSetColor(tk::gui::color::WHITE);
-    glBegin(GL_POINTS);
-    for (int p = 0; p < points->cols(); p++) {
-        Eigen::Vector4f v = points->col(p);
-        glVertex3f(v(0), v(1), v(2));
-    }
-    glEnd();
+    //glPointSize(1.0f);
+    //tkSetColor(tk::gui::color::WHITE);
+    //glBegin(GL_POINTS);
+    //for (int p = 0; p < points->cols(); p++) {
+    //    Eigen::Vector4f v = points->col(p);
+    //    glVertex3f(v(0), v(1), v(2));
+    //}
+    //glEnd();
 
     //sharp and corner features
     glPointSize(5.0f);
