@@ -1145,6 +1145,15 @@ Viewer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int m
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
+    if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+        mouseView.setPerspective(!mouseView.isPerspective()); 
+        if(mouseView.isPerspective()) {
+            tk::tformat::printMsg("Viewer", "set to perspective view\n");
+        } else {
+            tk::tformat::printMsg("Viewer", "set to ortho view\n");
+        }
+    }   
+
     if (key < MAX_KEYS) {
         if(action == GLFW_PRESS)
             keys[key] = true;

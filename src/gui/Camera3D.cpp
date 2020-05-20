@@ -136,7 +136,12 @@ void Camera3D::setCenter(Eigen::Vector3f center)
 void Camera3D::updateMatrices()
 {
     m_modelView = Eigen::lookAt(m_eye, m_center, m_up);
-    m_projection = Eigen::perspective(m_fovRads, 1.0f * m_windowAspect, m_zNear, m_zFar);
+    if(m_perspective) {
+        m_projection = Eigen::perspective(m_fovRads, 1.0f * m_windowAspect, m_zNear, m_zFar);
+    } else {
+        float zoom = m_radius/2;
+        m_projection = Eigen::ortho<float>(-m_windowAspect*zoom, m_windowAspect*zoom, -1*zoom, 1*zoom, -m_zFar, m_zFar);
+    }
 }
 
 tk::common::Vector3<float> Camera3D::unproject(float zplane) {
