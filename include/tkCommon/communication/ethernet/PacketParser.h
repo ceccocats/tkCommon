@@ -83,10 +83,10 @@ namespace tk { namespace communication {
 
     class PacketParser{
         private:
-            const struct sniff_ethernet *ethernet;	/* The ethernet header [1] */
-            const struct sniff_ip 		*ip;		/* The IP header */
-            const struct sniff_tcp 		*tcp;		/* The TCP header */
-            const struct sniff_udp 		*udp;		/* The UDP header */
+            const struct sniff_ethernet *ethernet = nullptr;	/* The ethernet header [1] */
+            const struct sniff_ip 	*ip  = nullptr;         /* The IP header */
+            const struct sniff_tcp 	*tcp = nullptr;         /* The TCP header */
+            const struct sniff_udp 	*udp = nullptr;         /* The UDP header */
 
 
             struct pcap_pkthdr 	*header;			/* The pointer to header info */

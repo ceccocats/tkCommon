@@ -77,6 +77,13 @@ int
 tk::communication::PacketParser::computeNextPacket(pcap_t* pcapFile,uint8_t* buffer, timeStamp_t& stamp){
 
     int payload_lenght = this->firstFrame(pcapFile,stamp);
+    
+    // not recognized header
+    if(payload_lenght <= 0) {
+        payload_lenght = header->len;
+        std::memcpy(buffer,pkt_data, payload_lenght);
+        return payload_lenght;
+    }
 
     int header_lenght = size_ip + SIZE_ETHERNET;
 
