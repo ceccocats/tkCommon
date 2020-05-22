@@ -14,7 +14,8 @@ class ActuationData{
         double speed;
         double torque;
 
-        void init(double steerAngle, double accel, double speed, double torque)
+        ActuationData();
+        ActuationData(double steerAngle, double accel, double speed, double torque)
 	    : steerAngle(steerAngle)
         , accel(accel)
         , speed(speed)

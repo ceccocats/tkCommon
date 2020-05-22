@@ -12,8 +12,8 @@ namespace tk { namespace data {
 class ControlInputData{
     public:
         tk::perception::perceptionData perceptionData; //obstacles, road signals, lanes and vehicle data
-
-        void init(tk::perception::perceptionData perceptionData) : perceptionData(perceptionData){};
+        ControlInputData();
+        ControlInputData(tk::perception::perceptionData perceptionData) : perceptionData(perceptionData){};
 
 };
 

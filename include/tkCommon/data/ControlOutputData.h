@@ -10,15 +10,13 @@ namespace tk { namespace data {
  */
 class ControlOutputData{
     public:
-        ActuationData actuation;
+        tk::data::ActuationData actuation;
         tk::math::CSpline2D trajectory;
 
         ControlOutputData();
-        
-        void init(ActuationData actuation, tk::math::CSpline2D trajectory) 
-        : actuation(actuation)
-        , trajectory(trajectory){};
-        
+        ControlOutputData(tk::data::ActuationData actuation, tk::math::CSpline2D trajectory) : actuation(actuation), trajectory(trajectory){};
+
+ 
 };
 
 }
