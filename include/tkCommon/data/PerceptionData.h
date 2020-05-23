@@ -415,6 +415,7 @@ struct ObjectData2D_t{
         box = s.box;
         color = s.color;
         label = s.label;
+        return *this;
     }
 };
 
@@ -428,7 +429,8 @@ struct ObjectData3D_t{
         pose = s.pose;
         size = s.size;
         color = s.color;
-        label = s.label;
+        label = s.label;   
+        return *this;        
     }
 };
 
@@ -444,6 +446,7 @@ struct LineData_t{
         type =s.type;
         points = s.points;
         color = s.color;
+        return *this;
     }
     void push(T point){
         points.push_back(point);

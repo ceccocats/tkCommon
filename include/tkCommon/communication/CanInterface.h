@@ -78,6 +78,7 @@ namespace tk { namespace communication {
         static void* record (void* object){
             CanInterface* obj = reinterpret_cast<CanInterface*>(object);
             obj->pcap.record();
+            pthread_exit(0);
         }
     };
 }}
