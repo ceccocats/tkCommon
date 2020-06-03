@@ -475,6 +475,9 @@ class rotatedBox3D : public generic{
             this->objType   = s.objType;
             return *this;
         }
+        void draw(tk::gui::Viewer *viewer){
+            viewer->tkDrawRotatedBox3D(pos, dim, rot, obj_class::getColor(objType), 150);
+        }
 };
 
 /**

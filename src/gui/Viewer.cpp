@@ -921,11 +921,15 @@ Viewer::tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture)
 
 void
 Viewer::tkSplitPanel(int count, float ratio, float xLim, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y){
-    num_rows = 4;
+    if(ratio > 0) {
+        num_rows = 4;
+    }else{
+        num_rows = ceil(sqrt(image_count));
+    }
 
     num_cols = ceil((float)count/num_rows);
 
-    h = 1.0f/((float)num_rows/2);
+    h = 2.0f/num_rows;
     if(ratio > 0){
         w = h * ratio;
     }
@@ -950,7 +954,7 @@ Viewer::tkViewportImage(int width, int height, float xLim, float yLim, int im_id
 	int num_rows, num_cols;
 	float x, y, w, h;
 	float ratio = -1;
-
+/*
 	if(!image_fullscreen){
 		ratio = float(image_width) / float(image_height);
 	}
@@ -965,11 +969,45 @@ Viewer::tkViewportImage(int width, int height, float xLim, float yLim, int im_id
 		x = x + ((float)width/(float)height) - xLim;
 	}
 
+ */
+
+    if(image_fullscreen){
+        num_rows = ceil(sqrt(image_count));
+    }
+    else{
+        num_rows = std::min<int>(4, image_count);
+    }
+
+    num_cols = ceil((float)image_count/num_rows);
+
+    if(!image_fullscreen){
+        h = 2.0f * yLim /(float)5;
+        w = h * (float)image_width / (float)image_height;
+    }
+    else{
+        if((float)width / (float)height > ((float)image_width * num_cols) / ((float)image_height * num_rows)){
+            h = 2.0f * yLim /(float)num_rows;
+            w = h * (float)image_width / (float)image_height;
+        }
+        else{
+            w = 2.0f * xLim /(float)num_cols;
+            h = w * (float)image_height / (float)image_width;
+        }
+    }
+
 	int i = im_id;
 	col = i / num_rows;
 	row = i % num_rows;
 
-	glTranslatef(x + ( col * w ), y + ( row * h ), 0);
+    if(image_fullscreen){
+        x = ((float)col - (float)num_cols/2) * w + w/2;
+    }
+    else{
+        x = -xLim + col * w + w/2;
+    }
+    y = ((float)row - (float)num_rows/2) * h + h/2;
+
+	glTranslatef(x, y, 0);
 	glScalef( w, h, 1);
 
 	im_width = w;
