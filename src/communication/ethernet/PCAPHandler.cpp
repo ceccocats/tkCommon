@@ -92,6 +92,7 @@ int tk::communication::PCAPHandler::getPacket(uint8_t* buffer, timeStamp_t& stam
 
     if (!pcapFile){
         clsErr("pcap error.\n");
+        sleep(1);
         return -1;
     }
 
