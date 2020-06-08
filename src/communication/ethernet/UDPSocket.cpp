@@ -8,7 +8,7 @@ namespace tk { namespace communication {
 
 
     bool
-    UDPSocket::initReceiver(const int port, const std::string ip) {
+    UDPSocket::initReceiver(const int port, const std::string ip, time_t timeout_us) {
     
         memset(&this->sock_addr, 0, sizeof(this->sock_addr));
 
@@ -30,6 +30,13 @@ namespace tk { namespace communication {
             perror("UDP error");
             return false;
         }
+
+		if(timeout_us > 0){
+			struct timeval tv;
+			tv.tv_sec = timeout_us / 1000000;
+			tv.tv_usec = timeout_us - tv.tv_sec;
+			setsockopt(this->sock_fd, SOL_SOCKET, SO_RCVTIMEO, (const char *) &tv, sizeof tv);
+		}
 
         if (!ip.empty()) {
             if (isMulticast(ip)) {

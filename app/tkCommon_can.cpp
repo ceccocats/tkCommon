@@ -2,6 +2,8 @@
 #include "tkCommon/communication/CanInterface.h"
 #include "tkCommon/communication/can/VehicleCanParser.h"
 
+bool gRun = true;
+
 int main( int argc, char** argv){
 
     tk::common::CmdParser cmd(argv, "Can utils");

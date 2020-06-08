@@ -299,6 +299,13 @@ namespace tk { namespace common {
 
             ~Vector2() {}
 
+            Vector2& operator=(const Vector2& s){
+
+                this->x = s.x;
+                this->y = s.y;
+                return *this;
+            }
+
             /**
              * override ostream for a nice print
              * @param os

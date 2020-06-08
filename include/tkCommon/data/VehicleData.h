@@ -217,6 +217,53 @@ namespace tk { namespace data {
             speedKMH = speed * 3.6;
             return true;
         }
+
+        void draw(tk::gui::Viewer *viewer){
+
+        	// TODO: move to tk::gui::Viewer
+
+			tk::gui::Viewer::tkDrawTf(header.name, header.tf);
+			tk::gui::Viewer::tkSetColor(tk::gui::color::AMBER);
+			tk::common::Vector3<float> dim{(float) CAR_DIM_X, (float) CAR_DIM_Y,
+										   (float) CAR_DIM_Z};
+			tk::common::Vector3<float> wheels[4];
+			wheels[0] = {0, (float) -CAR_BACKAXLE_W / 2, 0};
+			wheels[1] = wheels[0];
+			wheels[1].y *= -1;
+			wheels[2] = wheels[0], wheels[3] = wheels[1];
+			wheels[2].x += CAR_WHEELBASE;
+			wheels[3].x += CAR_WHEELBASE;
+
+			tk::gui::Viewer::tkDrawLine(wheels[0], wheels[1]);
+			tk::gui::Viewer::tkDrawLine(wheels[2], wheels[3]);
+			tk::gui::Viewer::tkDrawLine(tk::common::Vector3<float>{wheels[0].x, 0, 0},
+										tk::common::Vector3<float>{wheels[2].x, 0, 0});
+
+			for (int i = 0; i < 4; i++) {
+				glPushMatrix();
+				glTranslatef(wheels[i].x, wheels[i].y, wheels[i].z);
+				glRotatef(90, 1, 0, 0);
+				tk::gui::Viewer::tkDrawCircle(tk::common::Vector3<float>{0, 0, 0}, CAR_WHEEL_R);
+				glPopMatrix();
+			}
+			tk::common::Vector3<float> pose{dim.x / 2 - (float) CAR_BACK2AXLE, 0, dim.z / 2};
+
+        }
+
+        void draw2D(tk::gui::Viewer *viewer) {
+
+			float yLim = viewer->yLim;
+
+			tk::common::Vector2<float> pos;
+			float size;
+			pos = tk::common::Vector2<float>{0,-yLim+0.25f};
+			size = 0.2;
+			double speed = this->speedKMH;
+			int gear = actualGear;
+			double rpm = RPM;
+
+			tk::gui::Viewer::tkDrawSpeedometer(pos, speed, size);
+        }
     };
 }
 }

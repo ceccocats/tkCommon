@@ -14,10 +14,14 @@ namespace tk { namespace data {
 
         // stat
         double age, quality, sats;
+        
+        // time
+        timeStamp_t gpsStamp;
 
         // IMU
         double angleX, angleY, angleZ;
         double angleRateX, angleRateY, angleRateZ;
+	    double speedX, speedY, speedZ;
         double accX, accY, accZ;
         double sideSlip;
 
@@ -47,10 +51,15 @@ namespace tk { namespace data {
             angleRateX  = 0;
             angleRateY  = 0;
             angleRateZ  = 0;
+            speedX      = 0;
+            speedY      = 0;
+		    speedZ      = 0;
             accX        = 0;
             accY        = 0;
             accZ        = 0;
             sideSlip    = 0;
+
+            gpsStamp    = 0;
         }
 
         /**
@@ -94,10 +103,15 @@ namespace tk { namespace data {
             this->angleRateX  = s.angleRateX;
             this->angleRateY  = s.angleRateY;
             this->angleRateZ  = s.angleRateZ;
+            this->speedX      = s.speedX;
+            this->speedY      = s.speedY;
+            this->speedZ      = s.speedZ;
             this->accX        = s.accX;
             this->accY        = s.accY;
             this->accZ        = s.accZ;
             this->sideSlip    = s.sideSlip;
+
+            this->gpsStamp    = s.gpsStamp;
 
             return *this;
         }

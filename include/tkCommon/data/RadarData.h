@@ -112,5 +112,51 @@ namespace tk { namespace data {
 
             return *this;
         }
+
+        void draw(tk::gui::Viewer *viewer){
+            glPushMatrix();
+
+			// TODO: move to tk::gui::Viewer
+            tk::gui::Viewer::tkApplyTf(header.tf);
+
+			tk::common::Vector3<float> pose;
+			tk::common::Tfpose  correction = tk::common::odom2tf(0, 0, 0, +M_PI/2);
+			for(int i = 0; i < nRadar; i++) {
+				glPushMatrix();
+				tk::gui::Viewer::tkDrawTf(near_data[i].header.name, (near_data[i].header.tf * correction));
+				tk::gui::Viewer::tkApplyTf(near_data[i].header.tf);
+				// draw near
+				for (int j = 0; j < near_data[i].nPoints; j++) {
+					float rcs = near_features[i](tk::data::RadarFeatureType::RCS, j);
+
+					//NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+					float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
+					tk::gui::Viewer::tkSetRainbowColor(hue);
+
+					pose.x = near_data[i].points(0, j);
+					pose.y = near_data[i].points(1, j);
+					pose.z = near_data[i].points(2, j);
+
+					tk::gui::Viewer::tkDrawCircle(pose, 0.05);
+				}
+				//// draw far
+				for (int j = 0; j < far_data[i].nPoints; j++) {
+				    float rcs = far_features[i](tk::data::RadarFeatureType::RCS, j);
+
+			        //NewValue = (((OldValue - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+			        float hue = (((rcs + 40) * (1 - 0)) / (20 + 40)) + 0;
+			        tk::gui::Viewer::tkSetRainbowColor(hue);
+
+				    pose.x = far_data[i].points(0, j);
+				    pose.y = far_data[i].points(1, j);
+				    pose.z = far_data[i].points(2, j);
+
+				    tk::gui::Viewer::tkDrawCircle(pose, 0.05);
+				}
+				glPopMatrix();
+			}
+            glPopMatrix();
+        }
+
     };
 }}
