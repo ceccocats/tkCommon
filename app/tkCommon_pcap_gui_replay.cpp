@@ -167,6 +167,7 @@ void* replayLoop(void*){
 
     handler.close();
     sender.close();
+    pthread_exit(0);
 }
 
 void* control(void*){
@@ -201,6 +202,7 @@ void* control(void*){
 		usleep(100);
 	}
 
+    pthread_exit(0);
 }
 
 

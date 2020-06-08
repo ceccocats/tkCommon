@@ -7,11 +7,12 @@
 class TestDump : public tk::math::MatDump {
 
     public:
-    bool fromVar(tk::math::MatIO::var_t &var) { }
+    bool fromVar(tk::math::MatIO::var_t &var) { return false; }
 
     bool toVar(std::string name, tk::math::MatIO::var_t &var) {
         std::string a = "ciao";
         var.set(name, a);
+        return true;
     }
 };
 

@@ -11,6 +11,11 @@ namespace tk { namespace data {
      */
     class SensorData : tk::math::MatDump {
     public:
+
+                 SensorData() {};
+        virtual ~SensorData() {};
+
+
         HeaderData  header;                 /**< Header, @see HeaderData */
 
         /**
@@ -27,7 +32,11 @@ namespace tk { namespace data {
          */
         virtual void release() { clsErr("release method not implemented"); tkFATAL("abort"); };
 
-        virtual bool checkDimension(SensorData *s) { clsErr("check dimension method not implemented"); tkFATAL("abort"); };
+        virtual bool checkDimension(SensorData *s) { 
+            clsErr("check dimension method not implemented"); 
+            tkFATAL("abort"); 
+            return false;
+        };
 
         /**
          * @brief Overloading of operator =

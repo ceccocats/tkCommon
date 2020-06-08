@@ -50,6 +50,8 @@ namespace tk { namespace gui {
             self->init();
             self->init_mutex.unlock();
             self->run();
+
+            pthread_exit(0);
         }
 
         void initOnThread(bool splashScreen = true) {

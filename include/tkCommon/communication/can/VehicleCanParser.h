@@ -87,6 +87,8 @@ namespace tk { namespace communication {
             for(auto m : msgs) {
                 printMsg(m.first);
             }
+
+            return true;
         }
 
         void printMsg(int id) {
@@ -121,7 +123,7 @@ namespace tk { namespace communication {
                     x = reverse_byte_order(x);
                     shift = 64 - (7 - sig.getStartbit()%8 + 8*(sig.getStartbit()/8) + sigLength);
                 }
-                uint64_t lmask = 0xffffffffffffffff >> 64 - sigLength;
+                uint64_t lmask = 0xffffffffffffffff >> (64 - sigLength);
                 x = (x >> shift) & lmask;
 
                 double val;

@@ -158,6 +158,7 @@ void *update_th(void *data) {
 
         rate.wait();
     }
+    pthread_exit(0);
 }
 
 int main( int argc, char** argv){

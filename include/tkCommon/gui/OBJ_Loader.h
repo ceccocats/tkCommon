@@ -145,7 +145,7 @@ namespace objl
 	{
 		Material()
 		{
-			name;
+			name = "none";
 			Ns = 0.0f;
 			Ni = 0.0f;
 			d = 0.0f;
@@ -271,7 +271,7 @@ namespace objl
 			float a = 1 - y - b;
 
 			// Projected point
-			Vector3  p = (a * tri1) + (b * tri2) + (y * tri3);
+			//Vector3  p = (a * tri1) + (b * tri2) + (y * tri3);
 
 			if (a >= 0 && a <= 1
 				&& b >= 0 && b <= 1
@@ -706,7 +706,7 @@ namespace objl
 			for (int i = 0; i < int(sface.size()); i++)
 			{
 				// See What type the vertex is.
-				int vtype;
+				int vtype = 0;
 
 				algorithm::split(sface[i], svert, "/");
 
