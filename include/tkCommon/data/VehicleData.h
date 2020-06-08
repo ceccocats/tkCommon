@@ -210,7 +210,7 @@ namespace tk { namespace data {
             var["wheelFLspeed"       ].get(wheelFLspeed);
             var["wheelFRspeed"       ].get(wheelFRspeed);
             var["wheelRLspeed"       ].get(wheelRLspeed);
-            var["wheelRLspeed"       ].get(wheelRLspeed);
+            var["wheelRRspeed"       ].get(wheelRRspeed);
             var["sideSlip"           ].get(sideSlip);
             var["tractionGrip"       ].get(tractionGrip);
 
