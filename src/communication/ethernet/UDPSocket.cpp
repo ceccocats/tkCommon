@@ -109,7 +109,7 @@ namespace tk { namespace communication {
                 return false;
             }
 
-            std::cout<<"BIND ON SRCPORT: "<<srcport<<"\n";
+            clsMsg(std::string{"bind on port "}+std::to_string(srcport)+"\n");
             struct sockaddr_in srcaddr;
             memset(&srcaddr, 0, sizeof(srcaddr));
             srcaddr.sin_family = AF_INET;
