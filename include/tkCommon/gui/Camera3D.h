@@ -82,7 +82,6 @@ class Camera3D
         return m_mouseRight;
     }
 
-  private:
     Eigen::Matrix4f m_modelView;
     Eigen::Matrix4f m_projection;
 
