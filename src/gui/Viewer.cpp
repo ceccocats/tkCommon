@@ -136,7 +136,7 @@ Viewer::init() {
 
 void
 Viewer::add(std::string name, Drawable *data){
-	buffer.add(name, data);
+	buffer.add(name, data, this);
 }
 
 

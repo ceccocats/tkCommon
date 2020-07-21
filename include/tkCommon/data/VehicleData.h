@@ -218,13 +218,8 @@ namespace tk { namespace data {
             return true;
         }
 
-        void draw(tk::gui::Viewer *viewer){
+        void onAdd(tk::gui::Viewer *viewer) {
             std::string name = header.name;
-
-        	// TODO: move to tk::gui::Viewer
-
-			tk::gui::Viewer::tkDrawTf(name, header.tf);
-
 
             // draw odom
             if(!viewer->plotManger->plotExist(name)) {
@@ -235,7 +230,13 @@ namespace tk { namespace data {
             carOdometry(odom);
             tk::common::Tfpose tf = tk::common::odom2tf(odom.x, odom.y, odom.yaw);
             viewer->plotManger->addPoint(name, tk::common::tf2pose(tf));
+        }
 
+        void draw(tk::gui::Viewer *viewer){
+
+        	// TODO: move to tk::gui::Viewer
+
+			tk::gui::Viewer::tkDrawTf(header.name, header.tf);
 
 			tk::gui::Viewer::tkSetColor(tk::gui::color::AMBER);
 			tk::common::Vector3<float> dim{(float) CAR_DIM_X, (float) CAR_DIM_Y,

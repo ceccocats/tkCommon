@@ -176,10 +176,7 @@ namespace tk { namespace data {
         }
 
         static tk::common::GeodeticConverter geoConv;
-        void draw(tk::gui::Viewer *viewer){
-
-            tk::gui::Viewer::tkDrawTf(header.name, header.tf);
-
+        void onAdd(tk::gui::Viewer *viewer) {
             if(!geoConv.isInitialised() && sats > 10 && lat != 0 && lon != 0) {
                 geoConv.initialiseReference(lat, lon, height);
                 std::cout<<std::setprecision(20)<<header.name<<" Ref: "<<lat<<" "<<lon<<" "<<height<<"\n";
@@ -189,11 +186,14 @@ namespace tk { namespace data {
                 tk::common::Tfpose tf = tk::common::geodetic2tf(geoConv, lat, lon, height, angleX, angleY, angleZ)*header.tf.inverse();
                 if(!viewer->plotManger->plotExist(header.name)) {
                     std::cout<<"Add GPS plot: "<<header.name<<"\n";
-                    viewer->plotManger->addCirclePlot(header.name, tk::gui::randomColor(), 10000, 0.5);
+                    viewer->plotManger->addCirclePlot(header.name, tk::gui::randomColor(), 100000, 0.5);
                 } else {
                     viewer->plotManger->addPoint(header.name, tf);
                 }
             }
+        }
+        void draw(tk::gui::Viewer *viewer){
+            tk::gui::Viewer::tkDrawTf(header.name, header.tf);
         }
 
     };
