@@ -3,6 +3,10 @@
 using namespace tk::gui;
 
 void PlotManager::addPlot(std::string id, plot_t::conf_t &pconf) {
+    //tkASSERT(id != "");
+    if(id == "") {
+        return;
+    }
     plots[id].conf = pconf;
     plots[id].points.setDim(pconf.maxPoints);
     plots[id].points.clear();
@@ -38,18 +42,23 @@ void PlotManager::addPosesPlot(std::string id, Color_t color, int maxpts, float 
 }
 
 bool PlotManager::plotExist(std::string id) {
+    //tkASSERT(id != "");
     // key alread present
     return plots.find(id) != plots.end();
 }
 
 void PlotManager::addPoint(std::string id, tk::common::Vector3<float> pt) {
-    plots[id].points.add(tk::common::odom2tf(pt.x, pt.y, pt.z, 0, 0, 0));
-    plots[id].updateLimits();
+    if(plotExist(id)) {
+        plots[id].points.add(tk::common::odom2tf(pt.x, pt.y, pt.z, 0, 0, 0));
+        plots[id].updateLimits();
+    }
 }
 
 void PlotManager::addPoint(std::string id, tk::common::Tfpose pt) {
-    plots[id].points.add(pt);
-    plots[id].updateLimits();
+    if(plotExist(id)) {
+        plots[id].points.add(pt);
+        plots[id].updateLimits();
+    }
 }
 
 void PlotManager::addPoints(std::string id, std::vector<tk::common::Vector3<float>> pts) {

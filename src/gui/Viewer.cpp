@@ -1080,7 +1080,7 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
     */
     tkSetColor(tk::gui::color::YELLOW);
     char speedStr[256];
-    sprintf(speedStr, "%.2f", speed/3.6);
+    sprintf(speedStr, "%.2f", speed*3.6);
     tkDrawText(speedStr, tk::common::Vector3<float>{pose.x, pose.y - 0.08f, 0},
                          tk::common::Vector3<float>{0, 0, 0},
                          tk::common::Vector3<float>{0.05f, 0.05f, 0.0f});

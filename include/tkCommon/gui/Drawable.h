@@ -37,7 +37,9 @@ namespace tk{namespace gui{
 		std::mutex mutex;
 
 		DrawBuffer &operator=(const DrawBuffer &s){
+			mutex.lock();
 			buffer = s.buffer;
+			mutex.unlock();
 			return *this;
 		}
 
