@@ -37,8 +37,12 @@ namespace tk { namespace data {
             // GPS
             lat     = 0;
             lon     = 0;
-            hdop    = 0;
             height  = 0;
+
+            hdop     = 0;
+            vdop     = 0;
+            vel_hdop = 0;
+            vel_vdop = 0;
 
             // stat
             age     = 0;
@@ -89,8 +93,11 @@ namespace tk { namespace data {
             // GPS
             this->lat     = s.lat;
             this->lon     = s.lon;
-            this->hdop    = s.hdop;
             this->height  = s.height;
+            this->hdop    = s.hdop;
+            this->vdop    = s.vdop;
+            this->vel_hdop = s.vel_hdop;
+            this->vel_vdop = s.vel_vdop;
 
             // stat
             this->age     = s.age;

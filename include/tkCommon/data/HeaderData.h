@@ -8,14 +8,14 @@ namespace tk { namespace data {
 
     public:
         enum Value : uint8_t{
-        NOT_SPEC    = 0,
-        LIDAR       = 1,
-        VEHICLE     = 2,
-        GPS         = 3,
-        CAMDATA     = 4,
-        RADAR       = 5,
-        LINES       = 6,
-        PERCEPTION  = 7,
+            NOT_SPEC    = 0,
+            LIDAR       = 1,
+            VEHICLE     = 2,
+            GPS         = 3,
+            CAMDATA     = 4,
+            RADAR       = 5,
+            LINES       = 6,
+            PERCEPTION  = 7,
         };
 
         /**
@@ -89,7 +89,15 @@ namespace tk { namespace data {
             this->tf            = s.tf;
             this->sensorID      = s.sensorID;
             this->messageID     = s.messageID;
-            this->name          = s.name;
+
+            // safe string update
+            if(this->name != s.name) {
+                clsWrn("Changing header name from " + name + " to " + s.name +
+                       " if this message appers it is a problem\n");
+                // this WARNING could be caused by the use of a tmpData in the sensor
+                // if you are using tmpData please be sure to not rewrite the header name
+                this->name = s.name;
+            }
 
             return *this;
         }
