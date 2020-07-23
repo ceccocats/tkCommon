@@ -80,6 +80,8 @@ int
 tk::communication::PacketParser::computeNextPacket(pcap_t* pcapFile,uint8_t* buffer, timeStamp_t& stamp){
 
     int payload_lenght = this->firstFrame(pcapFile,stamp);
+    if(payload_lenght < 0)
+        return payload_lenght;
 
     // not recognized header
     if(payload_lenght == 0) {

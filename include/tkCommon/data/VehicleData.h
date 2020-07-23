@@ -277,6 +277,14 @@ namespace tk { namespace data {
 			int gear = actualGear;
 			double rpm = RPM;
 			tk::gui::Viewer::tkDrawSpeedometer(pos, speed, size);
+
+            std::string window_name = "Vehicle: " + header.name;
+            ImGui::Begin(window_name.c_str());
+            ImGui::BulletText("Speed\t%lf", speed);
+            ImGui::BulletText("WheelAngle\t%lf", wheelAngle);
+            ImGui::BulletText("Gear\t%d", actualGear);
+            ImGui::BulletText("RPM\t%d", RPM);
+            ImGui::End();
         }
     };
 }

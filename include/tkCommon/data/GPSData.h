@@ -10,7 +10,8 @@ namespace tk { namespace data {
     class GPSData : public SensorData {
     public:
         // GPS
-        double lat, lon, hdop, height;
+        double lat, lon, height;
+        double hdop, vdop, vel_hdop, vel_vdop;
 
         // stat
         double age, quality, sats;
@@ -175,9 +176,10 @@ namespace tk { namespace data {
             return true;
         }
 
+        // Draw funcitons
         static tk::common::GeodeticConverter geoConv;
         void onAdd(tk::gui::Viewer *viewer) {
-            if(!geoConv.isInitialised() && sats > 10 && lat != 0 && lon != 0) {
+            if(!geoConv.isInitialised() && sats > 5 && lat != 0 && lon != 0) {
                 geoConv.initialiseReference(lat, lon, height);
                 std::cout<<std::setprecision(20)<<header.name<<" Ref: "<<lat<<" "<<lon<<" "<<height<<"\n";
             }
@@ -195,6 +197,19 @@ namespace tk { namespace data {
         void draw(tk::gui::Viewer *viewer){
             tk::gui::Viewer::tkDrawTf(header.name, header.tf);
         }
-
+        void draw2D(tk::gui::Viewer *viewer){
+            std::string window_name = "GPS: " + header.name;
+            ImGui::Begin(window_name.c_str());
+            ImGui::BulletText("Latitude  %lf", lat);
+            ImGui::BulletText("Longitude %lf", lon);
+            ImGui::BulletText("Altitude  %lf", height);
+            ImGui::BulletText("Quality   %lf", quality);
+            ImGui::BulletText("DOP  %lf  %lf", hdop, vdop);
+            ImGui::BulletText("Speeds     %lf %lf %lf", speedX, speedY, speedZ);
+            ImGui::BulletText("Acc        %lf %lf %lf", accX, accY, accZ);
+            ImGui::BulletText("Angles     %lf %lf %lf", angleX, angleY, angleZ);
+            ImGui::BulletText("AngleRates %lf %lf %lf", angleRateX, angleRateY, angleRateZ);
+            ImGui::End();
+        }
     };
 }}
