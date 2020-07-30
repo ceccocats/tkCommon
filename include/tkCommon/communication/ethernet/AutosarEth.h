@@ -26,7 +26,6 @@ namespace tk { namespace communication {
          * @return
          */
         bool read(uint8_t *buffer, int buflen) {
-
             if (buflen < sizeof(AutosarHeader_t))
                 return false;
 
@@ -40,8 +39,11 @@ namespace tk { namespace communication {
             this->buflen = sizeof(AutosarHeader_t) + len;
             this->data = buffer + sizeof(AutosarHeader_t);
 
-            //clsMsg("msg id: " + hexId() + " len: " + std::to_string(len) + "\n");
-            return buflen <= sizeof(AutosarHeader_t) + header.datalenght;
+            if(buflen >= this->buflen) {
+                //clsMsg("msg id: " + hexId() + " len: " + std::to_string(len) + "\n");
+                return true;
+            } 
+            return false;
         }
 
         /**
