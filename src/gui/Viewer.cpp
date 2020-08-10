@@ -1335,9 +1335,9 @@ Viewer::tkDrawPerceptionPyramid(tk::common::Vector3<float> &pose, float rotation
 }
 
 void
-Viewer::tkDrawLidarCloud(tk::common::Tfpose &tf, Eigen::MatrixXf &points, int nPoints, Eigen::MatrixXf &intensity){
-	glPushMatrix();{
-		tk::gui::Viewer::tkApplyTf(tf);
+Viewer::tkDrawLidarCloud(Eigen::MatrixXf &points, int nPoints, Eigen::MatrixXf &intensity){
+	glPushMatrix();
+    {
 		glPointSize(1.0);
 		glBegin(GL_POINTS);
 		//white
