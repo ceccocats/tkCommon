@@ -179,7 +179,7 @@ namespace tk { namespace data {
         // Draw funcitons
         static tk::common::GeodeticConverter geoConv;
         void onAdd(tk::gui::Viewer *viewer) {
-            if(!geoConv.isInitialised() && sats > 5 && lat != 0 && lon != 0) {
+            if(!geoConv.isInitialised() && sats >= 5 && lat != 0 && lon != 0) {
                 geoConv.initialiseReference(lat, lon, height);
                 std::cout<<std::setprecision(20)<<header.name<<" Ref: "<<lat<<" "<<lon<<" "<<height<<"\n";
             }
@@ -203,7 +203,7 @@ namespace tk { namespace data {
             ImGui::BulletText("Latitude  %lf", lat);
             ImGui::BulletText("Longitude %lf", lon);
             ImGui::BulletText("Altitude  %lf", height);
-            ImGui::BulletText("Quality   %lf", quality);
+            ImGui::BulletText("Quality   %lf  Sats  %lf", quality, sats);
             ImGui::BulletText("DOP  %lf  %lf", hdop, vdop);
             ImGui::BulletText("Speeds     %lf %lf %lf", speedX, speedY, speedZ);
             ImGui::BulletText("Acc        %lf %lf %lf", accX, accY, accZ);

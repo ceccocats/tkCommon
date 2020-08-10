@@ -123,9 +123,9 @@ tk::communication::PacketParser::computeNextPacket(pcap_t* pcapFile,uint8_t* buf
         std::memcpy(buffer,pkt_data + header_lenght, payload_lenght);
 
         //Is Fragment?
-        if(ntohs(ip->ip_len) != (ntohs(udp->uh_ulen)+size_ip)){
-            return defragment(pcapFile,buffer,stamp,payload_lenght,ntohs(ip->ip_len)-size_tcp-size_ip); //TODO: need to test
-        }
+        //if(ntohs(ip->ip_len) != (ntohs(udp->uh_ulen)+size_ip)){
+        //    return defragment(pcapFile,buffer,stamp,payload_lenght,ntohs(ip->ip_len)-size_tcp-size_ip); //TODO: need to test
+        //}
 
         return payload_lenght;
     }
