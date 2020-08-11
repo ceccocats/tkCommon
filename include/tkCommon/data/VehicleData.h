@@ -1,7 +1,7 @@
 #pragma once
-
 #include "tkCommon/data/SensorData.h"
-#include <tkCommon/common.h>
+#include "tkCommon/common.h"
+#include "tkCommon/math/MatIO.h"
 
 namespace tk { namespace data {
 
@@ -31,23 +31,23 @@ namespace tk { namespace data {
         double     steerAngleRate = 0;          /** steering wheel angle [ rad/s ]*/
         double     wheelAngle     = 0;          /** wheel angle          [ rad   ]*/
 
-        uint8_t    brakePedalSts        = 0;    /** brake status         [ on/off ]*/
+        int        brakePedalSts        = 0;    /** brake status         [ on/off ]*/
         double     brakeMasterPressure  = 0;    /** brake pressure       [ bar ]*/
-        double     gasPedal             = 0;    /** gas padal percentage [ 0-1 ]*/
-        double     engineTorque         = 0;    /** engine torque        [ % ]*/
-        double     engineFrictionTorque = 0;    /** friction torque      [ % ]*/
+        double     gasPedal             = 0;    /** gas padal            [ 0-1 ]*/
+        double     engineTorque         = 0;    /** engine torque        [ 0-1 ]*/
+        double     engineFrictionTorque = 0;    /** friction torque      [ 0-1 ]*/
 
-        uint8_t    actualGear = 0;              /** current Gear         [ int ]*/
-        uint16_t   RPM = 0;                     /** RPM                  [ int ]*/
+        int    actualGear = 0;              /** current Gear         [ int ]*/
+        int    RPM = 0;                     /** RPM                  [ int ]*/
 
         /**wheel speeds         [ m/s ]*/
         double     wheelFLspeed =0, wheelFRspeed =0, wheelRLspeed =0, wheelRRspeed =0;
         /**wheel dir            [int] ** 0:no_dir   1:forward   2:backward   4:invalid*/
-        uint8_t    wheelFLDir =0, wheelFRDir =0, wheelRLDir =0, wheelRRDir =0;
+        int        wheelFLDir =0, wheelFRDir =0, wheelRLDir =0, wheelRRDir =0;
 
 
-        double     sideSlip     = 0;        /** beta angle               [ rad   ]*/
-        uint8_t    tractionGrip = 0;        /** traction control grip    [ ? ]*/
+        double     sideSlip     = 0;        /** beta angle               [ grad ]*/
+        int        tractionGrip = 0;        /** traction control grip    [ 0-255 ]*/
 
         // faults
         uint8_t ESPFault = 0;
@@ -55,47 +55,30 @@ namespace tk { namespace data {
         // inputs
         uint8_t activateDrive = 0, activateSteer = 0;
 
-        /** Odometry vales in space*/
+        // Odometry vales in space
         long double x = 0;
         long double y = 0;
-
-        /** Direction of car in space*/
-        long double carDirection = 0;
-
-        /** Boolean variable for know if new data is arrived*/
-        bool Bspeed = 0, Bsteer = 0;
-        int  posBuffer = 0;
-
-        #define ODOM_BUFFER_SIZE 10
+        long double carDirection = 0; // Direction of car in space
+        bool Bspeed = 0, Bsteer = 0;  // Boolean variable for know if new data is arrived
         struct odom_t {
             long double x = 0;
             long double y = 0;
             long double z = 0;
             long double yaw = 0;
             uint64_t t = 0;
-        } odometryBuffer[ODOM_BUFFER_SIZE];
+        } odom;
 
-        bool carOdometry(odom_t &odom, uint64_t time = 0){
-
-            int bufPos = posBuffer;
-            for(int i=1; i<ODOM_BUFFER_SIZE; i++) {
-                int c = (bufPos - i) % ODOM_BUFFER_SIZE;
-                if(c <0)
-                    c += ODOM_BUFFER_SIZE;
-
-                if(odometryBuffer[c].t < time || time == 0){
-                    odom = odometryBuffer[c];
-                    //if(odom.t == 0)
-                    //    return false;
-                    return true;
-                }
-            }
+        bool carOdometry(odom_t &out_odom){
+            if(odom.x != 0 || odom.y != 0 || odom.z != 0 || odom.yaw != 0) {
+                out_odom = odom;
+                return true;
+            } 
             return false;
         }
 
-        bool carOdometry(tk::common::Tfpose &tf, uint64_t time = 0){
+        bool carOdometry(tk::common::Tfpose &tf){
             odom_t odom;
-            bool status = carOdometry(odom, time);
+            bool status = carOdometry(odom);
             tf = tk::common::odom2tf(odom.x, odom.y, odom.yaw);
             return status;
         }
@@ -156,15 +139,7 @@ namespace tk { namespace data {
             this->carDirection          = s.carDirection;
             this->Bspeed                = s.Bspeed;
             this->Bsteer                = s.Bsteer;
-            this->posBuffer             = s.posBuffer;
-
-            for(int i=0; i < ODOM_BUFFER_SIZE; i++){
-                this->odometryBuffer[i].x   = s.odometryBuffer[i].x;
-                this->odometryBuffer[i].y   = s.odometryBuffer[i].y;
-                this->odometryBuffer[i].z   = s.odometryBuffer[i].z;
-                this->odometryBuffer[i].yaw = s.odometryBuffer[i].yaw;
-                this->odometryBuffer[i].t   = s.odometryBuffer[i].t;
-            }
+            this->odom                  = s.odom;
 
             return *this;
          }
@@ -175,99 +150,141 @@ namespace tk { namespace data {
             return os;
         }
 
-        static const int VEHICLE_FIELDS = 25;
-        const char  *fields[VEHICLE_FIELDS] = {"stamp",
-           "CAR_WHEELBASE", "CAR_DIM_X", "CAR_DIM_Y", "CAR_DIM_Z", "CAR_BACK2AXLE", "CAR_MASS", "CAR_FRONTAXLE_W", "CAR_BACKAXLE_W",
-           "CAR_WHEEL_R", "speed", "yawRate", "accelX", "accelY", "wheelAngle", "brakeMasterPressure", "gasPedal", "engineTorque",
-           "actualGear_d", "wheelFLspeed", "wheelFRspeed", "wheelRLspeed", "wheelRRspeed", "sideSlip", "tractionGrip_d"};
+  
+        bool toVar(std::string name, tk::math::MatIO::var_t &var) {
+            tk::math::MatIO::var_t hvar;
+            tk::data::SensorData::toVar("header", hvar);
 
-        /**
-         *
-         * @param name
-         * @return
-         */
-        matvar_t *toMatVar(std::string name = "gps") {
-
-            #define TK_VEHDATA_MATVAR_DOUBLE(x) var = Mat_VarCreate(#x, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dim, &x, 0); \
-                                                Mat_VarSetStructFieldByName(matstruct, #x, 0, var); //0 for first row
-
-            size_t dim[2] = { 1, 1 }; // create 1x1 struct
-            matvar_t* matstruct = Mat_VarCreateStruct(name.c_str(), 2, dim, fields, VEHICLE_FIELDS); //main struct: Data
-
-            matvar_t *var = Mat_VarCreate("stamp", MAT_C_UINT64, MAT_T_UINT64, 2, dim, &header.stamp, 0);
-            Mat_VarSetStructFieldByName(matstruct, "stamp", 0, var); //0 for first row
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_WHEELBASE);
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_DIM_X);
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_DIM_Y);
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_DIM_Z);
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_BACK2AXLE);
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_MASS);
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_FRONTAXLE_W);
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_BACKAXLE_W);
-            TK_VEHDATA_MATVAR_DOUBLE(CAR_WHEEL_R);
-            TK_VEHDATA_MATVAR_DOUBLE(speed);
-            TK_VEHDATA_MATVAR_DOUBLE(yawRate);
-            TK_VEHDATA_MATVAR_DOUBLE(accelX);
-            TK_VEHDATA_MATVAR_DOUBLE(accelY);
-            TK_VEHDATA_MATVAR_DOUBLE(wheelAngle);
-            TK_VEHDATA_MATVAR_DOUBLE(brakeMasterPressure);
-            TK_VEHDATA_MATVAR_DOUBLE(gasPedal);
-            TK_VEHDATA_MATVAR_DOUBLE(engineTorque);
-            double actualGear_d = actualGear;
-            TK_VEHDATA_MATVAR_DOUBLE(actualGear_d);
-            TK_VEHDATA_MATVAR_DOUBLE(wheelFLspeed);
-            TK_VEHDATA_MATVAR_DOUBLE(wheelFRspeed);
-            TK_VEHDATA_MATVAR_DOUBLE(wheelRLspeed);
-            TK_VEHDATA_MATVAR_DOUBLE(wheelRRspeed);
-            TK_VEHDATA_MATVAR_DOUBLE(sideSlip);
-            double tractionGrip_d = tractionGrip;
-            TK_VEHDATA_MATVAR_DOUBLE(tractionGrip_d);
-            return matstruct;
+            std::vector<tk::math::MatIO::var_t> structVars(25);
+            structVars[ 0] = hvar;
+            structVars[ 1].set("CAR_WHEELBASE",      CAR_WHEELBASE); 
+            structVars[ 2].set("CAR_DIM_X",          CAR_DIM_X);
+            structVars[ 3].set("CAR_DIM_Y",          CAR_DIM_Y);
+            structVars[ 4].set("CAR_DIM_Z",          CAR_DIM_Z);
+            structVars[ 5].set("CAR_BACK2AXLE",      CAR_BACK2AXLE);
+            structVars[ 6].set("CAR_MASS",           CAR_MASS);
+            structVars[ 7].set("CAR_FRONTAXLE_W",    CAR_FRONTAXLE_W);
+            structVars[ 8].set("CAR_BACKAXLE_W",     CAR_BACKAXLE_W);
+            structVars[ 9].set("CAR_WHEEL_R",        CAR_WHEEL_R);
+            structVars[10].set("speed",              speed);
+            structVars[11].set("yawRate",            yawRate);
+            structVars[12].set("accelX",             accelX);
+            structVars[13].set("accelY",             accelY);
+            structVars[14].set("wheelAngle",         wheelAngle);
+            structVars[15].set("brakeMasterPressure",brakeMasterPressure);
+            structVars[16].set("gasPedal",           gasPedal);
+            structVars[17].set("engineTorque",       engineTorque);
+            structVars[18].set("actualGear",         actualGear);
+            structVars[19].set("wheelFLspeed",       wheelFLspeed);
+            structVars[20].set("wheelFRspeed",       wheelFRspeed);
+            structVars[21].set("wheelRLspeed",       wheelRLspeed);
+            structVars[22].set("wheelRRspeed",       wheelRRspeed);
+            structVars[23].set("sideSlip",           sideSlip);
+            structVars[24].set("tractionGrip",       tractionGrip);
+            return var.setStruct(name, structVars);
         }
 
-        /**
-         *
-         * @param var
-         * @return
-         */
-        bool fromMatVar(matvar_t *var) {
+ 
+        bool fromVar(tk::math::MatIO::var_t &var) {
+            if(var.empty())
+                return false;
+            tk::data::SensorData::fromVar(var["header"]);
+            var["CAR_WHEELBASE"      ].get(CAR_WHEELBASE); 
+            var["CAR_DIM_X"          ].get(CAR_DIM_X);
+            var["CAR_DIM_Y"          ].get(CAR_DIM_Y);
+            var["CAR_DIM_Z"          ].get(CAR_DIM_Z);
+            var["CAR_BACK2AXLE"      ].get(CAR_BACK2AXLE);
+            var["CAR_MASS"           ].get(CAR_MASS);
+            var["CAR_FRONTAXLE_W"    ].get(CAR_FRONTAXLE_W);
+            var["CAR_BACKAXLE_W"     ].get(CAR_BACKAXLE_W);
+            var["CAR_WHEEL_R"        ].get(CAR_WHEEL_R);
+            var["speed"              ].get(speed);
+            var["yawRate"            ].get(yawRate);
+            var["accelX"             ].get(accelX);
+            var["accelY"             ].get(accelY);
+            var["wheelAngle"         ].get(wheelAngle);
+            var["brakeMasterPressure"].get(brakeMasterPressure);
+            var["gasPedal"           ].get(gasPedal);
+            var["engineTorque"       ].get(engineTorque);
+            var["actualGear"         ].get(actualGear);
+            var["wheelFLspeed"       ].get(wheelFLspeed);
+            var["wheelFRspeed"       ].get(wheelFRspeed);
+            var["wheelRLspeed"       ].get(wheelRLspeed);
+            var["wheelRRspeed"       ].get(wheelRRspeed);
+            var["sideSlip"           ].get(sideSlip);
+            var["tractionGrip"       ].get(tractionGrip);
 
-            matvar_t *pvar = Mat_VarGetStructFieldByName(var, "stamp", 0);
-            tkASSERT(pvar->class_type == MAT_C_UINT64);
-            memcpy(&header.stamp, pvar->data, sizeof(uint64_t));
+            speedKMH = speed * 3.6;
+            return true;
+        }
 
-            #define TK_VEHDATA_MATVAR_READ_DOUBLE(x) pvar = Mat_VarGetStructFieldByName(var, #x, 0); \
-                                                     tkASSERT(pvar != 0); \
-                                                     tkASSERT(pvar->class_type == MAT_C_DOUBLE); \
-                                                     memcpy(&x, pvar->data, sizeof(double));
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_WHEELBASE);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_DIM_X);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_DIM_Y);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_DIM_Z);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_BACK2AXLE);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_MASS);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_FRONTAXLE_W);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_BACKAXLE_W);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(CAR_WHEEL_R);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(speed);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(yawRate);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(accelX);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(accelY);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(wheelAngle);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(brakeMasterPressure);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(gasPedal);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(engineTorque);
-            double actualGear_d;
-            TK_VEHDATA_MATVAR_READ_DOUBLE(actualGear_d);
-            actualGear = actualGear_d;
-            TK_VEHDATA_MATVAR_READ_DOUBLE(wheelFLspeed);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(wheelFRspeed);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(wheelRLspeed);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(wheelRRspeed);
-            TK_VEHDATA_MATVAR_READ_DOUBLE(sideSlip);
-            double tractionGrip_d;
-            TK_VEHDATA_MATVAR_READ_DOUBLE(tractionGrip_d);
-            tractionGrip = tractionGrip_d;
+        void onAdd(tk::gui::Viewer *viewer) {
+            std::string name = header.name;
+
+            // draw odom
+            if(!viewer->plotManger->plotExist(name)) {
+                std::cout<<"Add ODOM plot: "<<name<<"\n";
+                viewer->plotManger->addLinePlot(name, tk::gui::randomColor(), 100000, 1);
+            }
+            tk::data::VehicleData::odom_t odom;
+            carOdometry(odom);
+            tk::common::Tfpose tf = tk::common::odom2tf(odom.x, odom.y, odom.yaw);
+            viewer->plotManger->addPoint(name, tk::common::tf2pose(tf));
+        }
+
+        void draw(tk::gui::Viewer *viewer){
+
+        	// TODO: move to tk::gui::Viewer
+
+			tk::gui::Viewer::tkDrawTf(header.name, header.tf);
+
+			tk::gui::Viewer::tkSetColor(tk::gui::color::AMBER);
+			tk::common::Vector3<float> dim{(float) CAR_DIM_X, (float) CAR_DIM_Y,
+										   (float) CAR_DIM_Z};
+			tk::common::Vector3<float> wheels[4];
+			wheels[0] = {0, (float) -CAR_BACKAXLE_W / 2, 0};
+			wheels[1] = wheels[0];
+			wheels[1].y *= -1;
+			wheels[2] = wheels[0], wheels[3] = wheels[1];
+			wheels[2].x += CAR_WHEELBASE;
+			wheels[3].x += CAR_WHEELBASE;
+
+			tk::gui::Viewer::tkDrawLine(wheels[0], wheels[1]);
+			tk::gui::Viewer::tkDrawLine(wheels[2], wheels[3]);
+			tk::gui::Viewer::tkDrawLine(tk::common::Vector3<float>{wheels[0].x, 0, 0},
+										tk::common::Vector3<float>{wheels[2].x, 0, 0});
+
+			for (int i = 0; i < 4; i++) {
+				glPushMatrix();
+				glTranslatef(wheels[i].x, wheels[i].y, wheels[i].z);
+				glRotatef(90, 1, 0, 0);
+				tk::gui::Viewer::tkDrawCircle(tk::common::Vector3<float>{0, 0, 0}, CAR_WHEEL_R);
+				glPopMatrix();
+			}
+			tk::common::Vector3<float> pose{dim.x / 2 - (float) CAR_BACK2AXLE, 0, dim.z / 2};
+
+        }
+
+        void draw2D(tk::gui::Viewer *viewer) {
+
+			float yLim = viewer->yLim;
+
+			tk::common::Vector2<float> pos;
+			float size;
+			pos = tk::common::Vector2<float>{0,-yLim+0.25f};
+			size = 0.2;
+			double speed = this->speed;
+			int gear = actualGear;
+			double rpm = RPM;
+			tk::gui::Viewer::tkDrawSpeedometer(pos, speed, size);
+
+            std::string window_name = "Vehicle: " + header.name;
+            ImGui::Begin(window_name.c_str());
+            ImGui::BulletText("Speed\t%lf", speed);
+            ImGui::BulletText("WheelAngle\t%lf", wheelAngle);
+            ImGui::BulletText("Gear\t%d", actualGear);
+            ImGui::BulletText("RPM\t%d", RPM);
+            ImGui::End();
         }
     };
 }

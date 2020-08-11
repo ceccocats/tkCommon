@@ -4,24 +4,24 @@
 
 namespace tk { namespace gui  {
 
-class MouseView3D
+class Camera3D
 {
   public:
-    MouseView3D();
+    Camera3D();
 
     //4x4 matrix in col-major format
-    const Eigen::Matrix4f *getModelView() const
+    const Eigen::Matrix4f &getModelView() const
     {
-        return &m_modelView;
+        return m_modelView;
     }
 
     //4x4 matrix in col-major format
-    const Eigen::Matrix4f *getProjection() const
+    const Eigen::Matrix4f &getProjection() const
     {
-        return &m_projection;
+        return m_projection;
     }
 
-    const float *getEye() const {
+    const Eigen::Vector3f &getEye() const {
         return m_eye;
     }
 
@@ -36,8 +36,8 @@ class MouseView3D
     void mouseMove(float x, float y);
     void mouseWheel(float dx, float dy);
 
-    void setCenter(float x, float y, float z);
-    const float* getCenter() const {
+    void setCenter(Eigen::Vector3f center);
+    const Eigen::Vector3f &getCenter() const {
         return m_center;
     }
 
@@ -49,8 +49,9 @@ class MouseView3D
         return p;
     }
     void setWorldPos(tk::common::Vector3<float> p) {
-        setCenter(p.x, p.y, p.z);
+        setCenter(Eigen::Vector3f(p.x, p.y, p.z));
     }
+
     void setAngle(tk::common::Vector3<float> a) {
         m_angles[0] = a.z;
         m_angles[1] = a.y;
@@ -63,7 +64,7 @@ class MouseView3D
         return a;
     }
     tk::common::Vector3<float> unproject(float zplane);
-    tk::common::Vector2<float> project(tk::common::Vector3<float> point);
+    tk::common::Vector3<float> project(tk::common::Vector3<float> point);
 
 
     tk::common::Vector3<float> getPointOnGround();
@@ -81,29 +82,30 @@ class MouseView3D
         return m_mouseRight;
     }
 
-  private:
     Eigen::Matrix4f m_modelView;
     Eigen::Matrix4f m_projection;
 
     float m_windowAspect; // width/height
     float m_fovRads;
-    float m_center[3];
-    float m_up[3];
-    float m_eye[3];
+    Eigen::Vector3f m_eye;
+    Eigen::Vector3f m_center;
+    Eigen::Vector3f m_up;
+
+    float vangleMin = -M_PI/2 + 0.0001;
+    float vangleMax = +M_PI/2 - 0.0001;
 
     float m_zNear;
     float m_zFar;
 
-    // MOUSE NAVIGATION VARIABLES
-    float m_startAngles[2];
-    float m_startCenter[3];
-
     float m_radius;
-    float m_angles[2];
+    Eigen::Vector2f m_angles;
 
     bool m_mouseLeft;
     bool m_mouseRight;
-    float m_currentPos[2];
+    Eigen::Vector2f m_currentPos;
+
+    Eigen::Vector2f m_startAngles;
+    Eigen::Vector3f m_startCenter;
 
     void updateEye();
     void updateMatrices();

@@ -13,6 +13,12 @@ namespace tk { namespace data {
         Eigen::MatrixXf intensity;
 
         /**
+         *  Laser ID
+         */
+        Eigen::MatrixXf laserID;
+
+
+        /**
          * @brief ID matrix
          */
         Eigen::MatrixXi idMatrix;
@@ -24,12 +30,6 @@ namespace tk { namespace data {
         Eigen::MatrixXi polarCloud;
 
         /**
-         * @brief max intensity number
-         * 
-         */
-        int MAX_INTENSITY;
-
-        /**
          * @brief Initialization method only for Eigen points and intensity.
          */
         void init(){
@@ -37,8 +37,15 @@ namespace tk { namespace data {
             this->nPoints = 0;
             this->points.resize(4,CLOUD_MAX_POINTS);
             this->intensity.resize(1,CLOUD_MAX_POINTS);
+            this->laserID.resize(1,CLOUD_MAX_POINTS);
+            this->idMatrix.resize(0,0);
+
+            this->points.setZero();
+            this->intensity.setZero();
+            this->laserID.setZero();
+            this->idMatrix.setZero();
+
             header.sensor = sensorName::LIDAR;
-            MAX_INTENSITY = 255;
         }
         /**
          * @brief Initialization method for all data
@@ -48,7 +55,7 @@ namespace tk { namespace data {
          */
         void init(int o_layers, int v_layers){
             this->init();
-            this->initIdMatrix(v_layers,o_layers);
+            this->initIdMatrix(o_layers,v_layers);
         }
         /**
          * @brief Initialization method for idMatrix and setting to -1
@@ -57,8 +64,8 @@ namespace tk { namespace data {
          * @param v_layers vertical layers
          */
         void initIdMatrix(int o_layers, int v_layers){
-            this->idMatrix.resize(v_layers,o_layers);
-            this->idMatrix.setConstant(v_layers,o_layers,-1);
+            this->idMatrix.resize(o_layers,v_layers);
+            this->idMatrix.setConstant(o_layers,v_layers,-1);
             header.name = sensorName::LIDAR;
         }
         /**
@@ -79,6 +86,7 @@ namespace tk { namespace data {
         void release(){
             this->points.resize(0,0);
             this->intensity.resize(0,0);
+            this->laserID.resize(0,0);
             this->idMatrix.resize(0,0);            
         }
         /**
@@ -92,11 +100,19 @@ namespace tk { namespace data {
             this->idMatrix  = s.idMatrix;
             this->points    = s.points;
             this->intensity = s.intensity;
+            this->laserID   = s.laserID;
             return *this;
         }
 
         bool checkDimension(SensorData *s){
             return true;
+        }
+
+        void draw(tk::gui::Viewer *viewer){
+
+			tk::gui::Viewer::tkDrawTf(header.name, header.tf);
+    		tk::gui::Viewer::tkApplyTf(header.tf);
+			viewer->tkDrawLidarCloud(points, nPoints, intensity);
         }
     };
 }}

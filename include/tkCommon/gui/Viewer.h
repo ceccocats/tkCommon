@@ -8,16 +8,14 @@
 #include <iostream>
 #include <fstream>
 #include "tkCommon/common.h"
-#include "tkCommon/gui/MouseView3D.h"
+#include "tkCommon/gui/Camera3D.h"
 #include "tkCommon/gui/Color.h"
 #include "tkCommon/gui/lodepng.h"
-#include "tkCommon/gui/imgui.h"
-#include "tkCommon/gui/imgui_impl_glfw.h"
-#include "tkCommon/gui/imgui_impl_opengl3.h"
+#include "tkCommon/gui/imgui/imgui.h"
+#include "tkCommon/gui/imgui/imgui_impl_glfw.h"
+#include "tkCommon/gui/imgui/imgui_impl_opengl3.h"
 
-#include "tkCommon/data/RadarData.h"
-#include "tkCommon/data/LidarData.h"
-#include "tkCommon/data/ImageData.h"
+#include <tkCommon/gui/Drawable.h>
 
 #include "tkCommon/gui/libdrawtext/drawtext.h"
 
@@ -98,12 +96,14 @@ namespace tk { namespace gui {
         static void tkSetColor(tk::gui::Color_t c, float alpha = -1);
         static void tkApplyTf(tk::common::Tfpose tf);
         static void tkDrawAxis(float s = 1.0);
+        static void tkDrawTriangle(tk::common::Vector3<float> a, tk::common::Vector3<float> b, tk::common::Vector3<float> c, bool filled = false);
         static void tkDrawCircle(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = false);
         static void tkDrawSphere(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = true);
         static void tkDrawCloud(Eigen::MatrixXf *data);
-        static void tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx);
+        static void tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx, float maxval=1.0);
         static void tkDrawCloudRGB(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int r, int g, int b);
         static void tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght, float radius = -1.0, int nbSubdivisions = 12);
+        static void tkDrawArrow(float length = 1.0, float radius = -1.0, int nbSubdivisions = 12);
         static void tkDrawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
         static void tkDrawRectangle(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
         static void tkDrawLine(tk::common::Vector3<float> p0, tk::common::Vector3<float> p1);
@@ -122,12 +122,48 @@ namespace tk { namespace gui {
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         static void tkDrawTf(std::string name, tk::common::Tfpose tf);
         static void tkDrawLogo(std::string file, double scale);
-        static void tkDrawRadarData(tk::data::RadarData *data);
+        //static void tkDrawRadarData(tk::data::RadarData *data);
 
-        static void tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture);
+        //static void tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture);
         static void tkSplitPanel(int count, float ratio, float xLim, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y);
+        static void tkViewportImage(int width, int height, float xLim, float yLim, int im_id, float &im_width, float &im_height);
 
-        static void tkDrawLiDARData(tk::data::LidarData *data);
+		template<typename T, typename = std::enable_if<std::is_base_of<Drawable, T>::value>>
+        void insert(std::string name, T *data = nullptr){
+			buffer.insert<T>(name, data);
+		}
+
+		/// Returns the requested element
+		template<typename T, typename = std::enable_if<std::is_base_of<Drawable, T>::value>>
+		T* element(std::string name){
+			return (T*)buffer.map[name];
+		}
+
+		template<typename T, typename = std::enable_if<std::is_base_of<Drawable, T>::value>>
+		void update(std::string name, T *data){
+			buffer.update<T>(name, data);
+		}
+
+		void add(std::string name, Drawable *data);
+
+		// data draw primitivies
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		virtual void tkDrawTextureImage(unsigned int texture, int index);
+
+		virtual void tkDrawLineOnImage(std::vector<tk::common::Vector3<float>> &points, int index, tk::gui::Color_t color);
+
+		virtual void tkDrawLineOnImage(std::vector<tk::common::Vector2<float>> &points, int index, tk::gui::Color_t color);
+
+		virtual void tkDrawBoxOnImage(float x, float y, float w, float h, int index, tk::gui::Color_t color);
+
+		virtual void tkDrawRotatedBox3D(tk::common::Vector3<float> &pose, tk::common::Vector3<float> &size, tk::common::Vector3<float> &rot, tk::gui::Color_t color, float alpha = 255);
+
+		virtual void tkDrawPerceptionPyramid(tk::common::Vector3<float> &pose, float rotation, tk::gui::Color_t color, float alpha = 255);
+
+		virtual void tkDrawLidarCloud(Eigen::MatrixXf &points, int nPoints, Eigen::MatrixXf &intensity);
+
+        //static void tkDrawLiDARData(tk::data::LidarData *data);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         static void tkViewport2D(int width, int height, int x=0, int y=0);
@@ -143,10 +179,15 @@ namespace tk { namespace gui {
         float                   xLim = 1.0; /**< 2d x coord screen limit (1.0 if quad) */  
         float                   yLim = 1.0; /**< 2d y coord screen limit (fixed to 1.0) */
 
-        static MouseView3D      mouseView;
+        static Camera3D         mouseView;
         static const int        MAX_KEYS = 1024;
         static bool             keys[MAX_KEYS];
         static std::vector<tk::gui::Color_t> colors;
+
+        static int image_count;
+        static int image_fullscreen;
+        static int image_width;
+        static int image_height;
 
         bool drawLogo = true;
         std::vector<tk::common::Vector3<float>> logo;
@@ -167,6 +208,13 @@ namespace tk { namespace gui {
         // tex
         GLuint                  hipertTex;
 
+		//std::vector<tk::gui::Drawable *> 	drawBuffer;
+		//std::vector<bool> 					drawFlags;
+
+		//std::map<std::string, Drawable*> drawBuffer;
+
+		DrawMap buffer;
+
 
     private:
         std::string             windowName;
@@ -185,7 +233,6 @@ namespace tk { namespace gui {
         static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
         static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
-        static void tkDrawArrow(float length = 1.0, float radius = -1.0, int nbSubdivisions = 12);
     };
 
 }}

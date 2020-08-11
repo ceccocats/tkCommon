@@ -8,7 +8,7 @@ int main( int argc, char** argv){
     tk::common::CmdParser cmd(argv, "Convert GEO data to XYZ, first line is the reference");
     std::string in_file = cmd.addArg("in_file", "", "path the file to convert");
     std::string out_file = cmd.addArg("out_file", in_file + "_converted", "path of the result file");
-    cmd.print();
+    cmd.parse();
 
     if(in_file == "") {
         std::cout<<"you must provide a txt file\n";

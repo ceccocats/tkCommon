@@ -1,7 +1,6 @@
 #pragma once
-
 #include "math.h"
-#include <Eigen/Dense>
+#include <tkCommon/common.h>
 
 namespace tk { namespace common {
 // Geodetic system parameters

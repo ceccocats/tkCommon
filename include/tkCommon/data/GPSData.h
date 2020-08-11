@@ -1,6 +1,6 @@
 #pragma once
-
 #include "tkCommon/data/SensorData.h"
+#include "tkCommon/math/MatIO.h"
 
 namespace tk { namespace data {
 
@@ -10,20 +10,21 @@ namespace tk { namespace data {
     class GPSData : public SensorData {
     public:
         // GPS
-        double lat, lon, hdop, height;
+        double lat, lon, height;
+        double hdop, vdop, vel_hdop, vel_vdop;
 
         // stat
         double age, quality, sats;
+        
+        // time
+        timeStamp_t gpsStamp;
 
         // IMU
         double angleX, angleY, angleZ;
         double angleRateX, angleRateY, angleRateZ;
+	    double speedX, speedY, speedZ;
         double accX, accY, accZ;
         double sideSlip;
-
-        static const int GPS_FIELDS = 15;
-        const char  *fields[GPS_FIELDS] = {"stamp", "lat", "lon", "height", "sats", "angleX", "angleY", "angleZ",
-                                           "angleRateX", "angleRateY", "angleRateZ", "accX", "accY", "accZ", "sideSlip"};
 
         /**
          *
@@ -51,10 +52,15 @@ namespace tk { namespace data {
             angleRateX  = 0;
             angleRateY  = 0;
             angleRateZ  = 0;
+            speedX      = 0;
+            speedY      = 0;
+		    speedZ      = 0;
             accX        = 0;
             accY        = 0;
             accZ        = 0;
             sideSlip    = 0;
+
+            gpsStamp    = 0;
         }
 
         /**
@@ -98,10 +104,15 @@ namespace tk { namespace data {
             this->angleRateX  = s.angleRateX;
             this->angleRateY  = s.angleRateY;
             this->angleRateZ  = s.angleRateZ;
+            this->speedX      = s.speedX;
+            this->speedY      = s.speedY;
+            this->speedZ      = s.speedZ;
             this->accX        = s.accX;
             this->accY        = s.accY;
             this->accZ        = s.accZ;
             this->sideSlip    = s.sideSlip;
+
+            this->gpsStamp    = s.gpsStamp;
 
             return *this;
         }
@@ -114,71 +125,91 @@ namespace tk { namespace data {
          */
         friend std::ostream& operator<<(std::ostream& os, const GPSData& m) {
             os << std::setprecision(10) << m.header.stamp<< " Lat/Lon: " << m.lat <<"°/" << m.lon
-               <<"°, Height: "<<m.height<<" Nsats: "<<m.sats<<" quality: "<<m.quality<<"\n";
+               <<"°, Height: "<<m.height<<" Nsats: "<<m.sats<<" quality: "<<m.quality;
             return os;
         }
 
-        /**
-         *
-         * @param name
-         * @return
-         */
-        matvar_t *toMatVar(std::string name = "gps") {
 
-            #define TK_GPSDATA_MATVAR_DOUBLE(x) var = Mat_VarCreate(#x, MAT_C_DOUBLE, MAT_T_DOUBLE, 2, dim, &x, 0); \
-                                                Mat_VarSetStructFieldByName(matstruct, #x, 0, var); //0 for first row
+        bool toVar(std::string name, tk::math::MatIO::var_t &var) {
+            tk::math::MatIO::var_t hvar;
+            tk::data::SensorData::toVar("header", hvar);
 
-            size_t dim[2] = { 1, 1 }; // create 1x1 struct
-            matvar_t* matstruct = Mat_VarCreateStruct(name.c_str(), 2, dim, fields, GPS_FIELDS); //main struct: Data
-
-            matvar_t *var = Mat_VarCreate("stamp", MAT_C_UINT64, MAT_T_UINT64, 2, dim, &header.stamp, 0);
-            Mat_VarSetStructFieldByName(matstruct, "stamp", 0, var); //0 for first row
-            TK_GPSDATA_MATVAR_DOUBLE(lat);
-            TK_GPSDATA_MATVAR_DOUBLE(lon);
-            TK_GPSDATA_MATVAR_DOUBLE(height);
-            TK_GPSDATA_MATVAR_DOUBLE(sats);
-            TK_GPSDATA_MATVAR_DOUBLE(angleX);
-            TK_GPSDATA_MATVAR_DOUBLE(angleY);
-            TK_GPSDATA_MATVAR_DOUBLE(angleZ);
-            TK_GPSDATA_MATVAR_DOUBLE(angleRateX);
-            TK_GPSDATA_MATVAR_DOUBLE(angleRateY);
-            TK_GPSDATA_MATVAR_DOUBLE(angleRateZ);
-            TK_GPSDATA_MATVAR_DOUBLE(accX);
-            TK_GPSDATA_MATVAR_DOUBLE(accY);
-            TK_GPSDATA_MATVAR_DOUBLE(accZ);
-            TK_GPSDATA_MATVAR_DOUBLE(sideSlip);
-            return matstruct;
+            std::vector<tk::math::MatIO::var_t> structVars(15);
+            structVars[ 0] = hvar;
+            structVars[ 1].set("lat",        lat);
+            structVars[ 2].set("lon",        lon);
+            structVars[ 3].set("height",     height);
+            structVars[ 4].set("sats",       sats);
+            structVars[ 5].set("angleX",     angleX);
+            structVars[ 6].set("angleY",     angleY);
+            structVars[ 7].set("angleZ",     angleZ);
+            structVars[ 8].set("angleRateX", angleRateX);
+            structVars[ 9].set("angleRateY", angleRateY);
+            structVars[10].set("angleRateZ", angleRateZ);
+            structVars[11].set("accX",       accX);
+            structVars[12].set("accY",       accY);
+            structVars[13].set("accZ",       accZ);
+            structVars[14].set("sideSlip",   sideSlip);
+            return var.setStruct(name, structVars);
         }
 
-        /**
-         *
-         * @param var
-         * @return
-         */
-        bool fromMatVar(matvar_t *var) {
 
-            matvar_t *pvar = Mat_VarGetStructFieldByName(var, "stamp", 0);
-            tkASSERT(pvar->class_type == MAT_C_UINT64);
-            memcpy(&header.stamp, pvar->data, sizeof(uint64_t));
+        bool fromVar(tk::math::MatIO::var_t &var) {
+            if(var.empty())
+                return false;
 
-            #define TK_GPSDATA_MATVAR_READ_DOUBLE(x) pvar = Mat_VarGetStructFieldByName(var, #x, 0); \
-                                                     tkASSERT(pvar != 0); \
-                                                     tkASSERT(pvar->class_type == MAT_C_DOUBLE); \
-                                                     memcpy(&x, pvar->data, sizeof(double));
-            TK_GPSDATA_MATVAR_READ_DOUBLE(lat);
-            TK_GPSDATA_MATVAR_READ_DOUBLE(lon);
-            TK_GPSDATA_MATVAR_READ_DOUBLE(height);
-            TK_GPSDATA_MATVAR_READ_DOUBLE(sats);
-            TK_GPSDATA_MATVAR_READ_DOUBLE(angleX);
-            TK_GPSDATA_MATVAR_READ_DOUBLE(angleY);
-            TK_GPSDATA_MATVAR_READ_DOUBLE(angleZ);
-            TK_GPSDATA_MATVAR_READ_DOUBLE(angleRateX);
-            TK_GPSDATA_MATVAR_READ_DOUBLE(angleRateY);
-            TK_GPSDATA_MATVAR_READ_DOUBLE(angleRateZ);
-            TK_GPSDATA_MATVAR_READ_DOUBLE(accX);
-            TK_GPSDATA_MATVAR_READ_DOUBLE(accY);
-            TK_GPSDATA_MATVAR_READ_DOUBLE(accZ);
-            TK_GPSDATA_MATVAR_READ_DOUBLE(sideSlip);
+            tk::data::SensorData::fromVar(var["header"]);
+            var["lat"       ].get(lat);
+            var["lon"       ].get(lon);
+            var["height"    ].get(height);
+            var["sats"      ].get(sats);
+            var["angleX"    ].get(angleX);
+            var["angleY"    ].get(angleY);
+            var["angleZ"    ].get(angleZ);
+            var["angleRateX"].get(angleRateX);
+            var["angleRateY"].get(angleRateY);
+            var["angleRateZ"].get(angleRateZ);
+            var["accX"      ].get(accX);
+            var["accY"      ].get(accY);
+            var["accZ"      ].get(accZ);
+            var["sideSlip"  ].get(sideSlip);
+            return true;
+        }
+
+        // Draw funcitons
+        static tk::common::GeodeticConverter geoConv;
+        void onAdd(tk::gui::Viewer *viewer) {
+            if(!geoConv.isInitialised() && sats >= 5 && lat != 0 && lon != 0) {
+                geoConv.initialiseReference(lat, lon, height);
+                std::cout<<std::setprecision(20)<<header.name<<" Ref: "<<lat<<" "<<lon<<" "<<height<<"\n";
+            }
+
+            if(geoConv.isInitialised()) {
+                tk::common::Tfpose tf = tk::common::geodetic2tf(geoConv, lat, lon, height, angleX, angleY, angleZ)*header.tf.inverse();
+                if(!viewer->plotManger->plotExist(header.name)) {
+                    std::cout<<"Add GPS plot: "<<header.name<<"\n";
+                    viewer->plotManger->addCirclePlot(header.name, tk::gui::randomColor(), 100000, 0.5);
+                } else {
+                    viewer->plotManger->addPoint(header.name, tf);
+                }
+            }
+        }
+        void draw(tk::gui::Viewer *viewer){
+            tk::gui::Viewer::tkDrawTf(header.name, header.tf);
+        }
+        void draw2D(tk::gui::Viewer *viewer){
+            std::string window_name = "GPS: " + header.name;
+            ImGui::Begin(window_name.c_str());
+            ImGui::BulletText("Latitude  %lf", lat);
+            ImGui::BulletText("Longitude %lf", lon);
+            ImGui::BulletText("Altitude  %lf", height);
+            ImGui::BulletText("Quality   %lf  Sats  %lf", quality, sats);
+            ImGui::BulletText("DOP  %lf  %lf", hdop, vdop);
+            ImGui::BulletText("Speeds     %lf %lf %lf", speedX, speedY, speedZ);
+            ImGui::BulletText("Acc        %lf %lf %lf", accX, accY, accZ);
+            ImGui::BulletText("Angles     %lf %lf %lf", angleX, angleY, angleZ);
+            ImGui::BulletText("AngleRates %lf %lf %lf", angleRateX, angleRateY, angleRateZ);
+            ImGui::End();
         }
     };
 }}

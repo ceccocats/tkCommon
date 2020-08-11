@@ -31,11 +31,11 @@ Index of this file:
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include "tkCommon/gui/imgui.h"
+#include "tkCommon/gui/imgui/imgui.h"
 #ifndef IMGUI_DEFINE_MATH_OPERATORS
 #define IMGUI_DEFINE_MATH_OPERATORS
 #endif
-#include "tkCommon/gui/imgui_internal.h"
+#include "tkCommon/gui/imgui/imgui_internal.h"
 
 #include <ctype.h>      // toupper
 #if defined(_MSC_VER) && _MSC_VER <= 1500 // MSVC 2008 or earlier
@@ -3124,7 +3124,7 @@ static bool STB_TEXTEDIT_INSERTCHARS(STB_TEXTEDIT_STRING* obj, int pos, const Im
 #define STB_TEXTEDIT_K_SHIFT        0x20000
 
 #define STB_TEXTEDIT_IMPLEMENTATION
-#include "tkCommon/gui/imstb_textedit.h"
+#include "tkCommon/gui/imgui/imstb_textedit.h"
 
 }
 

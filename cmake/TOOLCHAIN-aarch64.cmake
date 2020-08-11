@@ -38,6 +38,19 @@ set(CUDA_cudadevrt_LIBRARY ${CUDA_TOOLKIT_ROOT_DIR}/targets/${cuda_target_full_p
 include_directories(/usr/include/aarch64-linux-gnu/)
 include_directories(${CMAKE_SYSROOT}/usr/local/include)
 
+
+# copy all libraries to install dir
+if(NOT TARGET install-deps)
+    add_custom_target(install-deps
+        COMMAND echo "install external libraries"
+        COMMAND mkdir -p ${CMAKE_INSTALL_PREFIX}/libEXT/
+        COMMAND rsync -avh --ignore-errors ${CMAKE_SYSROOT}/usr/local/lib/ ${CMAKE_INSTALL_PREFIX}/libEXT/
+        COMMAND rsync -avh --ignore-errors ${CMAKE_SYSROOT}/usr/lib/ ${CMAKE_INSTALL_PREFIX}/libEXT/
+        COMMAND rsync -avh --ignore-errors ${CMAKE_SYSROOT}/opt/pdk/lib/ ${CMAKE_INSTALL_PREFIX}/libEXT/
+        COMMAND rsync -avh --ignore-errors ${CMAKE_SYSROOT}/opt/ros/*/lib/ ${CMAKE_INSTALL_PREFIX}/libEXT/
+    )
+endif()
+
 if(NOT TARGET upload)
     # set UPLOAD to target
     set(TK_USER nvidia)
@@ -46,9 +59,9 @@ if(NOT TARGET upload)
     set(TK_TARGET_INSTALL_PATH /home/${TK_USER}/build)
     add_custom_target(upload
         # create installation folder on target
-        COMMAND sshpass -p "${TK_PASS}" ssh -o StrictHostKeyChecking=no -p 22 ${TK_USER}@${TK_IP} "mkdir -p ${TK_TARGET_INSTALL_PATH}"
+        COMMAND sshpass -p "${TK_PASS}" ssh -o StrictHostKeyChecking=no ${TK_USER}@${TK_IP} "mkdir -p ${TK_TARGET_INSTALL_PATH}"
         # upload installation
-        COMMAND sshpass -p "${TK_PASS}" rsync --progress -rltgDz -e "ssh -p 22" ${CMAKE_INSTALL_PREFIX}/ ${TK_USER}@${TK_IP}:${TK_TARGET_INSTALL_PATH}/
+        COMMAND sshpass -p "${TK_PASS}" rsync --progress -rltgDz -e "ssh" ${CMAKE_INSTALL_PREFIX}/ ${TK_USER}@${TK_IP}:${TK_TARGET_INSTALL_PATH}/
         COMMAND echo "installed to ${TK_IP}:${TK_TARGET_INSTALL_PATH}"
     )
 endif()

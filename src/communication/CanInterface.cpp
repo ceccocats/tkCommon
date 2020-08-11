@@ -76,20 +76,35 @@ namespace tk { namespace communication {
 
             if(pcapmode) {
                 uint8_t buffer[64];
+                uint8_t *buf = buffer;
                 int len = pcap.getPacket(buffer, data->stamp); // we get the header to read ID and DLC
+
+                // FIXME: this is linux cooked capture header skip (luca shitty record)
+                bool cooked = false;
+                if(len > 16) {
+                    buf = buf + 16;
+                    len -= 16;
+                    cooked = true;
+                }
+                tkASSERT(len <= 16);
+                
                 if (len > 8) { // header is 8 byte
                     uint16_t id;
-                    memcpy(&id, buffer + 2, sizeof(uint16_t));
-                    id = __bswap_16(id);
+                    if(!cooked) {
+                        memcpy(&id, buf + 2, sizeof(uint16_t));
+                        id = __bswap_16(id);
+                    } else {
+                        memcpy(&id, buf, sizeof(uint16_t));
+                    }
                     data->frame.can_id = id;
-                    memcpy(&data->frame.can_dlc, buffer + 4, sizeof(uint8_t));
+                    memcpy(&data->frame.can_dlc, buf + 4, sizeof(uint8_t));
 
                     // dimensions doesn match
-                    if (8 + data->frame.can_dlc != len)
+                    if (8 + data->frame.can_dlc > len)
                         return false;
 
-                    memcpy(&data->frame.data, buffer + 8, data->frame.can_dlc * sizeof(uint8_t));
-                    //tk::common::hex_dump(std::cout, buffer, len);
+                    memcpy(&data->frame.data, buf + 8, data->frame.can_dlc * sizeof(uint8_t));
+                    //tk::common::hex_dump(std::cout, buf, len);
                     //std::cout << std::hex << data->frame.can_id << std::dec << " " << int(data->frame.can_dlc) << " "
                     //          << data->stamp << "\n";
                     return true;
@@ -198,7 +213,10 @@ namespace tk { namespace communication {
     CanInterface::close(){
 
         if(offlineMode){
-            pcap.close();
+            if(pcapmode)
+                pcap.close();
+            else 
+                logstream.close();
             return true;
         }else{
             int err = ::close(soc);

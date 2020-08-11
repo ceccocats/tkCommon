@@ -1,8 +1,6 @@
 #pragma once
 #include "CSpline2D.h"
 
-#undef Success  // stupid X11
-#include "Eigen/Dense"
 using namespace Eigen;
 
 namespace tk { namespace  math {
@@ -30,6 +28,8 @@ public:
     bool init(std::vector<tk::common::Vector3<float>> waypoints);
 
     tk::common::Vector3<float> calc_position(double s, double d=0);
+
+    std::vector<tk::common::Vector3<float>> calc_points(double step);
 
 private:
     /**

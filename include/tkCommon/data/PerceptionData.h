@@ -1,7 +1,10 @@
 #pragma once
 #include "tkCommon/common.h"
+#include "tkCommon/gui/Color.h"
 #include "tkCommon/data/SensorData.h"
+#include "tkCommon/data/GPSData.h"
 #include "tkCommon/data/VehicleData.h"
+#include "tkCommon/data/ImageData.h"
 #include <vector>
 
 ///////////////////////////////////////////////in fondo la vecchia
@@ -12,13 +15,14 @@ namespace tk{ namespace perception{
  * @brief enum perception type used for polymorphism
  */
 enum class type{
-    NOT_SET = 0,
-    LANE    = 1,
-    BOX2D   = 2,
-    RT2DBOX = 3,
-    BOX3D   = 4,
-    RT3DBOX = 5,
-    SIGN    = 6
+    NOT_SET  = 0,
+    LANE     = 1,
+    BOX2D    = 2,
+    RT2DBOX  = 3,
+    BOX3D    = 4,
+    RT3DBOX  = 5,
+    SIGN     = 6,
+	BOUNDARY = 7
 };
 
 /**
@@ -44,37 +48,100 @@ class lane_type{
             return std::string{"type error"};
         }
 
-    private:
+        lane_type& operator=(const Value & s){
+			this->value = s;
+			return *this;
+		}
+
+        bool operator!=(lane_type::Value v) noexcept {
+            return v != value;
+        }
+
+        bool operator==(lane_type::Value v) noexcept {
+            return v == value;
+        }
+
         lane_type::Value value;
 };
 
 /**
- * @brief box type
+ * @brief detected object type
  */
-class box_type{
+class obj_class{
 
     public:
+        //Setted like masa-protocol
         enum Value : uint8_t{
         NOT_CLS     = 0,
-        PEDESTRIAN  = 1,
-        CAR         = 2,
-        MOTOBIKE    = 3,
-        CYCLE       = 4};
+        PEDESTRIAN  = 14,
+        CAR         = 6,
+        MOTOBIKE    = 13,
+        CYCLE       = 1,
+        // Added later
+		ROADSIGN	= 8,
+		LIGHT		= 7};
+
+		static tk::gui::Color_t objects_colors[15];
 
         /**
          * @brief   method for convert id to box detection string name
          */
         std::string toString(){
-            if(value == box_type::NOT_CLS)      return std::string{"not classified"};
-            if(value == box_type::PEDESTRIAN)   return std::string{"pedestrian"};
-            if(value == box_type::CAR)          return std::string{"car"};
-            if(value == box_type::MOTOBIKE)     return std::string{"motobike"};
-            if(value == box_type::CYCLE)        return std::string{"cycle"};
+            if(value == obj_class::NOT_CLS)      return std::string{"not classified"};
+            if(value == obj_class::PEDESTRIAN)   return std::string{"pedestrian"};
+            if(value == obj_class::CAR)          return std::string{"car"};
+            if(value == obj_class::MOTOBIKE)     return std::string{"motobike"};
+            if(value == obj_class::CYCLE)        return std::string{"cycle"};
+			if(value == obj_class::ROADSIGN)     return std::string{"road sign"};
+			if(value == obj_class::LIGHT)     	 return std::string{"traffic light"};
             return std::string{"type error"};
         }
 
-    private:
-        box_type::Value value;
+		obj_class& operator=(const Value & s){
+			this->value = s;
+			return *this;
+		}
+
+		obj_class& operator=(const obj_class & s){
+			this->value = s.value;
+			return *this;
+		}
+
+		bool operator!=(obj_class::Value v) noexcept {
+			return v != value;
+		}
+
+		bool operator==(obj_class::Value v) noexcept {
+			return v == value;
+		}
+
+		static tk::gui::Color_t& getColor(obj_class c){
+        	return getColor(c.value);
+        }
+
+		static tk::gui::Color_t& getColor(obj_class::Value c){
+        	switch((int)c){
+        		case tk::perception::obj_class::NOT_CLS:
+					return tk::gui::color::BLACK;	// black (not classified)
+        		case tk::perception::obj_class::CYCLE:
+					return tk::gui::color::CYAN;	// cyan	 (cycle)
+        		case tk::perception::obj_class::ROADSIGN:
+					return tk::gui::color::PURPLE;	// magenta (road sign)
+        		case tk::perception::obj_class::CAR:
+					return tk::gui::color::GREEN;	// green   (car)
+        		case tk::perception::obj_class::LIGHT:
+					return tk::gui::color::YELLOW;	// yellow  (traffic lights)
+        		case tk::perception::obj_class::MOTOBIKE:
+					return tk::gui::color::BLUE;	// blue    (motor bike)
+        		case tk::perception::obj_class::PEDESTRIAN:
+					return tk::gui::color::ORANGE;	// orange  (pedestrian)
+        		default:
+					return tk::gui::color::RED;		// red (unused)
+        	}
+
+        }
+
+		obj_class::Value value;
 };
 
 /**
@@ -137,8 +204,25 @@ class sign_type{
             if(value == sign_type::NO_ENTRY)            return std::string{"no entry"};
             return std::string{"type error"};
         }
+		sign_type& operator=(const Value & s){
+			this->value = s;
+			return *this;
+		}
 
-    private:
+
+        bool operator!=(sign_type::Value v) noexcept {
+            return v != value;
+        }
+
+        bool operator==(sign_type::Value v) noexcept {
+            return v == value;
+        }
+
+        void operator=(sign_type::Value v) noexcept {
+            value = v;
+        }
+
+    public:
         sign_type::Value value;
 };
 
@@ -147,11 +231,12 @@ class sign_type{
  */
 class semaphore_status{
     public:
+        //Setted like masa-protocol
         enum Value : uint8_t{
         NOT_CLS     = 0,
-        RED         = 1,
+        RED         = 3,
         YELLOW      = 2,
-        GREEN       = 3,
+        GREEN       = 1,
         BLINK       = 4};
 
         /**
@@ -165,19 +250,60 @@ class semaphore_status{
             if(value == semaphore_status::BLINK)    return std::string{"blink"};
             return std::string{"type error"};
         }
+
+		semaphore_status& operator=(const Value & s){
+			this->value = s;
+			return *this;
+		}
     
-    private:
+    public:
         semaphore_status::Value value;
+};
+
+/**
+ * @brief boundary point type
+ */
+class boundary_type {
+public:
+	enum Value : uint8_t{
+		OTHER     	= 0,
+		CURB      	= 1,
+		VEHICLE		= 2,
+		PERSON		= 3,
+		UNDEFINED	= 4};
+
+	/**
+	 * @brief   method for convert id to semaphore status string name
+	 */
+	std::string toString(){
+		if(value == boundary_type::OTHER)     	return std::string{"other"};
+		if(value == boundary_type::CURB)   		return std::string{"curb"};
+		if(value == boundary_type::VEHICLE)    	return std::string{"vehicle"};
+		if(value == boundary_type::PERSON)    	return std::string{"person"};
+		if(value == boundary_type::UNDEFINED)   return std::string{"undefined"};
+		return std::string{"type error"};
+	}
+
+	boundary_type& operator=(const Value & s){
+		this->value = s;
+		return *this;
+	}
+
+private:
+	boundary_type::Value value;
 };
 
 /**
  * @brief generic perception class used for polymorphism
  */
-class generic{
+class generic : public tk::gui::Drawable{
     protected:
         type classtype;
-    
+
     public:
+		int sensorID = 0;
+		double confidence;
+
         bool init(){
             classtype = type::NOT_SET;
             return true;
@@ -190,9 +316,9 @@ class generic{
 /**
  * @brief single lane data
  */
-class lane : public generic{
+class lane2D : public generic{
     public:
-        std::vector<tk::common::Vector3<float>> points;
+        std::vector<tk::common::Vector2<float>> points;
         lane_type                          laneType;
     
     public:
@@ -200,35 +326,82 @@ class lane : public generic{
             classtype = type::LANE;
             return true;
         }
-        lane& operator=(const lane& s){
+        lane2D& operator=(const lane2D& s){
 
             this->points    = s.points;
             this->laneType  = s.laneType;
             return *this;
         }
+		void draw2D(tk::gui::Viewer *viewer) {
+        	viewer->tkDrawLineOnImage(points, sensorID, tk::gui::color::BLUE);
+		}
 };
 
 /**
  * @brief single 2D box data
  */
-class box2D : public generic{
+class box2D {
+	public:
+		int x=0, y=0, w=0, h=0;
+		box2D& operator=(const box2D& s){
+
+			this->x   = s.x;
+			this->y   = s.y;
+			this->w   = s.w;
+			this->h   = s.h;
+			return *this;
+		}
+};
+
+/**
+ * @brief detected 2D object
+ */
+class object2D : public generic{
     public:
-        tk::common::Vector2<float>  pos;
-        tk::common::Vector2<float>  dim;
-        box_type                    objType;
-    
-    public:
+        box2D 		box;
+        obj_class   objType;
+        float       orientation;
+
         bool init(){
             classtype = type::BOX2D;
             return true;
         }
-        box2D& operator=(const box2D& s){
-
-            this->pos       = s.pos;
-            this->dim       = s.dim;
+		object2D& operator=(const object2D& s){
+			this->sensorID  = s.sensorID;
+            this->box 		= s.box;
             this->objType   = s.objType;
             return *this;
         }
+
+        void draw2D(tk::gui::Viewer *viewer) {
+
+			viewer->tkDrawBoxOnImage(box.x, box.y, box.w, box.h, sensorID, obj_class::getColor(objType.value));
+
+        }
+};
+
+/**
+ * @brief boundary data
+ */
+class boundary : public generic{
+	public:
+		std::vector<tk::common::Vector3<float>> points;
+		std::vector<boundary_type> types;
+
+		bool init(){
+			classtype = type::BOUNDARY;
+		}
+
+		boundary& operator=(const boundary& s){
+
+			this->points  = s.points;
+			this->types   = s.types;
+			return *this;
+		}
+
+		void draw2D(tk::gui::Viewer *viewer) {
+			viewer->tkDrawLineOnImage(points, sensorID, tk::gui::color::RED);
+		}
 };
 
 /**
@@ -239,7 +412,7 @@ class rotatedBox2D : public generic{
         tk::common::Vector2<float>  pos;
         tk::common::Vector2<float>  dim;
         tk::common::Vector2<float>  rot;
-        box_type                    objType;
+        obj_class                   objType;
     
     public:
         bool init(){
@@ -263,7 +436,7 @@ class box3D : public generic{
     public:
         tk::common::Vector3<float>  pos;
         tk::common::Vector2<float>  dim;
-        box_type                    objType;
+		obj_class                    objType;
     
     public:
         bool init(){
@@ -287,7 +460,7 @@ class rotatedBox3D : public generic{
         tk::common::Vector3<float>  pos;
         tk::common::Vector3<float>  dim;
         tk::common::Vector3<float>  rot;
-        box_type                    objType;
+		obj_class                    objType;
     
     public:
         bool init(){
@@ -302,12 +475,15 @@ class rotatedBox3D : public generic{
             this->objType   = s.objType;
             return *this;
         }
+        void draw(tk::gui::Viewer *viewer){
+            viewer->tkDrawRotatedBox3D(pos, dim, rot, obj_class::getColor(objType), 150);
+        }
 };
 
 /**
  * @brief single road sign data
  */
-class roadSing : public generic{
+class roadSign : public generic{
     public:
         tk::common::Vector3<float>  pos;
         sign_type                   sign;
@@ -319,7 +495,7 @@ class roadSing : public generic{
             classtype = type::SIGN;
             return true;
         }
-        roadSing& operator=(const roadSing& s){
+        roadSign& operator=(const roadSign& s){
 
             this->pos       = s.pos;
             this->sign      = s.sign;
@@ -337,7 +513,7 @@ typedef std::vector<generic*> genericsdata;
 /**
  * @brief lane vector
  */
-typedef std::vector<lane> lanesData;
+typedef std::vector<lane2D> lanesData;
 
 /**
  * @brief 2D box vector
@@ -362,21 +538,23 @@ typedef std::vector<rotatedBox3D> rotatedBox3DsData;
 /**
  * @brief road sign vector
  */
-typedef std::vector<roadSing> roadSingsData;
+typedef std::vector<roadSign> roadSingsData;
 
 
 class perceptionData : public tk::data::SensorData{
     public:
 
-        std::vector<rotatedBox3DsData>  boxs;
-        std::vector<roadSingsData>      signs;
-        std::vector<lanesData>          lanes;
-        tk::data::VehicleData           veh;
-        
+        std::vector<rotatedBox3D>   boxes;
+        std::vector<object2D>       camera_objects;
+        std::vector<roadSign>       signs;
+        std::vector<lane2D>         camera_lanes;
+
+        float rotation = 0;
+        bool draw_masa_style = false;
 
         void init() override {
             tk::data::SensorData::init();
-            veh.init();
+            header.sensorID = tk::data::sensorName::PERCEPTION;
         }
 
         void release() override {}
@@ -388,13 +566,45 @@ class perceptionData : public tk::data::SensorData{
         perceptionData& operator=(const perceptionData &s) {
             SensorData::operator=(s);
 
-            this->boxs  = s.boxs;
+            this->boxes  = s.boxes;
             this->signs = s.signs;
-            this->lanes = s.lanes;
-            this->veh   = s.veh;
+            this->camera_lanes = s.camera_lanes;
+            this->camera_objects = s.camera_objects;
 
             return *this;
-         }
+        }
+
+		void draw2D(tk::gui::Viewer *viewer) {
+
+        	for(int i = 0; i < camera_objects.size(); i++){
+        		camera_objects[i].draw2D(viewer);
+        	}
+			for(int i = 0; i < camera_lanes.size(); i++){
+				camera_lanes[i].draw2D(viewer);
+			}
+        }
+
+		void draw(tk::gui::Viewer *viewer){
+
+			for(int i = 0; i < signs.size(); i++){
+				tk::gui::Color_t c = obj_class::getColor(obj_class::ROADSIGN);
+				viewer->tkDrawPerceptionPyramid(signs[i].pos, rotation, c, 100);
+			}
+
+        	if(!draw_masa_style){
+				for(int i = 0; i < boxes.size(); i++){
+					viewer->tkDrawRotatedBox3D(boxes[i].pos, boxes[i].dim, boxes[i].rot, obj_class::getColor(boxes[i].objType), 150);
+				}
+        	}
+        	else{
+        		for(int i = 0; i < boxes.size(); i++){
+					viewer->tkDrawPerceptionPyramid(boxes[i].pos, rotation, obj_class::getColor(boxes[i].objType), 100);
+        		}
+        	}
+
+			rotation += 1;
+
+		}
 };
 
 
@@ -434,10 +644,14 @@ struct ObjectData3D_t{
 
 template <class T>
 struct LineData_t{
+    int camIdx;
+    char type;
     std::vector<T> points;
     tk::common::Vector4<float> color;
 
     LineData_t &operator=(const LineData_t& s){
+        camIdx = s.camIdx;
+        type =s.type;
         points = s.points;
         color = s.color;
     }
@@ -476,53 +690,72 @@ typedef BoundaryData_t<tk::common::Vector3<float>> BoundaryData3D_t;
 
 class LinesData_t : public tk::data::SensorData {
 public:
-    std::vector<LineData3D_t> data;
 
-        void init() {
-            SensorData::init();
-            header.sensor = tk::data::sensorName::LINES;
-        }
+    tk::data::HeaderData header;
+    std::vector<LineData2D_t> data;   // filled by detection
+    std::vector<LineData3D_t> data3d; // filled by fusion
 
-        void release(){
-            return;
-        }
+    void init() {
+        SensorData::init();
+        header.sensor = tk::data::sensorName::LINES;
+    }
 
-        bool checkDimension(SensorData *s){
-            return true;
-        }
+    void release(){
+        return;
+    }
 
-    matvar_t *toMatVar(std::string name = "lines") {
-        size_t dims[] = {data.size(), 1};
-        matvar_t *array = Mat_VarCreate(name.c_str(),MAT_C_CELL,MAT_T_CELL,2,dims,NULL,0);
+    bool checkDimension(SensorData *s){
+        return true;
+    }
+
+    bool toVar(std::string name, tk::math::MatIO::var_t &var) {
+
+        std::vector<tk::math::MatIO::var_t> cellsVars(data.size());
 
         for(int i=0; i<data.size(); i++) {
-            Eigen::MatrixXf p(3, data[i].points.size());
+            std::vector<tk::math::MatIO::var_t> structVars(3);
+
+            structVars[0].set("camIdx", data[i].camIdx);
+            int type = data[i].type;
+            structVars[1].set("type", type);
+ 
+            // line data
+            Eigen::MatrixXf p(2, data[i].points.size());
             for(int j=0; j<p.cols(); j++) {
                 p(0, j) = data[i].points[j].x;
                 p(1, j) = data[i].points[j].y;
-                p(2, j) = data[i].points[j].z;
             }
-            matvar_t *var = tk::common::eigenXf2matvar(p, "line");
-            Mat_VarSetCell(array, i,var);
+            structVars[2].set("data", p);
+
+            cellsVars[i].setStruct("lineData", structVars);
         }
-        return array;
+
+        return var.setCells(name, cellsVars);
     }
 
-    bool fromMatVar(matvar_t *var) {
+    bool fromVar(tk::math::MatIO::var_t &var) {
+        if(var.empty())
+            return false;
 
-        int n = var->dims[0];
-        for(int i=0; i<n; i++) {
-            matvar_t *pvar = Mat_VarGetCell(var, i);
-            Eigen::MatrixXf mat = tk::common::matvar2eigenXf(pvar);
+        for(int i=0; i<var.size(); i++) {
+            LineData2D_t line;
+            
+            std::string key = var[i];
+            var[key]["camIdx"].get(line.camIdx);
 
-            LineData3D_t line;
+            int type;
+            var[key]["type"].get(type);
+            line.type = type;
+            
+            Eigen::MatrixXf mat; 
+            var[key]["data"].get(mat);
             for(int j=0; j<mat.cols(); j++) {
-                tk::common::Vector3<float> p;
+                tk::common::Vector2<float> p;
                 p.x = mat(0, j);
                 p.y = mat(1, j);
-                p.z = mat(2, j);
                 line.points.push_back(p);
             }
+
             data.push_back(line);
         }
         return true;

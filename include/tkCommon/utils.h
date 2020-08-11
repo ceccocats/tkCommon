@@ -79,33 +79,6 @@ T clamp(T val, T min, T max) {
 }
 
 /**
- * Load YAML node from file
- * @param conf_file
- * @return
- */
-inline YAML::Node loadYAMLconf(std::string conf_file) {
-    return YAML::LoadFile(conf_file);
-}
-
-/**
- * Get configuration from YAML node
- * @tparam T
- * @param conf yaml node
- * @param key configuration KEY
- * @param defaultVal defalt value in case of no KEY found
- * @return conf value
- */
-template<typename T>
-inline T getYAMLconf(YAML::Node conf, std::string key, T defaultVal) {
-    T val = defaultVal;
-    if(conf && conf[key]) {
-        val = conf[key].as<T>();
-    }
-    //std::cout<<"YAML "<<key<<", val: "<<val<<"\n";
-    return val;
-}
-
-/**
  *   Class for loop rate at a certain delta time
  *   in microsecs
  */
@@ -133,7 +106,7 @@ struct LoopRate {
     void wait(bool print = true) {
         T = getTimeStamp();
 
-        timeStamp_t delta = T - lastT;
+        int64_t delta = T - lastT;
         if(delta >= 0 && delta < dt) {
             usleep(dt - delta);
         } else if(lastT > 0) {
@@ -152,8 +125,7 @@ struct LoopRate {
 template<typename T>
 struct CircularArray {
 
-    static const int MAX_DIM = 10000;
-    T array[CircularArray::MAX_DIM];
+    T *array = nullptr;
     int dim, position;
 
     std::mutex m;
@@ -167,6 +139,11 @@ struct CircularArray {
         position = 0;
     }
 
+    ~CircularArray() {
+        if(array != nullptr)
+            delete [] array;
+    }
+
     void clear() {
         position = 0;
     }
@@ -176,9 +153,10 @@ struct CircularArray {
      * @param _dim
      */
     void setDim(int _dim) {
+        if(array != nullptr)
+            delete [] array;
+        array = new T[_dim];
         dim = _dim;
-        if(dim > CircularArray::MAX_DIM)
-            dim = CircularArray::MAX_DIM;
     }
 
     /**

@@ -12,7 +12,7 @@ int main( int argc, char** argv){
     bool        opt1 = cmd.addBoolOpt("-v", "enable verbose");
     int         opt2 = cmd.addIntOpt("-num0", 23, "a number");
     float       opt3 = cmd.addFloatOpt("-num1", 12.34, "another number");
-    cmd.print();
+    cmd.parse();
 
     std::cout<<"inserted params:\n";
     std::cout<<arg0<<"\n";
