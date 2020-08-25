@@ -69,6 +69,7 @@ add_library(tkCommon SHARED
     src/common.cpp
     src/version.cpp
     src/CmdParser.cpp    
+    src/PID.cpp
 )
 target_link_libraries(tkCommon tkGUI yaml-cpp matio dl)
 
