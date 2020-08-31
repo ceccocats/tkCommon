@@ -426,14 +426,17 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
 
             //std::cout<<"mat: "<<loader.LoadedMeshes[o].MeshMaterial.name<<" diffuse: "<<obj.colors[o]<<"\n";
             
-            obj.triangles[o] = Eigen::MatrixXf(5, indices.size());
+            obj.triangles[o] = Eigen::MatrixXf(8, indices.size());
             for(int i=0; i<indices.size(); i++) {
                 int idx = indices[i];
                 obj.triangles[o](0,i) = verts[idx].Position.X;
                 obj.triangles[o](1,i) = verts[idx].Position.Y;
                 obj.triangles[o](2,i) = verts[idx].Position.Z;
-                obj.triangles[o](3,i) = verts[idx].TextureCoordinate.X;
-                obj.triangles[o](4,i) = 1 - verts[idx].TextureCoordinate.Y;
+                obj.triangles[o](3,i) = verts[idx].Normal.X;
+                obj.triangles[o](4,i) = verts[idx].Normal.Y;
+                obj.triangles[o](5,i) = verts[idx].Normal.Z;
+                obj.triangles[o](6,i) = verts[idx].TextureCoordinate.X;
+                obj.triangles[o](7,i) = 1 - verts[idx].TextureCoordinate.Y;
             }
         }
 
