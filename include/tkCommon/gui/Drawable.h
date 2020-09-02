@@ -20,6 +20,8 @@ namespace tk{namespace gui{
 
 		//virtual void draw2D(int width, int height, float xLim, float yLim) {}
 
+		virtual void onAdd(tk::gui::Viewer *viewer) {}
+
 		virtual void draw(tk::gui::Viewer *viewer) {}
 
 		virtual void draw2D(tk::gui::Viewer *viewer) {}
@@ -37,7 +39,9 @@ namespace tk{namespace gui{
 		std::mutex mutex;
 
 		DrawBuffer &operator=(const DrawBuffer &s){
+			mutex.lock();
 			buffer = s.buffer;
+			mutex.unlock();
 			return *this;
 		}
 
@@ -114,13 +118,15 @@ namespace tk{namespace gui{
 			}
 		}
 
-		void add(std::string name, Drawable* d){
+		void add(std::string name, Drawable* d, tk::gui::Viewer *viewer = nullptr){
 			auto search = map.find(name);
 			if (search != map.end()) {
 				map[name] = d;
 			} else {
 				map.insert(std::pair<std::string,Drawable*>(name,d));
 			}
+			if(viewer != nullptr)
+				d->onAdd(viewer);
 		}
 
 		void draw2D(Viewer *viewer){

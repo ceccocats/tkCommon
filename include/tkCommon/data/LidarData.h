@@ -13,6 +13,12 @@ namespace tk { namespace data {
         Eigen::MatrixXf intensity;
 
         /**
+         *  Laser ID
+         */
+        Eigen::MatrixXf laserID;
+
+
+        /**
          * @brief ID matrix
          */
         Eigen::MatrixXi idMatrix;
@@ -31,7 +37,14 @@ namespace tk { namespace data {
             this->nPoints = 0;
             this->points.resize(4,CLOUD_MAX_POINTS);
             this->intensity.resize(1,CLOUD_MAX_POINTS);
+            this->laserID.resize(1,CLOUD_MAX_POINTS);
             this->idMatrix.resize(0,0);
+
+            this->points.setZero();
+            this->intensity.setZero();
+            this->laserID.setZero();
+            this->idMatrix.setZero();
+
             header.sensor = sensorName::LIDAR;
         }
         /**
@@ -73,6 +86,7 @@ namespace tk { namespace data {
         void release(){
             this->points.resize(0,0);
             this->intensity.resize(0,0);
+            this->laserID.resize(0,0);
             this->idMatrix.resize(0,0);            
         }
         /**
@@ -86,6 +100,7 @@ namespace tk { namespace data {
             this->idMatrix  = s.idMatrix;
             this->points    = s.points;
             this->intensity = s.intensity;
+            this->laserID   = s.laserID;
             return *this;
         }
 
@@ -96,8 +111,8 @@ namespace tk { namespace data {
         void draw(tk::gui::Viewer *viewer){
 
 			tk::gui::Viewer::tkDrawTf(header.name, header.tf);
-
-			viewer->tkDrawLidarCloud(header.tf, points, nPoints, intensity);
+    		tk::gui::Viewer::tkApplyTf(header.tf);
+			viewer->tkDrawLidarCloud(points, nPoints, intensity);
         }
     };
 }}

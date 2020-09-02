@@ -63,10 +63,11 @@ namespace tk { namespace data {
      */
     class HeaderData {
     public:
-        sensorName          sensor;
-        timeStamp_t         stamp = 0;      /**< Time stamp, expressed in millisecond. */
         std::string         name;           /**< Name of the sensor. */
         tk::common::Tfpose  tf;             /**< TF in respect to back axel, @see tk::common::Tfpose. */
+        sensorName          sensor;
+        
+        timeStamp_t         stamp = 0;      /**< Time stamp, expressed in millisecond. */
         int                 sensorID;       /**< ID of the sensor. */
         int                 messageID;      /**< Incremental message counter. */
 
@@ -86,10 +87,19 @@ namespace tk { namespace data {
          */
         HeaderData &operator=(const HeaderData &s) {
             this->stamp         = s.stamp;
-            this->tf            = s.tf;
             this->sensorID      = s.sensorID;
             this->messageID     = s.messageID;
-            this->name          = s.name;
+
+            // safe string update
+            if(this->name != s.name) {
+                clsWrn("Changing header name from " + name + " to " + s.name +
+                       " if this message appers it is a problem\n");
+                // this WARNING could be caused by the use of a tmpData in the sensor
+                // if you are using tmpData please be sure to not rewrite the header name
+                this->name = s.name;
+            }
+            // safe TF update
+            tf = s.tf;
 
             return *this;
         }

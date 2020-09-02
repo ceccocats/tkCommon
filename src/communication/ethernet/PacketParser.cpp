@@ -4,20 +4,23 @@ int
 tk::communication::PacketParser::firstFrame(pcap_t* pcapFile, timeStamp_t& stamp){
                 
     int status = pcap_next_ex(pcapFile, &header, &pkt_data);
-    if(status < 0) return -1;
+    if(status < 0) {
+        clsErr("PCAP error: " + std::to_string(status));
+        return -1;
+    }
 
     //set timestamp
     stamp = header->ts.tv_sec * 1e6 + header->ts.tv_usec;
 
     //get ethernet header
-    if(header->caplen < sizeof(sniff_ethernet)) return -1;
+    if(header->caplen < sizeof(sniff_ethernet)) return 0;
     ethernet = (struct sniff_ethernet*)(pkt_data);
 
     //get ip header
-    if(header->caplen < sizeof(sniff_ip) + SIZE_ETHERNET) return -1;
+    if(header->caplen < sizeof(sniff_ip) + SIZE_ETHERNET) return 0;
     ip = (struct sniff_ip*)(pkt_data + SIZE_ETHERNET);
     size_ip = IP_HL(ip)*4;
-    if (size_ip < 20) return -1;
+    if (size_ip < 20) return 0;
 
     // if is fragmented ?
     if(ip->ip_off != FRAGMENT_MASK){
@@ -77,6 +80,15 @@ int
 tk::communication::PacketParser::computeNextPacket(pcap_t* pcapFile,uint8_t* buffer, timeStamp_t& stamp){
 
     int payload_lenght = this->firstFrame(pcapFile,stamp);
+    if(payload_lenght < 0)
+        return payload_lenght;
+
+    // not recognized header
+    if(payload_lenght == 0) {
+        payload_lenght = header->len;
+        std::memcpy(buffer,pkt_data, payload_lenght);
+        return payload_lenght;
+    }
 
     int header_lenght = size_ip + SIZE_ETHERNET;
 
@@ -111,9 +123,9 @@ tk::communication::PacketParser::computeNextPacket(pcap_t* pcapFile,uint8_t* buf
         std::memcpy(buffer,pkt_data + header_lenght, payload_lenght);
 
         //Is Fragment?
-        if(ntohs(ip->ip_len) != (ntohs(udp->uh_ulen)+size_ip)){
-            return defragment(pcapFile,buffer,stamp,payload_lenght,ntohs(ip->ip_len)-size_tcp-size_ip); //TODO: need to test
-        }
+        //if(ntohs(ip->ip_len) != (ntohs(udp->uh_ulen)+size_ip)){
+        //    return defragment(pcapFile,buffer,stamp,payload_lenght,ntohs(ip->ip_len)-size_tcp-size_ip); //TODO: need to test
+        //}
 
         return payload_lenght;
     }

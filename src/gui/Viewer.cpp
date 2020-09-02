@@ -136,7 +136,7 @@ Viewer::init() {
 
 void
 Viewer::add(std::string name, Drawable *data){
-	buffer.add(name, data);
+	buffer.add(name, data, this);
 }
 
 
@@ -1080,7 +1080,7 @@ Viewer::tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float ra
     */
     tkSetColor(tk::gui::color::YELLOW);
     char speedStr[256];
-    sprintf(speedStr, "%.2f", speed/3.6);
+    sprintf(speedStr, "%.2f", speed*3.6);
     tkDrawText(speedStr, tk::common::Vector3<float>{pose.x, pose.y - 0.08f, 0},
                          tk::common::Vector3<float>{0, 0, 0},
                          tk::common::Vector3<float>{0.05f, 0.05f, 0.0f});
@@ -1335,9 +1335,9 @@ Viewer::tkDrawPerceptionPyramid(tk::common::Vector3<float> &pose, float rotation
 }
 
 void
-Viewer::tkDrawLidarCloud(tk::common::Tfpose &tf, Eigen::MatrixXf &points, int nPoints, Eigen::MatrixXf &intensity){
-	glPushMatrix();{
-		tk::gui::Viewer::tkApplyTf(tf);
+Viewer::tkDrawLidarCloud(Eigen::MatrixXf &points, int nPoints, Eigen::MatrixXf &intensity){
+	glPushMatrix();
+    {
 		glPointSize(1.0);
 		glBegin(GL_POINTS);
 		//white

@@ -218,11 +218,26 @@ namespace tk { namespace data {
             return true;
         }
 
+        void onAdd(tk::gui::Viewer *viewer) {
+            std::string name = header.name;
+
+            // draw odom
+            if(!viewer->plotManger->plotExist(name)) {
+                std::cout<<"Add ODOM plot: "<<name<<"\n";
+                viewer->plotManger->addLinePlot(name, tk::gui::randomColor(), 100000, 1);
+            }
+            tk::data::VehicleData::odom_t odom;
+            carOdometry(odom);
+            tk::common::Tfpose tf = tk::common::odom2tf(odom.x, odom.y, odom.yaw);
+            viewer->plotManger->addPoint(name, tk::common::tf2pose(tf));
+        }
+
         void draw(tk::gui::Viewer *viewer){
 
         	// TODO: move to tk::gui::Viewer
 
 			tk::gui::Viewer::tkDrawTf(header.name, header.tf);
+
 			tk::gui::Viewer::tkSetColor(tk::gui::color::AMBER);
 			tk::common::Vector3<float> dim{(float) CAR_DIM_X, (float) CAR_DIM_Y,
 										   (float) CAR_DIM_Z};
@@ -258,11 +273,18 @@ namespace tk { namespace data {
 			float size;
 			pos = tk::common::Vector2<float>{0,-yLim+0.25f};
 			size = 0.2;
-			double speed = this->speedKMH;
+			double speed = this->speed;
 			int gear = actualGear;
 			double rpm = RPM;
-
 			tk::gui::Viewer::tkDrawSpeedometer(pos, speed, size);
+
+            std::string window_name = "Vehicle: " + header.name;
+            ImGui::Begin(window_name.c_str());
+            ImGui::BulletText("Speed\t%lf", speed);
+            ImGui::BulletText("WheelAngle\t%lf", wheelAngle);
+            ImGui::BulletText("Gear\t%d", actualGear);
+            ImGui::BulletText("RPM\t%d", RPM);
+            ImGui::End();
         }
     };
 }

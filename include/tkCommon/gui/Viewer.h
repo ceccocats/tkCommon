@@ -161,7 +161,7 @@ namespace tk { namespace gui {
 
 		virtual void tkDrawPerceptionPyramid(tk::common::Vector3<float> &pose, float rotation, tk::gui::Color_t color, float alpha = 255);
 
-		virtual void tkDrawLidarCloud(tk::common::Tfpose &tf, Eigen::MatrixXf &points, int nPoints, Eigen::MatrixXf &intensity);
+		virtual void tkDrawLidarCloud(Eigen::MatrixXf &points, int nPoints, Eigen::MatrixXf &intensity);
 
         //static void tkDrawLiDARData(tk::data::LidarData *data);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
