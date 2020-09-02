@@ -125,7 +125,9 @@ namespace tk { namespace data {
          */
         friend std::ostream& operator<<(std::ostream& os, const GPSData& m) {
             os << std::setprecision(10) << m.header.stamp<< " Lat/Lon: " << m.lat <<"°/" << m.lon
-               <<"°, Height: "<<m.height<<" Nsats: "<<m.sats<<" quality: "<<m.quality;
+               <<"°, Height: "<<m.height<<" Nsats: "<<m.sats<<" quality: "<<m.quality
+               <<"\n\tgyr: ("<<m.angleRateX<<","<<m.angleRateY<<","<<m.angleRateZ<<") "
+               <<"acc: ("<<m.accX<<","<<m.accY<<","<<m.accZ<<") ";
             return os;
         }
 
