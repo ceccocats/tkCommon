@@ -112,44 +112,22 @@ add_dependencies(tkGUI tkversiongit)
 #-------------------------------------------------------------------------------
 # Build apps
 #-------------------------------------------------------------------------------
-add_executable(tkGUI_simple app/tkGUI_simple.cpp)
-target_link_libraries(tkGUI_simple tkCommon ${GUI_LIBS})
+file(GLOB tkpackage_APPScpp "app/*.cpp")
+foreach(cpp ${tkpackage_APPScpp})
+    get_filename_component(app "${cpp}" NAME_WE)
+    list(APPEND tkpackage_APPS ${app})
+endforeach()
+foreach(app ${tkpackage_APPS})
+    add_executable(${app} "app/${app}.cpp")
+    target_link_libraries(${app} tkCommon tkCommunication ${GUI_LIBS})
+endforeach()
 
-add_executable(tkCommon_cmd app/tkCommon_cmd.cpp)
-target_link_libraries(tkCommon_cmd tkCommon)
-
-add_executable(tkCommon_matio app/tkCommon_matio.cpp)
-target_link_libraries(tkCommon_matio tkCommon)
-
-add_executable(tkCommon_eth_pcap app/tkCommon_eth_pcap.cpp)
-target_link_libraries(tkCommon_eth_pcap tkCommon tkCommunication)
-
-add_executable(tkCommon_pcap_replay app/tkCommon_pcap_replay.cpp)
-target_link_libraries(tkCommon_pcap_replay tkCommon tkCommunication)
-
-add_executable(tkCommon_eth_socket app/tkCommon_eth_socket.cpp)
-target_link_libraries(tkCommon_eth_socket tkCommon tkCommunication)
-
-add_executable(tkCommon_terminal_format app/tkCommon_terminal_format.cpp)
-target_link_libraries(tkCommon_terminal_format)
-
-add_executable(tkCommon_pcap_gui_replay app/tkCommon_pcap_gui_replay.cpp)
-target_link_libraries(tkCommon_pcap_gui_replay tkCommon tkCommunication ${GUI_LIBS})
-
-add_executable(tkCommon_segfault app/tkCommon_segfault.cpp)
-target_link_libraries(tkCommon_segfault tkCommon)
-
-add_executable(tkCommon_geoconv app/tkCommon_geoconv.cpp)
-target_link_libraries(tkCommon_geoconv tkCommon)
-
-add_executable(tkCommon_can app/tkCommon_can.cpp)
-target_link_libraries(tkCommon_can tkCommon tkCommunication)
 
 #-------------------------------------------------------------------------------
 # Install
 #-------------------------------------------------------------------------------
-install(TARGETS tkGUI_simple tkCommon_pcap_replay tkCommon_pcap_gui_replay tkCommon_eth_socket tkCommon_eth_pcap DESTINATION bin )
-install(TARGETS tkCommon tkGUI tkMath tklibDrawText tkCommunication DESTINATION lib)
+#install(TARGETS ${tkpackage_APPS} DESTINATION bin )
+#install(TARGETS tkCommon tkGUI tkMath tklibDrawText tkCommunication DESTINATION lib)
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts/" # source directory
         DESTINATION "bin/"
 )
