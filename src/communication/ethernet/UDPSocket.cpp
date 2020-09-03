@@ -133,7 +133,7 @@ namespace tk { namespace communication {
                 }
                 clsSuc("multicast socket created.\n");
 
-            } if(isBroadcast(ip)) {
+            } else if(isBroadcast(ip)) {
                 int broadcast= 1;
                 int r = setsockopt(this->sock_fd, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast));
                 if (r < 0){
