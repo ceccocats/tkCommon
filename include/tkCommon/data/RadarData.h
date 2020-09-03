@@ -7,7 +7,7 @@
 namespace tk { namespace data {
     static const int RADAR_MAX          = 6;
     static const int RADAR_MAX_PONINTS  = 5000;
-    static const int RADAR_MAX_FEATURES = 7;
+    static const int RADAR_MAX_FEATURES = 8;
 
     /**
      *
@@ -19,7 +19,8 @@ namespace tk { namespace data {
         VELOCITY_VAR   = 3,
         ANGLE_VAR      = 4,
         RCS            = 5,
-        ID             = 6
+        ID             = 6,
+        PROB           = 7
     };
 
     /**
