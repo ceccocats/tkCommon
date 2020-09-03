@@ -441,12 +441,14 @@ inline double toRadians(double x){
     return ((x * M_PI) / 180.0);
 }
 
-inline std::vector<std::string> splitString(const std::string &s, char delim) {
+inline std::vector<std::string> splitString(const std::string &s, char delim, int maxelems = -1) {
     std::vector<std::string> elems;
     std::stringstream ss(s);
     std::string substr;
-    while(std::getline(ss, substr, delim)) {
+    while(std::getline(ss, substr, delim) ) {
         elems.push_back(substr);
+        if(maxelems > 0 && elems.size() >= maxelems)
+            break;
     }
     return elems;
 }
