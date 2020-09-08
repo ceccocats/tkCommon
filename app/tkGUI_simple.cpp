@@ -14,6 +14,8 @@ public:
 
 	tk::gui::Shader glaxis;
 
+	tk::gui::Shader glcubecloud;
+
 	void init(){
 		tk::gui::Viewer::tkLoadOBJ(std::string(TKPROJ_PATH) + "data/levante", carObj);
 		
@@ -39,6 +41,11 @@ public:
 		geometry 	= std::string(TKPROJ_PATH) + "include/tkCommon/gui/shaders/axis/axis.geom";
 		glaxis.init(vertex, fragment, geometry);
 
+		vertex 		= std::string(TKPROJ_PATH) + "include/tkCommon/gui/shaders/cubecloud/cubecloud.vert";
+		fragment 	= std::string(TKPROJ_PATH) + "include/tkCommon/gui/shaders/cubecloud/cubecloud.frag";
+		geometry 	= std::string(TKPROJ_PATH) + "include/tkCommon/gui/shaders/cubecloud/cubecloud.geom";
+		glcubecloud.init(vertex, fragment, geometry);
+
 		cloud.resize(3, 10e6);
 		std::ifstream is("dief_vlp32.ply");
 		float x,y,z;
@@ -62,8 +69,9 @@ public:
 		glm::mat4 modelview;
 		glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
 
-		glpointcloud.use();
-		glpointcloud.setMat4("modelview", modelview);
+		glcubecloud.use();
+		glcubecloud.setMat4("modelview", modelview);
+		glcubecloud.setFloat("size",0.1f);
 
 		unsigned int cloudVAO = 0;
 		unsigned int cloudVBO = 0;
@@ -79,7 +87,7 @@ public:
 		glBindVertexArray(cloudVAO);
 		glDrawArrays(GL_POINTS, 0, cloud.cols());
 		glBindVertexArray(0);
-		glpointcloud.release();
+		glcubecloud.release();
 
 		glDeleteVertexArrays(1, &cloudVAO);
 		glDeleteBuffers(1, &cloudVBO);	
