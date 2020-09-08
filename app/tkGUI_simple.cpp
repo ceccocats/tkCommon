@@ -12,6 +12,8 @@ public:
 
 	tk::gui::Shader glcubes;
 
+	tk::gui::Shader glaxis;
+
 	void init(){
 		tk::gui::Viewer::tkLoadOBJ(std::string(TKPROJ_PATH) + "data/levante", carObj);
 		
@@ -31,6 +33,11 @@ public:
 		fragment 	= std::string(TKPROJ_PATH) + "include/tkCommon/gui/shaders/cubes/cubes.frag";
 		geometry 	= std::string(TKPROJ_PATH) + "include/tkCommon/gui/shaders/cubes/cubes.geom";
 		glcubes.init(vertex, fragment, geometry);
+
+		vertex 		= std::string(TKPROJ_PATH) + "include/tkCommon/gui/shaders/axis/axis.vert";
+		fragment 	= std::string(TKPROJ_PATH) + "include/tkCommon/gui/shaders/axis/axis.frag";
+		geometry 	= std::string(TKPROJ_PATH) + "include/tkCommon/gui/shaders/axis/axis.geom";
+		glaxis.init(vertex, fragment, geometry);
 
 		cloud.resize(3, 10e6);
 		std::ifstream is("dief_vlp32.ply");
@@ -80,6 +87,22 @@ public:
 
 		//cubes
 
+		/*int Ncubes = 100000;
+		float cubes[Ncubes*12];
+		for(int i=0; i<Ncubes; i++) {
+			cubes[12*i +0] = 50* float(rand()%1000) / 1000;
+			cubes[12*i +1] = 50* float(rand()%1000) / 1000;
+			cubes[12*i +2] = 50* float(rand()%1000) / 1000;
+			cubes[12*i +3] = float(rand()%1000) / 1000;
+			cubes[12*i +4] = float(rand()%1000) / 1000;
+			cubes[12*i +5] = float(rand()%1000) / 1000;
+			cubes[12*i +6] = float(rand()%1000) / 1000;
+			cubes[12*i +7] = float(rand()%1000) / 1000;
+			cubes[12*i +8] = float(rand()%1000) / 1000;
+			cubes[12*i +9]  = float(rand()%1000) / 1000;
+			cubes[12*i +10] = float(rand()%1000) / 1000;
+			cubes[12*i +11] = float(rand()%1000) / 1000;
+		}*/
 
 		float cube[] = {
 			2.0f,	// x center
@@ -127,6 +150,17 @@ public:
 		glDeleteVertexArrays(1, &cubesVAO);
 		glDeleteBuffers(1, &cubesVBO);
 		glcubes.release();	
+
+
+		//axis
+		glaxis.use();
+		glaxis.setMat4("modelview", modelview);
+		glaxis.setInt("width",glutGet(GLUT_SCREEN_WIDTH));
+		glaxis.setInt("height",glutGet(GLUT_SCREEN_HEIGHT));
+		glLineWidth(3.0);
+		glDrawArrays(GL_POINTS, 0, 1);
+		glLineWidth(1.0);
+		glaxis.release();
 	}
 
 	void draw2D(tk::gui::Viewer *viewer){

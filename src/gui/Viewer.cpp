@@ -122,6 +122,8 @@ Viewer::init() {
     //glDepthFunc(GL_GEQUAL);
     //glEnable(GL_LINE_SMOOTH);
 
+    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+
     std::string msg =   std::string{"OPENGL running on:"} + 
                         std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))) + " -- " +
                         std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))) + "\n";
@@ -153,7 +155,7 @@ Viewer::draw() {
     glPushMatrix();
     tk::common::Vector3<float> p = Viewer::mouseView.getWorldPos();
     tkApplyTf(tk::common::odom2tf(p.x, p.y, 0));
-    tkDrawAxis();
+    //tkDrawAxis();
     glPopMatrix();
 }
 
@@ -1183,7 +1185,7 @@ Viewer::tkDrawTf(std::string name, tk::common::Tfpose tf) {
                                 tk::common::Vector3<float>{0.01,0.01,0},
                                 tk::common::Vector3<float>{M_PI/2,0,0},
                                 tk::common::Vector3<float>{0.08,0.08,0});
-    tk::gui::Viewer::tkDrawAxis(0.1);
+    //tk::gui::Viewer::tkDrawAxis(0.1);
     glPopMatrix();
 }
 

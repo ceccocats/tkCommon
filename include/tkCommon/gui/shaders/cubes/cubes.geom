@@ -26,7 +26,7 @@ in VS_OUT {
 void main() {    
 
     fColor      = gs_in[0].color;
-    vec3 center = gl_in[0].gl_Position.xyz;
+    vec4 center = vec4( gl_in[0].gl_Position.xyz, 1.0f);
     vec3 size   = gs_in[0].size/2;
     mat4 rot    = gs_in[0].rotation;
 
@@ -35,23 +35,27 @@ void main() {
     //face-up
     /////////////////////////////////////////////////////////////////
     //1' vertex
-    vertex = vec4(center + vec3(size.x, -size.y, size.z), 1.0f);
-    vertex = rot * vertex;
+    vertex = vec4(vec3(size.x, -size.y, size.z), 1.0f);
+    vertex = vertex * rot;
+    vertex = vertex + center;
     gl_Position = modelview * vertex;
     EmitVertex();
     //2' vertex
-    vertex = vec4(center + vec3(size.x, size.y, size.z), 1.0f);
-    vertex = rot * vertex;
+    vertex = vec4(vec3(size.x, size.y, size.z), 1.0f);
+    vertex = vertex * rot;
+    vertex = vertex + center;
     gl_Position = modelview * vertex;
     EmitVertex();
     //3' vertex
-    vertex = vec4(center + vec3(-size.x, -size.y, size.z), 1.0f);
-    vertex = rot * vertex;
+    vertex = vec4(vec3(-size.x, -size.y, size.z), 1.0f);
+    vertex = vertex * rot;
+    vertex = vertex + center;
     gl_Position = modelview * vertex;
     EmitVertex();
     //4' vertex
-    vertex = vec4(center + vec3(-size.x, size.y, size.z), 1.0f);
-    vertex = rot * vertex;
+    vertex = vec4(vec3(-size.x, size.y, size.z), 1.0f);
+    vertex = vertex * rot;
+    vertex = vertex + center;
     gl_Position = modelview * vertex;
     EmitVertex();
     /////////////////////////////////////////////////////////////////
@@ -59,23 +63,27 @@ void main() {
     //face-down
     /////////////////////////////////////////////////////////////////
     //7' vertex
-    vertex = vec4(center + vec3(-size.x, -size.y, -size.z), 1.0f);
-    vertex = rot * vertex;
+    vertex = vec4(vec3(-size.x, -size.y, -size.z), 1.0f);
+    vertex = vertex * rot;
+    vertex = vertex + center;
     gl_Position = modelview * vertex;
     EmitVertex();
     //8' vertex
-    vertex = vec4(center + vec3(-size.x, size.y, -size.z), 1.0f);
-    vertex = rot * vertex;
+    vertex = vec4(vec3(-size.x, size.y, -size.z), 1.0f);
+    vertex = vertex * rot;
+    vertex = vertex + center;
     gl_Position = modelview * vertex;
     EmitVertex();
     //5' vertex
-    vertex = vec4(center + vec3(size.x, -size.y, -size.z), 1.0f);
-    vertex = rot * vertex;
+    vertex = vec4(vec3(size.x, -size.y, -size.z), 1.0f);
+    vertex = vertex * rot;
+    vertex = vertex + center;
     gl_Position = modelview * vertex;
     EmitVertex();
     //6' vertex
-    vertex = vec4(center + vec3(size.x, size.y, -size.z), 1.0f);
-    vertex = rot * vertex;
+    vertex = vec4(vec3(size.x, size.y, -size.z), 1.0f);
+    vertex = vertex * rot;
+    vertex = vertex + center;
     gl_Position = modelview * vertex;
     EmitVertex();
     /////////////////////////////////////////////////////////////////
@@ -85,23 +93,27 @@ void main() {
     //face-left
     /////////////////////////////////////////////////////////////////
      //3' vertex
-    vertex = vec4(center + vec3(-size.x, -size.y, size.z), 1.0f);
-    vertex = rot * vertex;
+    vertex = vec4(vec3(-size.x, -size.y, size.z), 1.0f);
+    vertex = vertex * rot;
+    vertex = vertex + center;
     gl_Position = modelview * vertex;
     EmitVertex();
     //7' vertex
-    vertex = vec4(center + vec3(-size.x, -size.y, -size.z), 1.0f);
-    vertex = rot * vertex;
+    vertex = vec4(vec3(-size.x, -size.y, -size.z), 1.0f);
+    vertex = vertex * rot;
+    vertex = vertex + center;
     gl_Position = modelview * vertex;
     EmitVertex();
     //1' vertex
-    vertex = vec4(center + vec3(size.x, -size.y, size.z), 1.0f);
-    vertex = rot * vertex;
+    vertex = vec4(vec3(size.x, -size.y, size.z), 1.0f);
+    vertex = vertex * rot;
+    vertex = vertex + center;
     gl_Position = modelview * vertex;
     EmitVertex();
     //5' vertex
-    vertex = vec4(center + vec3(size.x, -size.y, -size.z), 1.0f);
-    vertex = rot * vertex;
+    vertex = vec4(vec3(size.x, -size.y, -size.z), 1.0f);
+    vertex = vertex * rot;
+    vertex = vertex + center;
     gl_Position = modelview * vertex;
     EmitVertex();
     /////////////////////////////////////////////////////////////////
@@ -109,23 +121,27 @@ void main() {
     //face-left
     /////////////////////////////////////////////////////////////////
     //2' vertex
-    vertex = vec4(center + vec3(size.x, size.y, size.z), 1.0f);
-    vertex = rot * vertex;
+    vertex = vec4(vec3(size.x, size.y, size.z), 1.0f);
+    vertex = vertex * rot;
+    vertex = vertex + center;
     gl_Position = modelview * vertex;
     EmitVertex();
     //6' vertex
-    vertex = vec4(center + vec3(size.x, size.y, -size.z), 1.0f);
-    vertex = rot * vertex;
+    vertex = vec4(vec3(size.x, size.y, -size.z), 1.0f);
+    vertex = vertex * rot;
+    vertex = vertex + center;
     gl_Position = modelview * vertex;
     EmitVertex();
     //4' vertex
-    vertex = vec4(center + vec3(-size.x, size.y, size.z), 1.0f);
-    vertex = rot * vertex;
+    vertex = vec4(vec3(-size.x, size.y, size.z), 1.0f);
+    vertex = vertex * rot;
+    vertex = vertex + center;
     gl_Position = modelview * vertex;
     EmitVertex();
     //8' vertex
-    vertex = vec4(center + vec3(-size.x, size.y, -size.z), 1.0f);
-    vertex = rot * vertex;
+    vertex = vec4(vec3(-size.x, size.y, -size.z), 1.0f);
+    vertex = vertex * rot;
+    vertex = vertex + center;
     gl_Position = modelview * vertex;
     EmitVertex();
     /////////////////////////////////////////////////////////////////
