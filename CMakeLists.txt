@@ -34,6 +34,7 @@ set(GUI_LIBS
     ${GLFW3_LIBRARY}
     glut
     ${FREETYPE_LIBRARIES}
+    Xxf86vm
 )
 
 
