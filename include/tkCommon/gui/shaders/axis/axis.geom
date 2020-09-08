@@ -20,7 +20,7 @@ void main() {
     rotation[3] = vec4(0.0f,            0.0f,               0.0f,              1.0f);
     
     // x-axis
-    fColor      = vec3(1.0f, 0.2f, 0.2f);
+    fColor      = vec3(1.0f, 0.3f, 0.3f);
     gl_Position = center;
     EmitVertex();
     gl_Position = (rotation * vec4(lenght, 0.0f, 0.0f, 0.0f)) + center;
@@ -29,7 +29,7 @@ void main() {
     EndPrimitive();
 
     // y-axis
-    fColor      = vec3(0.2f, 1.0f, 0.2f);
+    fColor      = vec3(0.3f, 1.0f, 0.3f);
     gl_Position = center;
     EmitVertex();
     gl_Position = (rotation * vec4(0.0f, lenght, 0.0f, 0.0f)) + center;
@@ -38,7 +38,7 @@ void main() {
     EndPrimitive();
 
     // z-axis
-    fColor      = vec3(0.2f, 0.2f, 1.0f);
+    fColor      = vec3(0.3f, 0.3f, 1.0f);
     gl_Position = center;
     EmitVertex();
     gl_Position = (rotation * vec4(0.0f, 0.0f, lenght, 0.0f)) + center;

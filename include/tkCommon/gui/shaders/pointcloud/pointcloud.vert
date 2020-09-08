@@ -4,8 +4,6 @@ layout (location = 0) in vec4 point;
 
 uniform mat4 modelview;
 
-out vec4 color;
-
 void main(){
 
 	// coordinates
