@@ -15,9 +15,9 @@ void main()
     vs_out.size     = size;
     vs_out.color    = color;
     vs_out.rotation = mat4(
-        cos(rot.x)*cos(rot.y),  cos(rot.x)*sin(rot.y)*sin(rot.z) - sin(rot.x)*cos(rot.z),   cos(rot.x)*sin(rot.y)*cos(rot.z) + sin(rot.x)*sin(rot.z),   0,
-        sin(rot.x)*cos(rot.y),  sin(rot.x)*sin(rot.y)*sin(rot.z) + cos(rot.x)*cos(rot.z),   sin(rot.x)*sin(rot.y)*cos(rot.z) - cos(rot.x)*sin(rot.z),   0,
-        -sin(rot.y),            cos(rot.y)*sin(rot.z),                                      cos(rot.y)*cos(rot.z),                                      0,
+        cos(rot.z)*cos(rot.y),  cos(rot.z)*sin(rot.y)*sin(rot.x) - sin(rot.z)*cos(rot.x),   cos(rot.z)*sin(rot.y)*cos(rot.x) + sin(rot.z)*sin(rot.x),   0,
+        sin(rot.z)*cos(rot.y),  sin(rot.z)*sin(rot.y)*sin(rot.x) + cos(rot.z)*cos(rot.x),   sin(rot.z)*sin(rot.y)*cos(rot.x) - cos(rot.z)*sin(rot.x),   0,
+        -sin(rot.y),            cos(rot.y)*sin(rot.x),                                      cos(rot.y)*cos(rot.x),                                      0,
         0,                      0,                                                          0,                                                          1                               
     );
     gl_Position     = vec4(center.xyz, 1.0);

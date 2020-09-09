@@ -5,8 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/string_cast.hpp>
+//#define GLM_ENABLE_EXPERIMENTAL
+//#include <glm/gtx/string_cast.hpp>
 
 
 #include <string>
@@ -30,36 +30,24 @@ public:
         std::string vertexCode;
         std::string fragmentCode;
         std::string geometryCode;
-        std::ifstream vShaderFile;
-        std::ifstream fShaderFile;
-        std::ifstream gShaderFile;
-        // ensure ifstream objects can throw exceptions:
-        vShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-        fShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-        gShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
         try 
         {
-            // open files
-            vShaderFile.open(vertexPath.c_str());
-            fShaderFile.open(fragmentPath.c_str());
-            std::stringstream vShaderStream, fShaderStream;
-            // read file's buffer contents into streams
-            vShaderStream << vShaderFile.rdbuf();
-            fShaderStream << fShaderFile.rdbuf();		
-            // close file handlers
-            vShaderFile.close();
-            fShaderFile.close();
-            // convert stream into string
-            vertexCode = vShaderStream.str();
-            fragmentCode = fShaderStream.str();			
-            // if geometry shader path is present, also load a geometry shader
+            vertexCode = load(vertexPath);
+            if(vertexCode == ""){
+                return false;
+            }
+
+            fragmentCode = load(fragmentPath);
+            if(fragmentCode == ""){
+                return false;
+            }
+
             if(!geometryPath.empty())
             {
-                gShaderFile.open(geometryPath.c_str());
-                std::stringstream gShaderStream;
-                gShaderStream << gShaderFile.rdbuf();
-                gShaderFile.close();
-                geometryCode = gShaderStream.str();
+                geometryCode = load(geometryPath);
+                if(geometryCode == ""){
+                    return false;
+                }
             }
         }
         catch (std::ifstream::failure& e)
@@ -179,6 +167,8 @@ public:
     }
 
 private:
+
+    // method for check compile error
     void checkCompileErrors(GLuint shader, std::string type, std::string filename)
     {
         GLint success;
@@ -202,6 +192,43 @@ private:
             }
         }
     }
+
+    //method for load source shader code and processing include directives
+    std::string load(std::string path)
+	{
+		std::string     includeIndentifier  = "#include ";
+		std::string     fullSourceCode      = "";
+		std::ifstream   file(path);
+        std::string     lineBuffer;
+
+		if (!file.is_open())
+		{
+            clsErr("Error opening file" + path + "\n");
+			return "";
+		}
+
+		while (std::getline(file, lineBuffer))
+		{
+			if (lineBuffer.find(includeIndentifier) != lineBuffer.npos)
+			{
+				lineBuffer.erase(0, includeIndentifier.size());
+
+                //removing "" from include
+                lineBuffer = lineBuffer.substr(1,lineBuffer.size()-2);
+
+                size_t found = path.find_last_of("/\\");
+				lineBuffer.insert(0, path.substr(0, found + 1));
+
+				fullSourceCode += load(lineBuffer);
+
+				continue;
+			}
+			fullSourceCode += lineBuffer + '\n';
+		}
+		file.close();
+
+		return fullSourceCode;
+	}
 };
 
 }}

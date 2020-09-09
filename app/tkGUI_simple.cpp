@@ -65,6 +65,8 @@ public:
 
 	void draw(tk::gui::Viewer *viewer){
 
+		glm::vec3 lightPos(20.0f, 20.0f, 20.0f);
+
 		//get modelview matrix
 		glm::mat4 modelview;
 		glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
@@ -112,19 +114,35 @@ public:
 			cubes[12*i +11] = float(rand()%1000) / 1000;
 		}*/
 
+		static float a = 0;
+		a += 1;
+
 		float cube[] = {
 			2.0f,	// x center
 			2.0f,	// y center
 			2.0f,	// z center
-			0.2f,		// x size
-			0.2f,		// y size
+			4.2f,		// x size
+			4.2f,		// y size
+			4.0f,		// z size
+			(float)toRadians(a),	// roll
+			(float)toRadians(a),	// pitch
+			(float)toRadians(a),	// yaw
+			1.0f,	//red
+			0.5f,	//green
+			0.31f,	//blue
+
+			lightPos.x,	// x center
+			lightPos.y,	// y center
+			lightPos.z,	// z center
+			1.0f,		// x size
+			1.0f,		// y size
 			1.0f,		// z size
-			(float)toRadians(45.0f),	// yaw
-			(float)toRadians(45.0f),	// pitch
-			(float)toRadians(90.0f),	// roll
+			(float)toRadians(0.0f),	// roll
+			(float)toRadians(0.0f),	// pitch
+			(float)toRadians(0.0f),	// yaw
 			1.0f,	//red
 			1.0f,	//green
-			0.0f	//blue
+			1.0f	//blue
 		};
 
 
@@ -150,9 +168,16 @@ public:
 
 		glcubes.use();
 		glcubes.setMat4("modelview", modelview);
+		glcubes.setVec3("lightPos", lightPos);
+
+		tk::common::Vector3<float> pos = viewer->mouseView.getWorldPos();
+
+		//glm::vec3 camera(pos.x,pos.y,pos.z);
+
+		//glcubes.setVec3("viewPos", camera);
 
 		glBindVertexArray(cubesVAO);
-        glDrawArrays(GL_POINTS, 0, 1);
+        glDrawArrays(GL_POINTS, 0, 2);
 		glBindVertexArray(0);
 
 		glDeleteVertexArrays(1, &cubesVAO);
