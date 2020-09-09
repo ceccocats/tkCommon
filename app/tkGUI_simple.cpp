@@ -16,6 +16,8 @@ public:
 
 	tk::gui::Shader glcubecloud;
 
+	tk::gui::Shader gllightcubecloud;
+
 	void init(){
 		tk::gui::Viewer::tkLoadOBJ(std::string(TKPROJ_PATH) + "data/levante", carObj);
 		
@@ -46,6 +48,11 @@ public:
 		geometry 	= std::string(TKPROJ_PATH) + "include/tkCommon/gui/shaders/cubecloud/cubecloud.geom";
 		glcubecloud.init(vertex, fragment, geometry);
 
+		vertex 		= std::string(TKPROJ_PATH) + "include/tkCommon/gui/shaders/lightcubecloud/lightcubecloud.vert";
+		fragment 	= std::string(TKPROJ_PATH) + "include/tkCommon/gui/shaders/lightcubecloud/lightcubecloud.frag";
+		geometry 	= std::string(TKPROJ_PATH) + "include/tkCommon/gui/shaders/lightcubecloud/lightcubecloud.geom";
+		gllightcubecloud.init(vertex, fragment, geometry);
+
 		cloud.resize(3, 10e6);
 		std::ifstream is("dief_vlp32.ply");
 		float x,y,z;
@@ -65,15 +72,16 @@ public:
 
 	void draw(tk::gui::Viewer *viewer){
 
-		glm::vec3 lightPos(20.0f, 20.0f, 20.0f);
+		glm::vec3 lightPos(0.0f, 0.0f, 20.0f);
 
 		//get modelview matrix
 		glm::mat4 modelview;
 		glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
 
-		glcubecloud.use();
-		glcubecloud.setMat4("modelview", modelview);
-		glcubecloud.setFloat("size",0.1f);
+		gllightcubecloud.use();
+		gllightcubecloud.setMat4("modelview", modelview);
+		gllightcubecloud.setFloat("size",0.03f);
+		gllightcubecloud.setVec3("lightPos",lightPos);
 
 		unsigned int cloudVAO = 0;
 		unsigned int cloudVBO = 0;
@@ -89,7 +97,7 @@ public:
 		glBindVertexArray(cloudVAO);
 		glDrawArrays(GL_POINTS, 0, cloud.cols());
 		glBindVertexArray(0);
-		glcubecloud.release();
+		gllightcubecloud.release();
 
 		glDeleteVertexArrays(1, &cloudVAO);
 		glDeleteBuffers(1, &cloudVBO);	
@@ -120,7 +128,7 @@ public:
 		float cube[] = {
 			2.0f,	// x center
 			2.0f,	// y center
-			2.0f,	// z center
+			7.0f,	// z center
 			4.2f,		// x size
 			4.2f,		// y size
 			4.0f,		// z size
