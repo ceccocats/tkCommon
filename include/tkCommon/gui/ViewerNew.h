@@ -140,7 +140,10 @@ namespace tk { namespace gui {
             aspectRatio = (float)width / (float)height;
             xLim = aspectRatio;
             yLim = 1.0;
-            glViewport(0, 0, width, height);
+
+            camera.setViewPort(0, 0, width, height);
+            glViewport(camera.viewport[0], camera.viewport[1], 
+                       camera.viewport[2], camera.viewport[3]);
 
             glMatrixMode( GL_PROJECTION );
             glLoadIdentity();
@@ -150,7 +153,6 @@ namespace tk { namespace gui {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glClearColor(float(background.r)/255, float(background.g)/255, float(background.b)/255, float(background.a)/255);
 
-            camera.setWindowAspect(aspectRatio);
             glPushMatrix();
 
             // apply camera matrix
