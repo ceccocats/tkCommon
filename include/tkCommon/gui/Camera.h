@@ -167,10 +167,11 @@ glm::vec3 Camera::project(glm::vec3 obj) {
 }
 
 glm::vec3 Camera::unprojectPlane(glm::vec2 pos) {
+    pos.y = viewport[3] - pos.y;
     const glm::vec3 A = glm::unProject( 
-        glm::vec3(pos.x, -pos.y, 0.0), modelView, projection, viewport);
+        glm::vec3(pos.x, pos.y, 0.0), modelView, projection, viewport);
     const glm::vec3 B = glm::unProject( 
-        glm::vec3(pos.x, -pos.y, 1.0), modelView, projection, viewport);
+        glm::vec3(pos.x, pos.y, 1.0), modelView, projection, viewport);
 
     float m1 = (A.z - B.z) / (A.x - B.x); 
     float q1 = (A.z - m1*A.x); 

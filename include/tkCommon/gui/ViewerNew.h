@@ -32,7 +32,7 @@ namespace tk { namespace gui {
         float  aspectRatio = 1;
         float  xLim = 1.0; /**< 2d x coord screen limit (1.0 if quad) */  
         float  yLim = 1.0; /**< 2d y coord screen limit (fixed to 1.0) */
-        double dt = 1.0/30;
+        double dt = 1.0/60;
         bool   running = true;
 
 		DrawMap drawBuffer;
@@ -99,6 +99,22 @@ namespace tk { namespace gui {
         glutInit(&foo, (char**)bar);
 
 
+        //ImGUI
+        {
+            // Setup Dear ImGui context
+            IMGUI_CHECKVERSION();
+            ImGui::CreateContext();
+            ImGuiIO& io = ImGui::GetIO(); (void)io;
+            // Setup Dear ImGui style
+            ImGui::StyleColorsDark();
+            //ImGui::StyleColorsClassic();
+
+            // Setup Platform/Renderer bindings
+            ImGui_ImplGlfw_InitForOpenGL(window, true);
+            ImGui_ImplOpenGL3_Init(glsl_version);
+        }
+
+
         // OpenGL confs
         glEnable(GL_DEPTH_TEST);
         //glDisable(GL_CULL_FACE);        
@@ -126,6 +142,19 @@ namespace tk { namespace gui {
 
     void ViewerNew::draw() {
         drawBuffer.draw(this);
+
+        ImGuiIO& io = ImGui::GetIO();
+        ImGui::Begin("Viewer");
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        ImGui::Text("window size: %d x %d", width, height);
+        ImGui::Text("window ratio: %f", aspectRatio);
+        ImGui::Text("window lim: (%f, %f)", xLim, yLim);
+        ImGui::Text("Drawables (%d)", int(drawBuffer.map.size()));
+        std::map<std::string,Drawable*>::iterator it; 
+        for(it = drawBuffer.map.begin(); it!=drawBuffer.map.end(); ++it){
+            ImGui::Checkbox(it->first.c_str(), &it->second->enabled); 
+        }
+        ImGui::End();
     }
 
     void ViewerNew::run() {
@@ -159,7 +188,20 @@ namespace tk { namespace gui {
             glMultMatrixf(glm::value_ptr(camera.projection));
             glMultMatrixf(glm::value_ptr(camera.modelView));
             
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+            camera.mouseOnGUI = ImGui::IsMouseHoveringAnyWindow();
+
+
+            // just for debug
+            glm::vec3 pp = camera.unprojectPlane({camera.mousePos.x,camera.mousePos.y});
+            tk::gui::Viewer::tkDrawCube({pp.x, pp.y, pp.z}, {0.5, 0.5, 0.05});
+            
             draw();
+
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
             glPopMatrix();
 
@@ -173,6 +215,10 @@ namespace tk { namespace gui {
             rate.wait(false);
         }
 
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();  
+        ImGui::DestroyContext();
+        
         glfwDestroyWindow(window);
         glfwTerminate();
     }
