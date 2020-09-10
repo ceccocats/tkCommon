@@ -432,7 +432,6 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
 
 
             //std::cout<<"mat: "<<loader.LoadedMeshes[o].MeshMaterial.name<<" diffuse: "<<obj.colors[o]<<"\n";
-            
             obj.triangles[o] = Eigen::MatrixXf(8, indices.size());
             for(int i=0; i<indices.size(); i++) {
                 int idx = indices[i];
