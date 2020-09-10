@@ -1,7 +1,8 @@
 #include "tkCommon/gui/tkBufferGl.h"
 
+namespace tk { namespace gui {
 template <>
-void tk::gui::tkBufferGl<int>::setVertexAttrib(){
+void tkBufferGl<int>::setVertexAttrib(){
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -21,7 +22,7 @@ void tk::gui::tkBufferGl<int>::setVertexAttrib(){
 }
 
 template <>
-void tk::gui::tkBufferGl<float>::setVertexAttrib(){
+void tkBufferGl<float>::setVertexAttrib(){
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -41,7 +42,7 @@ void tk::gui::tkBufferGl<float>::setVertexAttrib(){
 }
 
 template <>
-void tk::gui::tkBufferGl<double>::setVertexAttrib(){
+void tkBufferGl<double>::setVertexAttrib(){
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -59,3 +60,5 @@ void tk::gui::tkBufferGl<double>::setVertexAttrib(){
     }
     glBindVertexArray(0);
 }
+
+}}
