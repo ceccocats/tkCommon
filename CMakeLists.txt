@@ -35,6 +35,7 @@ set(GUI_LIBS
     glut
     ${FREETYPE_LIBRARIES}
     Xxf86vm
+    X11
 )
 
 
@@ -115,6 +116,9 @@ add_dependencies(tkGUI tkversiongit)
 #-------------------------------------------------------------------------------
 add_executable(tkGUI_simple app/tkGUI_simple.cpp)
 target_link_libraries(tkGUI_simple tkCommon ${GUI_LIBS})
+
+add_executable(tkGUI_new app/tkGUI_new.cpp)
+target_link_libraries(tkGUI_new tkCommon ${GUI_LIBS})
 
 add_executable(tkCommon_cmd app/tkCommon_cmd.cpp)
 target_link_libraries(tkCommon_cmd tkCommon)
