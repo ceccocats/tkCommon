@@ -10,7 +10,6 @@
 #include "tkCommon/common.h"
 #include "tkCommon/gui/Viewer.h"
 #include "tkCommon/gui/Drawable.h"
-#include "tkCommon/gui/Shader.h"
 #include "tkCommon/gui/Camera.h"
 #include "tkCommon/gui/Color.h"
 #include "tkCommon/gui/lodepng.h"
@@ -89,8 +88,18 @@ namespace tk { namespace gui {
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1);
 
+        // Initialize OpenGL loader
+        bool err = glewInit() != GLEW_OK;
+        if (err) {
+            tk::tformat::printErr("Viewer", "Failed to initialize OpenGL loader!\n");
+            exit(-1);
+        }
+        int foo = 1;
+        const char* bar[1] = {" "}; 
+        glutInit(&foo, (char**)bar);
+
+
         // OpenGL confs
-        glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
         glEnable(GL_DEPTH_TEST);
         //glDisable(GL_CULL_FACE);        
         //glDepthFunc(GL_GEQUAL);
@@ -99,6 +108,7 @@ namespace tk { namespace gui {
         //glEnable(GL_BLEND);
         //glEnable(GL_ALPHA_TEST);
         //glDepthMask(GL_FALSE); // make the depth buffer read-only
+        glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
         
         // print OpenGL status
         std::string msg = std::string{"OPENGL running on:"} + 
