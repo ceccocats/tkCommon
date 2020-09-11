@@ -120,8 +120,8 @@ namespace tk { namespace gui {
         //glDisable(GL_CULL_FACE);        
         //glDepthFunc(GL_GEQUAL);
         //glEnable(GL_LINE_SMOOTH);
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_BLEND);
         //glEnable(GL_ALPHA_TEST);
         //glDepthMask(GL_FALSE); // make the depth buffer read-only
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);

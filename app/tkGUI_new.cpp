@@ -2,6 +2,7 @@
 #include "tkCommon/gui/tkShader.h"
 #include "tkCommon/gui/tkBufferGl.h"
 #include "tkCommon/gui/components/axis/axis.h"
+#include "tkCommon/gui/components/grid/grid.h"
 #include <thread>
 #include <signal.h>
 
@@ -11,6 +12,7 @@ tk::gui::ViewerNew* tk::gui::ViewerNew::instance = nullptr;
 class Scene : public tk::gui::Drawable {
 public:
 	tk::gui::components::axis axis;
+	tk::gui::components::grid grid;
 
 	tk::gui::Viewer::object3D_t carObj;
 	tk::gui::tkShader		mesh;
@@ -50,7 +52,8 @@ public:
 		std::string geometry 	= std::string(TKPROJ_PATH) + "include/tkCommon/gui/components/mesh/mesh.geom";
 		mesh.init(vertex, fragment, geometry);
 
-		axis.init();	
+		axis.init();
+		grid.init();	
 	}
 
 	void draw(tk::gui::Viewer *viewer){
@@ -59,6 +62,9 @@ public:
 
 		//axis
 		axis.draw();
+
+		// 3d grid
+		grid.draw();
 
 		glm::mat4 modelview;
 		glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview));
