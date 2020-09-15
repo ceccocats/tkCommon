@@ -85,6 +85,11 @@ target_link_libraries(tkCommunication pcap)
 
 add_library(tkMath SHARED src/math/CSpline.cpp src/math/CSpline2D.cpp src/math/CSpline3D.cpp)
 
+add_library(tkJoystick SHARED 
+    src/joystick/Joystick.cpp
+    src/joystick/gamepad/gamepad.cpp
+)
+target_link_libraries(tkJoystick udev)
 
 #-------------------------------------------------------------------------------
 # GIT version autoupdate
@@ -119,7 +124,7 @@ foreach(cpp ${tkpackage_APPScpp})
 endforeach()
 foreach(app ${tkpackage_APPS})
     add_executable(${app} "app/${app}.cpp")
-    target_link_libraries(${app} tkCommon tkCommunication ${GUI_LIBS})
+    target_link_libraries(${app} tkCommon tkCommunication tkJoystick ${GUI_LIBS})
 endforeach()
 
 
