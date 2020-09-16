@@ -3,6 +3,7 @@
 #include "tkCommon/gui/tkBufferGl.h"
 #include "tkCommon/gui/components/axis/axis.h"
 #include "tkCommon/gui/components/grid/grid.h"
+#include "tkCommon/gui/components/mesh/mesh.h"
 #include <thread>
 #include <signal.h>
 
@@ -13,22 +14,18 @@ class Scene : public tk::gui::Drawable {
 public:
 	tk::gui::components::axis axis;
 	tk::gui::components::grid grid;
+	tk::gui::components::mesh mesh;
 
 	tk::gui::Viewer::object3D_t carObj;
-	tk::gui::tkShader		mesh;
+	//tk::gui::tkShader		mesh;
 	static const int levanteMesh = 16;
 	tk::gui::tkBufferGl<float>	carbuffer[levanteMesh];
 
+
+	tk::gui::tkBufferGl<float>	test;
+
 	void init(){
 		tk::gui::Viewer::tkLoadOBJ(std::string(TKPROJ_PATH) + "data/levante", carObj);
-
-		std::vector<tk::gui::vertexAttribs_t> att;
-		att.push_back({3,18,0});
-		att.push_back({3,18,3});
-		att.push_back({3,18,6});
-		att.push_back({3,18,9});
-		att.push_back({3,18,12});
-		att.push_back({3,18,15});
 
 		float* vec = new float[250000 * 6];
 		for(int m = 0; m < carObj.triangles.size(); m++){
@@ -44,16 +41,11 @@ public:
 			}
 			carbuffer[m].init();
 			carbuffer[m].setData(vec,n*6);
-			carbuffer[m].pushVectorVertex(att);
-			carbuffer[m].setVertexAttrib();
 		}
-		std::string vertex 		= std::string(TKPROJ_PATH) + "include/tkCommon/gui/components/mesh/mesh.vert";
-		std::string fragment 	= std::string(TKPROJ_PATH) + "include/tkCommon/gui/components/mesh/mesh.frag";
-		std::string geometry 	= std::string(TKPROJ_PATH) + "include/tkCommon/gui/components/mesh/mesh.geom";
-		mesh.init(vertex, fragment, geometry);
 
 		axis.init();
-		grid.init();	
+		grid.init();
+		mesh.init();
 	}
 
 	void draw(tk::gui::Viewer *viewer){
@@ -66,21 +58,11 @@ public:
 		// 3d grid
 		grid.draw();
 
-		glm::mat4 modelview;
-		glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview));
-
-		mesh.use();
-		mesh.setMat4("modelview", modelview);
-		mesh.setVec3("lightPos",lightPos);
+		//draw levante
 		for(int m = 0; m < levanteMesh; m++){
-			glm::vec3 color(carObj.colors[m].x, carObj.colors[m].y, carObj.colors[m].z);
-			mesh.setVec3("color",color);
-			carbuffer[m].use();
-			glDrawArrays(GL_POINTS, 0, carObj.triangles[m].cols());
-			carbuffer[m].unuse();
-
+			tk::gui::Color_t color= tk::gui::color4f(carObj.colors[m].x, carObj.colors[m].y, carObj.colors[m].z, 1);
+			mesh.draw(&carbuffer[m], carObj.triangles[m].cols(), lightPos, color);
 		}
-		mesh.unuse();
 	}
 
 	void draw2D(tk::gui::Viewer *viewer){

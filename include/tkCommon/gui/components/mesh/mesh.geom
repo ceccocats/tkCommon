@@ -3,11 +3,9 @@ layout (points) in;
 layout (triangle_strip, max_vertices = 3) out;
 
 uniform mat4 modelview;
-uniform vec3 color;
 
 out vec3 FragPos;
 out vec3 Normal;
-out vec4 objectColor;
 
 in VS_OUT {
     vec3 point1;
@@ -26,8 +24,6 @@ void main() {
     vec3 normal2    = gs_in[0].normal2;
     vec4 point3     = vec4(gs_in[0].point3, 1.0);
     vec3 normal3    = gs_in[0].normal3;
-
-    objectColor = vec4(color.xyz, 1.0);
 
     //1' vertex
     gl_Position = modelview * point1;

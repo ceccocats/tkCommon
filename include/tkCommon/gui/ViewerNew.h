@@ -84,7 +84,7 @@ namespace tk { namespace gui {
         glfwSetScrollCallback(window, scroll_callback);
         glfwSetCursorPosCallback(window, cursor_position_callback);
         glfwSetMouseButtonCallback(window, mouse_button_callback);
-        //glfwSetKeyCallback(window, keyCallback);
+        glfwSetKeyCallback(window, keyCallback);
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1);
 
@@ -193,7 +193,6 @@ namespace tk { namespace gui {
             ImGui::NewFrame();
             camera.mouseOnGUI = ImGui::IsMouseHoveringAnyWindow();
 
-
             // just for debug
             glm::vec3 pp = camera.unprojectPlane({camera.mousePos.x,camera.mousePos.y});
             tk::gui::Viewer::tkDrawCube({pp.x, pp.y, pp.z}, {0.5, 0.5, 0.05});
@@ -254,6 +253,17 @@ namespace tk { namespace gui {
             ViewerNew::instance->camera.mouseDown(button, xpos, ypos);
         if (action == GLFW_RELEASE)
             ViewerNew::instance->camera.mouseUp(button, xpos, ypos);
+    }
+
+    void ViewerNew::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods){
+
+        if (key == GLFW_KEY_ESCAPE){
+            glfwSetWindowShouldClose(window, true); 	
+        }
+
+        if(key == GLFW_KEY_R){
+            ViewerNew::instance->camera.init();
+        }
     }
 }}
 
