@@ -27,7 +27,7 @@ class MyViewer : public tk::gui::Viewer {
                                       "A:     set steer zero\n" +
                                       "B:     reset steer\n"    +
                                       "X:     disable steer\n";
-        tkDrawText(str, {-xLim+0.05, yLim-0.1, 0.01}, {0,0,0}, {0.05, 0.05, 0.05});
+        tkDrawText(str, {-xLim+0.05f, yLim-0.1f, 0.01f}, {0.0f,0.0f,0.0f}, {0.05f, 0.05f, 0.05f});
     }
 
     void drawBar(std::string name, float val, float y, float w = 0.8, float h = 0.1) {
@@ -44,15 +44,12 @@ class MyViewer : public tk::gui::Viewer {
 };
 
 
-
 bool gRun = true;
 void signal_handler(int signal){
     gRun = false;
     std::cerr<<"\nRequest closing..\n";
 }
 
-tk::communication::CanInterface canSoc;
-tk::communication::CarControl carCtrl;
 
 int main( int argc, char** argv){
     std::signal(SIGINT, signal_handler);
@@ -80,6 +77,9 @@ int main( int argc, char** argv){
 	Joystick joy;
     tkASSERT(joy.init());
 
+    tk::communication::CanInterface canSoc;
+    tk::communication::CarControl carCtrl;
+    
     tkASSERT(canSoc.initSocket(soc_file));
     carCtrl.init(&canSoc);
     

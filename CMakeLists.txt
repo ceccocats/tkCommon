@@ -80,6 +80,7 @@ add_library(tkCommunication SHARED
     src/communication/EthInterface.cpp
     src/communication/CanInterface.cpp
     src/communication/serial/SerialPort.cpp
+    src/communication/car/CarControl.cpp
 )
 target_link_libraries(tkCommunication pcap)
 
