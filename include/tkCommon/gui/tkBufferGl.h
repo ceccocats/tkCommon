@@ -27,8 +27,10 @@ class tkBufferGl
     private:
         unsigned int VAO;
         unsigned int VBO;
+        unsigned int EBO;
 
-        int size = 0;
+        int size    = 0;
+        bool called = false;
 
         std::vector<vertexAttribs_t> vertexAttribs;
 
@@ -36,17 +38,27 @@ class tkBufferGl
 
         /**
          * Init method
+         * 
          */
         void init();
 
         /**
          * Method for set data in GL_ARRAY_BUFFER
          * 
-         * @param T* pointer to data
+         * @param T*    pointer to data
          * 
          * @param int   lenght
          */
         void setData(T* data, int lenght, int offset = 0);
+
+        /**
+         * Method for set indices in GL_ELEMENT_ARRAY_BUFFER
+         * 
+         * @param unsigned int* pointer to data
+         * 
+         * @param int           lenght
+         */
+        void setIndices(unsigned int* data, int lenght);
 
         /**
          * Method for set vertex attributes pointer
@@ -95,7 +107,6 @@ void tkBufferGl<T>::init(){
 
 template <typename T>
 void tkBufferGl<T>::use(){
-
     glBindVertexArray(VAO);
 }
 
@@ -108,6 +119,22 @@ template <typename T>
 void tkBufferGl<T>::release(){
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+}
+
+template <typename T>
+void tkBufferGl<T>::setIndices(unsigned int* data, int lenght){
+
+    if(called == true){
+        clsWrn("You must call setIndices one time\n");
+        return;
+    }
+    called = true;
+    glBindVertexArray(VAO);
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, lenght * sizeof(unsigned int), data, GL_STATIC_DRAW);
+    glBindVertexArray(0);
 }
 
 template <typename T>

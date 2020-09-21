@@ -17,7 +17,7 @@
 namespace tk { namespace gui { namespace components {
 
 /**
- * @brief class that draw a mesh organized in 18 points an normals 
+ * @brief class that draw a mesh organized in 18 points an normals (or you can use index vector)
  *          [x0 y0 z0 nx0 ny0 nz0 x1 y1 z1 nx1 ny1 nz1 x2 y2 z2 nx2 ny2 nz2]
  * 
  *                  (x1,y1,z1)

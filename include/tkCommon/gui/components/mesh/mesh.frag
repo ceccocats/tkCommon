@@ -2,11 +2,10 @@
 out vec4 FragColor;
 
 uniform vec4 color;
+uniform vec3 lightPos;
 
 in vec3 Normal;  
-in vec3 FragPos;  
-  
-uniform vec3 lightPos;  
+in vec3 FragPos;    
 
 //light params
 const vec3  lightColor          = vec3(1.0, 1.0, 1.0);

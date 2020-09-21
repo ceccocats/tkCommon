@@ -4,6 +4,8 @@
 #include "tkCommon/gui/components/axis/axis.h"
 #include "tkCommon/gui/components/grid/grid.h"
 #include "tkCommon/gui/components/mesh/mesh.h"
+#include "tkCommon/gui/components/texture/texture.h"
+#include "tkCommon/gui/CommonViewer.h"
 #include <thread>
 #include <signal.h>
 
@@ -15,37 +17,72 @@ public:
 	tk::gui::components::axis axis;
 	tk::gui::components::grid grid;
 	tk::gui::components::mesh mesh;
+	tk::gui::components::texture text;
 
-	tk::gui::Viewer::object3D_t carObj;
-	//tk::gui::tkShader		mesh;
-	static const int levanteMesh = 16;
-	tk::gui::tkBufferGl<float>	carbuffer[levanteMesh];
+	tk::gui::common::object3D_t carObj;
+	std::vector<tk::gui::tkBufferGl<float>> levante;
 
-
+	tk::gui::tkTexture<uint8_t>	texture;
+	std::vector<tk::common::Vector3<float>> posTexture;
 	tk::gui::tkBufferGl<float>	test;
 
+
+	tk::gui::tkBufferGl<float> carbuffer[16];
+
 	void init(){
-		tk::gui::Viewer::tkLoadOBJ(std::string(TKPROJ_PATH) + "data/levante", carObj);
+		//tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", carObj);
 
-		float* vec = new float[250000 * 6];
-		for(int m = 0; m < carObj.triangles.size(); m++){
-			int n = carObj.triangles[m].cols();
+		tk::gui::common::loadOBJ("/home/alice/Downloads/Car.obj", carObj);
 
-			for(int i = 0; i < n; i++){
-				vec[i * 6 + 0] = carObj.triangles[m](0,i);
-				vec[i * 6 + 1] = carObj.triangles[m](1,i);
-				vec[i * 6 + 2] = carObj.triangles[m](2,i);
-				vec[i * 6 + 3] = carObj.triangles[m](3,i);
-				vec[i * 6 + 4] = carObj.triangles[m](4,i);
-				vec[i * 6 + 5] = carObj.triangles[m](5,i);
-			}
-			carbuffer[m].init();
-			carbuffer[m].setData(vec,n*6);
+		levante.resize(carObj.meshes.size());
+		for(int i = 0; i < carObj.meshes.size(); i++){
+
+			levante[i].init();
+
+			float* data; int n;
+			data = carObj.meshes[i].vertexBufferPositionNormal(&n);
+			levante[i].setData(data,n);
+			delete[] data;
+
+			levante[i].setIndices(carObj.meshes[i].indices.data(),carObj.meshes[i].indices.size());
 		}
 
 		axis.init();
 		grid.init();
 		mesh.init();
+		text.init();
+
+		int width, height, channels;
+		uint8_t* img = tk::gui::common::loadImage("/home/alice/Downloads/Car.png",&width, &height, &channels);
+		//uint8_t* img = tk::gui::common::loadImage(std::string(TKPROJ_PATH) + "data/tkLogo.png",&width, &height, &channels);
+		texture.init(width, height, channels);
+		texture.setData(img);
+
+		float* data1; int n1;
+		data1 = carObj.meshes[0].vertexBufferPositionTextcoord(&n1);
+
+		test.init();
+		test.setData(data1,n1);
+		test.setIndices(carObj.meshes[0].indices.data(),carObj.meshes[0].indices.size());
+		delete[] data1;
+
+
+
+		/*float vertices[] = {
+			//positions				//texture cords
+			1.0f,  1.0f, 0.0f,   	1.0f, 0.0f, 
+			0.5f, 1.0f, 0.0f,   	1.0f, 1.0f,
+			0.5f, 0.5f, 0.0f,   	0.0f, 1.0f,
+			1.0f,  0.5f, 0.0f,   	0.0f, 0.0f
+		};
+		unsigned int indices[] = {  
+			0, 1, 3, // first triangle
+			1, 2, 3  // second triangle
+		};
+
+		test.init();
+		test.setData(vertices,21);
+		test.setIndices(indices,6);	*/
 	}
 
 	void draw(tk::gui::Viewer *viewer){
@@ -59,10 +96,12 @@ public:
 		grid.draw();
 
 		//draw levante
-		for(int m = 0; m < levanteMesh; m++){
-			tk::gui::Color_t color= tk::gui::color4f(carObj.colors[m].x, carObj.colors[m].y, carObj.colors[m].z, 1);
-			mesh.draw(&carbuffer[m], carObj.triangles[m].cols(), lightPos, color);
-		}
+		/*for(int i = 0; i < levante.size(); i++){
+			mesh.draw(&levante[i], carObj.meshes[i].indices.size(), lightPos, carObj.meshes[i].color);
+		}*/
+
+
+		text.draw(&texture,&test,carObj.meshes[0].indices.size(),true);
 	}
 
 	void draw2D(tk::gui::Viewer *viewer){
