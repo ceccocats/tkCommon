@@ -4,6 +4,7 @@
 #include "tkCommon/gui/components/axis/axis.h"
 #include "tkCommon/gui/components/grid/grid.h"
 #include "tkCommon/gui/components/mesh/mesh.h"
+#include "tkCommon/gui/components/lines/lines.h"
 #include "tkCommon/gui/components/texture/texture.h"
 #include "tkCommon/gui/CommonViewer.h"
 #include <thread>
@@ -14,26 +15,53 @@ tk::gui::ViewerNew* tk::gui::ViewerNew::instance = nullptr;
 
 class Scene : public tk::gui::Drawable {
 public:
+
+	//Axis
 	tk::gui::components::axis axis;
+
+	//Grid
 	tk::gui::components::grid grid;
-	tk::gui::components::mesh mesh;
-	tk::gui::components::texture text;
 
-	tk::gui::common::object3D_t carObj;
+	//Mesh
+	tk::gui::components::mesh 				mesh;
 	std::vector<tk::gui::tkBufferGl<float>> levante;
+	tk::gui::common::object3D_t				carObj;
 
-	tk::gui::tkTexture<uint8_t>	texture;
-	std::vector<tk::common::Vector3<float>> posTexture;
-	tk::gui::tkBufferGl<float>	test;
+	//Texture
+	tk::gui::components::texture 	text;
+	tk::gui::tkTexture<uint8_t>		texture;
+	tk::gui::tkBufferGl<float>		posText2D;
+	tk::gui::tkBufferGl<float>		posText3D;
 
+	//Lines
+	tk::gui::components::lines lines;
+	tk::gui::tkBufferGl<float> posLines2D;
+	tk::gui::tkBufferGl<float> posLines3D;
 
-	tk::gui::tkBufferGl<float> carbuffer[16];
+	//Light
+	glm::vec3 lightPos;
+
 
 	void init(){
-		//tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", carObj);
 
-		tk::gui::common::loadOBJ("/home/alice/Downloads/Car.obj", carObj);
+		//Light
+		lightPos = glm::vec3(0.0f, 0.0f, 20.0f);
 
+		//Axis
+		axis.init();
+		///////////////
+
+
+		//Grid
+		grid.init();
+		///////////////
+
+
+		//mesh
+		mesh.init();
+
+		//Load obj file and fill buffer
+		tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", carObj);
 		levante.resize(carObj.meshes.size());
 		for(int i = 0; i < carObj.meshes.size(); i++){
 
@@ -44,64 +72,121 @@ public:
 			levante[i].setData(data,n);
 			delete[] data;
 
+			//fill indices
 			levante[i].setIndices(carObj.meshes[i].indices.data(),carObj.meshes[i].indices.size());
 		}
+		///////////////
 
-		axis.init();
-		grid.init();
-		mesh.init();
+
+		//Texture
 		text.init();
 
+		//Load texture file and fill buffer
 		int width, height, channels;
-		uint8_t* img = tk::gui::common::loadImage("/home/alice/Downloads/Car.png",&width, &height, &channels);
-		//uint8_t* img = tk::gui::common::loadImage(std::string(TKPROJ_PATH) + "data/tkLogo.png",&width, &height, &channels);
+		uint8_t* img = tk::gui::common::loadImage(std::string(TKPROJ_PATH) + "data/tkLogo.png",&width, &height, &channels);
 		texture.init(width, height, channels);
 		texture.setData(img);
 
-		float* data1; int n1;
-		data1 = carObj.meshes[0].vertexBufferPositionTextcoord(&n1);
-
-		test.init();
-		test.setData(data1,n1);
-		test.setIndices(carObj.meshes[0].indices.data(),carObj.meshes[0].indices.size());
-		delete[] data1;
-
-
-
-		/*float vertices[] = {
+		//Texture 2D
+		float vertices2D[] = {
 			//positions				//texture cords
-			1.0f,  1.0f, 0.0f,   	1.0f, 0.0f, 
-			0.5f, 1.0f, 0.0f,   	1.0f, 1.0f,
-			0.5f, 0.5f, 0.0f,   	0.0f, 1.0f,
-			1.0f,  0.5f, 0.0f,   	0.0f, 0.0f
+			1.0f,	1.0f,	0.0f,   	1.0f, 0.0f, 
+			0.7f,	1.0f, 	0.0f,   	1.0f, 1.0f,
+			0.7f, 	0.7f,	0.0f,   	0.0f, 1.0f,
+			1.0f,	0.7f,	0.0f,   	0.0f, 0.0f
 		};
-		unsigned int indices[] = {  
-			0, 1, 3, // first triangle
-			1, 2, 3  // second triangle
+		unsigned int indices2D[] = {  
+			0, 1, 2, // first triangle
+			0, 3, 2  // second triangle
 		};
+		posText2D.init();
+		posText2D.setData(vertices2D,21);
+		posText2D.setIndices(indices2D,6);
 
-		test.init();
-		test.setData(vertices,21);
-		test.setIndices(indices,6);	*/
+		//Texture 3D
+		float vertices3D[] = {
+			//positions				//texture cords
+			6.0f,	6.0f,	0.0f,   	0.5f, 0.0f, 
+			3.0f,	6.0f, 	0.0f,   	0.5f, 1.0f,
+			3.0f, 	3.0f,	0.0f,   	0.0f, 1.0f,
+			6.0f,	3.0f,	0.0f,   	0.0f, 0.0f,
+		};
+		unsigned int indices3D[] = {  
+			0, 1, 2, // first triangle
+			0, 3, 2, // second triangle
+		};
+		posText3D.init();
+		posText3D.setData(vertices3D,21);
+		posText3D.setIndices(indices3D,6);	
+		///////////////
+
+
+		//Lines
+		lines.init();
+
+		//Lines 3D
+		posLines3D.init();
+		float datalines3D[] = {
+
+			//points						//color
+			-2.5f,	2.5f,	0.0f,			1.0f,0.0f,0.0f,1.0f,
+			2.5f,	2.5f,	0.0f,			0.0f,1.0f,0.0f,1.0f,
+			2.5f,	-2.5f,	0.0f,			0.0f,0.0f,1.0f,1.0f,
+			-2.5f,	-2.5f,	0.0f,			1.0f,1.0f,0.0f,1.0f
+		};
+		posLines3D.setData(datalines3D,28);
+
+		//Lines 3D
+		posLines2D.init();
+		float datalines2D[] = {
+
+			//points						//color
+			1.0f,	-1.0f,	0.0f, 			1.0f,0.0f,0.0f,1.0f,
+			0.7f,	-1.0f, 	0.0f,			1.0f,0.0f,0.0f,1.0f,
+			0.7f, 	-0.7f,	0.0f,			0.0f,1.0f,0.0f,1.0f,
+			1.0f,	-0.7f,	0.0f, 			0.0f,1.0f,0.0f,1.0f
+		};
+		posLines2D.setData(datalines2D,28);
+		///////////////
 	}
 
 	void draw(tk::gui::Viewer *viewer){
 
-		glm::vec3 lightPos(0.0f, 0.0f, 20.0f);
-
-		//axis
+		//Axis
 		axis.draw();
+		///////////////
 
-		// 3d grid
+
+		//Grid
 		grid.draw();
+		///////////////
 
-		//draw levante
-		/*for(int i = 0; i < levante.size(); i++){
+
+		//Mesh levante
+		for(int i = 0; i < levante.size(); i++){	
 			mesh.draw(&levante[i], carObj.meshes[i].indices.size(), lightPos, carObj.meshes[i].color);
-		}*/
+		}
+		///////////////
 
 
-		text.draw(&texture,&test,carObj.meshes[0].indices.size(),true);
+		//Texture 2D
+		text.draw(&texture,&posText2D,6);			//2 triangles = 6 vertex
+		///////////////
+
+
+		//Texture 2D
+		text.draw(&texture,&posText3D,6,true);		//2 triangles = 6 vertex
+		///////////////
+
+
+		//Lines 3D
+		lines.draw(&posLines3D,4,2,GL_LINE_LOOP);	//4 vertex vith line size 2 closing loop
+		///////////////
+
+		
+		//Lines 3D
+		lines.draw(&posLines2D,4,2,GL_LINE_LOOP,false);	//4 vertex vith line size 2 closing loop
+		///////////////
 	}
 
 	void draw2D(tk::gui::Viewer *viewer){
