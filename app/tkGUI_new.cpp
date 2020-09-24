@@ -73,7 +73,7 @@ public:
 			delete[] data;
 
 			//fill indices
-			levante[i].setIndices(carObj.meshes[i].indices.data(),carObj.meshes[i].indices.size());
+			levante[i].setIndexVector(carObj.meshes[i].indices.data(),carObj.meshes[i].indices.size());
 		}
 		///////////////
 
@@ -101,7 +101,7 @@ public:
 		};
 		posText2D.init();
 		posText2D.setData(vertices2D,21);
-		posText2D.setIndices(indices2D,6);
+		posText2D.setIndexVector(indices2D,6);
 
 		//Texture 3D
 		float vertices3D[] = {
@@ -117,7 +117,7 @@ public:
 		};
 		posText3D.init();
 		posText3D.setData(vertices3D,21);
-		posText3D.setIndices(indices3D,6);	
+		posText3D.setIndexVector(indices3D,6);	
 		///////////////
 
 

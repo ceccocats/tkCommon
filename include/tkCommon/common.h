@@ -68,7 +68,6 @@ namespace tk { namespace common {
         else
             return false;
     }
-    
 
     /**
      * Convert odometry to TfPose

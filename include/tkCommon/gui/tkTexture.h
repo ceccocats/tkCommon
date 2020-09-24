@@ -19,7 +19,7 @@ template <class T>
 class tkTexture
 {
     private:
-        unsigned int    texture;
+        GLuint          texture;
         int             width;
         int             height;
 
@@ -43,6 +43,13 @@ class tkTexture
          * @param T*    pointer to data
          */
         void setData(T* data);
+
+         /**
+         * Method for get texture id
+         * 
+         * @return      texture id
+         */
+        unsigned int id();
 
         /**
          * use method for set GL_TEXTURE_2D in shader
@@ -80,6 +87,11 @@ void tkTexture<T>::setData(T* data){
     use();
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, format, type, data);
     unuse();
+}
+
+template <typename T>
+GLuint tkTexture<T>::id(){
+    return texture;
 }
 
 }}

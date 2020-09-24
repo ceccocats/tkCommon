@@ -52,8 +52,7 @@ class texture
                     modelview = glm::mat4(1.0); //identity
             }
 
-            buffer->pushVectorVertex(vertexPointer);
-            buffer->setVertexAttrib();
+            buffer->setVertexAttribs(vertexPointer);
 
             shader.use();
             shader.setMat4("modelview",modelview);

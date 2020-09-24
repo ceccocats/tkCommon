@@ -53,8 +53,7 @@ class cubes3D
         void draw(tk::gui::tkBufferGl<float>* buffer, int n, glm::vec3& lightPos, tk::gui::Color_t color = tk::gui::color::WHITE){
 
 		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
-            buffer->pushVectorVertex(vertexPointer);
-            buffer->setVertexAttrib();
+            buffer->setVertexAttribs(vertexPointer);
 
             glm::vec4 pointColor(   float(color.r)/255.0f,
                                     float(color.g)/255.0f,

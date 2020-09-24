@@ -32,7 +32,7 @@ class tkBufferGl
         int size    = 0;
         bool called = false;
 
-        std::vector<vertexAttribs_t> vertexAttribs;
+        GLenum          type;
 
     public:
 
@@ -58,25 +58,23 @@ class tkBufferGl
          * 
          * @param int           lenght
          */
-        void setIndices(unsigned int* data, int lenght);
-
-        /**
-         * Method for set vertex attributes pointer
-         * 
-         * @param int   lenght of current vertex
-         * 
-         * @param int   offset of starting vertex position
-         * 
-         * @param int   lenght of total vertex in a frame
-         */
-        void pushVertexAttrib(int vertexSize, int offset, int dataSize);
+        void setIndexVector(unsigned int* data, int lenght);
 
         /**
          * Method for set vertex attributes pointer array
          * 
          * @param std::vector<vertexAttribs_t>&  vector contains vertex attributes pointer
          */
-        void pushVectorVertex(std::vector<vertexAttribs_t>& vec);
+        void setVertexAttribs(std::vector<vertexAttribs_t>& vertexAttribs);
+
+
+        /**
+         * Method that attach a texture to opengl shader for drawing not in viz but in texture
+         * 
+         * @param GLunit    texture
+         * @param GLenum    attachment
+         */
+        void attachTexture(GLuint texture, GLenum attachment = GL_COLOR_ATTACHMENT0);
 
         /**
          * use method for set GL_ARRAY_BUFFER in shader
@@ -89,21 +87,11 @@ class tkBufferGl
         void unuse();
 
         /**
-         * update vertex attributes pointer
-         */
-        void setVertexAttrib();
-
-        /**
          * release data method
          */
         void release();
 };
 
-template <typename T>
-void tkBufferGl<T>::init(){
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-}
 
 template <typename T>
 void tkBufferGl<T>::use(){
@@ -112,6 +100,7 @@ void tkBufferGl<T>::use(){
 
 template <typename T>
 void tkBufferGl<T>::unuse(){
+    glBindFramebuffer(VBO, 0);
     glBindVertexArray(0);
 }
 
@@ -123,7 +112,7 @@ void tkBufferGl<T>::release(){
 }
 
 template <typename T>
-void tkBufferGl<T>::setIndices(unsigned int* data, int lenght){
+void tkBufferGl<T>::setIndexVector(unsigned int* data, int lenght){
 
     if(called == true){
         clsWrn("You must call setIndices one time\n");
@@ -138,13 +127,28 @@ void tkBufferGl<T>::setIndices(unsigned int* data, int lenght){
 }
 
 template <typename T>
-void tkBufferGl<T>::pushVertexAttrib(int vertexSize, int offset, int dataSize){
-    vertexAttribs.push_back({vertexSize, offset, dataSize});
+void tkBufferGl<T>::setVertexAttribs(std::vector<vertexAttribs_t>& vertexAttribs){
+    
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    
+    //check if vertexAttribs is set
+    if(vertexAttribs.size() == 0){
+        clsErr("You need to fill vertexAttribsPointer\n");
+        return;
+    }
+
+    for(int i = 0; i < vertexAttribs.size(); i++) {
+        glEnableVertexAttribArray(i);
+        glVertexAttribPointer(i, vertexAttribs[i].vertexSize, 
+            type, GL_FALSE, vertexAttribs[i].dataSize * sizeof(T), (void*)(vertexAttribs[i].offset * sizeof(T)));
+    }
+    glBindVertexArray(0);
 }
 
 template <typename T>
-void tkBufferGl<T>::pushVectorVertex(std::vector<vertexAttribs_t>& vec){
-    vertexAttribs = vec;
+void tkBufferGl<T>::attachTexture(GLuint texture, GLenum attachment){
+    glFramebufferTexture2D(VBO, attachment, GL_TEXTURE_2D, texture, 0);
 }
 
 template <typename T>
