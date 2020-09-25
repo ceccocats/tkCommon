@@ -1,6 +1,6 @@
 #pragma once
-#include "tkCommon/gui/tkShader.h"
-#include "tkCommon/gui/tkBufferGl.h"
+#include "tkCommon/gui/Shader.h"
+#include "tkCommon/gui/Buffer.h"
 
 #include <stdlib.h>
 #include <stdio.h>

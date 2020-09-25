@@ -1,11 +1,10 @@
 #include "tkCommon/gui/ViewerNew.h"
-#include "tkCommon/gui/tkShader.h"
-#include "tkCommon/gui/tkBufferGl.h"
-#include "tkCommon/gui/components/axis/axis.h"
-#include "tkCommon/gui/components/grid/grid.h"
-#include "tkCommon/gui/components/mesh/mesh.h"
-#include "tkCommon/gui/components/lines/lines.h"
-#include "tkCommon/gui/components/texture/texture.h"
+#include "tkCommon/gui/Buffer.h"
+#include "tkCommon/gui/shader/axis.h"
+#include "tkCommon/gui/shader/grid.h"
+#include "tkCommon/gui/shader/mesh.h"
+#include "tkCommon/gui/shader/lines.h"
+#include "tkCommon/gui/shader/texture.h"
 #include "tkCommon/gui/CommonViewer.h"
 #include <thread>
 #include <signal.h>
@@ -17,30 +16,30 @@ class Scene : public tk::gui::Drawable {
 public:
 
 	//Axis
-	tk::gui::components::axis axis;
+	tk::gui::shader::axis axis;
 
 	//Grid
-	tk::gui::components::grid grid;
+	tk::gui::shader::grid grid;
 
 	//Mesh
-	tk::gui::components::mesh 				mesh;
-	std::vector<tk::gui::tkBufferGl<float>> levante;
+	tk::gui::shader::mesh 				mesh;
+	std::vector<tk::gui::Buffer<float>> levante;
 	tk::gui::common::object3D_t				carObj;
 
 	//Texture
-	tk::gui::components::texture 	text;
-	tk::gui::tkTexture<uint8_t>		texture;
-	tk::gui::tkBufferGl<float>		posText2D;
-	tk::gui::tkBufferGl<float>		posText3D;
+	tk::gui::shader::texture 	text;
+	tk::gui::Texture<uint8_t>		texture;
+	tk::gui::Buffer<float>		posText2D;
+	tk::gui::Buffer<float>		posText3D;
 
 	//Lines
-	tk::gui::components::lines lines;
-	tk::gui::tkBufferGl<float> posLines2D;
-	tk::gui::tkBufferGl<float> posLines3D;
+	tk::gui::shader::lines lines;
+	tk::gui::Buffer<float> posLines2D;
+	tk::gui::Buffer<float> posLines3D;
 
 	//Shader in texture
-	tk::gui::tkTexture<uint8_t> rendering;
-	tk::gui::tkBufferGl<float> posrendering;
+	tk::gui::Texture<uint8_t> rendering;
+	tk::gui::Buffer<float> posrendering;
 
 	//Light
 	glm::vec3 lightPos;
@@ -155,7 +154,7 @@ public:
 
 
 		//Shader write in texture
-		rendering.init(800,800,3);
+		rendering.init(800,800,4);
 
 		//Texture 2D
 		float verticesCube2D[] = {
@@ -222,7 +221,7 @@ public:
 
 		//Draw all in texture
 		rendering.useForRendering();
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
     	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		drawElements();

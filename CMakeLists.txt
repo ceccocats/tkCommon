@@ -56,9 +56,9 @@ add_library(tkGUI SHARED
     src/gui/Viewer.cpp
     src/gui/PlotManager.cpp
     src/gui/lodepng.cpp
-    src/gui/tkBufferGl.cpp
-    src/gui/tkShader.cpp
-    src/gui/tkTexture.cpp
+    src/gui/Buffer.cpp
+    src/gui/Shader.cpp
+    src/gui/Texture.cpp
     src/gui/stb_image.cpp
     src/gui/Camera3D.cpp
     src/gui/imgui/imgui_demo.cpp

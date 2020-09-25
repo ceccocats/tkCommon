@@ -17,6 +17,9 @@
 #include "tkCommon/gui/imgui/imgui_impl_glfw.h"
 #include "tkCommon/gui/imgui/imgui_impl_opengl3.h"
 
+#define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
+#define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
+
 
 namespace tk { namespace gui {
 
@@ -34,6 +37,9 @@ namespace tk { namespace gui {
         float  yLim = 1.0; /**< 2d y coord screen limit (fixed to 1.0) */
         double dt = 1.0/60;
         bool   running = true;
+
+        GLint total_mem_kb = 0;
+        GLint cur_avail_mem_kb = 0;
 
 		DrawMap drawBuffer;
 
@@ -138,17 +144,21 @@ namespace tk { namespace gui {
 
         // init cameras
         camera.init();
+
+        glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &total_mem_kb);
     }
 
     void ViewerNew::draw() {
         drawBuffer.draw(this);
+
+        glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
 
         ImGuiIO& io = ImGui::GetIO();
         ImGui::Begin("Viewer");
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::Text("window size: %d x %d", width, height);
         ImGui::Text("window ratio: %f", aspectRatio);
-        ImGui::Text("window lim: (%f, %f)", xLim, yLim);
+        ImGui::Text("GPU memory: %d / %d MB", (int)((total_mem_kb - cur_avail_mem_kb)/1024.0), (int)(total_mem_kb/1024.0));
         ImGui::Text("Drawables (%d)", int(drawBuffer.map.size()));
         std::map<std::string,Drawable*>::iterator it; 
         for(it = drawBuffer.map.begin(); it!=drawBuffer.map.end(); ++it){
