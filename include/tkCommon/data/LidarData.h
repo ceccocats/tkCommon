@@ -1,5 +1,6 @@
 #pragma once
 #include "tkCommon/data/CloudData.h"
+#include "tkCommon/gui/shader/pointcloud4f.h"
 
 namespace tk { namespace data {
 
@@ -108,11 +109,34 @@ namespace tk { namespace data {
             return true;
         }
 
+    private:
+
+        bool initted = false;
+        tk::gui::shader::pointcloud4f   shader;
+        tk::gui::Buffer<float>          gpu_cloud;
+
+
+    public:
+
+        void onAdd(tk::gui::Viewer *viewer){
+
+            if(initted == false){
+                initted = true;
+                shader.init();
+                gpu_cloud.init();
+            }
+
+            gpu_cloud.setData(points.data(),nPoints*4);
+        }
+
         void draw(tk::gui::Viewer *viewer){
 
-			tk::gui::Viewer::tkDrawTf(header.name, header.tf);
-    		tk::gui::Viewer::tkApplyTf(header.tf);
-			viewer->tkDrawLidarCloud(points, nPoints, intensity);
+            shader.draw(&gpu_cloud,nPoints);			
+        }
+
+        ~LidarData(){
+            shader.close();
+            gpu_cloud.release();
         }
     };
 }}

@@ -6,6 +6,8 @@
 #include "tkCommon/gui/shader/lines.h"
 #include "tkCommon/gui/shader/texture.h"
 #include "tkCommon/gui/CommonViewer.h"
+#include "tkCommon/data/LidarData.h"
+#include "tkCommon/math/MatIO.h"
 #include <thread>
 #include <signal.h>
 
@@ -238,10 +240,36 @@ public:
 
 
 tk::gui::ViewerNew viewer;
+tk::data::LidarData ldata;
 
 void sig_handler(int signo) {
     std::cout<<"request stop\n";
 	viewer.close();
+}
+
+void read_cloud() {
+
+	tk::math::MatIO mat;
+	mat.open("/media/alice/FerrariRecs1/datasets/balocco_velarray_camera.mat");
+
+	Eigen::MatrixXf points;
+
+	tk::math::MatIO::var_t var;
+	for(int i=0; i<mat.size(); i++) {
+		mat.read(mat[i], var);
+		var["lidar"]["points"].get(points);
+		var.release();
+
+		ldata.lock();
+		for(int j=0; j<points.cols(); j++) {
+			ldata.points.col(j) = points.col(j);
+		}
+		ldata.nPoints = points.cols();
+		ldata.unlock();
+
+	}
+
+	mat.close();
 }
 
 
@@ -254,9 +282,16 @@ int main( int argc, char** argv){
 
 	viewer.init();
 	
-	Scene *scene = new Scene(); // with static does not work
-	scene->init();
-	viewer.add("scene", scene);
+	//Scene scene; // with static does not work
+	//scene.init();
+	//viewer.add("scene", &scene);
+	
+	ldata.init();
+	viewer.add("lidar", &ldata);
+	std::thread read_cloud_th(read_cloud);	
+
 	viewer.run();
+
+	read_cloud_th.join();
     return 0;
 }

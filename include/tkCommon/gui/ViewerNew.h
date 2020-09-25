@@ -239,7 +239,6 @@ namespace tk { namespace gui {
     }
 
     void ViewerNew::add(std::string name, Drawable *data){
-        clsMsg("add\n");
         drawBuffer.add(name, data, this);
     }
 

@@ -9,27 +9,111 @@ namespace tk{namespace gui{
 
 	class Viewer;
 
-	class Drawable{
+	class Drawable {
+	private:
+		std::mutex datamutex;
+		bool modified = true;		
 
 	public:
-		std::mutex *draw_mutex = nullptr;
 		bool enabled = true;
+		tk::common::Tfpose tf;
 
-		Drawable & operator=(const Drawable& obj) { }
-
-		//virtual void draw() {}
-
-		//virtual void draw2D(int width, int height, float xLim, float yLim) {}
-
+		void lock() {
+			datamutex.lock();
+		}
+		void unlock() {
+			modified = true;
+			datamutex.unlock();
+		}
 		virtual void onAdd(tk::gui::Viewer *viewer) {}
-
 		virtual void draw(tk::gui::Viewer *viewer) {}
-
 		virtual void draw2D(tk::gui::Viewer *viewer) {}
+	
+		void _beforeDraw(tk::gui::Viewer *viewer) {
+			datamutex.lock();
+			if(modified) {
+				onAdd(viewer);
+				modified = false;
+			}
+			datamutex.unlock();
+		}
+	};
 
-		~Drawable(){if(draw_mutex != nullptr) delete draw_mutex;}
+	class DrawMap {
+	public:
+		std::map<std::string, Drawable*>  map;
+
+		void add(std::string name, Drawable* d, tk::gui::Viewer *viewer = nullptr){
+			map[name] = d;
+		}
+
+		void draw2D(Viewer *viewer){
+			for (std::map<std::string,Drawable*>::iterator it = map.begin(); it!=map.end(); ++it){
+				if(!it->second->enabled)
+					continue;
+				
+				it->second->_beforeDraw(viewer);
+				it->second->draw2D(viewer);
+
+			}
+		}
+
+		void draw(Viewer *viewer){
+			for (std::map<std::string,Drawable*>::iterator it = map.begin(); it!=map.end(); ++it){
+				if(!it->second->enabled)
+					continue;
+
+				it->second->_beforeDraw(viewer);
+				it->second->draw(viewer);
+			}
+		}
 
 	};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	template<typename T, typename = std::enable_if<std::is_base_of<Drawable, T>::value>>
 	class DrawBuffer : public Drawable{
@@ -80,89 +164,5 @@ namespace tk{namespace gui{
 
 	};
 
-
-	class DrawMap {
-	public:
-		std::map<std::string, Drawable*>  map;
-
-		template<typename T, typename = std::enable_if<std::is_base_of<Drawable, T>::value>>
-		void insert(std::string name, T* d ){
-
-			auto search = map.find(name);
-			if (search != map.end()) {
-				Drawable *temp = map[name];
-				map.erase(name);
-				delete temp;
-			}
-
-			T *copy = new T();
-			if(d != nullptr){
-				*copy = *d;
-			}
-			if(copy->draw_mutex == nullptr){
-				copy->draw_mutex = new std::mutex;
-			}
-			map.insert(std::pair<std::string, Drawable*>(name, copy));
-		}
-
-		template<typename T, typename = std::enable_if<std::is_base_of<Drawable, T>::value>>
-		void update(std::string name, T* d ){
-
-			auto search = map.find(name);
-			if (search != map.end()) {
-				map[name]->draw_mutex->lock();
-				*((T*)map[name]) = *d;
-				map[name]->draw_mutex->unlock();
-			}
-			else{
-				insert<T>(name, d);
-			}
-		}
-
-		void add(std::string name, Drawable* d, tk::gui::Viewer *viewer = nullptr){
-			auto search = map.find(name);
-			if (search != map.end()) {
-				map[name] = d;
-			} else {
-				map.insert(std::pair<std::string,Drawable*>(name,d));
-			}
-			if(viewer != nullptr)
-				d->onAdd(viewer);
-		}
-
-		void draw2D(Viewer *viewer){
-			for (std::map<std::string,Drawable*>::iterator it = map.begin(); it!=map.end(); ++it){
-				if(!it->second->enabled)
-					continue;
-				
-				if(it->second->draw_mutex != nullptr)
-					it->second->draw_mutex->lock();
-				it->second->draw2D(viewer);
-				if(it->second->draw_mutex != nullptr)
-					it->second->draw_mutex->unlock();
-			}
-		}
-
-		void draw(Viewer *viewer){
-			for (std::map<std::string,Drawable*>::iterator it = map.begin(); it!=map.end(); ++it){
-				if(!it->second->enabled)
-					continue;
-
-				if(it->second->draw_mutex != nullptr)
-					it->second->draw_mutex->lock();
-				it->second->draw(viewer);
-				if(it->second->draw_mutex != nullptr)
-					it->second->draw_mutex->unlock();
-			}
-		}
-
-		~DrawMap(){
-			for (std::map<std::string,Drawable*>::iterator it = map.begin(); it!=map.end(); ++it){
-				Drawable *t = it->second;
-				it->second = nullptr;
-				delete t;
-			}
-		}
-	};
 
 }}

@@ -130,7 +130,7 @@ namespace tk { namespace gui {
 
 		template<typename T, typename = std::enable_if<std::is_base_of<Drawable, T>::value>>
         void insert(std::string name, T *data = nullptr){
-			buffer.insert<T>(name, data);
+			//buffer.insert<T>(name, data);
 		}
 
 		/// Returns the requested element
@@ -141,7 +141,7 @@ namespace tk { namespace gui {
 
 		template<typename T, typename = std::enable_if<std::is_base_of<Drawable, T>::value>>
 		void update(std::string name, T *data){
-			buffer.update<T>(name, data);
+			//buffer.update<T>(name, data);
 		}
 
 		void add(std::string name, Drawable *data);
