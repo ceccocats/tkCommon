@@ -218,73 +218,48 @@ namespace tk { namespace data {
             return true;
         }
 
-        void onAdd(tk::gui::Viewer *viewer) {
-            std::string name = header.name;
 
-            // draw odom
-            if(!viewer->plotManger->plotExist(name)) {
-                std::cout<<"Add ODOM plot: "<<name<<"\n";
-                viewer->plotManger->addLinePlot(name, tk::gui::randomColor(), 100000, 1);
+    public:
+    	//Mesh
+        tk::gui::shader::mesh 				mesh;
+        std::vector<tk::gui::Buffer<float>> levante;
+        tk::gui::common::object3D_t         carObj;
+
+
+        void onInit(tk::gui::Viewer *viewer){
+            mesh.init();
+            
+            //Load obj file and fill buffer
+            levante.resize(carObj.meshes.size());
+            for(int i = 0; i < carObj.meshes.size(); i++){
+
+                levante[i].init();
+
+                float* data; int n;
+                data = carObj.meshes[i].vertexBufferPositionNormal(&n);
+                levante[i].setData(data,n);
+                delete[] data;
+
+                //fill indices
+                levante[i].setIndexVector(carObj.meshes[i].indices.data(),carObj.meshes[i].indices.size());
             }
-            tk::data::VehicleData::odom_t odom;
-            carOdometry(odom);
-            tk::common::Tfpose tf = tk::common::odom2tf(odom.x, odom.y, odom.yaw);
-            viewer->plotManger->addPoint(name, tk::common::tf2pose(tf));
+            ///////////////
+        }
+
+        void onAdd(tk::gui::Viewer *viewer){
         }
 
         void draw(tk::gui::Viewer *viewer){
+            tk::gui::ViewerNew *new_viewer = (tk::gui::ViewerNew *)viewer;
 
-        	// TODO: move to tk::gui::Viewer
-
-			tk::gui::Viewer::tkDrawTf(header.name, header.tf);
-
-			tk::gui::Viewer::tkSetColor(tk::gui::color::AMBER);
-			tk::common::Vector3<float> dim{(float) CAR_DIM_X, (float) CAR_DIM_Y,
-										   (float) CAR_DIM_Z};
-			tk::common::Vector3<float> wheels[4];
-			wheels[0] = {0, (float) -CAR_BACKAXLE_W / 2, 0};
-			wheels[1] = wheels[0];
-			wheels[1].y *= -1;
-			wheels[2] = wheels[0], wheels[3] = wheels[1];
-			wheels[2].x += CAR_WHEELBASE;
-			wheels[3].x += CAR_WHEELBASE;
-
-			tk::gui::Viewer::tkDrawLine(wheels[0], wheels[1]);
-			tk::gui::Viewer::tkDrawLine(wheels[2], wheels[3]);
-			tk::gui::Viewer::tkDrawLine(tk::common::Vector3<float>{wheels[0].x, 0, 0},
-										tk::common::Vector3<float>{wheels[2].x, 0, 0});
-
-			for (int i = 0; i < 4; i++) {
-				glPushMatrix();
-				glTranslatef(wheels[i].x, wheels[i].y, wheels[i].z);
-				glRotatef(90, 1, 0, 0);
-				tk::gui::Viewer::tkDrawCircle(tk::common::Vector3<float>{0, 0, 0}, CAR_WHEEL_R);
-				glPopMatrix();
-			}
-			tk::common::Vector3<float> pose{dim.x / 2 - (float) CAR_BACK2AXLE, 0, dim.z / 2};
-
+            //Mesh levante
+            for(int i = 0; i < levante.size(); i++){	
+                mesh.draw(&levante[i], carObj.meshes[i].indices.size(), new_viewer->lightPos, carObj.meshes[i].color);
+            }
+            ///////////////
         }
 
-        void draw2D(tk::gui::Viewer *viewer) {
-
-			float yLim = viewer->yLim;
-
-			tk::common::Vector2<float> pos;
-			float size;
-			pos = tk::common::Vector2<float>{0,-yLim+0.25f};
-			size = 0.2;
-			double speed = this->speed;
-			int gear = actualGear;
-			double rpm = RPM;
-			tk::gui::Viewer::tkDrawSpeedometer(pos, speed, size);
-
-            std::string window_name = "Vehicle: " + header.name;
-            ImGui::Begin(window_name.c_str());
-            ImGui::BulletText("Speed\t%lf", speed);
-            ImGui::BulletText("WheelAngle\t%lf", wheelAngle);
-            ImGui::BulletText("Gear\t%d", actualGear);
-            ImGui::BulletText("RPM\t%d", RPM);
-            ImGui::End();
+        void onClose(){
         }
     };
 }

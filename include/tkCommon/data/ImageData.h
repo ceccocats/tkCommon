@@ -14,9 +14,6 @@ namespace tk{namespace data{
         int height = 0;
         int channels = 0;
         std::mutex *mtx = nullptr; // mutex contructor is marked delete, so you cant copy the struct containing mutex
-
-        bool gen_tex = false;
-        unsigned int texture;
         int index = 0;
 
         void init(){
@@ -56,12 +53,6 @@ namespace tk{namespace data{
             mtx->lock();
             memcpy(data, s.data, width * height * channels * sizeof(T));
             mtx->unlock();
-
-            if(gen_tex == false){
-				texture = s.texture;
-				gen_tex = s.gen_tex;
-            }
-
             return *this;
         }
 
@@ -76,49 +67,8 @@ namespace tk{namespace data{
             height = 0;
             channels = 0;
             delete [] tmp;
-            glDeleteTextures(1,&texture);
-            gen_tex = false;
             mtx->unlock();
         }
-
-        void toGL(){
-			if(empty()){
-				tk::tformat::printMsg("Viewer","Image empty\n");
-			}else{
-
-				//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-				glBindTexture(GL_TEXTURE_2D, texture);
-
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-				// Set texture clamping method
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-				if(this->channels == 4) {
-					glTexImage2D(GL_TEXTURE_2D,         // Type of texture
-								 0,                   // Pyramid level (for mip-mapping) - 0 is the top level
-								 GL_RGB,              // Internal colour format to convert to
-								 this->width,          // Image width  i.e. 640 for Kinect in standard mode
-								 this->height,          // Image height i.e. 480 for Kinect in standard mode
-								 0,                   // Border width in pixels (can either be 1 or 0)
-								 GL_RGBA,              // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
-								 GL_UNSIGNED_BYTE,    // Image data type
-								 this->data);        // The actual image data itself
-				}else if(this->channels == 3){
-					glTexImage2D(GL_TEXTURE_2D,         // Type of texture
-								 0,                   // Pyramid level (for mip-mapping) - 0 is the top level
-								 GL_RGB,              // Internal colour format to convert to
-								 this->width,          // Image width  i.e. 640 for Kinect in standard mode
-								 this->height,          // Image height i.e. 480 for Kinect in standard mode
-								 0,                   // Border width in pixels (can either be 1 or 0)
-								 GL_RGB,              // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
-								 GL_UNSIGNED_BYTE,    // Image data type
-								 this->data);        // The actual image data itself
-				}
-			}
-        };
 
         ImageData() {
             mtx = new std::mutex();
@@ -129,20 +79,40 @@ namespace tk{namespace data{
             delete mtx;
         }
 
-		void draw2D(tk::gui::Viewer *viewer) {
 
-        	if(!gen_tex){
-				gen_tex = true;
-				glGenTextures(1, &texture);
-        	}
-			this->toGL();
+        void onInit(tk::gui::Viewer *viewer){
+            gl_texture_shader.init();
+            gl_texture.init(width, height, channels);
 
-        	if(tk::gui::Viewer::image_width != this->width)
-				tk::gui::Viewer::image_width = this->width;
-			if(tk::gui::Viewer::image_height != this->height)
-				tk::gui::Viewer::image_height = this->height;
+            float s = 0.5;
+            float vertices[] = {
+                //positions     //texture cords
+                -s, s, 0.0f,   	0.0f, 0.0f, 
+                -s,-s, 0.0f,   	0.0f, 1.0f,
+                 s,-s, 0.0f,   	1.0f, 1.0f,
+                 s, s, 0.0f,   	1.0f, 0.0f
+            };
+            unsigned int indices[] = {  
+                0, 1, 2, // first triangle
+                0, 3, 2  // second triangle
+            };
+            gl_buffer.init();
+            gl_buffer.setData(vertices,21);
+            gl_buffer.setIndexVector(indices,6);	
+        }
 
-			viewer->tkDrawTextureImage(texture, index);
+        void onAdd(tk::gui::Viewer *viewer){
+		    gl_texture.setData(data);
+        }
+
+        void draw(tk::gui::Viewer *viewer){
+            gl_texture_shader.draw(&gl_texture,&gl_buffer,6); //2 triangles = 6 vertex
+        }
+
+        void onClose(){
+            gl_texture.release();
+            gl_buffer.release();
+            gl_texture_shader.close();
         }
 
     };

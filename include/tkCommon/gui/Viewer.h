@@ -91,7 +91,7 @@ namespace tk { namespace gui {
         
         static int  tkLoadTexture(std::string filename, GLuint &tex);
         static int  tkLoadOBJ(std::string filename, object3D_t &obj);
-        static void tkLoadLogo(std::string filename, std::vector<common::Vector3<float>> &logo);
+        static void tkLoadLogo(std::string filename, std::vector<tk::common::Vector3<float>> &logo);
         
         static void tkSetColor(tk::gui::Color_t c, float alpha = -1);
         static void tkApplyTf(tk::common::Tfpose tf);

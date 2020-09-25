@@ -41,6 +41,7 @@ class Camera
     void updateEye();
     void updateMatrices();
     void setViewPort(int x, int y, int width, int height);
+    void setCenter(tk::common::Vector3<float> p);
     
     // util functons
     glm::vec3 project(glm::vec3 obj);
@@ -98,8 +99,16 @@ void Camera::updateMatrices() {
 
 void Camera::setViewPort(int x, int y, int width, int height) {
     viewport = glm::ivec4(x,y,width,height);
+    updateEye();
     updateMatrices();
 }
+
+void Camera::setCenter(tk::common::Vector3<float> p) {
+    center.x = p.x;
+    center.y = p.y;
+    center.z = p.z;
+}
+
 
 void Camera::mouseDown(int button, float x, float y) {
     if(mouseOnGUI)

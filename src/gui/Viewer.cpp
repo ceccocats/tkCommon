@@ -1,5 +1,4 @@
 #include "tkCommon/gui/Viewer.h"
-#include "tkCommon/gui/OBJ_Loader.h"
 
 extern bool gRun;
 using namespace tk::gui;
@@ -405,7 +404,7 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
     
     // correct locale dependent stof
     std::setlocale(LC_ALL, "C");
-
+/*
     objl::Loader loader;
     if(loader.LoadFile((filename + ".obj").c_str())) {
    
@@ -451,8 +450,8 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
     if(error == 1)
         tk::tformat::printErr("Viewer","Texture not found\n");
     }
-
-    return error;
+*/
+    return false;
 }
 
 void

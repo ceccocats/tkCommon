@@ -62,6 +62,7 @@ add_library(tkGUI SHARED
     src/gui/Shader.cpp
     src/gui/Texture.cpp
     src/gui/stb_image.cpp
+    src/gui/CommonViewer.cpp
     src/gui/Camera3D.cpp
     src/gui/imgui/imgui_demo.cpp
     src/gui/imgui/imgui_draw.cpp

@@ -44,13 +44,9 @@ class texture
             return true;
         }
 
-        void draw(tk::gui::Texture<uint8_t>* texture, tk::gui::Buffer<float>* buffer, int triangles, int withModelview = false){
+        void draw(tk::gui::Texture<uint8_t>* texture, tk::gui::Buffer<float>* buffer, int triangles){
 
-            if(withModelview == true){
-                    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview));
-            }else{
-                    modelview = glm::mat4(1.0); //identity
-            }
+            glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview));
 
             buffer->setVertexAttribs(vertexPointer);
 

@@ -47,6 +47,9 @@ namespace tk { namespace gui {
         //static const int        MAX_KEYS = 1024;
         //static bool             keys[MAX_KEYS];
 
+        //Light
+        glm::vec3 lightPos;
+
 
          ViewerNew() {
             ViewerNew::instance = this;
@@ -146,6 +149,10 @@ namespace tk { namespace gui {
         camera.init();
 
         glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &total_mem_kb);
+
+
+        // lights
+		lightPos = glm::vec3(0.0f, 0.0f, 20.0f);
     }
 
     void ViewerNew::draw() {
@@ -163,6 +170,8 @@ namespace tk { namespace gui {
         std::map<std::string,Drawable*>::iterator it; 
         for(it = drawBuffer.map.begin(); it!=drawBuffer.map.end(); ++it){
             ImGui::Checkbox(it->first.c_str(), &it->second->enabled); 
+            ImGui::SameLine(ImGui::GetWindowWidth()-30);
+            ImGui::Checkbox( ("##" + it->first +"_follow").c_str(), &it->second->follow); 
         }
         ImGui::End();
     }
@@ -180,6 +189,20 @@ namespace tk { namespace gui {
             xLim = aspectRatio;
             yLim = 1.0;
 
+			// average centers of every drawable to follow
+			if(drawBuffer.centers.size() >0) {
+                tk::common::Vector3<float> center;
+				for(int i=0; i<drawBuffer.centers.size(); i++) {
+					center.x += drawBuffer.centers[i].x;
+					center.y += drawBuffer.centers[i].y;
+					center.z += drawBuffer.centers[i].z;
+				}
+				center.x /= drawBuffer.centers.size();
+				center.y /= drawBuffer.centers.size();
+				center.z /= drawBuffer.centers.size();
+                camera.setCenter(center);
+			}
+            
             camera.setViewPort(0, 0, width, height);
             glViewport(camera.viewport[0], camera.viewport[1], 
                        camera.viewport[2], camera.viewport[3]);
@@ -223,6 +246,8 @@ namespace tk { namespace gui {
             running = running && !glfwWindowShouldClose(window);
             rate.wait(false);
         }
+
+        drawBuffer.close();
 
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();  
