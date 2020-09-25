@@ -3,6 +3,7 @@
 #include <string>
 #include "tkCommon/gui/stb_image.h"
 #include "tkCommon/gui/OBJ_Loader.h"
+#include "tkCommon/data/ImageData.h"
 
 namespace tk { namespace gui { namespace common {
 
@@ -76,6 +77,12 @@ uint8_t* loadImage(std::string filename, int* width, int* height, int* channels)
     }
     return data;
 }
+
+bool loadTkImage(std::string filename, tk::data::ImageData<uint8_t> &img){
+    img.data = loadImage(filename, &img.width, &img.height, &img.channels);
+    return img.data != NULL;
+}
+
 
 bool loadOBJ(std::string filename, object3D_t &obj) {
     
