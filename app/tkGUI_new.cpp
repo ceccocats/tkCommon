@@ -38,6 +38,10 @@ public:
 	tk::gui::tkBufferGl<float> posLines2D;
 	tk::gui::tkBufferGl<float> posLines3D;
 
+	//Shader in texture
+	tk::gui::tkTexture<uint8_t> rendering;
+	tk::gui::tkBufferGl<float> posrendering;
+
 	//Light
 	glm::vec3 lightPos;
 
@@ -90,10 +94,10 @@ public:
 		//Texture 2D
 		float vertices2D[] = {
 			//positions				//texture cords
-			1.0f,	1.0f,	0.0f,   	1.0f, 0.0f, 
-			0.7f,	1.0f, 	0.0f,   	1.0f, 1.0f,
-			0.7f, 	0.7f,	0.0f,   	0.0f, 1.0f,
-			1.0f,	0.7f,	0.0f,   	0.0f, 0.0f
+			0.8f,	1.0f, 	0.0f,   	0.0f, 0.0f, 
+			0.8f, 	0.8f,	0.0f,   	0.0f, 1.0f,
+			1.0f,	0.8f,	0.0f,   	1.0f, 1.0f,
+			1.0f,	1.0f,	0.0f,   	1.0f, 0.0f
 		};
 		unsigned int indices2D[] = {  
 			0, 1, 2, // first triangle
@@ -136,7 +140,7 @@ public:
 		};
 		posLines3D.setData(datalines3D,28);
 
-		//Lines 3D
+		//Lines 2D
 		posLines2D.init();
 		float datalines2D[] = {
 
@@ -148,9 +152,30 @@ public:
 		};
 		posLines2D.setData(datalines2D,28);
 		///////////////
+
+
+		//Shader write in texture
+		rendering.init(800,800,3);
+
+		//Texture 2D
+		float verticesCube2D[] = {
+			//positions				//texture cords
+			-1.0f,	1.0f,	0.0f,   	0.0f, 1.0f, 
+			-0.3f,	1.0f, 	0.0f,   	1.0f, 1.0f,
+			-0.3f, 	0.3f,	0.0f,   	1.0f, 0.0f,
+			-1.0f,	0.3f,	0.0f,   	0.0f, 0.0f
+		};
+		unsigned int indicesCube2D[] = {  
+			0, 1, 2, // first triangle
+			0, 3, 2  // second triangle
+		};
+		posrendering.init();
+		posrendering.setData(verticesCube2D,21);
+		posrendering.setIndexVector(indicesCube2D,6);
+		///////////////
 	}
 
-	void draw(tk::gui::Viewer *viewer){
+	void drawElements(){
 
 		//Axis
 		axis.draw();
@@ -184,8 +209,27 @@ public:
 		///////////////
 
 		
-		//Lines 3D
+		//Lines 2D
 		lines.draw(&posLines2D,4,2,GL_LINE_LOOP,false);	//4 vertex vith line size 2 closing loop
+		///////////////
+
+	}
+
+	void draw(tk::gui::Viewer *viewer){
+		
+		drawElements();
+
+
+		//Draw all in texture
+		rendering.useForRendering();
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		drawElements();
+
+		rendering.unuseRendering();
+
+		text.draw(&rendering,&posrendering,6);			//2 triangles = 6 vertex
 		///////////////
 	}
 

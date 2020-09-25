@@ -67,15 +67,6 @@ class tkBufferGl
          */
         void setVertexAttribs(std::vector<vertexAttribs_t>& vertexAttribs);
 
-
-        /**
-         * Method that attach a texture to opengl shader for drawing not in viz but in texture
-         * 
-         * @param GLunit    texture
-         * @param GLenum    attachment
-         */
-        void attachTexture(GLuint texture, GLenum attachment = GL_COLOR_ATTACHMENT0);
-
         /**
          * use method for set GL_ARRAY_BUFFER in shader
          */
@@ -100,7 +91,6 @@ void tkBufferGl<T>::use(){
 
 template <typename T>
 void tkBufferGl<T>::unuse(){
-    glBindFramebuffer(VBO, 0);
     glBindVertexArray(0);
 }
 
@@ -144,11 +134,6 @@ void tkBufferGl<T>::setVertexAttribs(std::vector<vertexAttribs_t>& vertexAttribs
             type, GL_FALSE, vertexAttribs[i].dataSize * sizeof(T), (void*)(vertexAttribs[i].offset * sizeof(T)));
     }
     glBindVertexArray(0);
-}
-
-template <typename T>
-void tkBufferGl<T>::attachTexture(GLuint texture, GLenum attachment){
-    glFramebufferTexture2D(VBO, attachment, GL_TEXTURE_2D, texture, 0);
 }
 
 template <typename T>

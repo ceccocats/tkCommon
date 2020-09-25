@@ -26,6 +26,11 @@ class tkTexture
         GLenum          format;
         GLenum          type;
 
+        bool            initRendering = false;
+        GLuint          framebuffer;
+        GLuint          RBO;
+        GLint           Viewport[4];
+
     public:
 
         /**
@@ -62,6 +67,16 @@ class tkTexture
         void unuse();
 
         /**
+         *  Method for set texture as rendering frame
+         */
+        void useForRendering();
+
+        /**
+         * Method for unset texture as rendering frame
+         */
+        void unuseRendering();
+
+        /**
          * release data method
          */
         void release();
@@ -75,6 +90,39 @@ void tkTexture<T>::use(){
 template <typename T>
 void tkTexture<T>::unuse(){
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+template <typename T>
+void tkTexture<T>::useForRendering(){
+    
+    if(initRendering == false){
+        initRendering = true;
+
+        glGenFramebuffers(1, &framebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+        glGenRenderbuffers(1, &RBO);
+        glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO); 
+        
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
+            clsErr("Error in rendering on texture\n");
+            return;
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glGetIntegerv(GL_VIEWPORT, Viewport);
+    glViewport(0,0,width,height);
+}
+
+template <typename T>
+void tkTexture<T>::unuseRendering(){
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(Viewport[0], Viewport[1], (GLsizei)Viewport[2], (GLsizei)Viewport[3]);
 }
 
 template <typename T>
