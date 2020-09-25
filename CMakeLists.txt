@@ -36,6 +36,8 @@ set(GUI_LIBS
     ${FREETYPE_LIBRARIES}
     Xxf86vm
     X11
+    gcc_s
+    gcc
 )
 message(${GUI_LIBS})
 
