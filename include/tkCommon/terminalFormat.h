@@ -215,4 +215,58 @@ namespace tk { namespace tformat{
     {
         return std::string("\033[0m");
     }
+
+
+    /**
+     *  Terminal ProgressBar
+     * 
+     *  Example usage:
+     *  tk::tformat::ProgressBar pbar(0, "example progress");
+     *  for(;pbar.eval(1000); pbar.i()++) {
+     *      usleep(5000);
+     *  }
+     */ 
+    class ProgressBar {
+    private:
+        int _end = 0;
+        int _idx = 0;
+        std::string _name;
+
+    public:
+        ProgressBar(int start, std::string name = "") {
+            _idx = start;
+            _name = name;
+        }
+        int size() {
+            return _end;
+        }
+        int &i() {
+            return _idx;
+        }
+        bool eval(int end) {
+            _end = end;
+            bool alive = _idx < end;
+
+            struct winsize ws;
+            ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
+            
+            std::string left_str = _name + " |";
+            std::string right_str = "| " + std::to_string(_idx) + "/" + std::to_string(_end);
+
+            int dim = ws.ws_col - left_str.size() - right_str.size();
+            std::cout<<left_str;
+            int endbar = (float(_idx) / _end)*dim;
+            for(int i=0; i<dim; i++) {
+                i<=endbar ? std::cout<<"#" : std::cout<<" ";
+            }
+            std::cout<<right_str;
+            
+            if(alive) 
+                std::cout<<"\r"<<std::flush;
+            else
+                std::cout<<"\n";
+            return alive;
+        }
+    };
+
 }}
