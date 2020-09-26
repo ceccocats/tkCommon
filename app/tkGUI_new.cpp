@@ -13,6 +13,8 @@
 #include <thread>
 #include <signal.h>
 
+#include "tkCommon/data/gen/GPSData.h"
+
 class Scene : public tk::gui::Drawable {
 public:
 

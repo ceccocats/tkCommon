@@ -43,6 +43,20 @@ message(${GUI_LIBS})
 
 
 #-------------------------------------------------------------------------------
+# Generate Data Headers
+#-------------------------------------------------------------------------------
+#add_custom_target(tkdataheaders_gen 
+#    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen
+#    COMMAND python3 _genDataHeaders.py)
+
+# definition of fidl_list
+add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/GPSData.h
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/_genDataHeaders.py
+    COMMAND python3 _genDataHeaders.py)
+add_custom_target(tkdataheaders_gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/GPSData.h)
+
+#-------------------------------------------------------------------------------
 # Build Libraries
 #-------------------------------------------------------------------------------
 add_library(tklibDrawText SHARED
@@ -114,8 +128,8 @@ endif()
 # copy only if it is changed (this solves useless recompiles)
 add_custom_target(tkversiongit COMMAND rsync --checksum tkversion_git.tmp tkversion_git.h)
 add_dependencies(tkversiongit tkversiongit_tmp)
-add_dependencies(tkCommon tkversiongit)
-add_dependencies(tkGUI tkversiongit)
+add_dependencies(tkCommon tkversiongit tkdataheaders_gen)
+add_dependencies(tkGUI tkversiongit tkdataheaders_gen)
 
 
 #-------------------------------------------------------------------------------

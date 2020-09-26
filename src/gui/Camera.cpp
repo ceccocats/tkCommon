@@ -1,5 +1,5 @@
 #include "tkCommon/gui/Camera.h"
-
+#include "tkCommon/math/quantile.h"
 namespace tk { namespace gui {
 
 void Camera::init() {
@@ -52,9 +52,9 @@ void Camera::setViewPort(int x, int y, int width, int height) {
 }
 
 void Camera::setCenter(tk::common::Vector3<float> p) {
-    center.x = p.x;
-    center.y = p.y;
-    center.z = p.z;
+    center.x = tk::math::lerp<float>(center.x, p.x, 0.1);
+    center.y = tk::math::lerp<float>(center.y, p.y, 0.1);
+    center.z = tk::math::lerp<float>(center.z, p.z, 0.1);
 }
 
 
