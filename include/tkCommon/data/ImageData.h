@@ -81,24 +81,7 @@ namespace tk{namespace data{
 
 
         void onInit(tk::gui::Viewer *viewer){
-            gl_texture_shader.init();
             gl_texture.init(width, height, channels);
-
-            float s = 0.5;
-            float vertices[] = {
-                //positions     //texture cords
-                -s, s, 0.0f,   	0.0f, 0.0f, 
-                -s,-s, 0.0f,   	0.0f, 1.0f,
-                 s,-s, 0.0f,   	1.0f, 1.0f,
-                 s, s, 0.0f,   	1.0f, 0.0f
-            };
-            unsigned int indices[] = {  
-                0, 1, 2, // first triangle
-                0, 3, 2  // second triangle
-            };
-            gl_buffer.init();
-            gl_buffer.setData(vertices,21);
-            gl_buffer.setIndexVector(indices,6);	
         }
 
         void onAdd(tk::gui::Viewer *viewer){
@@ -106,7 +89,11 @@ namespace tk{namespace data{
         }
 
         void draw(tk::gui::Viewer *viewer){
-            gl_texture_shader.draw(&gl_texture,&gl_buffer,6); //2 triangles = 6 vertex
+            ImGui::Begin("Image", NULL, ImGuiWindowFlags_NoScrollbar);
+            int imgX = ImGui::GetWindowSize().x-20;
+            int imgY = ImGui::GetWindowSize().y-35;
+            ImGui::Image((void*)(intptr_t)gl_texture.texture, ImVec2(imgX, imgY));
+            ImGui::End();
         }
 
         void onClose(){

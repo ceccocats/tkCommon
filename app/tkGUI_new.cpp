@@ -1,20 +1,17 @@
-#include "tkCommon/gui/ViewerNew.h"
+#include "tkCommon/gui/Viewer.h"
 #include "tkCommon/gui/Buffer.h"
 #include "tkCommon/gui/shader/axis.h"
 #include "tkCommon/gui/shader/grid.h"
 #include "tkCommon/gui/shader/mesh.h"
 #include "tkCommon/gui/shader/lines.h"
 #include "tkCommon/gui/shader/texture.h"
-#include "tkCommon/gui/CommonViewer.h"
+#include "tkCommon/gui/utils/CommonViewer.h"
 #include "tkCommon/data/LidarData.h"
 #include "tkCommon/data/VehicleData.h"
 #include "tkCommon/data/ImageData.h"
 #include "tkCommon/math/MatIO.h"
 #include <thread>
 #include <signal.h>
-
-bool gRun = true;
-tk::gui::ViewerNew* tk::gui::ViewerNew::instance = nullptr;
 
 class Scene : public tk::gui::Drawable {
 public:
@@ -241,7 +238,7 @@ public:
 };
 
 
-tk::gui::ViewerNew viewer;
+tk::gui::Viewer viewer;
 tk::data::LidarData ldata;
 tk::data::ImageData<uint8_t> img;
 tk::data::VehicleData veh;
@@ -259,7 +256,7 @@ void read_cloud() {
 
 	Eigen::MatrixXf points;
 	tk::math::MatIO::var_t var;
-	for(int i=0; i<mat.size() && gRun; i++) {
+	for(int i=0; i<mat.size() && viewer.isRunning(); i++) {
 		tk::common::Tfpose baseTf = tk::common::odom2tf(i*0.3, 0, 0);
 
 		veh.tf = baseTf * tk::common::odom2tf(0, 0, M_PI);
@@ -311,7 +308,6 @@ int main( int argc, char** argv){
 	std::thread read_cloud_th(read_cloud);	
 
 	viewer.run();
-	gRun = false;
 
 	read_cloud_th.join();
     return 0;

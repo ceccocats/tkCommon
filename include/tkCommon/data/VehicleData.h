@@ -250,11 +250,9 @@ namespace tk { namespace data {
         }
 
         void draw(tk::gui::Viewer *viewer){
-            tk::gui::ViewerNew *new_viewer = (tk::gui::ViewerNew *)viewer;
-
             //Mesh levante
             for(int i = 0; i < levante.size(); i++){	
-                mesh.draw(&levante[i], carObj.meshes[i].indices.size(), new_viewer->lightPos, carObj.meshes[i].color);
+                mesh.draw(&levante[i], carObj.meshes[i].indices.size(), viewer->lightPos, carObj.meshes[i].color);
             }
             ///////////////
         }

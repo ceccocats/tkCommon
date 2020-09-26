@@ -4,7 +4,7 @@
 #include <vector>
 #include <mutex>
 #include <map>
-#include "tkCommon/gui/CommonViewer.h"
+#include "tkCommon/gui/utils/CommonViewer.h"
 #include "tkCommon/gui/shader/pointcloud4f.h"
 #include "tkCommon/gui/shader/texture.h"
 #include "tkCommon/gui/shader/mesh.h"

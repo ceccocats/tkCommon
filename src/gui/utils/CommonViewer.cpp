@@ -1,7 +1,7 @@
 #include <string>
-#include "tkCommon/gui/CommonViewer.h"
-#include "tkCommon/gui/stb_image.h"
-#include "tkCommon/gui/OBJ_Loader.h"
+#include "tkCommon/gui/utils/CommonViewer.h"
+#include "tkCommon/gui/utils/stb_image.h"
+#include "tkCommon/gui/utils/OBJ_Loader.h"
 
 namespace tk { namespace gui { namespace common {
 

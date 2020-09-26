@@ -57,13 +57,12 @@ add_library(tklibDrawText SHARED
 add_library(tkGUI SHARED
     src/gui/Viewer.cpp
     src/gui/PlotManager.cpp
-    src/gui/lodepng.cpp
     src/gui/Buffer.cpp
     src/gui/Shader.cpp
     src/gui/Texture.cpp
-    src/gui/stb_image.cpp
-    src/gui/CommonViewer.cpp
-    src/gui/Camera3D.cpp
+    src/gui/Camera.cpp
+    src/gui/utils/stb_image.cpp
+    src/gui/utils/CommonViewer.cpp
     src/gui/imgui/imgui_demo.cpp
     src/gui/imgui/imgui_draw.cpp
     src/gui/imgui/imgui_widgets.cpp
@@ -122,9 +121,6 @@ add_dependencies(tkGUI tkversiongit)
 #-------------------------------------------------------------------------------
 # Build apps
 #-------------------------------------------------------------------------------
-add_executable(tkGUI_simple app/tkGUI_simple.cpp)
-target_link_libraries(tkGUI_simple tkCommon)
-
 add_executable(tkGUI_new app/tkGUI_new.cpp)
 target_link_libraries(tkGUI_new tkCommon)
 
@@ -161,7 +157,7 @@ target_link_libraries(tkCommon_can tkCommon tkCommunication)
 #-------------------------------------------------------------------------------
 # Install
 #-------------------------------------------------------------------------------
-install(TARGETS tkGUI_simple tkCommon_pcap_replay tkCommon_pcap_gui_replay tkCommon_eth_socket tkCommon_eth_pcap DESTINATION bin )
+install(TARGETS tkGUI_new tkCommon_pcap_replay tkCommon_pcap_gui_replay tkCommon_eth_socket tkCommon_eth_pcap DESTINATION bin )
 install(TARGETS tkCommon tkGUI tkMath tklibDrawText tkCommunication DESTINATION lib)
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts/" # source directory
         DESTINATION "bin/"
