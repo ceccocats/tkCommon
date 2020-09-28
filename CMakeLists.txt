@@ -11,6 +11,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 
 
 #-------------------------------------------------------------------------------
+# CUDA
+#-------------------------------------------------------------------------------
+find_package(CUDA 9.0 REQUIRED)
+include_directories(${CUDA_INCLUDE_DIRS})
+
+#-------------------------------------------------------------------------------
 # External Libraries
 #-------------------------------------------------------------------------------
 find_package(Eigen3 REQUIRED)
@@ -50,11 +56,12 @@ message(${GUI_LIBS})
 #    COMMAND python3 _genDataHeaders.py)
 
 # definition of fidl_list
-add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/GPSData.h
+add_custom_command(OUTPUT 
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/GpsData_gen.h
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/_genDataHeaders.py
     COMMAND python3 _genDataHeaders.py)
-add_custom_target(tkdataheaders_gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/GPSData.h)
+add_custom_target(tkdataheaders_gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/GpsData_gen.h)
 
 #-------------------------------------------------------------------------------
 # Build Libraries

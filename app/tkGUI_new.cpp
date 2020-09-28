@@ -13,7 +13,16 @@
 #include <thread>
 #include <signal.h>
 
-#include "tkCommon/data/gen/GPSData.h"
+#include "tkCommon/data/gen/ActuationData_gen.h"
+#include "tkCommon/data/gen/CalibData_gen.h"
+#include "tkCommon/data/gen/CanData_gen.h"
+#include "tkCommon/data/gen/CloudData_gen.h"
+#include "tkCommon/data/gen/GpsImuData_gen.h"
+#include "tkCommon/data/gen/ImageData_gen.h"
+#include "tkCommon/data/gen/RadarData_gen.h"
+#include "tkCommon/data/gen/VehicleData_gen.h"
+
+
 
 class Scene : public tk::gui::Drawable {
 public:
@@ -254,7 +263,7 @@ void sig_handler(int signo) {
 void read_cloud() {
 
 	tk::math::MatIO mat;
-	mat.open("/media/cecco/FerrariRecs1/datasets/balocco_velarray_camera.mat");
+	mat.open("/media/seb/FerrariRecs1/datasets/balocco_velarray_camera.mat");
 
 	Eigen::MatrixXf points;
 	tk::math::MatIO::var_t var;

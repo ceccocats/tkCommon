@@ -84,68 +84,70 @@ class CppFile(CodeFile):
 		self.write(self.format(text) + ":", -1)
 		
 
-def genData(className, VARS):
+def genData(className, VARS, DEPS = []):
 	print("GENERATE: ", className)
 	cpp = CppFile(className + ".h")
 	cpp("// this file is generated DO NOT DIRECTLY MODIFY")
 	cpp("#pragma once")
-	cpp("#include \"tkCommon/data/SensorData.h\"\n")
+	cpp("#include \"tkCommon/data/SensorData.h\"")
+	for d in DEPS:
+		cpp(d)
+	cpp("")
 	cpp("namespace tk { namespace data {\n")
 
 	with cpp.subs(ClassName=className):
 		with cpp.block("class $ClassName$ : public SensorData", ";"):
 			cpp.label("public")
 			for var in VARS:
-				with cpp.subs(type=var["type"], var=var["name"]):
-					cpp("$type$ $var$;")
+				if("default" not in var):
+					with cpp.subs(type=var["type"], var=var["name"]):
+						cpp("$type$ $var$;")
+				else:
+					with cpp.subs(type=var["type"], var=var["name"], default=var["default"]):
+						cpp("$type$ $var$ = $default$;")
 			cpp("")
 
 			with cpp.block("void init() override"):
 				cpp("SensorData::init();")
-				for var in VARS:
-					if "default" not in var:
-						continue
-					with cpp.subs(var=var["name"], default=var["default"]):
-						cpp("$var$ = $default$;")
 				for var in VARS:
 					if "init" not in var:
 						continue
 					with cpp.subs(init=var["init"]):
 						cpp("$init$;")
 
-			with cpp.block("$ClassName$& operator=(const $ClassName$& s)"):
-				cpp("SensorData::operator=(s);")
-				for var in VARS:
-					with cpp.subs(var=var["name"]):
-						cpp("$var$ = s.$var$;")
-				cpp("return *this;")
+			#with cpp.block("$ClassName$& operator=(const $ClassName$& s)"):
+			#	cpp("SensorData::operator=(s);")
+			#	for var in VARS:
+			#		with cpp.subs(var=var["name"]):
+			#			cpp("$var$ = s.$var$;")
+			#	cpp("return *this;")
 
-			with cpp.block("friend std::ostream& operator<<(std::ostream& os, const $ClassName$& s)"):
-				cpp("os<<\"$ClassName$:\"<<std::endl;")
-				#cpp("SensorData::operator<<(s);")
-				for var in VARS:
-					with cpp.subs(var=var["name"]):
-						cpp("os<<\"$var$: \"<<s.$var$<<std::endl;")
-				cpp("return os;")
+			#with cpp.block("friend std::ostream& operator<<(std::ostream& os, const $ClassName$& s)"):
+			#	cpp("os<<\"$ClassName$:\"<<std::endl;")
+			#	#cpp("SensorData::operator<<(s);")
+			#	for var in VARS:
+			#		with cpp.subs(var=var["name"]):
+			#			cpp("os<<\"$var$: \"<<s.$var$<<std::endl;")
+			#	cpp("return os;")
 
-			with cpp.block("bool toVar(std::string name, tk::math::MatIO::var_t &var)"):
-				cpp("tk::math::MatIO::var_t hvar;")
-				cpp("tk::data::SensorData::toVar(\"header\", hvar);")
-				with cpp.subs(nvars=len(VARS)+1):
-					cpp("std::vector<tk::math::MatIO::var_t> structVars($nvars$);")
-				cpp("structVars[0] = hvar;")
-				for i in range(len(VARS)):
-					with cpp.subs(i=i+1, var=VARS[i]["name"]):
-						cpp("structVars[$i$].set(\"$var$\", $var$);")
-				cpp("return var.setStruct(name, structVars);")
+			#with cpp.block("bool toVar(std::string name, tk::math::MatIO::var_t &var)"):
+			#	cpp("tk::math::MatIO::var_t hvar;")
+			#	cpp("tk::data::SensorData::toVar(\"header\", hvar);")
+			#	with cpp.subs(nvars=len(VARS)+1):
+			#		cpp("std::vector<tk::math::MatIO::var_t> structVars($nvars$);")
+			#	cpp("structVars[0] = hvar;")
+			#	for i in range(len(VARS)):
+			#		with cpp.subs(i=i+1, var=VARS[i]["name"]):
+			#			cpp("structVars[$i$].set(\"$var$\", $var$);")
+			#	cpp("return var.setStruct(name, structVars);")
 
-			with cpp.block("bool fromVar(tk::math::MatIO::var_t &var)"):
-				cpp("if(var.empty()) return false;")
-				cpp("tk::data::SensorData::fromVar(var[\"header\"]);")
-				for var in VARS:
-					with cpp.subs(var=var["name"]):
-						cpp("var[\"$var$\"].get($var$);")
-				cpp("return true;")
+			#with cpp.block("bool fromVar(tk::math::MatIO::var_t &var)"):
+			#	cpp("if(var.empty()) return false;")
+			#	cpp("tk::data::SensorData::fromVar(var[\"header\"]);")
+			#	for var in VARS:
+			#		with cpp.subs(var=var["name"]):
+			#			cpp("var[\"$var$\"].get($var$);")
+			#	cpp("return true;")
 	cpp("\n}}")
 
 	cpp.close()
