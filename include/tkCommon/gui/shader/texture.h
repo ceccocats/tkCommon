@@ -10,11 +10,7 @@
  * 
  */
 
-#include "tkCommon/gui/Shader.h"
-#include "tkCommon/gui/Texture.h"
-#include "tkCommon/gui/Buffer.h"
-#include "tkCommon/gui/Color.h"
-#include "tkCommon/common.h"
+#include "tkCommon/gui/shader/generic.h"
 
 namespace tk { namespace gui { namespace shader {
 
@@ -22,14 +18,8 @@ namespace tk { namespace gui { namespace shader {
  * @brief class that draw a texture, data organized in [X Y Z textX textY ...]
  * 
  */
-class texture
+class texture : public tk::gui::shader::generic
 {
-    private:
-        tk::gui::Shader                       shader;
-        std::vector<tk::gui::vertexAttribs_t>   vertexPointer;
-
-        glm::mat4                               modelview;
-
     public:
         bool init(){
             std::string vertex      = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/texture.vert";
@@ -44,7 +34,7 @@ class texture
             return true;
         }
 
-        void draw(tk::gui::Texture<uint8_t>* texture, tk::gui::Buffer<float>* buffer, int triangles){
+        void draw(tk::gui::Texture<uint8_t>* text, tk::gui::Buffer<float>* buffer, int triangles){
 
             glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview));
 
@@ -52,14 +42,16 @@ class texture
 
             shader.use();
             shader.setMat4("modelview",modelview);
-            texture->use();
+            text->use();
             buffer->use();
 
             glDrawElements(GL_TRIANGLES, triangles, GL_UNSIGNED_INT, 0);
 
             buffer->unuse();
-            texture->unuse();
+            text->unuse();
             shader.unuse();
+
+            glCheckError();
         }
 
         bool close(){

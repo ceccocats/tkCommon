@@ -10,24 +10,16 @@
  * 
  */
 
-#include "tkCommon/gui/Shader.h"
-#include "tkCommon/gui/Color.h"
+#include "tkCommon/gui/shader/generic.h"
 
 namespace tk { namespace gui { namespace shader {
 
 /**
- * @brief class that draw a pointcloud organized in 3 points [X Y Z X Y Z...]
+ * @brief class that draw grid
  * 
  */
-class grid
+class grid : public tk::gui::shader::generic
 {
-    private:
-        tk::gui::Shader           shader;
-
-        glm::mat4 modelview;
-        int   n = 50;
-        float dim = 1.0;
-
     public:
         bool init(){
             std::string vertex      = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/grid.vert";
@@ -35,7 +27,7 @@ class grid
             return shader.init(vertex, fragment);
         }
 
-        void draw(){
+        void draw(float dim = 1.0f, int n = 50){
             glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
 
             shader.use();
@@ -49,6 +41,8 @@ class grid
             glDrawArrays(GL_LINES, 0, n*2 +2);
 
             shader.unuse();
+
+            glCheckError();
         }
 
         bool close(){

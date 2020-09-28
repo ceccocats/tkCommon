@@ -10,9 +10,7 @@
  * 
  */
 
-#include "tkCommon/gui/Shader.h"
-#include "tkCommon/gui/Buffer.h"
-#include "tkCommon/gui/Color.h"
+#include "tkCommon/gui/shader/generic.h"
 
 namespace tk { namespace gui { namespace shader {
 
@@ -20,14 +18,8 @@ namespace tk { namespace gui { namespace shader {
  * @brief class that draw a pointcloud organized in 3 points [X Y Z 1 X Y Z 1...]
  * 
  */
-class pointcloud4f
+class pointcloud4f  : public tk::gui::shader::generic
 {
-    private:
-        std::vector<tk::gui::vertexAttribs_t>   vertexPointer;
-        tk::gui::Shader                       shader;
-
-        glm::mat4                               modelview;
-
     public:
         bool init(){
             std::string vertex      = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/pointcloud3f.vert";
@@ -61,6 +53,8 @@ class pointcloud4f
             buffer->unuse();
 
             shader.unuse();
+
+            glCheckError();
         }
 
         bool close(){

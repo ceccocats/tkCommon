@@ -10,10 +10,7 @@
  * 
  */
 
-#include "tkCommon/gui/Shader.h"
-#include "tkCommon/gui/Buffer.h"
-#include "tkCommon/gui/Color.h"
-#include "tkCommon/common.h"
+#include "tkCommon/gui/shader/generic.h"
 
 namespace tk { namespace gui { namespace shader {
 
@@ -21,14 +18,8 @@ namespace tk { namespace gui { namespace shader {
  * @brief class that draw a lines formed by [X Y Z R G B A ...]
  * 
  */
-class lines
+class lines : public tk::gui::shader::generic
 {
-    private:
-        std::vector<tk::gui::vertexAttribs_t>   vertexPointer;
-        tk::gui::Shader                       shader;
-
-        glm::mat4                               modelview;
-
     public:
         bool init(){
             std::string vertex      = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/lines.vert";
@@ -46,13 +37,9 @@ class lines
             return true;
         }
 
-        void draw(tk::gui::Buffer<float>* buffer, int n, int size = 1.0f,GLenum linemode = GL_LINE_STRIP, bool withModelview = true){
+        void draw(tk::gui::Buffer<float>* buffer, int n, int size = 1.0f,GLenum linemode = GL_LINE_STRIP){
 
-		    if(withModelview == true){
-                    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview));
-            }else{
-                    modelview = glm::mat4(1.0); //identity
-            }
+		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview));
 
             buffer->setVertexAttribs(vertexPointer);
 
@@ -66,13 +53,13 @@ class lines
             buffer->unuse();
 
             shader.unuse();
+
+            glCheckError();
         }
 
         bool close(){
             return shader.close();
         }
-
-
 };
 
 }}}

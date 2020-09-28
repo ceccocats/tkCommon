@@ -77,11 +77,11 @@ add_library(tklibDrawText SHARED
 
 add_library(tkGUI SHARED
     src/gui/Viewer.cpp
-    src/gui/PlotManager.cpp
-    src/gui/Buffer.cpp
-    src/gui/Shader.cpp
-    src/gui/Texture.cpp
-    src/gui/Camera.cpp
+    src/gui/utils/PlotManager.cpp
+    src/gui/utils/Buffer.cpp
+    src/gui/utils/Shader.cpp
+    src/gui/utils/Texture.cpp
+    src/gui/utils/Camera.cpp
     src/gui/utils/stb_image.cpp
     src/gui/utils/CommonViewer.cpp
     src/gui/imgui/imgui_demo.cpp

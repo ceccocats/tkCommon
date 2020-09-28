@@ -1,8 +1,35 @@
 #pragma once
 
 #include <string>
-#include "tkCommon/gui/Color.h"
+
 #include "tkCommon/common.h"
+
+#include "tkCommon/gui/utils/Shader.h"
+#include "tkCommon/gui/utils/Buffer.h"
+#include "tkCommon/gui/utils/Texture.h"
+#include "tkCommon/gui/utils/Color.h"
+
+void inline glCheckError_(const char *file, int line)
+{
+    GLenum errorCode;
+    while ((errorCode = glGetError()) != GL_NO_ERROR)
+    {
+        std::string error;
+        switch (errorCode)
+        {
+            case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
+            case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
+            case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
+            case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
+            case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
+            case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
+            case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+        }
+        tk::tformat::printErr("opengl", error + " at " + file +":"+std::to_string(line)+":0");
+    }
+}
+#define glCheckError() glCheckError_(__FILE__, __LINE__)
+
 
 namespace tk { namespace gui { namespace common {
 
@@ -15,7 +42,7 @@ struct vertex_t{
 struct mesh_t{
     std::vector<unsigned int>   indices;
     std::vector<vertex_t>       vertices;
-    tk::gui::Color_t            color;
+    Color_t                     color;
 
     float* vertexBufferPositionNormal(int* n){
 
@@ -56,5 +83,7 @@ struct object3D_t {
 
 uint8_t* loadImage(std::string filename, int* width, int* height, int* channels);
 bool     loadOBJ(std::string filename, object3D_t &obj);
+
+
 
 }}}

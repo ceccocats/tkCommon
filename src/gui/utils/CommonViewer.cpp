@@ -1,4 +1,3 @@
-#include <string>
 #include "tkCommon/gui/utils/CommonViewer.h"
 #include "tkCommon/gui/utils/stb_image.h"
 #include "tkCommon/gui/utils/OBJ_Loader.h"

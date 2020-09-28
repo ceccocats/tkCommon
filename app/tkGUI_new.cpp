@@ -1,26 +1,10 @@
 #include "tkCommon/gui/Viewer.h"
-#include "tkCommon/gui/Buffer.h"
-#include "tkCommon/gui/shader/axis.h"
-#include "tkCommon/gui/shader/grid.h"
-#include "tkCommon/gui/shader/mesh.h"
-#include "tkCommon/gui/shader/lines.h"
-#include "tkCommon/gui/shader/texture.h"
-#include "tkCommon/gui/utils/CommonViewer.h"
-#include "tkCommon/data/LidarData.h"
+#include "tkCommon/data/CloudData.h"
 #include "tkCommon/data/VehicleData.h"
 #include "tkCommon/data/ImageData.h"
 #include "tkCommon/math/MatIO.h"
 #include <thread>
 #include <signal.h>
-
-#include "tkCommon/data/gen/ActuationData_gen.h"
-#include "tkCommon/data/gen/CalibData_gen.h"
-#include "tkCommon/data/gen/CanData_gen.h"
-#include "tkCommon/data/gen/CloudData_gen.h"
-#include "tkCommon/data/gen/GpsImuData_gen.h"
-#include "tkCommon/data/gen/ImageData_gen.h"
-#include "tkCommon/data/gen/RadarData_gen.h"
-#include "tkCommon/data/gen/VehicleData_gen.h"
 
 
 

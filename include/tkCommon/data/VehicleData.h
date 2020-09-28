@@ -218,18 +218,24 @@ namespace tk { namespace data {
             return true;
         }
 
+    private:
 
-    public:
-    	//Mesh
-        tk::gui::shader::mesh 				mesh;
         std::vector<tk::gui::Buffer<float>> levante;
         tk::gui::common::object3D_t         carObj;
+    
+    public:
 
+        std::string model = std::string(TKPROJ_PATH) + "data/levante.obj";
+
+    public:
 
         void onInit(tk::gui::Viewer *viewer){
-            mesh.init();
+
+            shader = new tk::gui::shader::mesh();
+            shader->init();
+
+            tk::gui::common::loadOBJ(model, carObj);
             
-            //Load obj file and fill buffer
             levante.resize(carObj.meshes.size());
             for(int i = 0; i < carObj.meshes.size(); i++){
 
@@ -243,21 +249,21 @@ namespace tk { namespace data {
                 //fill indices
                 levante[i].setIndexVector(carObj.meshes[i].indices.data(),carObj.meshes[i].indices.size());
             }
-            ///////////////
-        }
-
-        void onAdd(tk::gui::Viewer *viewer){
         }
 
         void draw(tk::gui::Viewer *viewer){
-            //Mesh levante
             for(int i = 0; i < levante.size(); i++){	
-                mesh.draw(&levante[i], carObj.meshes[i].indices.size(), viewer->lightPos, carObj.meshes[i].color);
+                shader->draw(&levante[i], carObj.meshes[i].indices.size(), viewer->lightPos, carObj.meshes[i].color);
             }
-            ///////////////
         }
 
         void onClose(){
+            shader->close();
+            delete [] shader;
+
+            for(int i = 0; i < levante.size(); i++){
+                levante[i].release();
+            }
         }
     };
 }

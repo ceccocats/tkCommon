@@ -35,7 +35,7 @@ void Viewer::init() {
     const char* bar[1] = {" "}; 
     glutInit(&foo, (char**)bar);
 
-    // Font
+    //Font
     {
         /* XXX dtx_open_font opens a font file and returns a pointer to dtx_font */
         if(!(font = dtx_open_font(fontPath.c_str(), fontSize))) {
@@ -48,6 +48,8 @@ void Viewer::init() {
          */
         dtx_use_font(font, fontSize);
     }
+
+    //
 
 
     //ImGUI

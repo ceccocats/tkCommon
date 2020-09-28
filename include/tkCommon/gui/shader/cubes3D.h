@@ -10,9 +10,7 @@
  * 
  */
 
-#include "tkCommon/gui/Shader.h"
-#include "tkCommon/gui/Buffer.h"
-#include "tkCommon/gui/Color.h"
+#include "tkCommon/gui/shader/generic.h"
 
 namespace tk { namespace gui { namespace shader {
 
@@ -21,14 +19,8 @@ namespace tk { namespace gui { namespace shader {
  *          [Xcenter. Ycenter, Zcenter, Xsize, Ysize, Zsize, roll, pitch, yaw, red, green, blue, alpha]
  * 
  */
-class cubes3D
+class cubes3D : public tk::gui::shader::generic
 {
-    private:
-        std::vector<tk::gui::vertexAttribs_t>   vertexPointer;
-        tk::gui::Shader                       shader;
-
-        glm::mat4                               modelview;
-
     public:
         bool init(){
             std::string vertex      = std::string(TKPROJ_PATH) + "include/tkCommon/gui/components/shader/glsl/cubes3D.vert";
@@ -69,6 +61,8 @@ class cubes3D
             buffer->unuse();
 
             shader.unuse();
+
+            glCheckError();
         }
 
         bool close(){

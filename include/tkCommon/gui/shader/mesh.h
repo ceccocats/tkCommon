@@ -10,9 +10,7 @@
  * 
  */
 
-#include "tkCommon/gui/Shader.h"
-#include "tkCommon/gui/Buffer.h"
-#include "tkCommon/gui/Color.h"
+#include "tkCommon/gui/shader/generic.h"
 
 namespace tk { namespace gui { namespace shader {
 
@@ -30,14 +28,8 @@ namespace tk { namespace gui { namespace shader {
  *    (nx0, ny0, nz0)       (nx2, ny2, nz2)
  * 
  */
-class mesh
+class mesh : public tk::gui::shader::generic
 {
-    private:
-        std::vector<tk::gui::vertexAttribs_t>   vertexPointer;
-        tk::gui::Shader                       shader;
-
-        glm::mat4                               modelview;
-
     public:
         bool init(){
             std::string vertex      = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/mesh.vert";
@@ -76,6 +68,8 @@ class mesh
             buffer->unuse();
 
             shader.unuse();
+
+            glCheckError();
         }
 
         bool close(){
