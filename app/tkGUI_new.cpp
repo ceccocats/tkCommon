@@ -76,7 +76,7 @@ public:
 		mesh.init();
 
 		//Load obj file and fill buffer
-		tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", carObj);
+		tk::gui::common::loadOBJ(std::string(tkCommon_PATH) + "data/levante.obj", carObj);
 		levante.resize(carObj.meshes.size());
 		for(int i = 0; i < carObj.meshes.size(); i++){
 
