@@ -156,7 +156,7 @@ public:
 
 
 		//Shader write in texture
-		rendering.init(800,800,4);
+		rendering.init(800,800,4,true);
 
 		//Texture 2D
 		float verticesCube2D[] = {
@@ -223,7 +223,7 @@ public:
 
 		//Draw all in texture
 		rendering.useForRendering();
-		glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		drawElements();
@@ -282,16 +282,16 @@ int main( int argc, char** argv){
 
 	viewer.init();
 	
-	//Scene scene; // with static does not work
-	//scene.init();
-	//viewer.add("scene", &scene);
+	Scene scene; // with static does not work
+	scene.init();
+	viewer.add("scene", &scene);
 	
-	ldata.init();
+	/*ldata.init();
 	viewer.add("lidar", &ldata);
-	std::thread read_cloud_th(read_cloud);	
+	std::thread read_cloud_th(read_cloud);	*/
 
 	viewer.run();
 
-	read_cloud_th.join();
+	//read_cloud_th.join();
     return 0;
 }

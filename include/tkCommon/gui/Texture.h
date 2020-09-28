@@ -31,6 +31,10 @@ class Texture
         GLuint          RBO;
         GLint           Viewport[4];
 
+        bool            anti_aliasing;
+        GLuint          textureColorBufferMultiSampled;
+        GLuint          intermediateFBO;
+
     public:
 
         /**
@@ -40,7 +44,7 @@ class Texture
          * @param int   image geight
          * @param int   channels
          */
-        void init(int width, int height, int channels);
+        void init(int width, int height, int channels, bool anti_aliasing = false);
 
         /**
          * Method for set texture data
@@ -80,6 +84,25 @@ class Texture
          * release data method
          */
         void release();
+
+    private:
+
+        /**
+         * Internal method for generateTexture
+         * 
+         * @param GLenum    texture format
+         */
+        void generateTexture(GLenum format);
+
+        /**
+         * Internal method for rendering on texture without antialiasing
+         */
+        void renderWithoutAntialiasing();
+
+        /**
+         * Internal method for rendering on texture with antialiasing
+         */
+        void renderWithAntialiasing();
 };
 
 template <typename T>
@@ -94,7 +117,61 @@ void Texture<T>::unuse(){
 
 template <typename T>
 void Texture<T>::useForRendering(){
+
+    if(anti_aliasing == true){
+        this->renderWithAntialiasing();
+    }else{
+        this->renderWithoutAntialiasing();
+    }
+}
+
+template <typename T>
+void Texture<T>::unuseRendering(){
+
+    if(anti_aliasing == true){
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
+        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT,  GL_LINEAR);
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(Viewport[0], Viewport[1], (GLsizei)Viewport[2], (GLsizei)Viewport[3]);
+}
+
+template <typename T>
+void Texture<T>::release(){
+    glDeleteTextures(1,&texture);
+}
+
+template <typename T>
+void Texture<T>::setData(T* data){
+    use();
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, format, type, data);
+    unuse();
+}
+
+template <typename T>
+GLuint Texture<T>::id(){
+    return texture;
+}
+
+template <typename T>
+void Texture<T>::generateTexture(GLenum format){
+
+    glGenTextures(1, &texture);
     
+    use();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
+    unuse();
+}
+
+template <typename T>
+void Texture<T>::renderWithoutAntialiasing(){
     if(initRendering == false){
         initRendering = true;
 
@@ -119,27 +196,52 @@ void Texture<T>::useForRendering(){
     glViewport(0,0,width,height);
 }
 
-template <typename T>
-void Texture<T>::unuseRendering(){
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glViewport(Viewport[0], Viewport[1], (GLsizei)Viewport[2], (GLsizei)Viewport[3]);
-}
 
 template <typename T>
-void Texture<T>::release(){
-    glDeleteTextures(1,&texture);
-}
+void Texture<T>::renderWithAntialiasing(){
+    if(initRendering == false){
+        initRendering = true;
 
-template <typename T>
-void Texture<T>::setData(T* data){
-    use();
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, format, type, data);
-    unuse();
-}
+        glGenFramebuffers(1, &framebuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
-template <typename T>
-GLuint Texture<T>::id(){
-    return texture;
-}
+        // create a multisampled color attachment texture
+        glGenTextures(1, &textureColorBufferMultiSampled);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureColorBufferMultiSampled);
+        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 6, format, width, height, GL_TRUE);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, textureColorBufferMultiSampled, 0);
+
+
+        // create a (also multisampled) renderbuffer object for depth and stencil attachments
+        glGenRenderbuffers(1, &RBO);
+        glBindRenderbuffer(GL_RENDERBUFFER, RBO);
+        glRenderbufferStorageMultisample(GL_RENDERBUFFER, 6, GL_DEPTH24_STENCIL8, width, height);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
+            clsErr("Error in rendering on texture\n");
+            return;
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // configure second post-processing framebuffer
+        glGenFramebuffers(1, &intermediateFBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
+
+        // create a color attachment texture
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
+            clsErr("Error in rendering on texture\n");
+            return;
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glGetIntegerv(GL_VIEWPORT, Viewport);
+    glViewport(0,0,width,height);
+}    
 
 }}

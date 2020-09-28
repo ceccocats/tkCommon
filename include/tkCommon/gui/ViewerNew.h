@@ -81,6 +81,9 @@ namespace tk { namespace gui {
         glfwSetErrorCallback(errorCallback);
         glfwInit();
 
+        //Anti-aliasing
+        glfwWindowHint(GLFW_SAMPLES, 3);
+
         // Create a windowed mode window and its OpenGL context
         window = glfwCreateWindow(width, height, windowName.c_str(), NULL, NULL);
         if (!window) {
@@ -131,6 +134,7 @@ namespace tk { namespace gui {
         //glEnable(GL_ALPHA_TEST);
         //glDepthMask(GL_FALSE); // make the depth buffer read-only
         glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+        glEnable(GL_MULTISAMPLE);
         
         // print OpenGL status
         std::string msg = std::string{"OPENGL running on:"} + 
