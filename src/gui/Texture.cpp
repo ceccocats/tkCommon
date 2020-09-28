@@ -1,18 +1,13 @@
 #include "tkCommon/gui/Texture.h"
 
 namespace tk { namespace gui {
+
 template <>
-void Texture<uint8_t>::init(int width, int height, int channels){
+void Texture<uint8_t>::init(int width, int height, int channels, bool anti_aliasing){
 
-    this->width =   width;
-    this->height =  height;
-
-    glGenTextures(1, &texture);
-    use();
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    this->width         =   width;
+    this->height        =  height;
+    this->anti_aliasing = anti_aliasing;
 
     if(channels > 4 && channels < 1){
         clsErr("You must set 1, 2, 3 or 4 channel. Abort\n");
@@ -21,39 +16,32 @@ void Texture<uint8_t>::init(int width, int height, int channels){
     type =  GL_UNSIGNED_BYTE;
 
     if(channels == 1){
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_R8, width, height);
         format = GL_R;
+        this->generateTexture(GL_R8);
     }
 
     if(channels == 2){
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RG8, width, height);
         format = GL_RG;
+        this->generateTexture(GL_RG8);
     }
 
     if(channels == 3){
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB8, width, height);
         format = GL_RGB;
+        this->generateTexture(GL_RGB8);
     }
 
     if(channels == 4){
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, width, height);
         format = GL_RGBA;
+        this->generateTexture(GL_RGBA8);
     }
-    unuse();
 }
 
 template <>
-void Texture<float>::init(int width, int height, int channels){
+void Texture<float>::init(int width, int height, int channels, bool anti_aliasing){
 
-    this->width =   width;
-    this->height =  height;
-    
-    glGenTextures(1, &texture);
-    use();
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    this->width         =   width;
+    this->height        =  height;
+    this->anti_aliasing = anti_aliasing;
 
     if(channels > 4 && channels < 1){
         clsErr("You must set 1, 2, 3 or 4 channel. Abort\n");
@@ -62,25 +50,24 @@ void Texture<float>::init(int width, int height, int channels){
     type =  GL_FLOAT;
 
     if(channels == 1){
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_R16F, width, height);
         format = GL_R;
+        this->generateTexture(GL_R16F);
     }
 
     if(channels == 2){
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RG16F, width, height);
         format = GL_RG;
+        this->generateTexture(GL_RG16F);
     }
 
     if(channels == 3){
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGB16F, width, height);
         format = GL_RGB;
+        this->generateTexture(GL_RGB16F);
     }
 
     if(channels == 4){
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA16F, width, height);
         format = GL_RGBA;
+        this->generateTexture(GL_RGBA16F);
     }
-    unuse();
 }
 
 }}
