@@ -156,7 +156,7 @@ public:
 
 
 		//Shader write in texture
-		rendering.init(800,800,4,true);
+		rendering.init(800,800,4);
 
 		//Texture 2D
 		float verticesCube2D[] = {
