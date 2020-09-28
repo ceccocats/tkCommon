@@ -1,4 +1,4 @@
-#include "tkCommon/gui/stb_image.h"
+#include "tkCommon/gui/utils/stb_image.h"
 
 #if defined(STBI_ONLY_JPEG) || defined(STBI_ONLY_PNG) || defined(STBI_ONLY_BMP) \
   || defined(STBI_ONLY_TGA) || defined(STBI_ONLY_GIF) || defined(STBI_ONLY_PSD) \

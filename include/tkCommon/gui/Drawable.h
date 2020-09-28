@@ -4,6 +4,10 @@
 #include <vector>
 #include <mutex>
 #include <map>
+#include "tkCommon/gui/utils/CommonViewer.h"
+#include "tkCommon/gui/shader/pointcloud4f.h"
+#include "tkCommon/gui/shader/texture.h"
+#include "tkCommon/gui/shader/mesh.h"
 
 namespace tk{namespace gui{
 
@@ -13,10 +17,19 @@ namespace tk{namespace gui{
 	private:
 		std::mutex datamutex;
 		bool modified = true;		
+		bool drawInitted = false;
+
+	protected:
+		tk::gui::shader::pointcloud4f gl_cloud_shader;
+		tk::gui::shader::texture 	  gl_texture_shader;
+
+        tk::gui::Texture<uint8_t>     gl_texture;
+        tk::gui::Buffer<float>        gl_buffer;
 
 	public:
 		bool enabled = true;
-		tk::common::Tfpose tf;
+		bool follow = false;
+		tk::common::Tfpose tf = tk::common::Tfpose::Identity();
 
 		void lock() {
 			datamutex.lock();
@@ -25,22 +38,36 @@ namespace tk{namespace gui{
 			modified = true;
 			datamutex.unlock();
 		}
+		
+		virtual void onInit(tk::gui::Viewer *viewer) {}
+		virtual void onClose() {}
 		virtual void onAdd(tk::gui::Viewer *viewer) {}
 		virtual void draw(tk::gui::Viewer *viewer) {}
 		virtual void draw2D(tk::gui::Viewer *viewer) {}
 	
-		void _beforeDraw(tk::gui::Viewer *viewer) {
+		bool _beforeDraw(tk::gui::Viewer *viewer) {
 			datamutex.lock();
 			if(modified) {
+				if(!drawInitted) {
+					onInit(viewer);
+					drawInitted = true;
+				}
 				onAdd(viewer);
 				modified = false;
 			}
 			datamutex.unlock();
+			return drawInitted;
+		}
+
+		bool _drawInitted() {
+			return drawInitted;
 		}
 	};
 
 	class DrawMap {
 	public:
+		std::vector<tk::common::Vector3<float>> centers;
+
 		std::map<std::string, Drawable*>  map;
 
 		void add(std::string name, Drawable* d, tk::gui::Viewer *viewer = nullptr){
@@ -53,65 +80,43 @@ namespace tk{namespace gui{
 					continue;
 				
 				it->second->_beforeDraw(viewer);
-				it->second->draw2D(viewer);
+				if(it->second->_drawInitted()) {
+					glPushMatrix();
+					glMultMatrixf(it->second->tf.matrix().data());
+					it->second->draw2D(viewer);
+					glPopMatrix();
+				}
 
 			}
 		}
 
-		void draw(Viewer *viewer){
+		void draw(Viewer *viewer) {
+			centers.clear();
+
 			for (std::map<std::string,Drawable*>::iterator it = map.begin(); it!=map.end(); ++it){
 				if(!it->second->enabled)
 					continue;
+				if(it->second->follow) {
+					centers.push_back(tk::common::tf2pose(it->second->tf));
+				}
 
 				it->second->_beforeDraw(viewer);
-				it->second->draw(viewer);
+				if(it->second->_drawInitted()) {
+					glPushMatrix();
+					glMultMatrixf(it->second->tf.matrix().data());
+					it->second->draw(viewer);
+					glPopMatrix();
+				}
 			}
 		}
 
+		void close() {
+			for (std::map<std::string,Drawable*>::iterator it = map.begin(); it!=map.end(); ++it){
+				if(it->second->_drawInitted())
+					it->second->onClose();
+			}
+		}
 	};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

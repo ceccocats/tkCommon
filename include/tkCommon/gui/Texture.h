@@ -19,10 +19,6 @@ template <class T>
 class Texture
 {
     private:
-        GLuint          texture;
-        int             width;
-        int             height;
-
         GLenum          format;
         GLenum          type;
 
@@ -36,6 +32,9 @@ class Texture
         GLuint          intermediateFBO;
 
     public:
+        GLuint          texture;
+        int             width;
+        int             height;
 
         /**
          * Init method

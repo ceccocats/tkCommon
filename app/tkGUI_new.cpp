@@ -1,18 +1,19 @@
-#include "tkCommon/gui/ViewerNew.h"
+#include "tkCommon/gui/Viewer.h"
 #include "tkCommon/gui/Buffer.h"
 #include "tkCommon/gui/shader/axis.h"
 #include "tkCommon/gui/shader/grid.h"
 #include "tkCommon/gui/shader/mesh.h"
 #include "tkCommon/gui/shader/lines.h"
 #include "tkCommon/gui/shader/texture.h"
-#include "tkCommon/gui/CommonViewer.h"
+#include "tkCommon/gui/utils/CommonViewer.h"
 #include "tkCommon/data/LidarData.h"
+#include "tkCommon/data/VehicleData.h"
+#include "tkCommon/data/ImageData.h"
 #include "tkCommon/math/MatIO.h"
 #include <thread>
 #include <signal.h>
 
-bool gRun = true;
-tk::gui::ViewerNew* tk::gui::ViewerNew::instance = nullptr;
+#include "tkCommon/data/gen/GPSData.h"
 
 class Scene : public tk::gui::Drawable {
 public:
@@ -30,7 +31,7 @@ public:
 
 	//Texture
 	tk::gui::shader::texture 	text;
-	tk::gui::Texture<uint8_t>		texture;
+	tk::gui::Texture<uint8_t>   texture;
 	tk::gui::Buffer<float>		posText2D;
 	tk::gui::Buffer<float>		posText3D;
 
@@ -201,7 +202,7 @@ public:
 
 
 		//Texture 2D
-		text.draw(&texture,&posText3D,6,true);		//2 triangles = 6 vertex
+		text.draw(&texture,&posText3D,6);		//2 triangles = 6 vertex
 		///////////////
 
 
@@ -239,8 +240,11 @@ public:
 };
 
 
-tk::gui::ViewerNew viewer;
+tk::gui::Viewer viewer;
 tk::data::LidarData ldata;
+tk::data::ImageData<uint8_t> img;
+tk::data::VehicleData veh;
+tk::data::VehicleData veh2;
 
 void sig_handler(int signo) {
     std::cout<<"request stop\n";
@@ -250,12 +254,17 @@ void sig_handler(int signo) {
 void read_cloud() {
 
 	tk::math::MatIO mat;
-	mat.open("/media/alice/FerrariRecs1/datasets/balocco_velarray_camera.mat");
+	mat.open("/media/cecco/FerrariRecs1/datasets/balocco_velarray_camera.mat");
 
 	Eigen::MatrixXf points;
-
 	tk::math::MatIO::var_t var;
-	for(int i=0; i<mat.size(); i++) {
+	for(int i=0; i<mat.size() && viewer.isRunning(); i++) {
+		tk::common::Tfpose baseTf = tk::common::odom2tf(i*0.3, 0, 0);
+
+		veh.tf = baseTf * tk::common::odom2tf(0, 0, M_PI);
+		ldata.tf = baseTf;
+		veh2.tf = tk::common::odom2tf(0, 0, M_PI_4) * baseTf * tk::common::odom2tf(0, 0, M_PI);
+
 		mat.read(mat[i], var);
 		var["lidar"]["points"].get(points);
 		var.release();
@@ -267,6 +276,7 @@ void read_cloud() {
 		ldata.nPoints = points.cols();
 		ldata.unlock();
 
+		usleep(10000);
 	}
 
 	mat.close();
@@ -289,6 +299,18 @@ int main( int argc, char** argv){
 	/*ldata.init();
 	viewer.add("lidar", &ldata);
 	std::thread read_cloud_th(read_cloud);	*/
+	img.tf.linear() = img.tf.linear() * 10;
+	img.data = tk::gui::common::loadImage(std::string(TKPROJ_PATH) + "data/tkLogo.png", &img.width, &img.height, &img.channels);
+
+	tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", veh.carObj);
+	tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", veh2.carObj);
+
+	ldata.init();
+	viewer.add("lidar", &ldata);
+	viewer.add("image", &img);
+	viewer.add("vehicle", &veh);
+	viewer.add("vehicle2", &veh2);
+	std::thread read_cloud_th(read_cloud);	
 
 	viewer.run();
 
