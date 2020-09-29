@@ -1,4 +1,4 @@
-#include "tkCommon/gui/PlotManager.h"
+#include "tkCommon/gui/utils/PlotManager.h"
 
 using namespace tk::gui;
 

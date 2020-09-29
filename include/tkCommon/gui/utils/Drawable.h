@@ -4,65 +4,64 @@
 #include <vector>
 #include <mutex>
 #include <map>
-#include "tkCommon/gui/utils/CommonViewer.h"
-#include "tkCommon/gui/shader/pointcloud4f.h"
-#include "tkCommon/gui/shader/texture.h"
-#include "tkCommon/gui/shader/mesh.h"
 
-namespace tk{namespace gui{
+#include "tkCommon/gui/shader/shaders.h"
+
+namespace tk{ namespace gui{
 
 	class Viewer;
 
 	class Drawable {
-	private:
-		std::mutex datamutex;
-		bool modified = true;		
-		bool drawInitted = false;
-
-	protected:
-		tk::gui::shader::pointcloud4f gl_cloud_shader;
-		tk::gui::shader::texture 	  gl_texture_shader;
-
-        tk::gui::Texture<uint8_t>     gl_texture;
-        tk::gui::Buffer<float>        gl_buffer;
-
+	
 	public:
 		bool enabled = true;
 		bool follow = false;
+
 		tk::common::Tfpose tf = tk::common::Tfpose::Identity();
 
-		void lock() {
-			datamutex.lock();
-		}
-		void unlock() {
-			modified = true;
-			datamutex.unlock();
-		}
-		
 		virtual void onInit(tk::gui::Viewer *viewer) {}
 		virtual void onClose() {}
 		virtual void onAdd(tk::gui::Viewer *viewer) {}
 		virtual void draw(tk::gui::Viewer *viewer) {}
 		virtual void draw2D(tk::gui::Viewer *viewer) {}
-	
+
 		bool _beforeDraw(tk::gui::Viewer *viewer) {
 			datamutex.lock();
-			if(modified) {
-				if(!drawInitted) {
-					onInit(viewer);
-					drawInitted = true;
-				}
-				onAdd(viewer);
-				modified = false;
+
+			if(drawInitted == false){
+				drawInitted = true;
+				this->onInit(viewer);
 			}
+
+			if(modified == true){
+				modified = false;
+				this->onAdd(viewer);
+			}
+
 			datamutex.unlock();
+
 			return drawInitted;
 		}
 
-		bool _drawInitted() {
-			return drawInitted;
+		void lock() {
+			datamutex.lock();
 		}
+
+		void unlock() {
+			modified = true;
+			datamutex.unlock();
+		}
+
+	protected:
+		tk::gui::shader::generic*	shader;
+
+		std::mutex 	datamutex;
+		bool modified = true;
+
+		bool drawInitted = false;
 	};
+
+
 
 	class DrawMap {
 	public:
@@ -79,8 +78,7 @@ namespace tk{namespace gui{
 				if(!it->second->enabled)
 					continue;
 				
-				it->second->_beforeDraw(viewer);
-				if(it->second->_drawInitted()) {
+				if(it->second->_beforeDraw(viewer)) {
 					glPushMatrix();
 					glMultMatrixf(it->second->tf.matrix().data());
 					it->second->draw2D(viewer);
@@ -96,12 +94,12 @@ namespace tk{namespace gui{
 			for (std::map<std::string,Drawable*>::iterator it = map.begin(); it!=map.end(); ++it){
 				if(!it->second->enabled)
 					continue;
+					
 				if(it->second->follow) {
 					centers.push_back(tk::common::tf2pose(it->second->tf));
 				}
 
-				it->second->_beforeDraw(viewer);
-				if(it->second->_drawInitted()) {
+				if(it->second->_beforeDraw(viewer)) {
 					glPushMatrix();
 					glMultMatrixf(it->second->tf.matrix().data());
 					it->second->draw(viewer);
@@ -112,8 +110,7 @@ namespace tk{namespace gui{
 
 		void close() {
 			for (std::map<std::string,Drawable*>::iterator it = map.begin(); it!=map.end(); ++it){
-				if(it->second->_drawInitted())
-					it->second->onClose();
+				it->second->onClose();
 			}
 		}
 	};

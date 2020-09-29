@@ -30,7 +30,11 @@ class Buffer
         unsigned int EBO;
 
         int size    = 0;
-        bool called = false;
+
+        bool initEBO    = false;
+        int sizeEBO     = 0;
+
+        bool intted     = false;
 
         GLenum          type;
 
@@ -41,6 +45,14 @@ class Buffer
          * 
          */
         void init();
+
+
+        /**
+         * Method that return if EBO is setted
+         * 
+         * @return  if EBO is setted
+         */
+        bool hasEBO();
 
         /**
          * Method for set data in GL_ARRAY_BUFFER
@@ -102,17 +114,45 @@ void Buffer<T>::release(){
 }
 
 template <typename T>
+bool Buffer<T>::hasEBO(){
+    return initEBO;
+}
+
+template <typename T>
 void Buffer<T>::setIndexVector(unsigned int* data, int lenght){
 
-    if(called == true){
-        clsWrn("You must call setIndices one time\n");
-        return;
+    //init
+    if(initEBO == false){
+        initEBO = true;
+        sizeEBO = lenght;
+
+        glBindVertexArray(VAO);
+        glGenBuffers(1, &EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, lenght * sizeof(unsigned int), data, GL_DYNAMIC_DRAW); 
+        glBindVertexArray(0);  
+        return;    
     }
-    called = true;
+
     glBindVertexArray(VAO);
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, lenght * sizeof(unsigned int), data, GL_STATIC_DRAW);
+
+    //check dim
+    if(sizeEBO < lenght){
+        sizeEBO = lenght;
+
+        //delete and realloc
+        glDeleteBuffers(1, &EBO);
+        glGenBuffers(1, &EBO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeEBO  * sizeof(unsigned int), data, GL_DYNAMIC_DRAW);
+
+    }else{
+
+        //copy sub data
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, lenght * sizeof(unsigned int), data);
+    }
+
     glBindVertexArray(0);
 }
 
@@ -138,7 +178,24 @@ void Buffer<T>::setVertexAttribs(std::vector<vertexAttribs_t>& vertexAttribs){
 
 template <typename T>
 void Buffer<T>::setData(T* data, int lenght, int offset){
-            
+
+    if(intted == false){
+        intted = true;
+
+        size = lenght + offset;
+
+        int realOffset = offset == 0 ? 1 : offset;
+
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, size * realOffset * sizeof(T), NULL, GL_DYNAMIC_DRAW);
+        glBufferSubData(GL_ARRAY_BUFFER, offset * sizeof(T), lenght * sizeof(T), data);
+        glBindVertexArray(0);
+
+        return;
+    }
+
     glBindVertexArray(VAO);
 
     if(lenght+offset > size){

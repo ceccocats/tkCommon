@@ -1,37 +1,15 @@
 #include "tkCommon/gui/Viewer.h"
-#include "tkCommon/gui/Buffer.h"
-#include "tkCommon/gui/shader/axis.h"
-#include "tkCommon/gui/shader/grid.h"
-#include "tkCommon/gui/shader/mesh.h"
-#include "tkCommon/gui/shader/lines.h"
-#include "tkCommon/gui/shader/texture.h"
-#include "tkCommon/gui/utils/CommonViewer.h"
-#include "tkCommon/data/LidarData.h"
+#include "tkCommon/data/CloudData.h"
 #include "tkCommon/data/VehicleData.h"
 #include "tkCommon/data/ImageData.h"
 #include "tkCommon/math/MatIO.h"
 #include <thread>
 #include <signal.h>
 
-#include "tkCommon/data/gen/ActuationData_gen.h"
-#include "tkCommon/data/gen/CalibData_gen.h"
-#include "tkCommon/data/gen/CanData_gen.h"
-#include "tkCommon/data/gen/CloudData_gen.h"
-#include "tkCommon/data/gen/GpsImuData_gen.h"
-#include "tkCommon/data/gen/ImageData_gen.h"
-#include "tkCommon/data/gen/RadarData_gen.h"
-#include "tkCommon/data/gen/VehicleData_gen.h"
-
 
 
 class Scene : public tk::gui::Drawable {
 public:
-
-	//Axis
-	tk::gui::shader::axis axis;
-
-	//Grid
-	tk::gui::shader::grid grid;
 
 	//Mesh
 	tk::gui::shader::mesh 				mesh;
@@ -57,20 +35,16 @@ public:
 	glm::vec3 lightPos;
 
 
+	//heightmap
+	tk::gui::shader::heightmap map;
+	tk::math::Mat<float>	points;
+	tk::math::Mat<float>	colors;
+
+
 	void init(){
 
 		//Light
 		lightPos = glm::vec3(0.0f, 0.0f, 20.0f);
-
-		//Axis
-		axis.init();
-		///////////////
-
-
-		//Grid
-		grid.init();
-		///////////////
-
 
 		//mesh
 		mesh.init();
@@ -184,19 +158,48 @@ public:
 		posrendering.setData(verticesCube2D,21);
 		posrendering.setIndexVector(indicesCube2D,6);
 		///////////////
+
+		//heightmap
+		map.init();
+
+		points.resize(1,90);
+		points.data_h[0] = 6;
+		points.data_h[1] = 6;
+		points.data_h[2] = 2;
+
+		points.data_h[3] = 10;
+		points.data_h[4] = 6;
+		points.data_h[5] = 0;
+
+		points.data_h[6] = 6;
+		points.data_h[7] = 10;
+		points.data_h[8] = 0;
+
+		points.data_h[9]  = 10;
+		points.data_h[10] = 10;
+		points.data_h[11] = 2;
+
+		colors.resize(1,90);
+
+		colors.data_h[0] = 1;
+		colors.data_h[1] = 0;
+		colors.data_h[2] = 0;
+
+		colors.data_h[3] = 0;
+		colors.data_h[4] = 1;
+		colors.data_h[5] = 0;
+
+		colors.data_h[6] = 0;
+		colors.data_h[7] = 1;
+		colors.data_h[8] = 0;
+
+		colors.data_h[9]  = 0;
+		colors.data_h[10] = 0;
+		colors.data_h[11] = 1;
+		///////////////
 	}
 
 	void drawElements(){
-
-		//Axis
-		axis.draw();
-		///////////////
-
-
-		//Grid
-		grid.draw();
-		///////////////
-
 
 		//Mesh levante
 		for(int i = 0; i < levante.size(); i++){	
@@ -221,8 +224,11 @@ public:
 
 		
 		//Lines 2D
-		lines.draw(&posLines2D,4,2,GL_LINE_LOOP,false);	//4 vertex vith line size 2 closing loop
+		lines.draw(&posLines2D,4,2,GL_LINE_LOOP);	//4 vertex vith line size 2 closing loop
 		///////////////
+
+
+		map.draw(points,colors,2,2);
 
 	}
 
@@ -250,8 +256,8 @@ public:
 
 
 tk::gui::Viewer viewer;
-tk::data::LidarData ldata;
-tk::data::ImageData<uint8_t> img;
+tk::data::CloudData ldata;
+tk::data::ImageData img;
 tk::data::VehicleData veh;
 tk::data::VehicleData veh2;
 
@@ -263,7 +269,7 @@ void sig_handler(int signo) {
 void read_cloud() {
 
 	tk::math::MatIO mat;
-	mat.open("/media/seb/FerrariRecs1/datasets/balocco_velarray_camera.mat");
+	mat.open("/media/alice/FerrariRecs1/datasets/balocco_velarray_camera.mat");
 
 	Eigen::MatrixXf points;
 	tk::math::MatIO::var_t var;
@@ -279,10 +285,7 @@ void read_cloud() {
 		var.release();
 
 		ldata.lock();
-		for(int j=0; j<points.cols(); j++) {
-			ldata.points.col(j) = points.col(j);
-		}
-		ldata.nPoints = points.cols();
+		ldata.points.copyFrom(points.data(),points.rows(),points.cols());
 		ldata.unlock();
 
 		usleep(10000);
@@ -309,20 +312,22 @@ int main( int argc, char** argv){
 	viewer.add("lidar", &ldata);
 	std::thread read_cloud_th(read_cloud);	*/
 	img.tf.linear() = img.tf.linear() * 10;
-	img.data = tk::gui::common::loadImage(std::string(TKPROJ_PATH) + "data/tkLogo.png", &img.width, &img.height, &img.channels);
+	int w, h, c;
+	uint8_t* image = tk::gui::common::loadImage(std::string(tkCommon_PATH) + "data/tkLogo.png", &w, &h, &c);
+	//img.data.copyFrom(image,1, w*h*c);
 
-	tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", veh.carObj);
-	tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", veh2.carObj);
+	//tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", veh.carObj);
+	//tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", veh2.carObj);
 
 	ldata.init();
 	viewer.add("lidar", &ldata);
-	viewer.add("image", &img);
+	//viewer.add("image", &img);
 	viewer.add("vehicle", &veh);
 	viewer.add("vehicle2", &veh2);
 	std::thread read_cloud_th(read_cloud);	
 
 	viewer.run();
 
-	//read_cloud_th.join();
+	read_cloud_th.join();
     return 0;
 }

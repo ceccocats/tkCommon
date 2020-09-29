@@ -9,6 +9,7 @@
 #include <sstream>
 #include <initializer_list>
 #include "tkCommon/CudaCommon.h"
+#include "tkCommon/math/MatIO.h"
 
 namespace tk { namespace math {
 
@@ -25,79 +26,145 @@ class Mat : public tk::math::MatDump {
         int     _rows = 0;
         int     _cols = 0;
         int     _size = 0;
+        bool    _gpu  = false;
 
     public:
         T*      data_d = nullptr;
         T*      data_h = nullptr;
 
-        Mat(int r=0, int c=0) {
-            //std::cout<<"init\n";
-            if(r > 0 && c > 0)
-                resize(r,c);
-        }
-        ~Mat() {
-            release();
+        __host__
+        Mat(){
+
         }
 
-        void copyFrom(T*data, int r, int c) {
+        __host__
+        ~Mat(){
+            
+        }
+
+        __host__ void
+        init(int r, int c){
+            if(r > 0 && c > 0){
+                resize(r,c);
+            }
+        }
+
+        __host__ void
+        useGPU(){
+            _gpu = true;
+            resize(_rows,_cols);
+        }
+
+        __host__ bool
+        hasGPU() const {
+            return _gpu;
+        }
+
+        __host__ void 
+        copyFrom(T*data, int r, int c) {
             resize(r, c);
             memcpy(data_h, data, _size*sizeof(T));
-            synchGPU();
+            if(_gpu == true){
+                synchGPU();
+            }
         }
 
-        void copyTo(T*data) {
+        __host__ void 
+        copyTo(T*data) {
             memcpy(data, data_h, _size*sizeof(T)); 
         }
 
-        void cloneGPU(const Mat<T> &m) {
+        __host__ void 
+        cloneGPU(const Mat<T> &m) {
+
+            tkASSERT(m.hasGPU() == true, "Could not clone from GPU")
+
             resize(m.rows(), m.cols());
+            useGPU();
             HANDLE_ERROR( cudaMemcpy(data_d, m.data_d, m.size() * sizeof(T), cudaMemcpyDeviceToDevice) ); 
         }
 
-        void cloneCPU(const Mat<T> &m) {
+        __host__ void 
+        cloneCPU(const Mat<T> &m) {
+
             resize(m.rows(), m.cols());
             memcpy(data_h, m.data_h, m.size() * sizeof(T)); 
         }
         
-        void synchGPU(){ 
+        __host__ void 
+        synchGPU(){ 
+
+            useGPU();
             HANDLE_ERROR( cudaMemcpy(data_d, data_h, _size * sizeof(T), cudaMemcpyHostToDevice) ); 
         }
 
-        void synchCPU(){ 
+        __host__ void 
+        synchCPU(){ 
+
+            tkASSERT(_gpu == true,"You set mat only on CPU\n");
             HANDLE_ERROR( cudaMemcpy(data_h, data_d, _size * sizeof(T), cudaMemcpyDeviceToHost) ); 
         }
         
-        void resize(int r, int c) {
-            if(data_h == nullptr || data_d == nullptr || _maxSize < r * c){
+        __host__ void 
+        resize(int r, int c) {
+
+            if(_maxSize < r * c || data_h == nullptr){
                 _maxSize = r * c + MAXSIZE_MARGIN;
                 HANDLE_ERROR( cudaFreeHost(data_h) );
                 HANDLE_ERROR( cudaMallocHost(&data_h, _maxSize * sizeof(T)) );
-                HANDLE_ERROR( cudaFree(data_d) );
-                HANDLE_ERROR( cudaMalloc(&data_d, _maxSize * sizeof(T)) );
+            }
+
+            if(_gpu == true){
+                if(_maxSize < r * c || data_d == nullptr){
+                    HANDLE_ERROR( cudaFree(data_d) );
+                    HANDLE_ERROR( cudaMalloc(&data_d, _maxSize * sizeof(T)) );
+                }
             }
             _rows = r;
             _cols = c;
             _size = r * c;
         }
 
-        void release(){
-            //std::cout<<"release\n";
-            if(data_h != nullptr)
-                HANDLE_ERROR( cudaFreeHost(data_h) ); 
-            if(data_d != nullptr)
-                HANDLE_ERROR( cudaFree(data_d) ); 
+        __host__ void 
+        close(){
+            if(data_h != nullptr){
+                HANDLE_ERROR( cudaFreeHost(data_h) );
+            } 
+            if(data_d != nullptr && _gpu == true){
+                HANDLE_ERROR( cudaFree(data_d) );
+            } 
         }
 
-        int rows() const { return _rows; }
-        int cols() const { return _cols; }
-        int size() const { return _size; }
+        __host__ __device__ int 
+        rows() const { 
+            return _rows; 
+        }
 
-        T& at(int r, int c) { return data_h[r+c*_rows]; }
+        __host__ __device__ int 
+        cols() const { 
+            return _cols; 
+        }
+        
+        __host__ __device__ int 
+        size() const { 
+            return _size; 
+        }
+        
+        __host__ T&  
+        atCPU(int r, int c) { 
+            return data_h[r+c*_rows]; 
+        }
+        
+        __device__ T&  
+        atGPU(int r, int c) { 
+            if(_gpu == true){
+                return data_d[r+c*_rows];
+            }
+            return nullptr;
+        }
 
-        /**
-         * Filled in row format
-         */
-        void set(std::initializer_list<T> a_args) {
+        __host__ void 
+        set(std::initializer_list<T> a_args) {
             if(a_args.size() != size()) {
                 std::cout<<"ERROR: you must set all data\n";
                 std::cout<<"try insert: "<<a_args.size()<<" in size: "<<size()<<"\n";
@@ -105,13 +172,16 @@ class Mat : public tk::math::MatDump {
             }
             int i=0;
             for(auto a : a_args) {
-                at(i/_cols, i%_cols) = a;
+                atCPU(i/_cols, i%_cols) = a;
                 i++;
             }
-            synchGPU();
+
+            if(_gpu == true){
+                synchGPU();
+            }
         }
 
-
+        __host__ 
         Mat& operator=(const Mat& s) {
             cloneCPU(s);
             cloneGPU(s);

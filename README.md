@@ -18,7 +18,6 @@ make -j8
 |------------|--------|---------|
 |[can-dbcparser](https://github.com/downtimes/can-dbcparser) |Michael Auracher | MIT|
 |[imgui](https://github.com/ocornut/imgui)| Omar Cornut | MIT|
-|[libdrawtext](https://github.com/jtsiomb/libdrawtext) | John Tsiombikas |LGPL-3.0|
 |[stb_image](https://github.com/nothings/stb)|Michael Keck| MIT|
 |[OBJ-Loader](https://github.com/Bly7/OBJ-Loader)|Robert Smith| MIT|
 |[Argh!](https://github.com/adishavit/argh)| Adi Shavit| Argh! |

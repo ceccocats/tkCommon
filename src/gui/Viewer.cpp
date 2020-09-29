@@ -18,12 +18,20 @@ void Viewer::init() {
         glfwTerminate();
     }
 
+    //Icon
+    int channels;
+    GLFWimage img;
+    img.pixels =tk::gui::common::loadImage(std::string(tkCommon_PATH) + "data/tkLogo.png", &img.width, &img.height, &channels);
+    glfwSetWindowIcon(window,1,&img);  
+
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetCursorPosCallback(window, cursor_position_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetKeyCallback(window, keyCallback);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
+
+    glCheckError();
 
     // Initialize OpenGL loader
     bool err = glewInit() != GLEW_OK;
@@ -35,20 +43,11 @@ void Viewer::init() {
     const char* bar[1] = {" "}; 
     glutInit(&foo, (char**)bar);
 
-    // Font
-    {
-        /* XXX dtx_open_font opens a font file and returns a pointer to dtx_font */
-        if(!(font = dtx_open_font(fontPath.c_str(), fontSize))) {
-            tk::tformat::printErr("Viewer",std::string{"failed to open font: "+fontPath});
-            exit(1);
-        }
-        /* XXX select the font and size to render with by calling dtx_use_font
-         * if you want to use a different font size, you must first call:
-         * dtx_prepare(font, size) once.
-         */
-        dtx_use_font(font, fontSize);
-    }
+    axis.init();
+    grid.init();
+    text.init(fontPath);
 
+    glCheckError();
 
     //ImGUI
     {
@@ -92,13 +91,18 @@ void Viewer::init() {
 
     glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &total_mem_kb);
 
-
     // lights
     lightPos = glm::vec3(0.0f, 0.0f, 20.0f);
+
+    glCheckError();
 }
 
 void Viewer::draw() {
     drawBuffer.draw(this);
+
+    axis.draw();
+    grid.draw();
+    text.draw("gatti gay", 1200.0f, 25.0f);
 
     glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
 
@@ -116,6 +120,8 @@ void Viewer::draw() {
         ImGui::Checkbox( ("##" + it->first +"_follow").c_str(), &it->second->follow); 
     }
     ImGui::End();
+
+    glCheckError();
 }
 
 void Viewer::run() {
@@ -204,6 +210,9 @@ bool Viewer::isRunning() {
 }
 
 void Viewer::close() { 
+    axis.close();
+    grid.close();
+    text.close();
     clsMsg("close\n");
     running = false;
 }

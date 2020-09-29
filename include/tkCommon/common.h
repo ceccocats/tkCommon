@@ -17,6 +17,7 @@
 #include "tkCommon/CmdParser.h"
 #include "tkCommon/terminalFormat.h"
 #include "tkCommon/exceptions.h"
+#include "tkCommon/math/Mat.h"
 
 namespace tk { namespace common {
 

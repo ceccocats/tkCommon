@@ -10,8 +10,7 @@
  * 
  */
 
-#include "tkCommon/gui/Shader.h"
-#include "tkCommon/gui/Color.h"
+#include "tkCommon/gui/shader/generic.h"
 
 namespace tk { namespace gui { namespace shader {
 
@@ -19,18 +18,13 @@ namespace tk { namespace gui { namespace shader {
  * @brief class that draw a pointcloud organized in 3 points [X Y Z X Y Z...]
  * 
  */
-class axis
+class axis : public tk::gui::shader::generic
 {
-    private:
-        tk::gui::Shader                       shader;
-
-        glm::mat4                               modelview;
-
     public:
         bool init(){
-            std::string vertex      = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/axis.vert";
-            std::string geometry    = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/axis.geom";
-            std::string fragment    = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/axis.frag";
+            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/axis.vert";
+            std::string geometry    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/axis.geom";
+            std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/axis.frag";
             
             return shader.init(vertex, fragment, geometry);
         }
@@ -48,6 +42,8 @@ class axis
             glLineWidth(1.0);
             
             shader.unuse();
+
+            glCheckError();
         }
 
         bool close(){

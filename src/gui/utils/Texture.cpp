@@ -1,4 +1,4 @@
-#include "tkCommon/gui/Texture.h"
+#include "tkCommon/gui/utils/Texture.h"
 
 namespace tk { namespace gui {
 

@@ -1,5 +1,6 @@
-#include "tkCommon/gui/Camera.h"
+#include "tkCommon/gui/utils/Camera.h"
 #include "tkCommon/math/quantile.h"
+
 namespace tk { namespace gui {
 
 void Camera::init() {

@@ -3,7 +3,6 @@
 #include "tkCommon/common.h"
 #include "tkCommon/utils.h"
 #include "tkCommon/gui/Viewer.h"
-#include "Viewer.h"
 
 namespace tk { namespace gui {
 

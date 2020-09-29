@@ -1,4 +1,4 @@
-#include "tkCommon/gui/Shader.h"
+#include "tkCommon/gui/utils/Shader.h"
 
 bool 
 tk::gui::Shader::init(std::string vertexPath, std::string fragmentPath, std::string geometryPath){
