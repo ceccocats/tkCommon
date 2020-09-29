@@ -11,10 +11,11 @@ VARS = [ {"name":"speed",   "type":"double"},
 genData(className, VARS)
 
 className = "ImuData_gen"
-VARS = [ {"name":"acc",       "type":"tk::common::Vector3<double>"},
-         {"name":"angleRate", "type":"tk::common::Vector3<double>"}, 
+DEPS = [ "#include \"tkCommon/math/Vec.h\"" ]
+VARS = [ {"name":"acc",       "type":"tk::math::Vec3<double>"},
+         {"name":"angleRate", "type":"tk::math::Vec3<double>"}, 
        ]
-genData(className, VARS)
+genData(className, VARS, DEPS)
 
 className = "GpsData_gen"
 VARS = [ {"name":"lat", "type":"double", "default":"0"}, 

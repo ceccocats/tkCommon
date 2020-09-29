@@ -44,19 +44,17 @@ namespace tk { namespace data {
             this->header        = s.header;
             return *this;
         }
+        friend std::ostream& operator<<(std::ostream& os, const SensorData& s)
+        {
+            os<<"header.stamp: "<<s.header.stamp;
+            return os;
+        }
 
         bool toVar(std::string name, tk::math::MatIO::var_t &var) {
-            std::vector<tk::math::MatIO::var_t> structVars(2);
-            structVars[0].set("stamp", header.stamp);
-            structVars[1].set("tf", header.tf.matrix());
-            return var.setStruct(name, structVars);
+            return header.toVar(name, var);
         }
         bool fromVar(tk::math::MatIO::var_t &var) {
-            if(var.empty())
-                return false;
-            var["stamp"].get(header.stamp);
-            var["tf"].get(header.tf.matrix());
-            return true;
+            return header.fromVar(var);
         }
     };
 }}

@@ -44,6 +44,7 @@ set(GUI_LIBS
     X11
     gcc_s
     gcc
+    ${CUDA_LIBRARIES}
 )
 message(${GUI_LIBS})
 

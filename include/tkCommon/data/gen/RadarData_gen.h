@@ -16,6 +16,37 @@ public:
     {
         SensorData::init();
     }
+    RadarData_gen& operator=(const RadarData_gen& s)
+    {
+        SensorData::operator=(s);
+        near = s.near;
+        far = s.far;
+        return *this;
+    }
+    friend std::ostream& operator<<(std::ostream& os, const RadarData_gen& s)
+    {
+        os<<"RadarData_gen:"<<std::endl;
+        os<<"header.stamp:"<<s.header.stamp<<std::endl;
+        os<<"near: "<<s.near<<std::endl;
+        os<<"far: "<<s.far<<std::endl;
+        return os;
+    }
+    bool toVar(std::string name, tk::math::MatIO::var_t &var)
+    {
+        std::vector<tk::math::MatIO::var_t> structVars(3);
+        structVars[0].set("header", header);
+        structVars[1].set("near", near);
+        structVars[2].set("far", far);
+        return var.setStruct(name, structVars);
+    }
+    bool fromVar(tk::math::MatIO::var_t &var)
+    {
+        if(var.empty()) return false;
+        var["header"].get(header);
+        var["near"].get(near);
+        var["far"].get(far);
+        return true;
+    }
 };
 
 }}

@@ -1,4 +1,6 @@
 #pragma once
+#include <utility>
+#include <type_traits>
 #include <matio.h>
 #include "tkCommon/common.h"
 
@@ -41,6 +43,7 @@ template <> struct matio_type<float>    { typedef float type;     static const m
 template <> struct matio_type<double>   { typedef double type;    static const matio_types tid = MAT_T_DOUBLE; static const matio_classes cid = MAT_C_DOUBLE; };
 template <> struct matio_type<long double> { typedef double type; static const matio_types tid = MAT_T_DOUBLE; static const matio_classes cid = MAT_C_DOUBLE; };
 
+class MatDump;
 
 /**
     Mat file reader class
@@ -222,12 +225,15 @@ public:
             return fieldMap[s];
         }
 
-        template <typename T>
-        bool get(T &val) {
+
+        template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool get(T &a);
+        template<class T, typename std::enable_if<!std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool get(T &a){
             matio_type<T> mat_type;
             if(!check(var, mat_type.tid, 2, true))
                 return false;
-            memcpy(&val, var->data, var->data_size);
+            memcpy(&a, var->data, var->data_size);
             return true;
         }
         template<typename T, int A, int B>
@@ -256,16 +262,18 @@ public:
             memcpy( (void*)vec.data(), var->data, vec.size()*var->data_size);
             return true;
         }
-   
 
-        template <typename T>
-        bool set(std::string name, T &val) {
+
+        template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool set(std::string name, T &a);
+        template<class T, typename std::enable_if<!std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool set(std::string name, T &a) {
             matio_type<T> mat_type;
             release();
             size_t dim[2] = { 1, 1 }; // 1x1, single value
-            var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, &val, 0);
+            var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, &a, 0);
             return true;
-        }   
+        } 
         template<typename T, int A, int B>
         bool set(std::string name, Eigen::Matrix<T, A, B> &mat) {
             matio_type<T> mat_type;
@@ -510,6 +518,16 @@ class MatDump {
         tkFATAL("Not implemented");
     }
 };
+
+// template specialization
+template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type>
+bool MatIO::var_t::get(T &m) {
+    return m.fromVar(*this);
+}
+template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type>
+bool MatIO::var_t::set(std::string name, T &m) {
+    return m.toVar(name, *this);
+}
 
 
 }}

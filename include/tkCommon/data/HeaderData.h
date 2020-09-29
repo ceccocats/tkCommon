@@ -1,6 +1,7 @@
 #pragma once
 
 #include "tkCommon/common.h"
+#include "tkCommon/math/MatIO.h"
 
 namespace tk { namespace data {
 
@@ -61,7 +62,7 @@ namespace tk { namespace data {
      * @brief Header data class.
      * Standard metadata for higher-level data class.
      */
-    class HeaderData {
+    class HeaderData : public tk::math::MatDump {
     public:
         std::string         name;           /**< Name of the sensor. */
         tk::common::Tfpose  tf;             /**< TF in respect to back axel, @see tk::common::Tfpose. */
@@ -102,6 +103,20 @@ namespace tk { namespace data {
             tf = s.tf;
 
             return *this;
+        }
+
+        bool toVar(std::string name, tk::math::MatIO::var_t &var) {
+            std::vector<tk::math::MatIO::var_t> structVars(2);
+            structVars[0].set("stamp", stamp);
+            structVars[1].set("tf", tf.matrix());
+            return var.setStruct(name, structVars);
+        }
+        bool fromVar(tk::math::MatIO::var_t &var) {
+            if(var.empty())
+                return false;
+            var["stamp"].get(stamp);
+            var["tf"].get(tf.matrix());
+            return true;
         }
     };
 }}

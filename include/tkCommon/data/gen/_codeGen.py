@@ -84,6 +84,13 @@ class CppFile(CodeFile):
 		self.write(self.format(text) + ":", -1)
 		
 
+def isVarConst(name):
+	return name.startswith("const") or name.startswith("typedef")
+	
+def isVarSTD(name):
+	return name.startswith("std::") or name.startswith("struct")
+
+
 def genData(className, VARS, DEPS = []):
 	print("GENERATE: ", className)
 	cpp = CppFile(className + ".h")
@@ -115,39 +122,48 @@ def genData(className, VARS, DEPS = []):
 					with cpp.subs(init=var["init"]):
 						cpp("$init$;")
 
-			#with cpp.block("$ClassName$& operator=(const $ClassName$& s)"):
-			#	cpp("SensorData::operator=(s);")
-			#	for var in VARS:
-			#		with cpp.subs(var=var["name"]):
-			#			cpp("$var$ = s.$var$;")
-			#	cpp("return *this;")
+			with cpp.block("$ClassName$& operator=(const $ClassName$& s)"):
+				cpp("SensorData::operator=(s);")
+				for var in VARS:
+					if isVarConst(var["type"]):
+						continue
+					with cpp.subs(var=var["name"]):
+						cpp("$var$ = s.$var$;")
+				cpp("return *this;")
 
-			#with cpp.block("friend std::ostream& operator<<(std::ostream& os, const $ClassName$& s)"):
-			#	cpp("os<<\"$ClassName$:\"<<std::endl;")
-			#	#cpp("SensorData::operator<<(s);")
-			#	for var in VARS:
-			#		with cpp.subs(var=var["name"]):
-			#			cpp("os<<\"$var$: \"<<s.$var$<<std::endl;")
-			#	cpp("return os;")
+			with cpp.block("friend std::ostream& operator<<(std::ostream& os, const $ClassName$& s)"):
+				cpp("os<<\"$ClassName$:\"<<std::endl;")
+				cpp("os<<\"header.stamp:\"<<s.header.stamp<<std::endl;")
+				#cpp("SensorData::operator<<(s);")
+				for var in VARS:
+					if isVarConst(var["type"]) or isVarSTD(var["type"]):
+						continue
+					with cpp.subs(var=var["name"]):
+						cpp("os<<\"$var$: \"<<s.$var$<<std::endl;")
+				cpp("return os;")
 
-			#with cpp.block("bool toVar(std::string name, tk::math::MatIO::var_t &var)"):
-			#	cpp("tk::math::MatIO::var_t hvar;")
-			#	cpp("tk::data::SensorData::toVar(\"header\", hvar);")
-			#	with cpp.subs(nvars=len(VARS)+1):
-			#		cpp("std::vector<tk::math::MatIO::var_t> structVars($nvars$);")
-			#	cpp("structVars[0] = hvar;")
-			#	for i in range(len(VARS)):
-			#		with cpp.subs(i=i+1, var=VARS[i]["name"]):
-			#			cpp("structVars[$i$].set(\"$var$\", $var$);")
-			#	cpp("return var.setStruct(name, structVars);")
+			MATVARS = []
+			for v in VARS:
+				if isVarConst(v["type"]) or isVarSTD(v["type"]):
+					continue
+				MATVARS.append(v)
 
-			#with cpp.block("bool fromVar(tk::math::MatIO::var_t &var)"):
-			#	cpp("if(var.empty()) return false;")
-			#	cpp("tk::data::SensorData::fromVar(var[\"header\"]);")
-			#	for var in VARS:
-			#		with cpp.subs(var=var["name"]):
-			#			cpp("var[\"$var$\"].get($var$);")
-			#	cpp("return true;")
+			with cpp.block("bool toVar(std::string name, tk::math::MatIO::var_t &var)"):
+				with cpp.subs(nvars=len(MATVARS)+1):
+					cpp("std::vector<tk::math::MatIO::var_t> structVars($nvars$);")
+				cpp("structVars[0].set(\"header\", header);")
+				for i in range(len(MATVARS)):
+					with cpp.subs(i=i+1, var=MATVARS[i]["name"]):
+						cpp("structVars[$i$].set(\"$var$\", $var$);")
+				cpp("return var.setStruct(name, structVars);")
+
+			with cpp.block("bool fromVar(tk::math::MatIO::var_t &var)"):
+				cpp("if(var.empty()) return false;")
+				cpp("var[\"header\"].get(header);")
+				for var in MATVARS:
+					with cpp.subs(var=var["name"]):
+						cpp("var[\"$var$\"].get($var$);")
+				cpp("return true;")
 	cpp("\n}}")
 
 	cpp.close()

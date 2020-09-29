@@ -17,7 +17,7 @@ namespace tk { namespace math {
  * @tparam  T matrix class type
  */
 template<class T>
-class Mat {
+class Mat : public tk::math::MatDump {
 
     private:
         static const int MAXSIZE_MARGIN = 0;
@@ -94,16 +94,6 @@ class Mat {
 
         T& at(int r, int c) { return data_h[r+c*_rows]; }
 
-        void print(std::string name = "") {
-            std::cout<<"Mat "<<name<<" ("<<_rows<<"x"<<_cols<<")\n";
-            for(int i = 0; i < _rows; ++i) {
-                for(int j = 0; j < _cols; ++j) {
-                    std::cout << std::right << std::setw(20) << at(i,j);
-                }
-                std::cout << std::endl;
-            }
-        }
-
         /**
          * Filled in row format
          */
@@ -119,6 +109,24 @@ class Mat {
                 i++;
             }
             synchGPU();
+        }
+
+
+        Mat& operator=(const Mat& s) {
+            cloneCPU(s);
+            cloneGPU(s);
+            return *this;
+        }
+
+        friend std::ostream& operator<<(std::ostream& os, const Mat& s) {
+            std::cout<<"Mat ("<<s.rows()<<"x"<<s.cols()<<")";
+            for(int i = 0; i < s.rows(); ++i) {
+                std::cout << std::endl;
+                for(int j = 0; j < s.rows(); ++j) {
+                    std::cout << std::right << std::setw(20) << s.data_h[i+j*s.rows()];
+                }
+            }
+            return os;
         }
 };
 
