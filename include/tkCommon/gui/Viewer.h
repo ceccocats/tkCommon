@@ -10,7 +10,6 @@
 #include "tkCommon/gui/utils/CommonViewer.h"
 #include "tkCommon/gui/utils/Drawable.h"
 #include "tkCommon/gui/utils/Camera.h"
-#include "tkCommon/gui/libdrawtext/drawtext.h"
 #include "tkCommon/gui/imgui/imgui.h"
 #include "tkCommon/gui/imgui/imgui_impl_glfw.h"
 #include "tkCommon/gui/imgui/imgui_impl_opengl3.h"
@@ -49,13 +48,12 @@ namespace tk { namespace gui {
         glm::vec3 lightPos;
 
         // font
-        int fontSize = 256;
         std::string fontPath = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf";
-        struct dtx_font *font;
 
         //Grid and axis
-        tk::gui::shader::axis;
-        tk::gui::shader::grid;
+        tk::gui::shader::axis axis;
+        tk::gui::shader::grid grid;
+        tk::gui::shader::text text;
 
 
          Viewer() {

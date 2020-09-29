@@ -22,9 +22,9 @@ class pointcloud3f  : public tk::gui::shader::generic
 {
     public:
         bool init(){
-            std::string vertex      = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/pointcloud3f.vert";
+            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloud3f.vert";
             std::string geometry    = "";
-            std::string fragment    = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/pointcloud3f.frag";
+            std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloud3f.frag";
             
             bool status = shader.init(vertex, fragment, geometry);
             if(status == false)

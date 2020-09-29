@@ -22,9 +22,9 @@ class axis : public tk::gui::shader::generic
 {
     public:
         bool init(){
-            std::string vertex      = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/axis.vert";
-            std::string geometry    = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/axis.geom";
-            std::string fragment    = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/axis.frag";
+            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/axis.vert";
+            std::string geometry    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/axis.geom";
+            std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/axis.frag";
             
             return shader.init(vertex, fragment, geometry);
         }

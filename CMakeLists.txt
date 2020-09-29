@@ -44,6 +44,7 @@ set(GUI_LIBS
     X11
     gcc_s
     gcc
+    ${CUDA_LIBRARIES}
 )
 message(${GUI_LIBS})
 
@@ -66,15 +67,6 @@ add_custom_target(tkdataheaders_gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/
 #-------------------------------------------------------------------------------
 # Build Libraries
 #-------------------------------------------------------------------------------
-add_library(tklibDrawText SHARED
-    src/gui/libdrawtext/draw.c
-    src/gui/libdrawtext/drawgl.c
-    src/gui/libdrawtext/drawrast.c
-    src/gui/libdrawtext/font.c
-    src/gui/libdrawtext/tpool.c
-    src/gui/libdrawtext/utf8.c
-)
-
 add_library(tkGUI SHARED
     src/gui/Viewer.cpp
     src/gui/utils/PlotManager.cpp
@@ -93,7 +85,7 @@ add_library(tkGUI SHARED
     src/common.cpp
     src/version.cpp
 )
-target_link_libraries(tkGUI tklibDrawText ${GUI_LIBS})
+target_link_libraries(tkGUI ${GUI_LIBS})
 
 add_library(tkCommon SHARED
     src/common.cpp
@@ -179,7 +171,7 @@ target_link_libraries(tkCommon_can tkCommon tkCommunication)
 # Install
 #-------------------------------------------------------------------------------
 install(TARGETS tkGUI_new tkCommon_pcap_replay tkCommon_pcap_gui_replay tkCommon_eth_socket tkCommon_eth_pcap DESTINATION bin )
-install(TARGETS tkCommon tkGUI tkMath tklibDrawText tkCommunication DESTINATION lib)
+install(TARGETS tkCommon tkGUI tkMath tkCommunication DESTINATION lib)
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts/" # source directory
         DESTINATION "bin/"
 )

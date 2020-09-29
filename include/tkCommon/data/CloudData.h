@@ -13,7 +13,7 @@ namespace tk { namespace data {
 
         void onInit(tk::gui::Viewer *viewer){
             shader = new tk::gui::shader::pointcloud4f();
-            shader->init();
+            ((tk::gui::shader::pointcloud4f*) shader)->init();
             pointcloud.init();
         }
 
@@ -22,11 +22,11 @@ namespace tk { namespace data {
         }
 
         void draw(tk::gui::Viewer *viewer){
-            shader->draw(&pointcloud, points.cols());			
+            ((tk::gui::shader::pointcloud4f*) shader)->draw(&pointcloud, points.cols());			
         }
 
         void onClose(){
-            shader->close();
+            ((tk::gui::shader::pointcloud4f*) shader)->close();
             pointcloud.release();
 
             delete [] shader;

@@ -38,6 +38,8 @@ namespace tk{ namespace gui{
 				this->onAdd(viewer);
 			}
 
+			datamutex.unlock();
+
 			return drawInitted;
 		}
 

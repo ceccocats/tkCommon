@@ -205,7 +205,7 @@ public:
 
 		
 		//Lines 2D
-		lines.draw(&posLines2D,4,2,GL_LINE_LOOP,false);	//4 vertex vith line size 2 closing loop
+		lines.draw(&posLines2D,4,2,GL_LINE_LOOP);	//4 vertex vith line size 2 closing loop
 		///////////////
 
 	}
@@ -234,8 +234,8 @@ public:
 
 
 tk::gui::Viewer viewer;
-tk::data::LidarData ldata;
-tk::data::ImageData<uint8_t> img;
+tk::data::CloudData ldata;
+tk::data::ImageData img;
 tk::data::VehicleData veh;
 tk::data::VehicleData veh2;
 
@@ -247,7 +247,7 @@ void sig_handler(int signo) {
 void read_cloud() {
 
 	tk::math::MatIO mat;
-	mat.open("/media/seb/FerrariRecs1/datasets/balocco_velarray_camera.mat");
+	mat.open("/media/alice/FerrariRecs1/datasets/balocco_velarray_camera.mat");
 
 	Eigen::MatrixXf points;
 	tk::math::MatIO::var_t var;
@@ -263,10 +263,7 @@ void read_cloud() {
 		var.release();
 
 		ldata.lock();
-		for(int j=0; j<points.cols(); j++) {
-			ldata.points.col(j) = points.col(j);
-		}
-		ldata.nPoints = points.cols();
+		ldata.points.copyFrom(points.data(),points.rows(),points.cols());
 		ldata.unlock();
 
 		usleep(10000);
@@ -293,10 +290,12 @@ int main( int argc, char** argv){
 	viewer.add("lidar", &ldata);
 	std::thread read_cloud_th(read_cloud);	*/
 	img.tf.linear() = img.tf.linear() * 10;
-	img.data = tk::gui::common::loadImage(std::string(TKPROJ_PATH) + "data/tkLogo.png", &img.width, &img.height, &img.channels);
+	int w, h, c;
+	uint8_t* image = tk::gui::common::loadImage(std::string(tkCommon_PATH) + "data/tkLogo.png", &w, &h, &c);
+	img.data.copyFrom(image,1, w*h*c);
 
-	tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", veh.carObj);
-	tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", veh2.carObj);
+	//tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", veh.carObj);
+	//tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", veh2.carObj);
 
 	ldata.init();
 	viewer.add("lidar", &ldata);

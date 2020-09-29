@@ -232,7 +232,7 @@ namespace tk { namespace data {
         void onInit(tk::gui::Viewer *viewer){
 
             shader = new tk::gui::shader::mesh();
-            shader->init();
+            ((tk::gui::shader::mesh*) shader)->init();
 
             tk::gui::common::loadOBJ(model, carObj);
             
@@ -253,12 +253,12 @@ namespace tk { namespace data {
 
         void draw(tk::gui::Viewer *viewer){
             for(int i = 0; i < levante.size(); i++){	
-                shader->draw(&levante[i], carObj.meshes[i].indices.size(), viewer->lightPos, carObj.meshes[i].color);
+                ((tk::gui::shader::mesh*) shader)->draw(&levante[i], carObj.meshes[i].indices.size(), viewer->lightPos, carObj.meshes[i].color);
             }
         }
 
         void onClose(){
-            shader->close();
+            ((tk::gui::shader::mesh*) shader)->close();
             delete [] shader;
 
             for(int i = 0; i < levante.size(); i++){

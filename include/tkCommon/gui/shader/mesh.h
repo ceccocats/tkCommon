@@ -32,9 +32,9 @@ class mesh : public tk::gui::shader::generic
 {
     public:
         bool init(){
-            std::string vertex      = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/mesh.vert";
-            std::string geometry    = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/mesh.geom";
-            std::string fragment    = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/mesh.frag";
+            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/mesh.vert";
+            std::string geometry    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/mesh.geom";
+            std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/mesh.frag";
             
             bool status = shader.init(vertex, fragment, geometry);
             if(status == false) return false;

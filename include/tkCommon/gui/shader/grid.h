@@ -22,8 +22,8 @@ class grid : public tk::gui::shader::generic
 {
     public:
         bool init(){
-            std::string vertex      = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/grid.vert";
-            std::string fragment    = std::string(TKPROJ_PATH) + "include/tkCommon/gui/shader/glsl/grid.frag";        
+            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/grid.vert";
+            std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/grid.frag";        
             return shader.init(vertex, fragment);
         }
 
