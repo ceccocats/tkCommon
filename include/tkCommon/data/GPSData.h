@@ -38,6 +38,9 @@ namespace tk { namespace data {
             lat     = 0;
             lon     = 0;
             hdop    = 0;
+            vdop    = 0;
+            vel_hdop = 0;
+            vel_vdop = 0;
             height  = 0;
 
             // stat
@@ -89,7 +92,11 @@ namespace tk { namespace data {
             // GPS
             this->lat     = s.lat;
             this->lon     = s.lon;
-            this->hdop    = s.hdop;
+            this->hdop    = s.hdop    ;
+            this->vdop    = s.vdop    ;
+            this->vel_hdop = s.vel_hdop;
+            this->vel_vdop = s.vel_vdop;
+            
             this->height  = s.height;
 
             // stat
@@ -134,7 +141,7 @@ namespace tk { namespace data {
             tk::math::MatIO::var_t hvar;
             tk::data::SensorData::toVar("header", hvar);
 
-            std::vector<tk::math::MatIO::var_t> structVars(15);
+            std::vector<tk::math::MatIO::var_t> structVars(21);
             structVars[ 0] = hvar;
             structVars[ 1].set("lat",        lat);
             structVars[ 2].set("lon",        lon);
@@ -150,6 +157,13 @@ namespace tk { namespace data {
             structVars[12].set("accY",       accY);
             structVars[13].set("accZ",       accZ);
             structVars[14].set("sideSlip",   sideSlip);
+            structVars[15].set("speedX",     speedX);
+            structVars[16].set("speedY",     speedY);
+            structVars[17].set("speedZ",     speedZ);
+            structVars[18].set("hdop",       hdop);
+            structVars[19].set("vdop",       vdop);
+            structVars[20].set("quality",    quality);
+        
             return var.setStruct(name, structVars);
         }
 
@@ -173,6 +187,12 @@ namespace tk { namespace data {
             var["accY"      ].get(accY);
             var["accZ"      ].get(accZ);
             var["sideSlip"  ].get(sideSlip);
+            var["speedX"    ].get(speedX);
+            var["speedY"    ].get(speedY);
+            var["speedZ"    ].get(speedZ);
+            var["hdop"      ].get(hdop);
+            var["vdop"      ].get(vdop);
+            var["quality"   ].get(quality);
             return true;
         }
 
