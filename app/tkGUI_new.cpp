@@ -11,12 +11,6 @@
 class Scene : public tk::gui::Drawable {
 public:
 
-	//Axis
-	tk::gui::shader::axis axis;
-
-	//Grid
-	tk::gui::shader::grid grid;
-
 	//Mesh
 	tk::gui::shader::mesh 				mesh;
 	std::vector<tk::gui::Buffer<float>> levante;
@@ -45,16 +39,6 @@ public:
 
 		//Light
 		lightPos = glm::vec3(0.0f, 0.0f, 20.0f);
-
-		//Axis
-		axis.init();
-		///////////////
-
-
-		//Grid
-		grid.init();
-		///////////////
-
 
 		//mesh
 		mesh.init();
@@ -171,16 +155,6 @@ public:
 	}
 
 	void drawElements(){
-
-		//Axis
-		axis.draw();
-		///////////////
-
-
-		//Grid
-		grid.draw();
-		///////////////
-
 
 		//Mesh levante
 		for(int i = 0; i < levante.size(); i++){	
