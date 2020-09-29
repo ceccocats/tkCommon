@@ -22,7 +22,7 @@ public:
 	uint64_t wakeups_missed;
     uint64_t last_ts;
 
-public:
+
      Task() {}
     ~Task() {}
 

@@ -1,5 +1,6 @@
 #include "tkCommon/CmdParser.h"
 #include "tkCommon/rt/Task.h"
+#include "tkCommon/rt/Thread.h"
 
 bool gRun = true;
 void sig_handler(int signo) {
@@ -7,20 +8,24 @@ void sig_handler(int signo) {
     gRun = false;
 }
 
+void *task(void *data) {
+    tk::rt::Task t;
+    t.init(1000);
+    while (gRun) {
+        t.wait();
+    }
+    t.printStats();
+}
 
 int main( int argc, char** argv){
     signal(SIGINT, sig_handler);
     tk::common::CmdParser cmd(argv, "RT task test");
-    int period = cmd.addIntOpt("-p", 100, "task period (us)");
     cmd.parse();
 
-    tk::rt::Task t;
-    t.init(period);
-    while (gRun) {
-        t.wait();
-        std::cout<<"tick "<<t.last_ts<<"\n";        
-    }
-    t.printStats();
-
+    tk::rt::Thread th;
+    th.init(task);
+    sleep(1);
+    gRun = false;
+    th.join();
     return 0;
 }
