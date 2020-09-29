@@ -292,14 +292,14 @@ int main( int argc, char** argv){
 	img.tf.linear() = img.tf.linear() * 10;
 	int w, h, c;
 	uint8_t* image = tk::gui::common::loadImage(std::string(tkCommon_PATH) + "data/tkLogo.png", &w, &h, &c);
-	img.data.copyFrom(image,1, w*h*c);
+	//img.data.copyFrom(image,1, w*h*c);
 
 	//tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", veh.carObj);
 	//tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", veh2.carObj);
 
 	ldata.init();
 	viewer.add("lidar", &ldata);
-	viewer.add("image", &img);
+	//viewer.add("image", &img);
 	viewer.add("vehicle", &veh);
 	viewer.add("vehicle2", &veh2);
 	std::thread read_cloud_th(read_cloud);	
