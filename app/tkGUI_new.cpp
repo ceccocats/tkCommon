@@ -35,6 +35,12 @@ public:
 	glm::vec3 lightPos;
 
 
+	//heightmap
+	tk::gui::shader::heightmap map;
+	tk::math::Mat<float>	points;
+	tk::math::Mat<float>	colors;
+
+
 	void init(){
 
 		//Light
@@ -152,6 +158,45 @@ public:
 		posrendering.setData(verticesCube2D,21);
 		posrendering.setIndexVector(indicesCube2D,6);
 		///////////////
+
+		//heightmap
+		map.init();
+
+		points.resize(1,90);
+		points.data_h[0] = 6;
+		points.data_h[1] = 6;
+		points.data_h[2] = 2;
+
+		points.data_h[3] = 10;
+		points.data_h[4] = 6;
+		points.data_h[5] = 0;
+
+		points.data_h[6] = 6;
+		points.data_h[7] = 10;
+		points.data_h[8] = 0;
+
+		points.data_h[9]  = 10;
+		points.data_h[10] = 10;
+		points.data_h[11] = 2;
+
+		colors.resize(1,90);
+
+		colors.data_h[0] = 1;
+		colors.data_h[1] = 0;
+		colors.data_h[2] = 0;
+
+		colors.data_h[3] = 0;
+		colors.data_h[4] = 1;
+		colors.data_h[5] = 0;
+
+		colors.data_h[6] = 0;
+		colors.data_h[7] = 1;
+		colors.data_h[8] = 0;
+
+		colors.data_h[9]  = 0;
+		colors.data_h[10] = 0;
+		colors.data_h[11] = 1;
+		///////////////
 	}
 
 	void drawElements(){
@@ -181,6 +226,9 @@ public:
 		//Lines 2D
 		lines.draw(&posLines2D,4,2,GL_LINE_LOOP);	//4 vertex vith line size 2 closing loop
 		///////////////
+
+
+		map.draw(points,colors,2,2);
 
 	}
 
@@ -280,6 +328,6 @@ int main( int argc, char** argv){
 
 	viewer.run();
 
-	//read_cloud_th.join();
+	read_cloud_th.join();
     return 0;
 }

@@ -7,3 +7,4 @@
 #include "tkCommon/gui/shader/pointcloud4f.h"
 #include "tkCommon/gui/shader/texture.h"
 #include "tkCommon/gui/shader/text.h"
+#include "tkCommon/gui/shader/heightmap.h"

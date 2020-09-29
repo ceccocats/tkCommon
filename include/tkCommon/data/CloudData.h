@@ -29,7 +29,7 @@ namespace tk { namespace data {
             ((tk::gui::shader::pointcloud4f*) shader)->close();
             pointcloud.release();
 
-            delete [] shader;
+            delete shader;
         }
     };
 }}

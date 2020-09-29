@@ -259,7 +259,7 @@ namespace tk { namespace data {
 
         void onClose(){
             ((tk::gui::shader::mesh*) shader)->close();
-            delete [] shader;
+            delete shader;
 
             for(int i = 0; i < levante.size(); i++){
                 levante[i].release();

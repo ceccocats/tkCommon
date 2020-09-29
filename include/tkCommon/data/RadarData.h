@@ -34,7 +34,7 @@ namespace tk { namespace data {
             farCloud.release();
             nearCloud.release();
 
-            delete [] shader;
+            delete shader;
         }
     };
 }}

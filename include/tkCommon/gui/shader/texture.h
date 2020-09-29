@@ -45,7 +45,11 @@ class texture : public tk::gui::shader::generic
             text->use();
             buffer->use();
 
-            glDrawElements(GL_TRIANGLES, triangles, GL_UNSIGNED_INT, 0);
+            if(buffer->hasEBO()){
+                glDrawElements(GL_TRIANGLES, triangles, GL_UNSIGNED_INT, 0);
+            }else{
+                glDrawArrays(GL_TRIANGLES, 0, triangles);
+            }
 
             buffer->unuse();
             text->unuse();
