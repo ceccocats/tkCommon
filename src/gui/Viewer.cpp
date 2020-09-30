@@ -36,7 +36,7 @@ void Viewer::init() {
     // Initialize OpenGL loader
     bool err = glewInit() != GLEW_OK;
     if (err) {
-        tk::tformat::printErr("Viewer", "Failed to initialize OpenGL loader!\n");
+        tk::tprint::printErr("Viewer", "Failed to initialize OpenGL loader!\n");
         exit(-1);
     }
     int foo = 1;
@@ -222,7 +222,7 @@ void Viewer::add(std::string name, Drawable *data){
 }
 
 void Viewer::errorCallback(int error, const char* description) {
-    tk::tformat::printErr("Viewer", std::string{"error: "}+std::to_string(error)+" "+description+"\n");
+    tk::tprint::printErr("Viewer", std::string{"error: "}+std::to_string(error)+" "+description+"\n");
 }
 
 void Viewer::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {

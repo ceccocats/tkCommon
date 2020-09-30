@@ -13,7 +13,7 @@
 #include <tkCommon/data/LidarData.h>
 
 #include <tkCommon/exceptions.h>
-#include <tkCommon/terminalFormat.h>
+#include <tkCommon/printTerminal.h>
 
 struct replayPcap_t{
 

@@ -25,7 +25,7 @@ void inline glCheckError_(const char *file, int line)
             case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
             case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
         }
-        tk::tformat::printErr("opengl", error + " at " + file +":"+std::to_string(line)+":0\n");
+        tk::tprint::printErr("opengl", error + " at " + file +":"+std::to_string(line)+":0\n");
     }
 }
 #define glCheckError() glCheckError_(__FILE__, __LINE__)

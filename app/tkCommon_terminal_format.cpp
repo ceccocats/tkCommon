@@ -1,4 +1,4 @@
-#include <tkCommon/terminalFormat.h>
+#include <tkCommon/printTerminal.h>
 #include <iostream>
 #include <cxxabi.h>
 
@@ -24,22 +24,22 @@ class tkClass{
 int main(int argc, char* argv[]){
 
     std::cout<<"this is how "
-             <<tk::tformat::print("colorful", tk::tformat::lightRed, tk::tformat::predefined, tk::tformat::underlined)
+             <<tk::tprint::print("colorful", tk::tprint::lightRed, tk::tprint::predefined, tk::tprint::underlined)
              <<" is "
-             <<tk::tformat::print("tk:\n\n", tk::tformat::lightYellow, tk::tformat::predefined, tk::tformat::bold);
+             <<tk::tprint::print("tk:\n\n", tk::tprint::lightYellow, tk::tprint::predefined, tk::tprint::bold);
 
     //Print usage
-    for(uint8_t i=tk::tformat::white; i<=tk::tformat::lightGray; i++) {
-        std::cout<<tk::tformat::print("Color code:  ", i);
-        std::cout<<tk::tformat::print(std::to_string(i)+"\n", i, tk::tformat::predefined, tk::tformat::reverse);
+    for(uint8_t i=tk::tprint::white; i<=tk::tprint::lightGray; i++) {
+        std::cout<<tk::tprint::print("Color code:  ", i);
+        std::cout<<tk::tprint::print(std::to_string(i)+"\n", i, tk::tprint::predefined, tk::tprint::reverse);
     }
 
     //Set unset usage
-    for(uint8_t i=tk::tformat::darkGray; i<=tk::tformat::black; i++) {
-        std::cout<<tk::tformat::set(i);
+    for(uint8_t i=tk::tprint::darkGray; i<=tk::tprint::black; i++) {
+        std::cout<<tk::tprint::set(i);
         std::cout<<"Color code:  ";
-        std::cout<<tk::tformat::set(i, tk::tformat::predefined, tk::tformat::reverse);
-        std::cout<<int(i)<<tk::tformat::unset()<<"\n";
+        std::cout<<tk::tprint::set(i, tk::tprint::predefined, tk::tprint::reverse);
+        std::cout<<int(i)<<tk::tprint::unset()<<"\n";
     }
 
     //Class printing

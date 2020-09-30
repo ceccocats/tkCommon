@@ -8,19 +8,18 @@
 #include <iomanip>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include "utils.h"
 
-#define clsName(X) (tk::tformat::printErr(abi::__cxa_demangle(typeid(*this).name());
+#define clsName(X) (tk::tprint::printErr(abi::__cxa_demangle(typeid(*this).name());
 
-#define clsErr(X)  (tk::tformat::printErr(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
+#define clsErr(X)  (tk::tprint::printErr(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
 
-#define clsSuc(X)  (tk::tformat::printSuc(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
+#define clsSuc(X)  (tk::tprint::printSuc(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
 
-#define clsWrn(X)  (tk::tformat::printWrn(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
+#define clsWrn(X)  (tk::tprint::printWrn(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
 
-#define clsMsg(X)  (tk::tformat::printMsg(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
+#define clsMsg(X)  (tk::tprint::printMsg(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
 
-namespace tk { namespace tformat{
+namespace tk { namespace tprint{
 
     const static uint8_t    predefined      = 39;
     const static uint8_t    white           = 30;
@@ -221,7 +220,7 @@ namespace tk { namespace tformat{
      *  Terminal ProgressBar
      * 
      *  Example usage:
-     *  tk::tformat::ProgressBar pbar(0, "example progress");
+     *  tk::tprint::ProgressBar pbar(0, "example progress");
      *  for(;pbar.eval(1000); pbar.i()++) {
      *      usleep(5000);
      *  }

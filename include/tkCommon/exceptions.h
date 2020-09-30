@@ -6,11 +6,12 @@
 #include <execinfo.h>
 #include <regex>
 #include <fstream>
-#include <tkCommon/terminalFormat.h>
+#include <tkCommon/printTerminal.h>
 
 
 #define tkASSERT(...) tk::exceptions::check_error(__FILE__,__FUNCTION__,__LINE__,__VA_ARGS__);
 #define tkFATAL(X) tk::exceptions::raise_error(__FILE__,__FUNCTION__,__LINE__,X);
+#define tkUNIT_TEST(...) tk::exceptions::check_unit_test(__FILE__,__FUNCTION__,__LINE__,__VA_ARGS__);
 
 namespace tk{
 
@@ -33,15 +34,24 @@ namespace tk{
                 
                 if(status == false){
                     if(msg != "")
-                        tk::tformat::printErr("tkAssert", msg+"\n");
-                    tk::tformat::printErr("tkAssert", "function: "+std::string(funz)+" at "+file+":"+ std::to_string(line)+"\n");
+                        tk::tprint::printErr("tkAssert", msg+"\n");
+                    tk::tprint::printErr("tkAssert", "function: "+std::string(funz)+" at "+file+":"+ std::to_string(line)+"\n");
                     exit(-1);
                 }
             }
 
             inline static void raise_error(const char *file, const char *funz, int line, std::string msg) {
-                tk::tformat::printErr("tkFatal", msg+"\nfunction: "+std::string(funz)+" at "+file+":"+ std::to_string(line)+"\n");
+                tk::tprint::printErr("tkFatal", msg+"\nfunction: "+std::string(funz)+" at "+file+":"+ std::to_string(line)+"\n");
                 exit(-1);
+            }
+
+            inline static void check_unit_test(const char *file, const char *funz, int line, bool status, std::string msg = ""){
+                
+                if(status == false){
+                    if(msg != "")
+                        tk::tprint::printErr("tkUNIT_TEST", msg+"\n");
+                    tk::tprint::printErr("tkUNIT_TEST", "failed at: "+std::string(funz)+" at "+file+":"+ std::to_string(line)+"\n");
+                }
             }
         
         private:
@@ -79,7 +89,7 @@ namespace tk{
                 std::regex addr_reg("\\[(0x.*?)\\]"); // inside brackets []
 
 
-                std::cout<<tk::tformat::set(tk::tformat::red,tk::tformat::predefined,tk::tformat::bold)<<"\n";
+                std::cout<<tk::tprint::set(tk::tprint::red,tk::tprint::predefined,tk::tprint::bold)<<"\n";
                 std::cerr<<"SEGFAULT\n";
                 std::cerr<<"----------------------------------------------------------------------\n";
                 for (i = 0; i < size; i++){
@@ -100,16 +110,16 @@ namespace tk{
                         std::string line = output.substr(output.find(":")+1);
                         line = line.substr(0,line.find("(")-1);
 
-                        std::cout<<tk::tformat::set(tk::tformat::predefined,tk::tformat::predefined,tk::tformat::bold)<<"\n";
+                        std::cout<<tk::tprint::set(tk::tprint::predefined,tk::tprint::predefined,tk::tprint::bold)<<"\n";
                         output = "sed -n "+line+"p "+file;
                         std::cout<<"Error in file "<<file<<" at line "<<line<<"\n\n";
                         int p = system(output.c_str());
-                        std::cout<<tk::tformat::set(tk::tformat::red,tk::tformat::predefined,tk::tformat::bold)<<"\n";
+                        std::cout<<tk::tprint::set(tk::tprint::red,tk::tprint::predefined,tk::tprint::bold)<<"\n";
 
                     }                    
                 }
                 std::cerr<<"----------------------------------------------------------------------";
-                std::cout<<tk::tformat::unset()<<"\n";
+                std::cout<<tk::tprint::unset()<<"\n";
 
                 free (strings);
 

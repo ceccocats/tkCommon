@@ -6,10 +6,10 @@ namespace tk { namespace gui { namespace common {
 
 uint8_t* loadImage(std::string filename, int* width, int* height, int* channels){
 
-    tk::tformat::printMsg("Viewer",std::string{"loading: "+filename+"\n"});
+    tk::tprint::printMsg("Viewer",std::string{"loading: "+filename+"\n"});
     uint8_t* data = stbi_load(filename.c_str(),width,height,channels,0);
     if(data == NULL){
-        tk::tformat::printErr("Viewer",std::string{"Error opening: "+filename+"\n"});
+        tk::tprint::printErr("Viewer",std::string{"Error opening: "+filename+"\n"});
     }
     return data;
 }
@@ -29,13 +29,13 @@ void copyVertexFromOBJL(vertex_t *tkv, objl::Vertex* v){
 
 bool loadOBJ(std::string filename, object3D_t &obj) {
     
-    tk::tformat::printMsg("Viewer",std::string{"loading: "+filename+"\n"});
+    tk::tprint::printMsg("Viewer",std::string{"loading: "+filename+"\n"});
 
     //Load and check
     objl::Loader loader;
     bool status = loader.LoadFile(filename.c_str());
     if(status == false){
-         tk::tformat::printErr("Viewer",std::string{"Error opening: "+filename+"\n"});
+         tk::tprint::printErr("Viewer",std::string{"Error opening: "+filename+"\n"});
          return false;
     }
 

@@ -15,7 +15,7 @@
 #include "tkCommon/timer.h"
 #include "tkCommon/geodetic_conv.h"
 #include "tkCommon/CmdParser.h"
-#include "tkCommon/terminalFormat.h"
+#include "tkCommon/printTerminal.h"
 #include "tkCommon/exceptions.h"
 #include "tkCommon/math/Mat.h"
 

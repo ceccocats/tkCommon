@@ -44,9 +44,9 @@ void senderLoop(int port, std::string ip, int srcport){
         std::cout<<"Send: "<<buffer<<"\n";
         bool ok = socket.send(buffer,(int)strlen((const char *)buffer));
         if(ok)
-            std::cout<<tk::tformat::print("correctly sent\n", tk::tformat::green, tk::tformat::predefined, tk::tformat::bold);
+            std::cout<<tk::tprint::print("correctly sent\n", tk::tprint::green, tk::tprint::predefined, tk::tprint::bold);
         else
-            std::cout<<tk::tformat::print("not sent\n", tk::tformat::red, tk::tformat::predefined, tk::tformat::bold);
+            std::cout<<tk::tprint::print("not sent\n", tk::tprint::red, tk::tprint::predefined, tk::tprint::bold);
     }
 
     socket.close();

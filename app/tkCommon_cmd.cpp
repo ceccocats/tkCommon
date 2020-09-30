@@ -22,7 +22,7 @@ int main( int argc, char** argv){
     std::cout<<opt2<<"\n";
     std::cout<<opt3<<"\n";
 
-    tk::tformat::ProgressBar pbar(0, "example progress");
+    tk::tprint::ProgressBar pbar(0, "example progress");
     for(;pbar.eval(1000); pbar.i()++) {
         usleep(5000);
     }

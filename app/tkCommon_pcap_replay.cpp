@@ -40,7 +40,7 @@ void replayLoop(std::string file, int port, std::string filter,std::string ip){
         count++;
         if(count%500 == 0){
 
-            tk::tformat::printMsg("pcapReplay", std::string{"send "}+std::to_string(count)+" packets\n");
+            tk::tprint::printMsg("pcapReplay", std::string{"send "}+std::to_string(count)+" packets\n");
         }
     }
 
