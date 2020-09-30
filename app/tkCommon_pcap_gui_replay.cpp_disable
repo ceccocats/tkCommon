@@ -10,8 +10,6 @@
 #include <tkCommon/communication/ethernet/PCAPHandler.h>
 #include <tkCommon/communication/ethernet/UDPSocket.h>
 
-#include <tkCommon/data/LidarData.h>
-
 #include <tkCommon/exceptions.h>
 #include <tkCommon/printTerminal.h>
 

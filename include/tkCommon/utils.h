@@ -18,9 +18,9 @@ typedef uint64_t timeStamp_t;
  * @return microseconds from epoch
  */
 inline timeStamp_t getTimeStamp() {
-    struct timeval cur_time;
-    gettimeofday(&cur_time, NULL);
-    return timeStamp_t(cur_time.tv_sec)*1e6 + cur_time.tv_usec;
+    struct timespec tp;
+    clock_gettime(CLOCK_REALTIME, &tp);
+    return timeStamp_t(tp.tv_sec)*1e6 + tp.tv_nsec/1000;
 }
 
 /**
@@ -31,6 +31,16 @@ inline timeStamp_t getTimeStamp() {
 inline timeStamp_t tv2TimeStamp(struct timeval tv) {
     return timeStamp_t(tv.tv_sec)*1e6 + tv.tv_usec;
 } 
+
+/**
+ * Convert timespac to microseconds from epoch
+ * @param tv
+ * @return
+ */
+inline timeStamp_t tp2TimeStamp(struct timespec tp) {
+    return timeStamp_t(tp.tv_sec)*1e6 + tp.tv_nsec/1000;
+} 
+
 
 inline std::string getTimeStampString(std::string sep="--_--") {
 
@@ -441,12 +451,14 @@ inline double toRadians(double x){
     return ((x * M_PI) / 180.0);
 }
 
-inline std::vector<std::string> splitString(const std::string &s, char delim) {
+inline std::vector<std::string> splitString(const std::string &s, char delim, int maxelems = -1) {
     std::vector<std::string> elems;
     std::stringstream ss(s);
     std::string substr;
-    while(std::getline(ss, substr, delim)) {
+    while(std::getline(ss, substr, delim) ) {
         elems.push_back(substr);
+        if(maxelems > 0 && elems.size() >= maxelems)
+            break;
     }
     return elems;
 }

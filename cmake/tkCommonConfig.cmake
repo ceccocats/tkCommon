@@ -32,6 +32,7 @@ set(tkCommon_LIBRARIES
     ${FREETYPE_LIBRARIES}
     tklibDrawText
     matio
+    tkJoystick
 )
 
 set(tkCommon_FOUND true)

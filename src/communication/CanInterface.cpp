@@ -139,16 +139,17 @@ namespace tk { namespace communication {
                 // get data string
                 std::string s;
                 for(int i =0; i<2; i++) {
-                    std::getline(iss, s, '#');
-
                     // get msg ID
                     if(i==0) {
+                        std::getline(iss, s, '#');
                         data->frame.can_id = std::stoul(s, nullptr, 16);
                         //std::cout<<std::hex<<data.frame.can_id<<" ";
                     }
 
                     // parse data
                     if(i==1) {
+                        std::getline(iss, s, ' ');
+
                         data->frame.can_dlc = s.size()/2;
                         if(data->frame.can_dlc > CAN_MAX_DLEN) {
                             return false;

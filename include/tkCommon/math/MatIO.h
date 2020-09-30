@@ -95,7 +95,7 @@ public:
 
     public:
 
-        void print(int level = 0) {
+        void print(int level = 0, int recursive_limit = -1, int list_limit = -1) {
             if(var == NULL)
                 return;
             if(var->name == NULL)
@@ -121,8 +121,17 @@ public:
             }
             std::cout<<"\n";
 
-            for(auto f: fieldMap)
-                f.second.print(level+1);
+            if(recursive_limit-- == 0) 
+                return;
+
+            int limit = 0;
+            for(auto f: fieldMap) {
+                if(list_limit >= 0 && ++limit > list_limit) {
+                    std::cout<<"...\n";
+                    break;
+                }
+                f.second.print(level+1, recursive_limit, list_limit);
+            } 
         }
 
         /**
