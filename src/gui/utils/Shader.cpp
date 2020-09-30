@@ -172,7 +172,7 @@ tk::gui::Shader::load(std::string path){
 
     if (!file.is_open())
     {
-        clsErr("Error opening file" + path + "\n");
+        clsErr("Error opening file: " + path + "\n");
         return "";
     }
 

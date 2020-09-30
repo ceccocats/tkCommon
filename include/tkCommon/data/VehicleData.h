@@ -225,7 +225,8 @@ namespace tk { namespace data {
     
     public:
 
-        std::string model = std::string(TKPROJ_PATH) + "data/levante.obj";
+        //std::string model = std::string(tkCommon_PATH) + "data/levante.obj";
+        std::string model = std::string(tkCommon_PATH) + "../tkFerrari/data/F151M/F151M.obj";
 
     public:
 

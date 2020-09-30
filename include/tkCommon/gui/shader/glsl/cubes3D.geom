@@ -47,26 +47,26 @@ void main() {
     //face-up
     /////////////////////////////////////////////////////////////////
     //1' vertex
-    vertex      = vec4(vec3(size.x, -size.y, size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(size.x, -size.y, size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[0];
     EmitVertex();
     //2' vertex
-    vertex = vec4(vec3(size.x, size.y, size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(size.x, size.y, size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[0];
     EmitVertex();
     //3' vertex
-    vertex = vec4(vec3(-size.x, -size.y, size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(-size.x, -size.y, size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[0];
     EmitVertex();
     //4' vertex
-    vertex      = vec4(vec3(-size.x, size.y, size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(-size.x, size.y, size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[0];
     EmitVertex();
@@ -77,26 +77,26 @@ void main() {
     //face-down
     /////////////////////////////////////////////////////////////////
     //5' vertex
-    vertex      = vec4(vec3(size.x, -size.y, -size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(size.x, -size.y, -size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[1];
     EmitVertex();
     //6' vertex
-    vertex      = vec4(vec3(size.x, size.y, -size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(size.x, size.y, -size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[1];
     EmitVertex();
     //7' vertex
-    vertex      = vec4(vec3(-size.x, -size.y, -size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(-size.x, -size.y, -size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[1];
     EmitVertex();
     //8' vertex
-    vertex      = vec4(vec3(-size.x, size.y, -size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(-size.x, size.y, -size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[1];
     EmitVertex();
@@ -107,26 +107,26 @@ void main() {
     //face-front
     /////////////////////////////////////////////////////////////////
     //3' vertex
-    vertex      = vec4(vec3(-size.x, -size.y, size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(-size.x, -size.y, size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[2];
     EmitVertex();
     //4' vertex
-    vertex      = vec4(vec3(-size.x, size.y, size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(-size.x, size.y, size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[2];
     EmitVertex();
     //7' vertex
-    vertex      = vec4(vec3(-size.x, -size.y, -size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(-size.x, -size.y, -size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[2];
     EmitVertex();
     //8' vertex
-    vertex      = vec4(vec3(-size.x, size.y, -size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(-size.x, size.y, -size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[2];
     EmitVertex();
@@ -137,26 +137,26 @@ void main() {
     //face-back
     /////////////////////////////////////////////////////////////////
     //1' vertex
-    vertex      = vec4(vec3(size.x, -size.y, size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(size.x, -size.y, size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[3];
     EmitVertex();
     //2' vertex
-    vertex      = vec4(vec3(size.x, size.y, size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(size.x, size.y, size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[3];
     EmitVertex();
     //5' vertex
-    vertex      = vec4(vec3(size.x, -size.y, -size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(size.x, -size.y, -size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[3];
     EmitVertex();
     //6' vertex
-    vertex      = vec4(vec3(size.x, size.y, -size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(size.x, size.y, -size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[3];
     EmitVertex();
@@ -167,26 +167,26 @@ void main() {
     //face-left
     /////////////////////////////////////////////////////////////////
      //3' vertex
-    vertex      = vec4(vec3(-size.x, -size.y, size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(-size.x, -size.y, size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[4];
     EmitVertex();
     //7' vertex
-    vertex      = vec4(vec3(-size.x, -size.y, -size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(-size.x, -size.y, -size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[4];
     EmitVertex();
     //1' vertex
-    vertex      = vec4(vec3(size.x, -size.y, size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(size.x, -size.y, size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[4];
     EmitVertex();
     //5' vertex
-    vertex      = vec4(vec3(size.x, -size.y, -size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(size.x, -size.y, -size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[4];
     EmitVertex();
@@ -197,26 +197,26 @@ void main() {
     //face-right
     /////////////////////////////////////////////////////////////////
     //2' vertex
-    vertex      = vec4(vec3(size.x, size.y, size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(size.x, size.y, size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[5];
     EmitVertex();
     //6' vertex
-    vertex      = vec4(vec3(size.x, size.y, -size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(size.x, size.y, -size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[5];
     EmitVertex();
     //4' vertex
-    vertex      = vec4(vec3(-size.x, size.y, size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(-size.x, size.y, size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[5];
     EmitVertex();
     //8' vertex
-    vertex      = vec4(vec3(-size.x, size.y, -size.z), 1.0f) * rot + center;
-    gl_Position = modelview * vertex;
+    vertex      = vec4(vec3(-size.x, size.y, -size.z), 1.0f) * rot;
+    gl_Position = modelview * center + vertex;
     FragPos     = vertex.xyz;
     Normal      = mat3(transpose(rot)) * facenormals[5];
     EmitVertex();

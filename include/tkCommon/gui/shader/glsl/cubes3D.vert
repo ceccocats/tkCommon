@@ -3,6 +3,7 @@ layout (location = 0) in vec3 center;
 layout (location = 1) in vec3 size;
 layout (location = 2) in vec3 rot;
 layout (location = 3) in vec4 color;
+layout (location = 4) in vec4 ciao;
 
 out VS_OUT {
     vec3 size;

@@ -23,9 +23,9 @@ class cubes3D : public tk::gui::shader::generic
 {
     public:
         bool init(){
-            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/components/shader/glsl/cubes3D.vert";
-            std::string geometry    = std::string(tkCommon_PATH) + "include/tkCommon/gui/components/shader/glsl/cubes3D.geom";
-            std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/components/shader/glsl/cubes3D.frag";
+            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/cubes3D.vert";
+            std::string geometry    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/cubes3D.geom";
+            std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/cubes3D.frag";
             
             bool status = shader.init(vertex, fragment, geometry);
             if(status == false)

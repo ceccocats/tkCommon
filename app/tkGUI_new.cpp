@@ -6,6 +6,11 @@
 #include <thread>
 #include <signal.h>
 
+tk::gui::Viewer viewer;
+tk::data::CloudData ldata;
+tk::data::ImageData img;
+tk::data::VehicleData veh;
+tk::data::VehicleData veh2;
 
 
 class Scene : public tk::gui::Drawable {
@@ -39,6 +44,11 @@ public:
 	tk::gui::shader::heightmap map;
 	tk::math::Mat<float>	points;
 	tk::math::Mat<float>	colors;
+
+    //cubecloud
+    tk::gui::shader::cubes3D cubes;
+    tk::gui::Buffer<float>   buffercloud;
+    int n_cubes;
 
 
 	void init(){
@@ -159,6 +169,54 @@ public:
 		posrendering.setIndexVector(indicesCube2D,6);
 		///////////////
 
+
+        Eigen::MatrixXf points2;
+        Eigen::MatrixXf pr,pg,pb;
+
+        tk::math::MatIO mat;
+        mat.open("/home/alice/cloud.mat");
+        tk::math::MatIO::var_t var;
+        mat.read("cloud",var);
+        var["points"].get(points2);
+        var["f_r"].get(pr);
+        var["f_g"].get(pg);
+        var["f_b"].get(pb);
+        var.release();
+        //points2.conservativeResize(4,10000000);
+
+        buffercloud.init();
+        cubes.init();
+        float* temp = new float[points2.cols() * 13];
+        for(int i = 0; i < points2.cols(); i++){
+            temp[i * 13 +  0] = points2(0,i); 
+            temp[i * 13 +  1] = points2(1,i);
+            temp[i * 13 +  2] = points2(2,i);
+            temp[i * 13 +  3] = 0.1;
+            temp[i * 13 +  4] = 0.1;
+            temp[i * 13 +  5] = 0.1;
+            temp[i * 13 +  6] = 0;
+            temp[i * 13 +  7] = 0;
+            temp[i * 13 +  8] = 0;
+            temp[i * 13 +  9] = pr(i);
+            temp[i * 13 + 10] = pg(i);
+            temp[i * 13 + 11] = pb(i);
+            temp[i * 13 + 12] = 1;
+        }
+
+        n_cubes = points2.cols();
+
+        buffercloud.setData(temp,points2.cols() * 13);
+        delete [] temp;
+
+        std::cout<<points.cols()<<std::endl;
+
+        //ldata.tf = tk::common::Tfpose::Identity();
+
+        //ldata.points.copyFrom(points2.data(),points2.rows(),points2.cols());
+
+
+
+
 		//heightmap
 		map.init();
 
@@ -203,7 +261,7 @@ public:
 
 		//Mesh levante
 		for(int i = 0; i < levante.size(); i++){	
-			mesh.draw(&levante[i], carObj.meshes[i].indices.size(), lightPos, carObj.meshes[i].color);
+			//mesh.draw(&levante[i], carObj.meshes[i].indices.size(), lightPos, carObj.meshes[i].color);
 		}
 		///////////////
 
@@ -227,8 +285,10 @@ public:
 		lines.draw(&posLines2D,4,2,GL_LINE_LOOP);	//4 vertex vith line size 2 closing loop
 		///////////////
 
+        cubes.draw(&buffercloud,n_cubes,lightPos);
 
-		map.draw(points,colors,2,2);
+
+		//map.draw(points,colors,2,2);
 
 	}
 
@@ -238,13 +298,13 @@ public:
 
 
 		//Draw all in texture
-		rendering.useForRendering();
+		/*rendering.useForRendering();
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		drawElements();
 
-		rendering.unuseRendering();
+		rendering.unuseRendering();*/
 
 		text.draw(&rendering,&posrendering,6);			//2 triangles = 6 vertex
 		///////////////
@@ -253,13 +313,6 @@ public:
 	void draw2D(tk::gui::Viewer *viewer){
 	}
 };
-
-
-tk::gui::Viewer viewer;
-tk::data::CloudData ldata;
-tk::data::ImageData img;
-tk::data::VehicleData veh;
-tk::data::VehicleData veh2;
 
 void sig_handler(int signo) {
     std::cout<<"request stop\n";
@@ -324,10 +377,10 @@ int main( int argc, char** argv){
 	//viewer.add("image", &img);
 	viewer.add("vehicle", &veh);
 	viewer.add("vehicle2", &veh2);
-	std::thread read_cloud_th(read_cloud);	
+	//std::thread read_cloud_th(read_cloud);	
 
 	viewer.run();
 
-	read_cloud_th.join();
+	//read_cloud_th.join();
     return 0;
 }
