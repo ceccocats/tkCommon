@@ -3,6 +3,8 @@
 bool 
 tk::communication::TCPSocket::initClient(const int port, const std::string ip){
 
+    tkFATAL("Need to testing")
+
     //Set socket struct
     memset(&this->sock_addr, 0, sizeof(this->sock_addr));
     this->sock_addr.sin_family          = AF_INET; // IPv4
