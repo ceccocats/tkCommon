@@ -1,9 +1,5 @@
 #pragma once
-#include "tkCommon/gui/utils/Drawable.h"
-#include "tkCommon/math/MatIO.h"
 #include "tkCommon/data/HeaderData.h"
-
-#include "tkCommon/gui/Viewer.h"
 
 namespace tk { namespace data {
 
@@ -12,9 +8,12 @@ namespace tk { namespace data {
      * This class is a basic data class that just contains basic information that all sensor data class must contain.
      * @see HeaderData
      */
-	class SensorData : public tk::gui::Drawable, public tk::math::MatDump {
+	class SensorData : public tk::math::MatDump {
     public:
         HeaderData  header;                 /**< Header, @see HeaderData */
+
+        bool        modified;
+        std::mutex  mutex;
 
         /**
          * @brief Initialization method.
@@ -22,6 +21,7 @@ namespace tk { namespace data {
          */
         virtual void init() {
             header.init();
+            modified = false;
         }
 
         /**
@@ -44,8 +44,8 @@ namespace tk { namespace data {
             this->header        = s.header;
             return *this;
         }
-        friend std::ostream& operator<<(std::ostream& os, const SensorData& s)
-        {
+
+        friend std::ostream& operator<<(std::ostream& os, const SensorData& s){
             os<<"header.stamp: "<<s.header.stamp;
             return os;
         }
@@ -53,8 +53,19 @@ namespace tk { namespace data {
         bool toVar(std::string name, tk::math::MatIO::var_t &var) {
             return header.toVar(name, var);
         }
+
         bool fromVar(tk::math::MatIO::var_t &var) {
             return header.fromVar(var);
+        }
+
+        void notifyUpdate(){
+            modified = true;
+        }
+
+        bool isChange(){
+            bool status = modified;
+            modified = false;
+            return status;
         }
     };
 }}

@@ -34,7 +34,7 @@ namespace tk { namespace communication {
         uint8_t accECU = 6;
 
     public:
-        tk::data::VehicleData::odom_t odom; /**< current vehicle odometry */
+        //tk::data::VehicleData::odom_t odom; /**< current vehicle odometry */
         int steerPos = 0;                   /**< current steer value      */
         int brakePos = 0;                   /**< current brake value      */
         int accPos = 0;                     /**< current accel value      */

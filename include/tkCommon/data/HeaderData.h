@@ -2,6 +2,7 @@
 
 #include "tkCommon/common.h"
 #include "tkCommon/math/MatIO.h"
+#include <mutex>
 
 namespace tk { namespace data {
 

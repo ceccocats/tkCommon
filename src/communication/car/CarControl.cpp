@@ -1,7 +1,7 @@
 #include "tkCommon/communication/car/CarControl.h"
 
 using namespace tk::communication;
-
+/*
 bool CarControl::init(tk::communication::CanInterface *soc) {
     this->soc = soc;
     run = true;
@@ -81,8 +81,6 @@ void CarControl::readLoop() {
                 odom.t = data.stamp;
             }
         }
-
-
     }
 }
 
@@ -203,4 +201,4 @@ void CarControl::requestMotorId() {
     data.frame.can_dlc = 0;
     data.frame.can_id = GET_HW_ID;
     soc->write(&data);
-}
+}*/

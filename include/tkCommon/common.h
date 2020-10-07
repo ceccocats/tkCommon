@@ -270,6 +270,14 @@ namespace tk { namespace common {
                 z = ptf.matrix()(2, 3);
                 return;
             }
+
+            Vector3& operator+=(const Vector3& vec){
+
+                this->x += vec.x;
+                this->y += vec.y;
+                this->z += vec.z;
+                return *this;
+            }
      };
 
     /**

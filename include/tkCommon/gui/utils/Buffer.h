@@ -29,7 +29,8 @@ class Buffer
         unsigned int VBO;
         unsigned int EBO;
 
-        int size    = 0;
+        int _size    = 0;
+        int lastSize = 0;
 
         bool initEBO    = false;
         int sizeEBO     = 0;
@@ -80,6 +81,11 @@ class Buffer
         void setVertexAttribs(std::vector<vertexAttribs_t>& vertexAttribs);
 
         /**
+         * use method for get size of last setData
+         */
+        int size();
+
+        /**
          * use method for set GL_ARRAY_BUFFER in shader
          */
         void use();
@@ -104,6 +110,11 @@ void Buffer<T>::use(){
 template <typename T>
 void Buffer<T>::unuse(){
     glBindVertexArray(0);
+}
+
+template <typename T>
+int Buffer<T>::size(){
+    return lastSize;
 }
 
 template <typename T>
@@ -179,17 +190,19 @@ void Buffer<T>::setVertexAttribs(std::vector<vertexAttribs_t>& vertexAttribs){
 template <typename T>
 void Buffer<T>::setData(T* data, int lenght, int offset){
 
+    lastSize = lenght + offset;
+
     if(intted == false){
         intted = true;
 
-        size = lenght + offset;
+        _size = lenght + offset;
 
         int realOffset = offset == 0 ? 1 : offset;
 
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, size * realOffset * sizeof(T), NULL, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, _size * realOffset * sizeof(T), NULL, GL_DYNAMIC_DRAW);
         glBufferSubData(GL_ARRAY_BUFFER, offset * sizeof(T), lenght * sizeof(T), data);
         glBindVertexArray(0);
 
@@ -198,9 +211,9 @@ void Buffer<T>::setData(T* data, int lenght, int offset){
 
     glBindVertexArray(VAO);
 
-    if(lenght+offset > size){
+    if(lenght+offset > _size){
 
-        size = lenght + offset;
+        _size = lenght + offset;
 
         //resize buffer or copy and resize
         if(offset == 0){
@@ -209,7 +222,7 @@ void Buffer<T>::setData(T* data, int lenght, int offset){
             glDeleteBuffers(1, &VBO);
             glGenBuffers(1, &VBO);
             glBindBuffer(GL_ARRAY_BUFFER, VBO);
-            glBufferData(GL_ARRAY_BUFFER, size  * sizeof(T), data, GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, _size  * sizeof(T), data, GL_DYNAMIC_DRAW);
 
         }else{
 
@@ -228,7 +241,7 @@ void Buffer<T>::setData(T* data, int lenght, int offset){
             glDeleteBuffers(1, &VBO);
             glGenBuffers(1, &VBO);
             glBindBuffer(GL_ARRAY_BUFFER, VBO);
-            glBufferData(GL_ARRAY_BUFFER, size  * sizeof(T), NULL, GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, _size  * sizeof(T), NULL, GL_DYNAMIC_DRAW);
 
             //recopy data
             glBindBuffer(GL_COPY_READ_BUFFER, VBOtemp);

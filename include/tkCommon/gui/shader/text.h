@@ -12,7 +12,7 @@
 
 #include "tkCommon/gui/shader/generic.h"
 
-#include <ft2build.h>
+#include <freetype2/ft2build.h>
 #include FT_FREETYPE_H
 
 namespace tk { namespace gui { namespace shader {

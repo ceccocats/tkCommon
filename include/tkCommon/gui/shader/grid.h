@@ -21,10 +21,14 @@ namespace tk { namespace gui { namespace shader {
 class grid : public tk::gui::shader::generic
 {
     public:
-        bool init(){
+        grid(){
             std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/grid.vert";
             std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/grid.frag";        
-            return shader.init(vertex, fragment);
+            shader.init(vertex, fragment);
+        }
+        
+        ~grid(){
+
         }
 
         void draw(float dim = 1.0f, int n = 50){

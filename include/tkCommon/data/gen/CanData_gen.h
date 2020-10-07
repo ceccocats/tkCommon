@@ -10,6 +10,7 @@ class CanData_gen : public SensorData
 {
 public:
     struct can_frame frame;
+    timeStamp_t stamp;
     
     void init() override
     {
@@ -19,24 +20,28 @@ public:
     {
         SensorData::operator=(s);
         frame = s.frame;
+        stamp = s.stamp;
         return *this;
     }
     friend std::ostream& operator<<(std::ostream& os, const CanData_gen& s)
     {
         os<<"CanData_gen:"<<std::endl;
         os<<"header.stamp:"<<s.header.stamp<<std::endl;
+        os<<"stamp: "<<s.stamp<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)
     {
-        std::vector<tk::math::MatIO::var_t> structVars(1);
+        std::vector<tk::math::MatIO::var_t> structVars(2);
         structVars[0].set("header", header);
+        structVars[1].set("stamp", stamp);
         return var.setStruct(name, structVars);
     }
     bool fromVar(tk::math::MatIO::var_t &var)
     {
         if(var.empty()) return false;
         var["header"].get(header);
+        var["stamp"].get(stamp);
         return true;
     }
 };

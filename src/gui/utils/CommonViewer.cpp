@@ -6,7 +6,6 @@ namespace tk { namespace gui { namespace common {
 
 uint8_t* loadImage(std::string filename, int* width, int* height, int* channels){
 
-    tk::tprint::printMsg("Viewer",std::string{"loading: "+filename+"\n"});
     uint8_t* data = stbi_load(filename.c_str(),width,height,channels,0);
     if(data == NULL){
         tk::tprint::printErr("Viewer",std::string{"Error opening: "+filename+"\n"});

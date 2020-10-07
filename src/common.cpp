@@ -254,8 +254,3 @@ namespace tk { namespace common {
         return tk::common::odom2tf(0, 0, h, rot.x, rot.y, rot.z);
     }
 }}
-
-
-// declare GPSdata static member
-#include "tkCommon/data/GPSData.h"
-tk::common::GeodeticConverter tk::data::GPSData::geoConv;

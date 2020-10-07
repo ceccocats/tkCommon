@@ -4,23 +4,22 @@
 #include <pthread.h>
 #include <string.h>
 #include <unistd.h>
-#include "tkCommon/terminalFormat.h"
+#include "tkCommon/common.h"
 
 namespace tk { namespace rt {
 
 class Thread {
 
 private:
-    pthread_t th;
+    pthread_t   th;
 
 public:
 
      Thread() {}
     ~Thread() {}
 
-    bool init(void *(*fun_ptr) (void *)) {
-        int err = pthread_create(&th, NULL, fun_ptr, NULL);
-        return err == 0;
+    bool init(void *(*fun_ptr) (void *), void* args) {
+        return pthread_create(&th, NULL, fun_ptr, args) == 0;
     }
 
     void join() {

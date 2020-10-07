@@ -3,9 +3,55 @@
 namespace tk { namespace gui {
 Viewer* Viewer::instance = nullptr;
 
-void Viewer::init() {
-    clsMsg("init\n");
+Viewer::Viewer(){
+    Viewer::instance = this;
+}
 
+
+Viewer::~Viewer(){
+
+}
+
+void 
+Viewer::start(){
+    if(running == false){
+        glThread.init(run,Viewer::instance);
+    }else{
+        clsWrn("Thread is already started\n");
+    }
+}
+
+bool 
+Viewer::isRunning(){
+    return running;
+}
+
+void 
+Viewer::stop(){
+    running = false;
+}
+
+void 
+Viewer::join(){
+    glThread.join();
+}
+
+void 
+Viewer::add(tk::gui::Drawable* obj){
+    newDrawables[newDrawables.size()] = obj;
+}
+
+void* 
+Viewer::run(void* istance){
+    Viewer* viewer = (Viewer*)istance;
+
+    viewer->init();
+
+    viewer->runloop();
+}
+
+void 
+Viewer::init() {
     glfwSetErrorCallback(errorCallback);
     glfwInit();
 
@@ -18,73 +64,51 @@ void Viewer::init() {
         glfwTerminate();
     }
 
+    //glut init
+    int argcp = 0;
+    char** argv;
+    glutInit(&argcp, argv);
+
     //Icon
     int channels;
     GLFWimage img;
     img.pixels =tk::gui::common::loadImage(std::string(tkCommon_PATH) + "data/tkLogo.png", &img.width, &img.height, &channels);
-    glfwSetWindowIcon(window,1,&img);  
+    glfwSetWindowIcon(window,1,&img); 
+    glCheckError(); 
 
+    //Callbacks
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetCursorPosCallback(window, cursor_position_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetKeyCallback(window, keyCallback);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
-
     glCheckError();
 
+
     // Initialize OpenGL loader
-    bool err = glewInit() != GLEW_OK;
-    if (err) {
+    if (glewInit() != GLEW_OK) {
         tk::tprint::printErr("Viewer", "Failed to initialize OpenGL loader!\n");
         exit(-1);
     }
-    int foo = 1;
-    const char* bar[1] = {" "}; 
-    glutInit(&foo, (char**)bar);
-
-    axis.init();
-    grid.init();
-    text.init(fontPath);
-
-    glCheckError();
 
     //ImGUI
-    {
-        // Setup Dear ImGui context
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO(); (void)io;
-        // Setup Dear ImGui style
-        ImGui::StyleColorsDark();
-        //ImGui::StyleColorsClassic();
-
-        // Setup Platform/Renderer bindings
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
-        ImGui_ImplOpenGL3_Init(glsl_version);
-    }
-
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
 
     // OpenGL confs
     glEnable(GL_DEPTH_TEST);
-    //glDisable(GL_CULL_FACE);        
-    //glDepthFunc(GL_GEQUAL);
-    //glEnable(GL_LINE_SMOOTH);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
-    //glEnable(GL_ALPHA_TEST);
-    //glDepthMask(GL_FALSE); // make the depth buffer read-only
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-    
-    // print OpenGL status
-    std::string msg = std::string{"OPENGL running on:"} + 
-                        std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))) + " -- " +
-                        std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))) + "\n";
-    clsMsg(msg);
 
     // set window size
     glfwGetFramebufferSize(window, &width, &height);
-    clsSuc("init with resolution " + std::to_string(width) + "x" + std::to_string(height) + "\n");
 
     // init cameras
     camera.init();
@@ -94,41 +118,112 @@ void Viewer::init() {
     // lights
     lightPos = glm::vec3(0.0f, 0.0f, 20.0f);
 
+    clsSuc  (   std::string{"OPENGL running on: "} + 
+                std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))) + " -- " +
+                std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))) + "\n"
+            );
+
     glCheckError();
 }
 
-void Viewer::draw() {
-    drawBuffer.draw(this);
-
-    axis.draw();
-    grid.draw();
-    text.draw("gatti gay", 1200.0f, 25.0f);
-
-    glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
-
+void 
+Viewer::drawInfos(){
     ImGuiIO& io = ImGui::GetIO();
-    ImGui::Begin("Viewer");
+    ImGui::Begin("Informations");
     ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-    ImGui::Text("window size: %d x %d", width, height);
-    ImGui::Text("window ratio: %f", aspectRatio);
+    ImGui::Text("Window size: %d x %d", width, height);
+    glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
     ImGui::Text("GPU memory: %d / %d MB", (int)((total_mem_kb - cur_avail_mem_kb)/1024.0), (int)(total_mem_kb/1024.0));
-    ImGui::Text("Drawables (%d)", int(drawBuffer.map.size()));
-    std::map<std::string,Drawable*>::iterator it; 
-    for(it = drawBuffer.map.begin(); it!=drawBuffer.map.end(); ++it){
-        ImGui::Checkbox(it->first.c_str(), &it->second->enabled); 
-        ImGui::SameLine(ImGui::GetWindowWidth()-30);
-        ImGui::Checkbox( ("##" + it->first +"_follow").c_str(), &it->second->follow); 
+    ImGui::Text("Drawables (%d)", int(drawables.size()));
+    
+    ImGui::Text("------------------------------------------");
+    for (auto const& drawable : drawables){
+        drawable.second->imGuiInfos();
     }
     ImGui::End();
 
     glCheckError();
 }
 
-void Viewer::run() {
-    clsMsg("run\n");
+void 
+Viewer::drawSettings(){
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui::Begin("Settings");
+    for (auto const& drawable : drawables){
+        drawable.second->imGuiSettings();
+    }
+    ImGui::End();
+    glCheckError();
+}
+
+
+void 
+Viewer::draw() {
+    for (auto const& drawable : drawables){
+        drawable.second->draw(Viewer::instance);
+    }
+    glCheckError();
+}
+
+void 
+Viewer::draw2D() {
+
+    //TODO: mettere la camera in ambiente 2D e disegnare logo tk
+
+    for (auto const& drawable : drawables){
+        drawable.second->draw2D(Viewer::instance);
+    }
+    glCheckError();
+}
+
+void 
+Viewer::initDrawables() {
+
+    if(newDrawables.size() > 0){
+        for (auto const& drw : newDrawables){
+            drw.second->onInit(Viewer::instance);
+            drawables[drawables.size()] = drw.second;
+        }
+        newDrawables.clear();
+    }
+    glCheckError();
+}
+
+void 
+Viewer::follow() {
+
+    tk::common::Vector3<float> center;
+    int n = 0;
+    for (auto const& drawable : drawables){
+        center += tk::common::tf2pose(drawable.second->tf);
+        n++;
+    }
+
+    if(n > 0){
+        center.x /= n;
+        center.y /= n;
+        center.z /= n;
+        camera.setCenter(center);
+    }
+}
+
+void 
+Viewer::close() { 
+    stop();
+    join();
+    for (auto const& drawable : drawables){
+        drawable.second->onClose();
+        delete drawable.second;
+    }   
+    clsMsg("closed\n");
+}
+
+void Viewer::runloop() {
+
     running = true;
     timeStamp_t VIZ_DT_US = dt*1e6;
     LoopRate rate((VIZ_DT_US), "VIZ_UPDATE");
+
     while (running) {
 
         // manage window resize
@@ -137,23 +232,11 @@ void Viewer::run() {
         xLim = aspectRatio;
         yLim = 1.0;
 
-        // average centers of every drawable to follow
-        if(drawBuffer.centers.size() >0) {
-            tk::common::Vector3<float> center;
-            for(int i=0; i<drawBuffer.centers.size(); i++) {
-                center.x += drawBuffer.centers[i].x;
-                center.y += drawBuffer.centers[i].y;
-                center.z += drawBuffer.centers[i].z;
-            }
-            center.x /= drawBuffer.centers.size();
-            center.y /= drawBuffer.centers.size();
-            center.z /= drawBuffer.centers.size();
-            camera.setCenter(center);
-        }
+        initDrawables();
+        follow();
         
         camera.setViewPort(0, 0, width, height);
-        glViewport(camera.viewport[0], camera.viewport[1], 
-                    camera.viewport[2], camera.viewport[3]);
+        glViewport(camera.viewport[0], camera.viewport[1], camera.viewport[2], camera.viewport[3]);
 
         glMatrixMode( GL_PROJECTION );
         glLoadIdentity();
@@ -174,11 +257,14 @@ void Viewer::run() {
         ImGui::NewFrame();
         camera.mouseOnGUI = ImGui::IsMouseHoveringAnyWindow();
 
-        // just for debug
+        // just for debug -- pp is mouse pose
         glm::vec3 pp = camera.unprojectPlane({camera.mousePos.x,camera.mousePos.y});
-        // pp is mouse pose
 
+        //tkRendering
+        drawInfos();
+        drawSettings();
         draw();
+        draw2D();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -190,12 +276,10 @@ void Viewer::run() {
 
         /* Poll for and process events */
         glfwPollEvents();
-        // update running status
+        glCheckError();
         running = running && !glfwWindowShouldClose(window);
         rate.wait(false);
     }
-
-    drawBuffer.close();
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();  
@@ -203,23 +287,10 @@ void Viewer::run() {
     
     glfwDestroyWindow(window);
     glfwTerminate();
+
+    close();
 }
 
-bool Viewer::isRunning() {
-    return running;
-}
-
-void Viewer::close() { 
-    axis.close();
-    grid.close();
-    text.close();
-    clsMsg("close\n");
-    running = false;
-}
-
-void Viewer::add(std::string name, Drawable *data){
-    drawBuffer.add(name, data, this);
-}
 
 void Viewer::errorCallback(int error, const char* description) {
     tk::tprint::printErr("Viewer", std::string{"error: "}+std::to_string(error)+" "+description+"\n");

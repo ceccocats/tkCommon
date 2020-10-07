@@ -21,17 +21,20 @@ namespace tk { namespace gui { namespace shader {
 class pointcloud4f  : public tk::gui::shader::generic
 {
     public:
-        bool init(){
+        pointcloud4f(){
             std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloud3f.vert";
             std::string geometry    = "";
             std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloud3f.frag";
             
             bool status = shader.init(vertex, fragment, geometry);
             if(status == false)
-                return false;
+                return;
 
             vertexPointer.push_back({4,4,0});
-            return true;
+        }
+
+        ~pointcloud4f(){
+
         }
 
         void draw(tk::gui::Buffer<float>* buffer, int n, tk::gui::Color_t color = tk::gui::color::WHITE){
@@ -60,8 +63,6 @@ class pointcloud4f  : public tk::gui::shader::generic
         bool close(){
             return shader.close();
         }
-
-
 };
 
 }}}

@@ -1,10 +1,25 @@
 #include "tkCommon/gui/Viewer.h"
+#include "tkCommon/gui/Drawables/axis.h"
+#include "tkCommon/gui/Drawables/grid.h"
+
+int main(){
+	tk::gui::Viewer viewer;
+	viewer.start();
+	viewer.add(new tk::gui::grid());
+	viewer.add(new tk::gui::axis());
+	viewer.join();
+}
+
+
+
+/*#include "tkCommon/gui/Viewer.h"
 #include "tkCommon/data/CloudData.h"
 #include "tkCommon/data/VehicleData.h"
 #include "tkCommon/data/ImageData.h"
 #include "tkCommon/math/MatIO.h"
 #include <thread>
 #include <signal.h>
+
 
 tk::gui::Viewer viewer;
 tk::data::CloudData ldata;
@@ -306,7 +321,7 @@ public:
 
 		rendering.unuseRendering();*/
 
-		text.draw(&rendering,&posrendering,6);			//2 triangles = 6 vertex
+		/*text.draw(&rendering,&posrendering,6);			//2 triangles = 6 vertex
 		///////////////
 	}
 
@@ -364,14 +379,14 @@ int main( int argc, char** argv){
 	/*ldata.init();
 	viewer.add("lidar", &ldata);
 	std::thread read_cloud_th(read_cloud);	*/
-	img.tf.linear() = img.tf.linear() * 10;
-	int w, h, c;
-	uint8_t* image = tk::gui::common::loadImage(std::string(tkCommon_PATH) + "data/tkLogo.png", &w, &h, &c);
+		//img.tf.linear() = img.tf.linear() * 10;
+		//int w, h, c;
+		//uint8_t* image = tk::gui::common::loadImage(std::string(tkCommon_PATH) + "data/tkLogo.png", &w, &h, &c);
 	//img.data.copyFrom(image,1, w*h*c);
 
 	//tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", veh.carObj);
 	//tk::gui::common::loadOBJ(std::string(TKPROJ_PATH) + "data/levante.obj", veh2.carObj);
-
+/*
 	ldata.init();
 	viewer.add("lidar", &ldata);
 	//viewer.add("image", &img);
@@ -383,4 +398,4 @@ int main( int argc, char** argv){
 
 	//read_cloud_th.join();
     return 0;
-}
+}*/

@@ -2,7 +2,8 @@ from _codeGen import genData
 
 className = "CanData_gen"
 DEPS = [ "#include <linux/can.h>", "#include <linux/can/raw.h>" ]
-VARS = [ {"name":"frame", "type":"struct can_frame"},]
+VARS = [ {"name":"frame", "type":"struct can_frame"},
+         {"name":"stamp", "type":"timeStamp_t"},]
 genData(className, VARS, DEPS)
 
 className = "VehicleData_gen"
