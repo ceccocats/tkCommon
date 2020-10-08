@@ -143,6 +143,8 @@ void CarControl::setAccPos(uint16_t pos) {
     return;
 }
 void CarControl::setBrakePos(uint16_t pos) {
+    pos = __bswap_16(pos);
+
     tk::data::CanData_t data;
     data.frame.can_dlc = 3;
     data.frame.can_id = SET_BRAKE_ID;
@@ -202,7 +204,7 @@ void CarControl::requestBrakePos() {
     tk::data::CanData_t data;
     data.frame.can_dlc = 1;
     data.frame.can_id = GET_BRAKE_ID;
-    data.frame.data[0] = accECU;
+    data.frame.data[0] = steerECU;
     soc->write(&data);
 }
 

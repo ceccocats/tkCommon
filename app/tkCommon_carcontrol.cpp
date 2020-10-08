@@ -28,6 +28,15 @@ class MyViewer : public tk::gui::Viewer {
                                       "B:     reset steer\n"    +
                                       "X:     disable steer\n";
         tkDrawText(str, {-xLim+0.05f, yLim-0.1f, 0.01f}, {0.0f,0.0f,0.0f}, {0.05f, 0.05f, 0.05f});
+
+
+        std::string str2 = std::string("Steer Req:   ") + std::to_string(steerReq) + "\n" +
+                           std::string("Steer Resp:  ") + std::to_string(curSteer) + "\n" +
+                           std::string("Acc Req:   ") + std::to_string(accReq) + "\n" +
+                           std::string("Acc Resp:  ") + std::to_string(curAcc) + "\n" +
+                           std::string("Brk Req:   ") + std::to_string(brakeReq) + "\n" +
+                           std::string("Brk Resp:  ") + std::to_string(curBrake) + "\n";
+        tkDrawText(str2, {-xLim+0.05f, -0.4, 0.01f}, {0.0f,0.0f,0.0f}, {0.05f, 0.05f, 0.05f});
     }
 
     void drawBar(std::string name, float val, float y, float w = 0.8, float h = 0.1) {
@@ -40,7 +49,10 @@ class MyViewer : public tk::gui::Viewer {
         tkDrawRectangle({val*w, y, 0}, {h,h,h}, true);
     } 
 
-    float steer, throttle;
+    float steer = 0, throttle = 0;
+
+    int steerReq = 0, curSteer = 0;
+    int accReq = 0, brakeReq = 0, curAcc = 0, curBrake = 0;
 };
 
 
@@ -65,7 +77,7 @@ int main( int argc, char** argv){
     std::string soc_file = cmd.addArg("interface", "can0", "can interface to read");
     std::string dbc_file = cmd.addArg("dbc", "", "DBC can to parse");
     float smoothSteer    = cmd.addFloatOpt("-lerp_steer", 0.02, "steer lerp value");
-    float smoothThrottle = cmd.addFloatOpt("-lerp_throttle", 0.10, "steer lerp value");
+    float smoothThrottle = cmd.addFloatOpt("-lerp_throttle", 0.10, "throttle lerp value");
     cmd.parse();
 
     MyViewer viewer;
@@ -83,6 +95,7 @@ int main( int argc, char** argv){
     
     tkASSERT(canSoc.initSocket(soc_file));
     carCtrl.init(&canSoc);
+    carCtrl.sendOdomEnable(false);
     
     LoopRate rate(50*1e3);
     float steer = 0, throttle = 0;
@@ -98,16 +111,20 @@ int main( int argc, char** argv){
 
         // commands
         steer    = tk::math::lerp(steer, stickL.x, smoothSteer);
-        throttle = -triggerL + triggerR; //tk::math::lerp(throttle, -triggerL + triggerR, smoothThrottle);
+        throttle = /*-triggerL + triggerR;*/ tk::math::lerp(throttle, -triggerL + triggerR, smoothThrottle);
 
         // update viewer
         viewer.steer = steer;
         viewer.throttle = throttle;
 
         std::cout<<"STATUS: "<<carCtrl.steerPos<<" "<<carCtrl.accPos<<" "<<carCtrl.brakePos<<"\n";
+        viewer.curSteer = carCtrl.steerPos;
+        viewer.curAcc = carCtrl.accPos;
+        viewer.curBrake = carCtrl.brakePos;
+        
         tk::data::VehicleData::odom_t o = carCtrl.odom;
         viewer.plotManger->addPoint("odom", tk::common::odom2tf(o.x, o.y, 0));
-        std::cout<<"ODOM: "<<o.t<<" "<<o.x<<" "<<o.y<<" "<<o.yaw<<" "<<o.speed<<"\n";
+        std::cout<<"ODOM: "<<o.x<<" "<<o.y<<" "<<o.yaw<<" "<<o.speed<<"\n";
         
         // ODOM LOG
         {
@@ -134,6 +151,15 @@ int main( int argc, char** argv){
             std::string cmd = "OFF";
             std::cout<<"Command: "<<cmd<<"\n";
             carCtrl.sendGenericCmd(cmd);
+        } else if(joy.getButtonPressed(BUTTON_Y)) {
+            std::cout<<"!!!! Engine !!!!\n";
+            carCtrl.sendAccEnable(true);
+            usleep(1000);
+            carCtrl.setBrakePos(100);
+            sleep(1);
+            carCtrl.sendEngineStart();
+            sleep(1);
+            carCtrl.sendAccEnable(false);
         }
 
         if(active) {
@@ -146,8 +172,13 @@ int main( int argc, char** argv){
 
             if(fabs(throttle) > 0.05) {
                 accReq   = throttle > 0 ? throttle*100 : 0;
-                brakeReq = throttle < 0 ? -throttle*100 : 0;
+                brakeReq = throttle < 0 ? -throttle*6000 : 0;
             }
+
+            std::cout<<"Req: "<<steerReq<<" "<<accReq<<" "<<brakeReq<<"\n";
+            viewer.steerReq = steerReq;
+            viewer.accReq = accReq;
+            viewer.brakeReq = brakeReq;
 
             carCtrl.setAccPos(accReq); 
             carCtrl.setBrakePos(brakeReq);

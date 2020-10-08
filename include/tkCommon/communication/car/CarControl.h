@@ -81,7 +81,9 @@ namespace tk { namespace communication {
         void setAccPos(uint16_t pos);
         /**
          *  Send a brake position command to the motor
-         *  0 is no brake, 100 is full brake
+         *  0 is no brake, 20000 is full brake
+         *  4000 step for 6 mm
+         *  max 20000 step for 30 mm  
          */
         void setBrakePos(uint16_t pos);
         /**
