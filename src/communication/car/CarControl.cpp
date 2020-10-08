@@ -78,6 +78,7 @@ void CarControl::readLoop() {
                 y =  __bswap_32(y);
                 vel =  __bswap_16(vel);               
                 odom.y = float(y)/2e4;
+                odom.speed = vel;
                 odom.t = data.stamp;
             }
         }
@@ -173,6 +174,13 @@ void CarControl::sendOdomEnable(bool status) {
     soc->write(&data);
 }
 
+void CarControl::sendEngineStart() {
+    tk::data::CanData_t data;
+    data.frame.can_dlc = 1;
+    data.frame.can_id = ON_OFF_ID;
+    data.frame.data[0] = steerECU;
+    soc->write(&data);
+}
 
 void CarControl::requestSteerPos() {
     tk::data::CanData_t data;

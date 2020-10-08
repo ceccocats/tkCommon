@@ -65,6 +65,7 @@ namespace tk { namespace data {
             long double y = 0;
             long double z = 0;
             long double yaw = 0;
+            long double speed = 0;
             uint64_t t = 0;
         } odom;
 

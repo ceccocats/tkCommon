@@ -22,6 +22,7 @@ namespace tk { namespace communication {
         static const canid_t ODOM_RESET_ID         = ( 0x11a | CAN_EFF_FLAG );
         static const canid_t ODOM0_ID              = ( 0x121 | CAN_EFF_FLAG );
         static const canid_t ODOM1_ID              = ( 0x122 | CAN_EFF_FLAG );
+        static const canid_t ON_OFF_ID             = ( 0x210 | CAN_EFF_FLAG );
 
         // can iface
         tk::communication::CanInterface *soc = nullptr;
@@ -91,6 +92,11 @@ namespace tk { namespace communication {
          *  Set Odometry stream enabled or not
          */
         void sendOdomEnable(bool status);
+
+        /**
+         *  Simulate pression off engine start
+         */
+        void sendEngineStart();
 
     private:
         // request info from the system

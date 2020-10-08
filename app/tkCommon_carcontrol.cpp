@@ -71,9 +71,10 @@ int main( int argc, char** argv){
     MyViewer viewer;
     viewer.setWindowName("Car control");
     viewer.initOnThread(false);
-    viewer.plotManger->addCirclePlot("odom", tk::gui::color::RED, 1000000, 1000, -1);
+    viewer.plotManger->addCirclePlot("odom", tk::gui::color::RED, 1000000, 0.5);
     viewer.plotManger->set2d("odom",true);
     
+
 	Joystick joy;
     tkASSERT(joy.init());
 
@@ -106,8 +107,15 @@ int main( int argc, char** argv){
         std::cout<<"STATUS: "<<carCtrl.steerPos<<" "<<carCtrl.accPos<<" "<<carCtrl.brakePos<<"\n";
         tk::data::VehicleData::odom_t o = carCtrl.odom;
         viewer.plotManger->addPoint("odom", tk::common::odom2tf(o.x, o.y, 0));
-        std::cout<<"ODOM: "<<o.t<<" "<<o.x<<" "<<o.y<<" "<<o.yaw<<"\n";
+        std::cout<<"ODOM: "<<o.t<<" "<<o.x<<" "<<o.y<<" "<<o.yaw<<" "<<o.speed<<"\n";
         
+        // ODOM LOG
+        {
+            static std::ofstream odom_os("odomlog_"+getTimeStampString()+".txt");
+            odom_os<<o.t<<" "<<o.x<<" "<<o.y<<" "<<o.yaw<<" "<<o.speed<<"\n";
+            odom_os.flush();
+        }
+
         if(joy.getButtonPressed(BUTTON_BACK)) {
             std::cout<<"disable Acc\n";
             carCtrl.sendAccEnable(false);
