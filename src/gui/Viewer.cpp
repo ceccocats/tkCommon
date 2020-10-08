@@ -234,7 +234,8 @@ Viewer::drawInfos(){
             update++;
         }
         std::string usage = std::to_string((total_mem_kb - cur_avail_mem_kb)/1024.0) + " / " + std::to_string(total_mem_kb/1024.0);
-        ImGui::PlotLines(usage.c_str(),&gpuUsage,IM_ARRAYSIZE(gpuUsage),nUsage,0,"ciao",0,total_mem_kb/1024.0);
+        std::string t = "ciao";
+        ImGui::PlotLines(usage.c_str(),gpuUsage,IM_ARRAYSIZE(gpuUsage),nUsage,0);
 
         ImGuiIO& io = ImGui::GetIO();
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
