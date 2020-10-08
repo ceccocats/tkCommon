@@ -136,9 +136,22 @@ Viewer::imguiDraw(){
             imguiSelected = -1;
     ImGui::Separator();
     for(int i = 0; i < drawables.size(); i++){
-        std::string name = drawables[i]->toString() + "\t(" + std::to_string(i) + ")";
-        if(ImGui::Selectable(name.c_str(), imguiSelected == i))
+        std::string selectName = drawables[i]->toString();
+
+        if(drawables[i]->enabled == false){
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 0.4f));
+            drawables[i]->follow = false;
+        }
+        
+        if(drawables[i]->follow == true)
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 1.0f, 0.5f, 1.0f));
+    
+        if(ImGui::Selectable(selectName.c_str(), imguiSelected == i))
             imguiSelected = i;
+        
+        if(drawables[i]->enabled == false || drawables[i]->follow == true)
+            ImGui::PopStyleColor();
+
     }
     ImGui::EndChild();
     ImGui::SameLine();
@@ -149,9 +162,9 @@ Viewer::imguiDraw(){
     if(imguiSelected == -1){
         name = "viewer";
     }else{
-        name = drawables[imguiSelected]->toString() + "\t(" + std::to_string(imguiSelected) + ")";
+        name = drawables[imguiSelected]->toString();
     }
-    ImGui::Text(name.c_str());
+    ImGui::Text("%s",name.c_str());
     ImGui::Separator();
 
     ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None);
@@ -225,7 +238,8 @@ Viewer::drawSettings(){
 void
 Viewer::beforeDraw(){
     for (auto const& drawable : drawables){
-        drawable.second->beforeDraw(Viewer::instance);
+        if(drawable.second->enabled) //TODO: removing?!?
+            drawable.second->beforeDraw(Viewer::instance);
     }
     glCheckError();
 }
@@ -233,7 +247,12 @@ Viewer::beforeDraw(){
 void 
 Viewer::draw() {
     for (auto const& drawable : drawables){
-        drawable.second->draw(Viewer::instance);
+        if(drawable.second->enabled){
+            glPushMatrix();
+			glMultMatrixf(drawable.second->tf.matrix().data());
+            drawable.second->draw(Viewer::instance);
+            glPopMatrix();
+        }
     }
     glCheckError();
 }
@@ -244,7 +263,8 @@ Viewer::draw2D() {
     //TODO: mettere la camera in ambiente 2D e disegnare logo tk di default
 
     for (auto const& drawable : drawables){
-        drawable.second->draw2D(Viewer::instance);
+        if(drawable.second->enabled)
+            drawable.second->draw2D(Viewer::instance);
     }
     glCheckError();
 }
@@ -268,8 +288,10 @@ Viewer::follow() {
     tk::common::Vector3<float> center;
     int n = 0;
     for (auto const& drawable : drawables){
-        center += tk::common::tf2pose(drawable.second->tf);
-        n++;
+        if(drawable.second->follow){
+            center += tk::common::tf2pose(drawable.second->tf);
+            n++;
+        }
     }
 
     if(n > 0){

@@ -12,15 +12,13 @@ namespace tk{ namespace gui{
             tk::gui::Buffer<float>  glbuffer;
 
             float                   imgui_color[4];
-
-            std::string name; 
+            float                   pointSize = 1.0f;
 
         public:
             tk::gui::Color_t        color;
 
             Cloud4f(tk::data::CloudData* cloud, tk::gui::Color_t color = tk::gui::color::WHITE){
                 this->cloud = cloud;
-                this->name  = "Cloud4f";    
                 this->color = color;           
             }
 
@@ -43,11 +41,15 @@ namespace tk{ namespace gui{
                     beforeDraw();
                 }
                 tk::gui::shader::pointcloud4f* shaderCloud = (tk::gui::shader::pointcloud4f*) shader;
-                shaderCloud->draw(&glbuffer, glbuffer.size(),color);		
+
+                glPointSize(pointSize);
+                shaderCloud->draw(&glbuffer, glbuffer.size(),color);
+                glPointSize(1.0);		
             }
 
             void imGuiSettings(){
                 ImGui::ColorEdit4("Color", imgui_color);
+                ImGui::SliderFloat("Size",&pointSize,1.0f,20.0f,"%.1f");
                 color.r = 255 * imgui_color[0];
                 color.g = 255 * imgui_color[1];
                 color.b = 255 * imgui_color[2];
@@ -70,7 +72,7 @@ namespace tk{ namespace gui{
             }
 
             std::string toString(){
-			return name;
-		}
+                return cloud->header.name;
+            }
 	};
 }}

@@ -34,5 +34,9 @@ namespace tk{ namespace gui{
                 shaderGrid->close();
                 delete shader;
             }
+
+            std::string toString(){
+                return "grid";
+            }
 	};
 }}

@@ -19,6 +19,7 @@ int main(){
 	var.release();
 	points2.conservativeResize(4,1000000);
 	cloud.points.copyFrom(points2.data(),points2.rows(),points2.cols());
+	cloud.header.name = "LiDAR cloud";
 	cloud.notifyUpdate();
 
 	viewer.start();

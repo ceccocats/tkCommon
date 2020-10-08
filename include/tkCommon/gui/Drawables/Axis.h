@@ -33,5 +33,9 @@ namespace tk{ namespace gui{
                 shaderAxis->close();
                 delete shader;
             }
+
+            std::string toString(){
+                return "axis";
+            }
 	};
 }}
