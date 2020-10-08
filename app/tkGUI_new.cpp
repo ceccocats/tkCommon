@@ -2,6 +2,7 @@
 #include "tkCommon/gui/Drawables/Axis.h"
 #include "tkCommon/gui/Drawables/Grid.h"
 #include "tkCommon/gui/Drawables/Cloud4f.h"
+#include "tkCommon/gui/Drawables/Mesh.h"
 
 #include "tkCommon/data/CloudData.h"
 
@@ -25,7 +26,9 @@ int main(){
 	viewer.start();
 	viewer.add(new tk::gui::Grid());
 	viewer.add(new tk::gui::Axis());
+	viewer.add(new tk::gui::Mesh(std::string(tkCommon_PATH) + "data/levante.obj"));
 	viewer.add(new tk::gui::Cloud4f(&cloud));
+	
 
 	
 

@@ -33,6 +33,7 @@ namespace tk { namespace gui {
         void add(tk::gui::Drawable* obj);
 
         static Viewer *instance;
+        glm::vec3   lightPos;
 
     private:
 
@@ -72,17 +73,16 @@ namespace tk { namespace gui {
         bool    running = false;
 
         Camera      camera;
-        glm::vec3   lightPos;
 
         GLFWwindow *window;
         const char *glsl_version = "#version 130";
 
         GLint total_mem_kb = 0;
         GLint cur_avail_mem_kb = 0;
-        int   nUsage;
-        float gpuUsage[30]; 
-        int   nFPS;
-        float vizFPS[30];
+        const int   nUsage = 30;
+        float       gpuUsage[30]; 
+        const int   nFPS = 30;
+        float       vizFPS[30];
 
         // glfw callbacks
         static void errorCallback(int error, const char* description);

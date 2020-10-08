@@ -221,28 +221,33 @@ Viewer::drawInfos(){
 
     if(imguiSelected == -1){
 
-        //Usage
+        //Usage FPS and GPU memory
         static int update = 15;
         if(update == 15){
             update = 0;
             glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
-            for(int i = nUsage-1; i > 0; i++){
+            for(int i = nUsage-1; i > 0; i--){
                 gpuUsage[i] = gpuUsage[i-1];
             }
             gpuUsage[0] = (total_mem_kb - cur_avail_mem_kb)/1024.0;
+
+            for(int i = nFPS-1; i > 0; i--){
+                vizFPS[i] = vizFPS[i-1];
+            }
+            ImGuiIO& io = ImGui::GetIO();
+            vizFPS[0] = io.Framerate;
         }else{
             update++;
         }
-        std::string usage = std::to_string((total_mem_kb - cur_avail_mem_kb)/1024.0) + " / " + std::to_string(total_mem_kb/1024.0);
-        std::string t = "ciao";
-        ImGui::PlotLines(usage.c_str(),gpuUsage,IM_ARRAYSIZE(gpuUsage),nUsage,0);
+        std::string usage = std::to_string((int)((total_mem_kb - cur_avail_mem_kb)/1024.0)) + " / " + std::to_string((int)(total_mem_kb/1024.0)) + " MB";
+        std::string t = "GPU memory";
+        ImGui::PlotLines(usage.c_str(),(const float*)gpuUsage,IM_ARRAYSIZE(gpuUsage),nUsage,t.c_str(),0,total_mem_kb/1024.0);
+        usage = std::to_string((int)vizFPS[0]) + " FPS";
+        ImGui::PlotLines(usage.c_str(),(const float*)vizFPS,IM_ARRAYSIZE(vizFPS),nFPS,nullptr,0,120.0);
 
-        ImGuiIO& io = ImGui::GetIO();
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+
         ImGui::Text("Window size: %d x %d", width, height);
         ImGui::Text("window ratio: %f", aspectRatio);
-        glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
-        ImGui::Text("GPU memory: %d / %d MB", (int)((total_mem_kb - cur_avail_mem_kb)/1024.0), (int)(total_mem_kb/1024.0));
 
         
     }else{

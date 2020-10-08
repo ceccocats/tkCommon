@@ -31,13 +31,14 @@ namespace tk { namespace gui { namespace shader {
 class mesh : public tk::gui::shader::generic
 {
     public:
-        bool init(){
+        
+        mesh(){
             std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/mesh.vert";
             std::string geometry    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/mesh.geom";
             std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/mesh.frag";
             
             bool status = shader.init(vertex, fragment, geometry);
-            if(status == false) return false;
+            if(status == false) return;
 
             vertexPointer.push_back({3,18,0});
 		    vertexPointer.push_back({3,18,3});
@@ -45,7 +46,11 @@ class mesh : public tk::gui::shader::generic
 		    vertexPointer.push_back({3,18,9});
 		    vertexPointer.push_back({3,18,12});
 		    vertexPointer.push_back({3,18,15});
-            return true;
+            return;
+        }
+
+        ~mesh(){
+
         }
 
         void draw(tk::gui::Buffer<float>* buffer, int n, glm::vec3 lightPos, tk::gui::Color_t color = tk::gui::color::WHITE){
