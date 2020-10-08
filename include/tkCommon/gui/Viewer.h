@@ -26,7 +26,7 @@ namespace tk { namespace gui {
     public:
         Viewer();
         ~Viewer();
-        void start();
+        void start(bool useImGUI = true);
         bool isRunning();
         void stop();
         void join();
@@ -67,6 +67,7 @@ namespace tk { namespace gui {
         float   xLim = 1.0;
         float   yLim = 1.0;
         double  dt = 1.0/60;
+        bool    useImGUI;
 
         int     imguiSelected = -1;
 

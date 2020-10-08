@@ -10,11 +10,18 @@ namespace tk{ namespace gui{
             std::vector<tk::gui::Buffer<float>> obj;
             std::vector<tk::gui::Color_t> objColors;
             std::string filename;
+            float imgui_color[4];
+            tk::gui::Color_t color;
 
         public:
 
             Mesh(std::string filename){
                 this->filename = filename;
+
+                imgui_color[0]=0;
+                imgui_color[1]=0;
+                imgui_color[2]=0;
+                imgui_color[3]=0;
             }
 
             ~Mesh(){
@@ -47,17 +54,47 @@ namespace tk{ namespace gui{
             void draw(tk::gui::Viewer *viewer){
                 tk::gui::shader::mesh* shaderMesh= (tk::gui::shader::mesh*) shader;
 
-                for(int i = 0; i < obj.size(); i++){	
-                    shaderMesh->draw(&obj[i], obj[i].size(), viewer->lightPos, objColors[i]);
+                tk::gui::Color_t meshColor;
+                for(int i = 0; i < obj.size(); i++){
+                    meshColor.r = objColors[i].r + color.r;
+                    meshColor.g = objColors[i].g + color.g;
+                    meshColor.b = objColors[i].b + color.b;	
+                    meshColor.a = objColors[i].a + color.a;
+                    shaderMesh->draw(&obj[i], obj[i].size(), viewer->lightPos, meshColor);
                 }		
             }
 
             void imGuiSettings(){
-                
+                ImGui::Text("Setting value to sum in a color mesh");
+                ImGui::SliderFloat("R",&imgui_color[0],-1.0f,1.0f,"%.1f");
+                ImGui::SameLine();
+                if (ImGui::Button("reset R")){
+                    imgui_color[0] = 0;
+                }
+                ImGui::SliderFloat("G",&imgui_color[1],-1.0f,1.0f,"%.1f");
+                ImGui::SameLine();
+                if (ImGui::Button("reset G")){
+                    imgui_color[1] = 0;
+                }
+                ImGui::SliderFloat("B",&imgui_color[2],-1.0f,1.0f,"%.1f");
+                ImGui::SameLine();
+                if (ImGui::Button("reset B")){
+                    imgui_color[2] = 0;
+                }
+                ImGui::SliderFloat("A",&imgui_color[3],-1.0f,1.0f,"%.1f");
+                ImGui::SameLine();
+                if (ImGui::Button("reset A")){
+                    imgui_color[3] = 0;
+                }
+
+                color.r = 255 * imgui_color[0];
+                color.g = 255 * imgui_color[1];
+                color.b = 255 * imgui_color[2];
+                color.a = 255 * imgui_color[3];
             }
 
             void imGuiInfos(){
-                
+                ImGui::Text("Drawing %s",filename.c_str());
             }
 
             void beforeDraw(){

@@ -13,8 +13,9 @@ Viewer::~Viewer(){
 }
 
 void 
-Viewer::start(){
+Viewer::start(bool useImGUI){
     if(running == false){
+        this->useImGUI=useImGUI;
         glThread.init(run,Viewer::instance);
     }else{
         clsWrn("Thread is already started\n");
@@ -240,10 +241,11 @@ Viewer::drawInfos(){
             update++;
         }
         std::string usage = std::to_string((int)((total_mem_kb - cur_avail_mem_kb)/1024.0)) + " / " + std::to_string((int)(total_mem_kb/1024.0)) + " MB";
-        std::string t = "GPU memory";
-        ImGui::PlotLines(usage.c_str(),(const float*)gpuUsage,IM_ARRAYSIZE(gpuUsage),nUsage,t.c_str(),0,total_mem_kb/1024.0);
+        std::string text = "GPU memory";
+        ImGui::PlotLines(usage.c_str(),(const float*)gpuUsage,IM_ARRAYSIZE(gpuUsage),nUsage,text.c_str(),0,total_mem_kb/1024.0);
         usage = std::to_string((int)vizFPS[0]) + " FPS";
-        ImGui::PlotLines(usage.c_str(),(const float*)vizFPS,IM_ARRAYSIZE(vizFPS),nFPS,nullptr,0,120.0);
+        text = "FPS";
+        ImGui::PlotLines(usage.c_str(),(const float*)vizFPS,IM_ARRAYSIZE(vizFPS),nFPS,text.c_str(),0,120.0);
 
 
         ImGui::Text("Window size: %d x %d", width, height);
@@ -387,7 +389,8 @@ void Viewer::runloop() {
         glm::vec3 pp = camera.unprojectPlane({camera.mousePos.x,camera.mousePos.y});
 
         //tkRendering
-        imguiDraw();
+        if(useImGUI == true)
+            imguiDraw();
         draw();
         draw2D();
 

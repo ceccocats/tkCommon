@@ -19,9 +19,14 @@ namespace tk{ namespace gui{
             ~Grid(){
 
             }
-
+            
             void onInit(tk::gui::Viewer *viewer){
                 shader = new tk::gui::shader::grid();
+            }
+
+            void imGuiSettings(){
+                ImGui::SliderFloat("Sector dim",&dim, 1.f,10.0f,"%.1f");
+                ImGui::SliderInt("Sector number",&n, 10, 1000,"%.1f");
             }
 
             void draw(tk::gui::Viewer *viewer){
