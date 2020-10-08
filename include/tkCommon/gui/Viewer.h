@@ -79,6 +79,10 @@ namespace tk { namespace gui {
 
         GLint total_mem_kb = 0;
         GLint cur_avail_mem_kb = 0;
+        int   nUsage;
+        float gpuUsage[30]; 
+        int   nFPS;
+        float vizFPS[30];
 
         // glfw callbacks
         static void errorCallback(int error, const char* description);

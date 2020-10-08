@@ -113,7 +113,14 @@ Viewer::init() {
     // init cameras
     camera.init();
 
+    //Graphics
+    for(int i = 0; i < nFPS; i++){
+        vizFPS[i] = 0;
+    }
     glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &total_mem_kb);
+    for(int i = 0; i < nUsage; i++){
+        gpuUsage[i] = 0;
+    }
 
     // lights
     lightPos = glm::vec3(0.0f, 0.0f, 20.0f);
@@ -213,12 +220,30 @@ void
 Viewer::drawInfos(){
 
     if(imguiSelected == -1){
+
+        //Usage
+        static int update = 15;
+        if(update == 15){
+            update = 0;
+            glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
+            for(int i = nUsage-1; i > 0; i++){
+                gpuUsage[i] = gpuUsage[i-1];
+            }
+            gpuUsage[0] = (total_mem_kb - cur_avail_mem_kb)/1024.0;
+        }else{
+            update++;
+        }
+        std::string usage = std::to_string((total_mem_kb - cur_avail_mem_kb)/1024.0) + " / " + std::to_string(total_mem_kb/1024.0);
+        ImGui::PlotLines(usage.c_str(),&gpuUsage,IM_ARRAYSIZE(gpuUsage),nUsage,0,"ciao",0,total_mem_kb/1024.0);
+
         ImGuiIO& io = ImGui::GetIO();
         ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
         ImGui::Text("Window size: %d x %d", width, height);
         ImGui::Text("window ratio: %f", aspectRatio);
         glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
         ImGui::Text("GPU memory: %d / %d MB", (int)((total_mem_kb - cur_avail_mem_kb)/1024.0), (int)(total_mem_kb/1024.0));
+
+        
     }else{
         drawables[imguiSelected]->imGuiInfos();
     }
