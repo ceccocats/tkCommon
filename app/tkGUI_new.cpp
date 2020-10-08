@@ -1,12 +1,35 @@
 #include "tkCommon/gui/Viewer.h"
-#include "tkCommon/gui/Drawables/axis.h"
-#include "tkCommon/gui/Drawables/grid.h"
+#include "tkCommon/gui/Drawables/Axis.h"
+#include "tkCommon/gui/Drawables/Grid.h"
+#include "tkCommon/gui/Drawables/Cloud4f.h"
+
+#include "tkCommon/data/CloudData.h"
 
 int main(){
 	tk::gui::Viewer viewer;
+
+	tk::data::CloudData cloud;
+	
+	Eigen::MatrixXf points2;
+	tk::math::MatIO mat;
+	mat.open("/home/alice/cloud.mat");
+	tk::math::MatIO::var_t var;
+	mat.read("cloud",var);
+	var["points"].get(points2);
+	var.release();
+	points2.conservativeResize(4,1000000);
+	cloud.points.copyFrom(points2.data(),points2.rows(),points2.cols());
+	cloud.notifyUpdate();
+
 	viewer.start();
-	viewer.add(new tk::gui::grid());
-	viewer.add(new tk::gui::axis());
+	viewer.add(new tk::gui::Grid());
+	viewer.add(new tk::gui::Axis());
+	viewer.add(new tk::gui::Cloud4f(&cloud));
+
+	
+
+
+
 	viewer.join();
 }
 

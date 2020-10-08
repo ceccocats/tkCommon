@@ -42,8 +42,10 @@ namespace tk { namespace gui {
         static void* run(void* istance);
         void  runloop();
 
+        void  beforeDraw();
         void  drawInfos();
         void  drawSettings();
+        void  imguiDraw();
         void  draw();
         void  draw2D();
         
@@ -64,6 +66,8 @@ namespace tk { namespace gui {
         float   xLim = 1.0;
         float   yLim = 1.0;
         double  dt = 1.0/60;
+
+        int     imguiSelected = -1;
 
         bool    running = false;
 

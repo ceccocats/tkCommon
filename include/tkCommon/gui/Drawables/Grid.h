@@ -4,19 +4,19 @@
 
 namespace tk{ namespace gui{
 
-	class grid : public Drawable {
+	class Grid : public Drawable {
 
         public:
 
             float   dim;
             int     n;
 
-            grid(float dim = 1.0, int n = 50){
+            Grid(float dim = 1.0, int n = 50){
                 this->dim = dim;
                 this->n = n;
             }
 
-            ~grid(){
+            ~Grid(){
 
             }
 

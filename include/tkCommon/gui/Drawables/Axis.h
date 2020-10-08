@@ -4,18 +4,18 @@
 
 namespace tk{ namespace gui{
 
-	class axis : public Drawable {
+	class Axis : public Drawable {
 
         public:
 
             float   dim;
             int     n;
 
-            axis(){
+            Axis(){
 
             }
 
-            ~axis(){
+            ~Axis(){
 
             }
 

@@ -63,9 +63,12 @@ namespace tk { namespace data {
         }
 
         bool isChange(){
-            bool status = modified;
+            if(modified == false){
+                return false;
+            }
+            
             modified = false;
-            return status;
+            return true;
         }
     };
 }}

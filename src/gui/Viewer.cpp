@@ -127,35 +127,108 @@ Viewer::init() {
 }
 
 void 
-Viewer::drawInfos(){
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::Begin("Informations");
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-    ImGui::Text("Window size: %d x %d", width, height);
-    glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
-    ImGui::Text("GPU memory: %d / %d MB", (int)((total_mem_kb - cur_avail_mem_kb)/1024.0), (int)(total_mem_kb/1024.0));
-    ImGui::Text("Drawables (%d)", int(drawables.size()));
-    
-    ImGui::Text("------------------------------------------");
-    for (auto const& drawable : drawables){
-        drawable.second->imGuiInfos();
+Viewer::imguiDraw(){
+    ImGui::SetNextWindowSize(ImVec2(500, 440), ImGuiCond_FirstUseEver);
+    ImGui::Begin("tkGUI");
+
+    ImGui::BeginChild("left pane", ImVec2(150, 0), true);
+    if(ImGui::Selectable("Viewer", imguiSelected == -1))
+            imguiSelected = -1;
+    ImGui::Separator();
+    for(int i = 0; i < drawables.size(); i++){
+        std::string name = drawables[i]->toString() + "\t(" + std::to_string(i) + ")";
+        if(ImGui::Selectable(name.c_str(), imguiSelected == i))
+            imguiSelected = i;
     }
+    ImGui::EndChild();
+    ImGui::SameLine();
+
+    ImGui::BeginGroup();
+    ImGui::BeginChild("item view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()));
+    std::string name;
+    if(imguiSelected == -1){
+        name = "viewer";
+    }else{
+        name = drawables[imguiSelected]->toString() + "\t(" + std::to_string(imguiSelected) + ")";
+    }
+    ImGui::Text(name.c_str());
+    ImGui::Separator();
+
+    ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None);
+
+    if(ImGui::BeginTabItem("Info")){
+        drawInfos();
+        ImGui::EndTabItem();
+    }
+
+    if(ImGui::BeginTabItem("Settings")){
+        drawSettings();
+        ImGui::EndTabItem();
+    }
+
+    ImGui::EndTabBar();
+    ImGui::EndChild();
+
+    if(imguiSelected != -1){
+
+        std::string value;
+        if(drawables[imguiSelected]->follow == true){
+            value = "unfollow";
+        }else{
+            value = "follow";
+        }
+        if (ImGui::Button(value.c_str())){
+            drawables[imguiSelected]->follow = ! drawables[imguiSelected]->follow;
+        }
+        ImGui::SameLine();
+
+        if(drawables[imguiSelected]->enabled == true){
+            value = "disable";
+        }else{
+            value = "enable";
+        }
+        if (ImGui::Button(value.c_str())){
+            drawables[imguiSelected]->enabled = ! drawables[imguiSelected]->enabled;
+        }
+    }
+    ImGui::EndGroup();
     ImGui::End();
 
+}
+
+void 
+Viewer::drawInfos(){
+
+    if(imguiSelected == -1){
+        ImGuiIO& io = ImGui::GetIO();
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
+        ImGui::Text("Window size: %d x %d", width, height);
+        ImGui::Text("window ratio: %f", aspectRatio);
+        glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
+        ImGui::Text("GPU memory: %d / %d MB", (int)((total_mem_kb - cur_avail_mem_kb)/1024.0), (int)(total_mem_kb/1024.0));
+    }else{
+        drawables[imguiSelected]->imGuiInfos();
+    }
     glCheckError();
 }
 
 void 
 Viewer::drawSettings(){
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::Begin("Settings");
-    for (auto const& drawable : drawables){
-        drawable.second->imGuiSettings();
+    if(imguiSelected == -1){
+        ImGui::Text("La mamma di gatti");
+    }else{
+        drawables[imguiSelected]->imGuiSettings();
     }
-    ImGui::End();
     glCheckError();
 }
 
+void
+Viewer::beforeDraw(){
+    for (auto const& drawable : drawables){
+        drawable.second->beforeDraw(Viewer::instance);
+    }
+    glCheckError();
+}
 
 void 
 Viewer::draw() {
@@ -168,7 +241,7 @@ Viewer::draw() {
 void 
 Viewer::draw2D() {
 
-    //TODO: mettere la camera in ambiente 2D e disegnare logo tk
+    //TODO: mettere la camera in ambiente 2D e disegnare logo tk di default
 
     for (auto const& drawable : drawables){
         drawable.second->draw2D(Viewer::instance);
@@ -261,8 +334,7 @@ void Viewer::runloop() {
         glm::vec3 pp = camera.unprojectPlane({camera.mousePos.x,camera.mousePos.y});
 
         //tkRendering
-        drawInfos();
-        drawSettings();
+        imguiDraw();
         draw();
         draw2D();
 
