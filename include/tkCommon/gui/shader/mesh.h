@@ -53,7 +53,7 @@ class mesh : public tk::gui::shader::generic
 
         }
 
-        void draw(tk::gui::Buffer<float>* buffer, int n, glm::vec3 lightPos, tk::gui::Color_t color = tk::gui::color::WHITE){
+        void draw(tk::gui::Buffer<float>* buffer, int n, glm::vec3 lightPos, tk::gui::Color_t color = tk::gui::color::WHITE, float ambientStrength = 0.6, bool useLight = true){
 
 		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
             buffer->setVertexAttribs(vertexPointer);
@@ -67,6 +67,8 @@ class mesh : public tk::gui::shader::generic
             shader.setMat4("modelview",modelview);
             shader.setVec4("color", pointColor);
             shader.setVec3("lightPos",lightPos);
+            shader.setFloat("ambientStrength",ambientStrength);
+            shader.setBool("useLight",useLight);
 
             buffer->use();
             glDrawArrays(GL_POINTS, 0, n);

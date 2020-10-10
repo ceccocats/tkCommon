@@ -24,7 +24,6 @@ namespace tk { namespace gui {
     class Viewer {
 
     public:
-        Viewer();
         ~Viewer();
         void start(bool useImGUI = true);
         bool isRunning();
@@ -32,11 +31,21 @@ namespace tk { namespace gui {
         void join();
         void add(tk::gui::Drawable* obj);
 
-        static Viewer *instance;
-        glm::vec3   lightPos;
+        float getWidth();
+        float getHeight();
+
+        static Viewer* getIstance(){
+             if (Viewer::instance == nullptr) {
+                Viewer::instance = new Viewer();
+            }
+            return Viewer::instance;
+        }
+
+        glm::vec3 getLightPos();
 
     private:
-
+        
+        Viewer();
         void  init();
         void  initDrawables();
 
@@ -52,6 +61,8 @@ namespace tk { namespace gui {
         
         void  follow();
         void  close();
+
+        static Viewer *instance;
 
         std::map<int,tk::gui::Drawable*> drawables;
         std::map<int,tk::gui::Drawable*> newDrawables;
@@ -74,6 +85,8 @@ namespace tk { namespace gui {
         bool    running = false;
 
         Camera      camera;
+
+        glm::vec3   lightPos;
 
         GLFWwindow *window;
         const char *glsl_version = "#version 130";

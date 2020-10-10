@@ -33,13 +33,13 @@ class axis : public tk::gui::shader::generic
             
         }
 
-        void draw(){
+        void draw(float width, float height){
             glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
 
             shader.use();
             shader.setMat4("modelview", modelview);
-            shader.setInt("width",glutGet(GLUT_SCREEN_WIDTH));
-		    shader.setInt("height",glutGet(GLUT_SCREEN_HEIGHT));
+            shader.setInt("width",width);
+		    shader.setInt("height",height);
 
             glLineWidth(3.0);
             glDrawArrays(GL_POINTS, 0, 1);

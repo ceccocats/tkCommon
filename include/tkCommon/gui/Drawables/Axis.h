@@ -25,7 +25,11 @@ namespace tk{ namespace gui{
 
             void draw(tk::gui::Viewer *viewer){
                 tk::gui::shader::axis* shaderAxis = (tk::gui::shader::axis*) shader;
-                shaderAxis->draw();
+                shaderAxis->draw(viewer->getWidth(),viewer->getHeight());
+            }
+
+            void imGuiInfos(){
+                ImGui::Text("3D axis drawable");
             }
 
             void onClose(){

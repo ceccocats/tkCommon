@@ -7,34 +7,31 @@
 #include "tkCommon/data/CloudData.h"
 
 int main(){
-	tk::gui::Viewer viewer;
+	tk::gui::Viewer* viewer = tk::gui::Viewer::getIstance();
 
 	tk::data::CloudData cloud;
-	
 	Eigen::MatrixXf points2;
 	tk::math::MatIO mat;
 	mat.open("/home/alice/cloud.mat");
 	tk::math::MatIO::var_t var;
 	mat.read("cloud",var);
 	var["points"].get(points2);
+	//var["f_intensity"].get(points2);
 	var.release();
 	points2.conservativeResize(4,1000000);
 	cloud.points.copyFrom(points2.data(),points2.rows(),points2.cols());
 	cloud.header.name = "LiDAR cloud";
 	cloud.notifyUpdate();
 
-	viewer.start();
-	viewer.add(new tk::gui::Grid());
-	viewer.add(new tk::gui::Axis());
-	viewer.add(new tk::gui::Mesh(std::string(tkCommon_PATH) + "data/levante.obj"));
-	viewer.add(new tk::gui::Cloud4f(&cloud));
-	
 
-	
+	viewer->start();
 
+	viewer->add(new tk::gui::Grid());
+	viewer->add(new tk::gui::Axis());
+	viewer->add(new tk::gui::Mesh(std::string(tkCommon_PATH) + "data/levante.obj"));
+	viewer->add(new tk::gui::Cloud4f(&cloud));
 
-
-	viewer.join();
+	viewer->join();
 }
 
 

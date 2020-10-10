@@ -29,6 +29,10 @@ namespace tk{ namespace gui{
                 ImGui::SliderInt("Sector number",&n, 10, 1000,"%.1f");
             }
 
+            void imGuiInfos(){
+                ImGui::Text("3D grid drawable");
+            }
+
             void draw(tk::gui::Viewer *viewer){
                 tk::gui::shader::grid* shaderGrid = (tk::gui::shader::grid*) shader;
                 shaderGrid->draw(dim,n);

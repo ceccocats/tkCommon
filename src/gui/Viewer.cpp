@@ -4,12 +4,12 @@ namespace tk { namespace gui {
 Viewer* Viewer::instance = nullptr;
 
 Viewer::Viewer(){
-    Viewer::instance = this;
+
 }
 
 
 Viewer::~Viewer(){
-
+    delete Viewer::instance;
 }
 
 void 
@@ -49,6 +49,21 @@ Viewer::run(void* istance){
     viewer->init();
 
     viewer->runloop();
+}
+
+float 
+Viewer::getWidth(){
+    return width;
+}
+
+float 
+Viewer::getHeight(){
+    return height;
+}
+
+glm::vec3 
+Viewer::getLightPos(){
+    return lightPos;
 }
 
 void 
@@ -194,9 +209,9 @@ Viewer::imguiDraw(){
 
         std::string value;
         if(drawables[imguiSelected]->follow == true){
-            value = "unfollow";
+            value = "Unfollow";
         }else{
-            value = "follow";
+            value = "Follow";
         }
         if (ImGui::Button(value.c_str())){
             drawables[imguiSelected]->follow = ! drawables[imguiSelected]->follow;
@@ -204,9 +219,9 @@ Viewer::imguiDraw(){
         ImGui::SameLine();
 
         if(drawables[imguiSelected]->enabled == true){
-            value = "disable";
+            value = "Disable";
         }else{
-            value = "enable";
+            value = "Enable";
         }
         if (ImGui::Button(value.c_str())){
             drawables[imguiSelected]->enabled = ! drawables[imguiSelected]->enabled;
@@ -261,7 +276,7 @@ Viewer::drawInfos(){
 void 
 Viewer::drawSettings(){
     if(imguiSelected == -1){
-        ImGui::Text("La mamma di gatti");
+        ImGui::SliderFloat3("Light position",&lightPos[0],-100.0f,100.0f);
     }else{
         drawables[imguiSelected]->imGuiSettings();
     }
