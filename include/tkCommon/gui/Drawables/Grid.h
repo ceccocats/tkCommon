@@ -37,7 +37,7 @@ namespace tk{ namespace gui{
             void onClose(){
                 tk::gui::shader::grid* shaderGrid = (tk::gui::shader::grid*) shader;
                 shaderGrid->close();
-                delete shader;
+                delete shaderGrid;
             }
 
             std::string toString(){

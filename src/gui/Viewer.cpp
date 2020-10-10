@@ -337,8 +337,6 @@ Viewer::follow() {
 
 void 
 Viewer::close() { 
-    stop();
-    join();
     for (auto const& drawable : drawables){
         drawable.second->onClose();
         delete drawable.second;
@@ -346,7 +344,8 @@ Viewer::close() {
     clsMsg("closed\n");
 }
 
-void Viewer::runloop() {
+void 
+Viewer::runloop() {
 
     running = true;
     timeStamp_t VIZ_DT_US = dt*1e6;
@@ -420,19 +419,23 @@ void Viewer::runloop() {
 }
 
 
-void Viewer::errorCallback(int error, const char* description) {
+void 
+Viewer::errorCallback(int error, const char* description) {
     tk::tprint::printErr("Viewer", std::string{"error: "}+std::to_string(error)+" "+description+"\n");
 }
 
-void Viewer::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+void 
+Viewer::scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     Viewer::instance->camera.mouseWheel(xoffset, yoffset);
 }
 
-void Viewer::cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
+void 
+Viewer::cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
     Viewer::instance->camera.mouseMove(xpos, ypos);
 }
 
-void Viewer::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+void 
+Viewer::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
 
@@ -442,7 +445,8 @@ void Viewer::mouse_button_callback(GLFWwindow* window, int button, int action, i
         Viewer::instance->camera.mouseUp(button, xpos, ypos);
 }
 
-void Viewer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods){
+void 
+Viewer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods){
 
     if (key == GLFW_KEY_ESCAPE){
         glfwSetWindowShouldClose(window, true); 	
