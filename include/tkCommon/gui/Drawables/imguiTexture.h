@@ -31,7 +31,9 @@ namespace tk{ namespace gui{
 
             void draw(tk::gui::Viewer *viewer){
                 if(image->isChange()){
-                    onChange(viewer);
+                    image->lock();
+                    texture.setData(image->data.data_h);
+                    image->unlockRead();
                 }
                 ImGui::Begin(image->header.name.c_str(), NULL, ImGuiWindowFlags_NoScrollbar);
                 int imgX = ImGui::GetWindowSize().x-20;

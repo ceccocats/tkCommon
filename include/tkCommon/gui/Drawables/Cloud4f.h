@@ -37,13 +37,15 @@ namespace tk{ namespace gui{
             }
 
             void draw(tk::gui::Viewer *viewer){
-                if(cloud->isChange()){
-                    beforeDraw();
+                if(cloud->isChanged()){
+                    cloud->lock();
+                    glbuffer.setData(cloud->points.data_h,cloud->points.size());
+                    cloud->unlockRead();
                 }
-                tk::gui::shader::pointcloud4f* shaderCloud = (tk::gui::shader::pointcloud4f*) shader;
 
+                tk::gui::shader::pointcloud4f* shaderCloud = (tk::gui::shader::pointcloud4f*) shader;
                 glPointSize(pointSize);
-                shaderCloud->draw(&glbuffer, glbuffer.size(),color);
+                shaderCloud->draw(&glbuffer, glbuffer.size()/4,color);
                 glPointSize(1.0);		
             }
 
@@ -58,10 +60,6 @@ namespace tk{ namespace gui{
 
             void imGuiInfos(){
                 ImGui::Text("Pointcloud has %d points",glbuffer.size());
-            }
-
-            void beforeDraw(){
-                glbuffer.setData(cloud->points.data_h,cloud->points.size());
             }
 
             void onClose(){

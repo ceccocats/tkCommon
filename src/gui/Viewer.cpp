@@ -15,6 +15,7 @@ Viewer::~Viewer(){
 void 
 Viewer::start(bool useImGUI){
     if(running == false){
+        running = true;
         this->useImGUI=useImGUI;
         glThread.init(run,Viewer::instance);
     }else{
@@ -362,7 +363,6 @@ Viewer::close() {
 void 
 Viewer::runloop() {
 
-    running = true;
     timeStamp_t VIZ_DT_US = dt*1e6;
     LoopRate rate((VIZ_DT_US), "VIZ_UPDATE");
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "tkCommon/data/HeaderData.h"
+#include "tkCommon/rt/Lockable.h"
 
 namespace tk { namespace data {
 
@@ -8,12 +9,9 @@ namespace tk { namespace data {
      * This class is a basic data class that just contains basic information that all sensor data class must contain.
      * @see HeaderData
      */
-	class SensorData : public tk::math::MatDump {
+	class SensorData : public tk::math::MatDump, public tk::rt::Lockable{
     public:
         HeaderData  header;                 /**< Header, @see HeaderData */
-
-        bool        modified;
-        std::mutex  mutex;
 
         /**
          * @brief Initialization method.
@@ -21,7 +19,6 @@ namespace tk { namespace data {
          */
         virtual void init() {
             header.init();
-            modified = false;
         }
 
         /**
@@ -56,19 +53,6 @@ namespace tk { namespace data {
 
         bool fromVar(tk::math::MatIO::var_t &var) {
             return header.fromVar(var);
-        }
-
-        void notifyUpdate(){
-            modified = true;
-        }
-
-        bool isChange(){
-            if(modified == false){
-                return false;
-            }
-            
-            modified = false;
-            return true;
         }
     };
 }}

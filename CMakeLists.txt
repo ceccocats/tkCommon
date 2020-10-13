@@ -46,7 +46,6 @@ set(GUI_LIBS
     gcc
     ${CUDA_LIBRARIES}
 )
-message(${GUI_LIBS})
 
 
 #-------------------------------------------------------------------------------
@@ -63,6 +62,11 @@ add_custom_command(OUTPUT
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/_genDataHeaders.py
     COMMAND python3 _genDataHeaders.py)
 add_custom_target(tkdataheaders_gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/GpsData_gen.h)
+
+add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/shader/colormaps/*
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/shader/glsl/pointcloudFrag
+    COMMAND python3 _colormapsGen.py)
+    add_custom_target(tkshaderpointcloud_gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/shader/colormaps/*)
 
 #-------------------------------------------------------------------------------
 # Build Libraries
@@ -134,7 +138,7 @@ endif()
 add_custom_target(tkversiongit COMMAND rsync --checksum tkversion_git.tmp tkversion_git.h)
 add_dependencies(tkversiongit tkversiongit_tmp)
 add_dependencies(tkCommon tkversiongit tkdataheaders_gen)
-add_dependencies(tkGUI tkversiongit tkdataheaders_gen)
+add_dependencies(tkGUI tkversiongit tkdataheaders_gen tkshaderpointcloud_gen)
 
 
 #-------------------------------------------------------------------------------

@@ -2,26 +2,65 @@
 #include "tkCommon/gui/Drawables/Axis.h"
 #include "tkCommon/gui/Drawables/Grid.h"
 #include "tkCommon/gui/Drawables/Cloud4f.h"
+#include "tkCommon/gui/Drawables/Cloud4fFeatures.h"
 #include "tkCommon/gui/Drawables/Mesh.h"
 
 #include "tkCommon/data/CloudData.h"
 
-int main(){
-	tk::gui::Viewer* viewer = tk::gui::Viewer::getIstance();
+#include <thread>
 
-	tk::data::CloudData cloud;
+tk::data::CloudData cloud;
+tk::gui::Viewer* 	viewer = tk::gui::Viewer::getIstance();
+
+void read_cloud() {
+
+	tk::math::MatIO mat;
+	mat.open("/home/alice/Documents/dataset/masa_ouster.mat");
+
+	cloud.header.name = "LiDAR cloud";
+
+	Eigen::MatrixXf points;
+	Eigen::MatrixXf intensity;
+	tk::math::MatIO::var_t var;
+	for(int i=0; i<mat.size() && viewer->isRunning(); i++) {
+
+		mat.read(mat[i], var);
+		var["lidar"]["points"].get(points);
+
+		mat.read(mat[i], var);
+		var["lidar"]["f_intensity"].get(intensity);
+
+		var.release();
+
+		cloud.lock();
+
+		cloud.points.copyFrom(points.data(),points.rows(),points.cols());
+		cloud.features.copyFrom(intensity.data(),intensity.rows(),intensity.cols());
+		cloud.gammaCorrectionIntensity();
+
+		cloud.unlockWrite();
+
+		usleep(100000);
+	}
+
+	mat.close();
+}
+
+int main(){
+
+	/*tk::data::CloudData cloud;
 	Eigen::MatrixXf points2;
 	tk::math::MatIO mat;
 	mat.open("/home/alice/cloud.mat");
 	tk::math::MatIO::var_t var;
 	mat.read("cloud",var);
 	var["points"].get(points2);
-	//var["f_intensity"].get(points2);
+	var["f_intensity"].get(intensity);//
 	var.release();
 	points2.conservativeResize(4,1000000);
 	cloud.points.copyFrom(points2.data(),points2.rows(),points2.cols());
 	cloud.header.name = "LiDAR cloud";
-	cloud.notifyUpdate();
+	cloud.notifyUpdate();*/
 
 
 	viewer->start();
@@ -29,9 +68,14 @@ int main(){
 	viewer->add(new tk::gui::Grid());
 	viewer->add(new tk::gui::Axis());
 	viewer->add(new tk::gui::Mesh(std::string(tkCommon_PATH) + "data/levante.obj"));
-	viewer->add(new tk::gui::Cloud4f(&cloud));
+	//viewer->add(new tk::gui::Cloud4f(&cloud));
+
+	viewer->add(new tk::gui::Cloud4fFeatures(&cloud));
+
+	std::thread read_cloud_th(read_cloud);
 
 	viewer->join();
+	read_cloud_th.join();
 }
 
 

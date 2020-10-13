@@ -7,11 +7,13 @@ tk::gui::Shader::init(std::string vertexPath, std::string fragmentPath, std::str
     
     vertexCode = load(vertexPath);
     if(vertexCode == ""){
+        clsErr("From "+vertexPath+"\n");
         return false;
     }
 
     fragmentCode = load(fragmentPath);
     if(fragmentCode == ""){
+        clsErr("From "+fragmentPath+"\n");
         return false;
     }
 
@@ -19,6 +21,7 @@ tk::gui::Shader::init(std::string vertexPath, std::string fragmentPath, std::str
     {
         geometryCode = load(geometryPath);
         if(geometryCode == ""){
+            clsErr("From "+geometryPath+"\n");
             return false;
         }
     }
@@ -172,7 +175,7 @@ tk::gui::Shader::load(std::string path){
 
     if (!file.is_open())
     {
-        clsErr("Error opening file: " + path + "\n");
+        clsErr("Error include file: " + path + "\n");
         return "";
     }
 
