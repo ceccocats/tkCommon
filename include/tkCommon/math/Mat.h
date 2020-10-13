@@ -39,11 +39,16 @@ class Mat : public tk::math::MatDump {
 
         __host__
         ~Mat(){
-            
+            if(data_h != nullptr){
+                HANDLE_ERROR( cudaFreeHost(data_h) );
+            } 
+            if(data_d != nullptr && _gpu == true){
+                HANDLE_ERROR( cudaFree(data_d) );
+            } 
         }
 
-        __host__ void
-        init(int r, int c){
+        __host__ 
+        Mat(int r, int c){
             if(r > 0 && c > 0){
                 resize(r,c);
             }
@@ -125,15 +130,6 @@ class Mat : public tk::math::MatDump {
             _size = r * c;
         }
 
-        __host__ void 
-        close(){
-            if(data_h != nullptr){
-                HANDLE_ERROR( cudaFreeHost(data_h) );
-            } 
-            if(data_d != nullptr && _gpu == true){
-                HANDLE_ERROR( cudaFree(data_d) );
-            } 
-        }
 
         __host__ __device__ int 
         rows() const { 
@@ -198,6 +194,18 @@ class Mat : public tk::math::MatDump {
             }
             return os;
         }
+};
+
+class Mat3d : public Mat<double> {
+    Mat3d() {
+        resize(3,3);
+    }
+};
+
+class Mat4f : public Mat<float> {
+    Mat4f() {
+        resize(4,4);
+    }
 };
 
 }}

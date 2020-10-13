@@ -10,11 +10,6 @@ namespace tk{ namespace gui{
             tk::gui::Texture<uint8_t>   texture; 
             tk::data::ImageData*        image;
 
-        protected:
-            void onChange(tk::gui::Viewer *viewer){
-                texture.setData(image->data.data_h);
-            }
-
         public:
 
             imguiTexture(tk::data::ImageData* image){

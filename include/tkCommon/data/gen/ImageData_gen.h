@@ -10,13 +10,16 @@ class ImageData_gen : public SensorData
 {
 public:
     tk::math::Mat<uint8_t> data;
-    uint32_t width = 0;
-    uint32_t height = 0;
-    uint32_t channels = 0;
+    uint32_t width;
+    uint32_t height;
+    uint32_t channels;
     
     void init() override
     {
         SensorData::init();
+        width = 0;
+        height = 0;
+        channels = 0;
     }
     ImageData_gen& operator=(const ImageData_gen& s)
     {
@@ -58,5 +61,7 @@ public:
         return true;
     }
 };
+
+
 
 }}

@@ -10,8 +10,25 @@ class CloudData_gen : public SensorData
 {
 public:
     typedef std::string featureType_t;
-    const featureType_t FEATURES_NONE = "f_none";
-    const featureType_t FEATURES_I = "f_intensity";
+    static const featureType_t FEATURES_NONE;
+    static const featureType_t FEATURES_I;
+    static const featureType_t FEATURES_CHANNEL;
+    static const featureType_t FEATURES_R;
+    static const featureType_t FEATURES_G;
+    static const featureType_t FEATURES_B;
+    static const featureType_t FEATURES_NX;
+    static const featureType_t FEATURES_NY;
+    static const featureType_t FEATURES_NZ;
+    static const featureType_t FEATURES_CLASS;
+    static const featureType_t FEATURES_DIST;
+    static const featureType_t FEATURES_VELOCITY;
+    static const featureType_t FEATURES_FALSE_DET;
+    static const featureType_t FEATURES_RANGE_VAR;
+    static const featureType_t FEATURES_VELOCITY_VAR;
+    static const featureType_t FEATURES_ANGLE_VAR;
+    static const featureType_t FEATURES_RCS;
+    static const featureType_t FEATURES_PROBABILITY;
+    static const featureType_t FEATURES_NEAR_SCAN;
     tk::math::Mat<float> points;
     tk::math::Mat<float> ranges;
     tk::math::Mat<float> features;
@@ -58,5 +75,26 @@ public:
         return true;
     }
 };
+
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_NONE = "f_none";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_I = "f_intensity";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_CHANNEL = "f_channel";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_R = "f_r";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_G = "f_g";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_B = "f_b";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_NX = "f_nx";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_NY = "f_ny";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_NZ = "f_nz";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_CLASS = "f_class";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_DIST = "f_dist";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_VELOCITY = "f_velocity";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_FALSE_DET = "f_false_det";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_RANGE_VAR = "f_range_var";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_VELOCITY_VAR = "f_velocity_var";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_ANGLE_VAR = "f_angle_var";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_RCS = "f_rcs";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_PROBABILITY = "f_probability";
+const CloudData_gen::featureType_t CloudData_gen::FEATURES_NEAR_SCAN = "f_near_scan";
+
 
 }}

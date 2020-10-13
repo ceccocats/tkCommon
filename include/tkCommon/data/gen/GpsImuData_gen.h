@@ -17,6 +17,8 @@ public:
     void init() override
     {
         SensorData::init();
+        gps.init();;
+        imu.init();;
     }
     GpsImuData_gen& operator=(const GpsImuData_gen& s)
     {
@@ -50,5 +52,7 @@ public:
         return true;
     }
 };
+
+
 
 }}

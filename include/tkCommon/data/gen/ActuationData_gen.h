@@ -16,9 +16,9 @@ public:
     void init() override
     {
         SensorData::init();
-        0;
-        0;
-        0;
+        steerAngle = 0;
+        accel = 0;
+        speed = 0;
     }
     ActuationData_gen& operator=(const ActuationData_gen& s)
     {
@@ -56,5 +56,7 @@ public:
         return true;
     }
 };
+
+
 
 }}

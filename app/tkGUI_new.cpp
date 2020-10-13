@@ -68,9 +68,9 @@ int main(){
 	viewer->add(new tk::gui::Grid());
 	viewer->add(new tk::gui::Axis());
 	viewer->add(new tk::gui::Mesh(std::string(tkCommon_PATH) + "data/levante.obj"));
-	//viewer->add(new tk::gui::Cloud4f(&cloud));
+	viewer->add(new tk::gui::Cloud4f(&cloud));
 
-	viewer->add(new tk::gui::Cloud4fFeatures(&cloud));
+	//viewer->add(new tk::gui::Cloud4fFeatures(&cloud));
 
 	std::thread read_cloud_th(read_cloud);
 

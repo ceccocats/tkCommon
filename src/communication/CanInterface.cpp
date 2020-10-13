@@ -77,7 +77,7 @@ namespace tk { namespace communication {
             if(pcapmode) {
                 uint8_t buffer[64];
                 uint8_t *buf = buffer;
-                int len = pcap.getPacket(buffer, data->stamp); // we get the header to read ID and DLC
+                int len = pcap.getPacket(buffer, data->header.stamp); // we get the header to read ID and DLC
 
                 // FIXME: this is linux cooked capture header skip (luca shitty record)
                 bool cooked = false;
@@ -130,7 +130,7 @@ namespace tk { namespace communication {
                 stamp.erase(std::remove(stamp.begin(), stamp.end(), '.'), stamp.end());
 
                 // fill timestamp value
-                data->stamp = std::stoull(stamp);
+                data->header.stamp = std::stoull(stamp);
 
                 // trash interface name
                 std::string name;
@@ -175,7 +175,7 @@ namespace tk { namespace communication {
             if(ok) {
                 struct timeval tv;
                 ioctl(soc, SIOCGSTAMP, &tv);
-                data->stamp = tv2TimeStamp(tv);
+                data->header.stamp = tv2TimeStamp(tv);
             }
             return ok;
         }

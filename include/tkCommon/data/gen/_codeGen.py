@@ -85,14 +85,18 @@ class CppFile(CodeFile):
 		
 
 def isVarConst(name):
-	return name.startswith("const") or name.startswith("typedef")
+	return name.startswith("const") or name.startswith("typedef") or name.startswith("static")
 	
+def isVarStatic(name):
+	return name.startswith("static")
+	
+
 def isVarSTD(name):
 	return name.startswith("std::") or name.startswith("struct")
 
 
 def genData(className, VARS, DEPS = []):
-	print("GENERATE: ", className)
+	print("[....] Generating", className)
 	cpp = CppFile(className + ".h")
 	cpp("// this file is generated DO NOT DIRECTLY MODIFY")
 	cpp("#pragma once")
@@ -106,21 +110,21 @@ def genData(className, VARS, DEPS = []):
 		with cpp.block("class $ClassName$ : public SensorData", ";"):
 			cpp.label("public")
 			for var in VARS:
-				if("default" not in var):
-					with cpp.subs(type=var["type"], var=var["name"]):
-						cpp("$type$ $var$;")
-				else:
-					with cpp.subs(type=var["type"], var=var["name"], default=var["default"]):
-						cpp("$type$ $var$ = $default$;")
+				with cpp.subs(type=var["type"], var=var["name"]):
+					cpp("$type$ $var$;")
 			cpp("")
 
 			with cpp.block("void init() override"):
 				cpp("SensorData::init();")
 				for var in VARS:
-					if "init" not in var:
+					if("init" in var):
+						with cpp.subs(init=var["init"]):
+							cpp("$init$;")
+					if(isVarStatic(var["type"])):
 						continue
-					with cpp.subs(init=var["init"]):
-						cpp("$init$;")
+					if("default" in var):
+						with cpp.subs(type=var["type"], var=var["name"], default=var["default"]):
+							cpp("$var$ = $default$;")
 
 			with cpp.block("$ClassName$& operator=(const $ClassName$& s)"):
 				cpp("SensorData::operator=(s);")
@@ -164,6 +168,17 @@ def genData(className, VARS, DEPS = []):
 					with cpp.subs(var=var["name"]):
 						cpp("var[\"$var$\"].get($var$);")
 				cpp("return true;")
+
+
+		cpp("")
+		for var in VARS:
+			if(isVarStatic(var["type"]) and "default" in var):
+				tp = (var["type"][len("static"):]).split(" ")
+				tp.insert(-1, " "+className +"::")
+				tp = "".join(tp)
+				with cpp.subs(type=tp, var=var["name"], default=var["default"]):
+					cpp("$type$ $ClassName$::$var$ = $default$;")
+		cpp("")
 	cpp("\n}}")
 
 	cpp.close()
