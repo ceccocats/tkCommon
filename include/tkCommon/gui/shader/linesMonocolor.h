@@ -18,43 +18,53 @@ namespace tk { namespace gui { namespace shader {
  * @brief class that draw a lines formed by [X Y Z R G B A ...]
  * 
  */
-class lines : public tk::gui::shader::generic
+class linesMonocolor : public tk::gui::shader::generic
 {
 
     public:
 
-        struct line_t{
+        struct line_color_t{
             float x;
             float y;
             float z;
-            float r;
-            float g;
-            float b;
-            float a;
+
+            line_color_t& operator =(const line_color_t& a){
+                x = a.x;
+                y = a.y;
+                z = a.z;
+                return *this;
+            }
         };
 
     public:
         
-        lines(){
-            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/lines.vert";
+        linesMonocolor(){
+            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/linesMonocolor.vert";
             std::string geometry    = "";
-            std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/lines.frag";
+            std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/linesMonocolor.frag";
             
             shader.init(vertex, fragment, geometry);
 
-            vertexPointer.resize(2);
-            vertexPointer[0] = {3,7,0};
-            vertexPointer[1] = {4,7,3};
+            vertexPointer.resize(1);
+            vertexPointer[0] = {3,3,0};
         }
 
-        void draw(tk::gui::Buffer<float>* buffer, int n, int size = 1.0f, GLenum linemode = GL_LINE_STRIP){
+        void draw(tk::gui::Buffer<float>* buffer, int n, int size = 1.0f, 
+                tk::gui::Color_t color = tk::gui::color::WHITE, GLenum linemode = GL_LINE_STRIP){
 
 		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview));
 
             buffer->setVertexAttribs(vertexPointer);
 
+            glm::vec4 linesColor(   float(color.r)/255.0f,
+                                    float(color.g)/255.0f,
+                                    float(color.b)/255.0f,
+                                    float(color.a)/255.0f    
+                                );
+
             shader.use();
             shader.setMat4("modelview",modelview);
+            shader.setVec4("color",linesColor);
 
             buffer->use();
             glLineWidth(size);

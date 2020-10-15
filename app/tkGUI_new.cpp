@@ -4,18 +4,28 @@
 #include "tkCommon/gui/Drawables/Cloud4f.h"
 #include "tkCommon/gui/Drawables/Cloud4fFeatures.h"
 #include "tkCommon/gui/Drawables/Mesh.h"
+#include "tkCommon/gui/Drawables/Gps.h"
+
 
 #include "tkCommon/data/CloudData.h"
+#include "tkCommon/data/GPSData.h"
+
 
 #include <thread>
 
 tk::data::CloudData cloud;
+tk::data::GPSData	gps;
 tk::gui::Viewer* 	viewer = tk::gui::Viewer::getIstance();
 
 void read_cloud() {
 
 	tk::math::MatIO mat;
 	mat.open("/home/alice/Documents/dataset/masa_ouster.mat");
+
+	gps.lat = 42.182945;
+	gps.lon = 12.477200;
+	gps.heigth = 0.0f;
+	gps.header.name = "GPS";
 
 	cloud.header.name = "LiDAR cloud";
 
@@ -39,6 +49,10 @@ void read_cloud() {
 		cloud.gammaCorrectionIntensity();
 
 		cloud.unlockWrite();
+
+		gps.lock();
+		gps.lat += 0.00001;
+		gps.unlockWrite();
 
 		usleep(100000);
 	}
@@ -69,6 +83,7 @@ int main(){
 	viewer->add(new tk::gui::Axis());
 	viewer->add(new tk::gui::Mesh(std::string(tkCommon_PATH) + "data/levante.obj"));
 	viewer->add(new tk::gui::Cloud4f(&cloud));
+	viewer->add(new tk::gui::Gps(&gps));
 
 	//viewer->add(new tk::gui::Cloud4fFeatures(&cloud));
 

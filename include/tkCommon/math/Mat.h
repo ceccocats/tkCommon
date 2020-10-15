@@ -197,15 +197,17 @@ class Mat : public tk::math::MatDump {
 };
 
 class Mat3d : public Mat<double> {
-    Mat3d() {
-        resize(3,3);
-    }
+    public:
+        Mat3d() {
+            resize(3,3);
+        }
 };
 
 class Mat4f : public Mat<float> {
-    Mat4f() {
-        resize(4,4);
-    }
+    public:
+        Mat4f() {
+            resize(4,4);
+        }
 };
 
 }}
