@@ -7,7 +7,6 @@
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <sys/timerfd.h>
-#include "tkCommon/terminalFormat.h"
 
 namespace tk { namespace rt {
 
