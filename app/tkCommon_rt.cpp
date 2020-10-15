@@ -23,7 +23,7 @@ int main( int argc, char** argv){
     cmd.parse();
 
     tk::rt::Thread th;
-    th.init(task);
+    th.init(task, NULL);
     sleep(1);
     gRun = false;
     th.join();

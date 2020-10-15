@@ -197,14 +197,24 @@ class Mat : public tk::math::MatDump {
 };
 
 class Mat3d : public Mat<double> {
+    public:
+
     Mat3d() {
         resize(3,3);
     }
 };
 
 class Mat4f : public Mat<float> {
+    public:
+
     Mat4f() {
         resize(4,4);
+    }
+
+    Mat4f& operator=(Eigen::Matrix4f& s)
+    {
+        copyFrom(s.data(), s.rows(), s.cols());
+        return *this;
     }
 };
 

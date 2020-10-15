@@ -113,7 +113,7 @@ def genData(className, VARS, DEPS = []):
 				with cpp.subs(type=var["type"], var=var["name"]):
 					cpp("$type$ $var$;")
 			cpp("")
-
+			
 			with cpp.block("void init() override"):
 				cpp("SensorData::init();")
 				for var in VARS:

@@ -20,8 +20,8 @@ public:
         x = y = 0;
     }
     Vec2(T x, T y) {
-        this.x = x;
-        this.y = y;
+        this->x = x;
+        this->y = y;
     }
     ~Vec2() {}
     
@@ -37,12 +37,12 @@ public:
     T z;
 
     Vec3() {
-        this.x = this.y = this.z = 0;
+        this->x = this->y = this->z = 0;
     }
     Vec3(T x, T y, T z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this->x = x;
+        this->y = y;
+        this->z = z;
     }
     ~Vec3() {
     }
