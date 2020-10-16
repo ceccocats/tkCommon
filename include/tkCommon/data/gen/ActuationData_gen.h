@@ -30,11 +30,11 @@ public:
     }
     friend std::ostream& operator<<(std::ostream& os, const ActuationData_gen& s)
     {
-        os<<"ActuationData_gen:"<<std::endl;
-        os<<"header.stamp:"<<s.header.stamp<<std::endl;
-        os<<"steerAngle: "<<s.steerAngle<<std::endl;
-        os<<"accel: "<<s.accel<<std::endl;
-        os<<"speed: "<<s.speed<<std::endl;
+        os<<"ActuationData_gen"<<std::endl;
+        os<<"	header.stamp:"<<s.header.stamp<<std::endl;
+        os<<"	steerAngle: "<<s.steerAngle<<std::endl;
+        os<<"	accel: "<<s.accel<<std::endl;
+        os<<"	speed: "<<s.speed<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)

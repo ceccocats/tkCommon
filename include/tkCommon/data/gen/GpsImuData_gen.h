@@ -29,10 +29,10 @@ public:
     }
     friend std::ostream& operator<<(std::ostream& os, const GpsImuData_gen& s)
     {
-        os<<"GpsImuData_gen:"<<std::endl;
-        os<<"header.stamp:"<<s.header.stamp<<std::endl;
-        os<<"gps: "<<s.gps<<std::endl;
-        os<<"imu: "<<s.imu<<std::endl;
+        os<<"GpsImuData_gen"<<std::endl;
+        os<<"	header.stamp:"<<s.header.stamp<<std::endl;
+        os<<"	gps: "<<s.gps<<std::endl;
+        os<<"	imu: "<<s.imu<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)

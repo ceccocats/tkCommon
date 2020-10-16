@@ -10,6 +10,8 @@ namespace tk{ namespace gui{
             tk::gui::Texture<uint8_t>   texture; 
             tk::data::ImageData*        image;
 
+            bool update = false;
+
         public:
 
             imguiTexture(tk::data::ImageData* image){
@@ -24,8 +26,13 @@ namespace tk{ namespace gui{
                 texture.init(image->width, image->height, image->channels);
             }
 
+            void updateRef(tk::data::ImageData* image){
+                this->image = image;   
+                update = true;
+            }
+
             void draw(tk::gui::Viewer *viewer){
-                if(image->isChange()){
+                if(image->isChanged() || update){
                     image->lock();
                     texture.setData(image->data.data_h);
                     image->unlockRead();
@@ -35,6 +42,13 @@ namespace tk{ namespace gui{
                 int imgY = ImGui::GetWindowSize().y-35;
                 ImGui::Image((void*)(intptr_t)texture.id(), ImVec2(imgX, imgY));
                 ImGui::End();
+            }
+
+            void imGuiInfos(){
+                std::stringstream print;
+                print<<(*image);
+                ImGui::Text("%s",print.str().c_str());
+                print.clear();
             }
 
             void onClose(){

@@ -32,12 +32,12 @@ public:
     }
     friend std::ostream& operator<<(std::ostream& os, const ImageData_gen& s)
     {
-        os<<"ImageData_gen:"<<std::endl;
-        os<<"header.stamp:"<<s.header.stamp<<std::endl;
-        os<<"data: "<<s.data<<std::endl;
-        os<<"width: "<<s.width<<std::endl;
-        os<<"height: "<<s.height<<std::endl;
-        os<<"channels: "<<s.channels<<std::endl;
+        os<<"ImageData_gen"<<std::endl;
+        os<<"	header.stamp:"<<s.header.stamp<<std::endl;
+        os<<"	data: "<<s.data<<std::endl;
+        os<<"	width: "<<s.width<<std::endl;
+        os<<"	height: "<<s.height<<std::endl;
+        os<<"	channels: "<<s.channels<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)

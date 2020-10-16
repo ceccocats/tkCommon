@@ -10,7 +10,8 @@ namespace tk{ namespace gui{
         private:
             tk::data::GPSData* gps;
 
-            static const int lastPos = 10;
+            static const int        lastPos = 40;
+            int                     nPos;
             tk::gui::Buffer<float>  glbuffer[lastPos];
 
             static const int circlePoints = 300;
@@ -21,19 +22,27 @@ namespace tk{ namespace gui{
 
             float   imgui_color[4];
             float   lineSize = 2.0f;
-            float   radius;;
+            float   radius;
+
+            bool update = false;
 
         public:
             tk::gui::Color_t        color;
 
-            Gps(tk::data::GPSData* gps, float radius = 3.0f, tk::gui::Color_t color = tk::gui::color::RED){
+            Gps(tk::data::GPSData* gps, int nPos = 10, float radius = 3.0f, tk::gui::Color_t color = tk::gui::color::RED){
                 this->gps = gps;
                 this->color = color;  
                 this->radius = radius;
+                this->nPos = nPos;
             }
 
             ~Gps(){
 
+            }
+
+            void updateRef(tk::data::GPSData* gps){
+                this->gps = gps;   
+                update = true;
             }
 
             void onInit(tk::gui::Viewer *viewer){
@@ -56,7 +65,9 @@ namespace tk{ namespace gui{
             }
 
             void draw(tk::gui::Viewer *viewer){
-                if(gps->isChanged()){
+                if(gps->isChanged() || update){
+                    update = false;
+
                     gps->lock();
 
                     if(!geoConv.isInitialised()) {
@@ -75,7 +86,7 @@ namespace tk{ namespace gui{
                     points.atCPU(0,0).z = z;
 
 
-                    for(int j = 0; j < lastPos; j++){
+                    for(int j = 0; j < nPos; j++){
                         for(int i = 0; i < circlePoints; i++){
                             float angle = 2.0f * M_PI * (float)i/(float)circlePoints;
                             lines.atCPU(0,i).x = points.atCPU(0,j).x + cos(angle) * radius;
@@ -93,8 +104,8 @@ namespace tk{ namespace gui{
                 col.r = color.r;
                 col.g = color.g;
                 col.b = color.b;
-                for(int i = 0; i < lastPos; i++){
-                    col.a = color.a / (i+1);
+                for(int i = 0; i < nPos; i++){
+                    col.a = color.a / ((i+1)/4.0f);
                     shaderLines->draw(&glbuffer[i], glbuffer[i].size()/3, lineSize, col, GL_LINE_LOOP);
                 }
                     	
@@ -103,6 +114,9 @@ namespace tk{ namespace gui{
             void imGuiSettings(){
                 ImGui::ColorEdit4("Color", imgui_color);
                 ImGui::SliderFloat("Size",&lineSize,1.0f,20.0f,"%.1f");
+                if(ImGui::SliderInt("Last n pos",&nPos,1,lastPos)){
+                    update = true;
+                }
                 ImGui::SliderFloat("Radius",&radius,1.0f,40.0f,"%.1f");
                 color.r = 255 * imgui_color[0];
                 color.g = 255 * imgui_color[1];
@@ -111,7 +125,10 @@ namespace tk{ namespace gui{
             }
 
             void imGuiInfos(){
-                //ImGui::Text("Pointcloud has %d points",glbuffer.size());
+                std::stringstream print;
+                print<<(*gps);
+                ImGui::Text("%s",print.str().c_str());
+                print.clear();
             }
 
             void onClose(){

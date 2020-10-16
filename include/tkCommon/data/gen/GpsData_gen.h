@@ -49,18 +49,18 @@ public:
     }
     friend std::ostream& operator<<(std::ostream& os, const GpsData_gen& s)
     {
-        os<<"GpsData_gen:"<<std::endl;
-        os<<"header.stamp:"<<s.header.stamp<<std::endl;
-        os<<"utcStamp: "<<s.utcStamp<<std::endl;
-        os<<"lat: "<<s.lat<<std::endl;
-        os<<"lon: "<<s.lon<<std::endl;
-        os<<"heigth: "<<s.heigth<<std::endl;
-        os<<"quality: "<<s.quality<<std::endl;
-        os<<"sats: "<<s.sats<<std::endl;
-        os<<"age: "<<s.age<<std::endl;
-        os<<"cov: "<<s.cov<<std::endl;
-        os<<"pressure: "<<s.pressure<<std::endl;
-        os<<"temp: "<<s.temp<<std::endl;
+        os<<"GpsData_gen"<<std::endl;
+        os<<"	header.stamp:"<<s.header.stamp<<std::endl;
+        os<<"	utcStamp: "<<s.utcStamp<<std::endl;
+        os<<"	lat: "<<s.lat<<std::endl;
+        os<<"	lon: "<<s.lon<<std::endl;
+        os<<"	heigth: "<<s.heigth<<std::endl;
+        os<<"	quality: "<<s.quality<<std::endl;
+        os<<"	sats: "<<s.sats<<std::endl;
+        os<<"	age: "<<s.age<<std::endl;
+        os<<"	cov: "<<s.cov<<std::endl;
+        os<<"	pressure: "<<s.pressure<<std::endl;
+        os<<"	temp: "<<s.temp<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)

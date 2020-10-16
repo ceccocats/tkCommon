@@ -30,11 +30,11 @@ public:
     }
     friend std::ostream& operator<<(std::ostream& os, const CalibData_gen& s)
     {
-        os<<"CalibData_gen:"<<std::endl;
-        os<<"header.stamp:"<<s.header.stamp<<std::endl;
-        os<<"K: "<<s.K<<std::endl;
-        os<<"D: "<<s.D<<std::endl;
-        os<<"R: "<<s.R<<std::endl;
+        os<<"CalibData_gen"<<std::endl;
+        os<<"	header.stamp:"<<s.header.stamp<<std::endl;
+        os<<"	K: "<<s.K<<std::endl;
+        os<<"	D: "<<s.D<<std::endl;
+        os<<"	R: "<<s.R<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)

@@ -40,17 +40,17 @@ public:
     }
     friend std::ostream& operator<<(std::ostream& os, const ImuData_gen& s)
     {
-        os<<"ImuData_gen:"<<std::endl;
-        os<<"header.stamp:"<<s.header.stamp<<std::endl;
-        os<<"acc: "<<s.acc<<std::endl;
-        os<<"angleVel: "<<s.angleVel<<std::endl;
-        os<<"angle: "<<s.angle<<std::endl;
-        os<<"mag: "<<s.mag<<std::endl;
-        os<<"covAcc: "<<s.covAcc<<std::endl;
-        os<<"covAngleVel: "<<s.covAngleVel<<std::endl;
-        os<<"covAngle: "<<s.covAngle<<std::endl;
-        os<<"covMag: "<<s.covMag<<std::endl;
-        os<<"sideSlip: "<<s.sideSlip<<std::endl;
+        os<<"ImuData_gen"<<std::endl;
+        os<<"	header.stamp:"<<s.header.stamp<<std::endl;
+        os<<"	acc: "<<s.acc<<std::endl;
+        os<<"	angleVel: "<<s.angleVel<<std::endl;
+        os<<"	angle: "<<s.angle<<std::endl;
+        os<<"	mag: "<<s.mag<<std::endl;
+        os<<"	covAcc: "<<s.covAcc<<std::endl;
+        os<<"	covAngleVel: "<<s.covAngleVel<<std::endl;
+        os<<"	covAngle: "<<s.covAngle<<std::endl;
+        os<<"	covMag: "<<s.covMag<<std::endl;
+        os<<"	sideSlip: "<<s.sideSlip<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)

@@ -27,10 +27,10 @@ public:
     }
     friend std::ostream& operator<<(std::ostream& os, const RadarData_gen& s)
     {
-        os<<"RadarData_gen:"<<std::endl;
-        os<<"header.stamp:"<<s.header.stamp<<std::endl;
-        os<<"near: "<<s.near<<std::endl;
-        os<<"far: "<<s.far<<std::endl;
+        os<<"RadarData_gen"<<std::endl;
+        os<<"	header.stamp:"<<s.header.stamp<<std::endl;
+        os<<"	near: "<<s.near<<std::endl;
+        os<<"	far: "<<s.far<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)

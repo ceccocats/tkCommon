@@ -185,13 +185,7 @@ class Mat : public tk::math::MatDump {
         }
 
         friend std::ostream& operator<<(std::ostream& os, const Mat& s) {
-            std::cout<<"Mat ("<<s.rows()<<"x"<<s.cols()<<")";
-            for(int i = 0; i < s.rows(); ++i) {
-                std::cout << std::endl;
-                for(int j = 0; j < s.rows(); ++j) {
-                    std::cout << std::right << std::setw(20) << s.data_h[i+j*s.rows()];
-                }
-            }
+            os<<"Mat ("<<s.rows()<<"x"<<s.cols()<<")";
             return os;
         }
 };

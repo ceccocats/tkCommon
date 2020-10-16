@@ -136,14 +136,14 @@ def genData(className, VARS, DEPS = []):
 				cpp("return *this;")
 
 			with cpp.block("friend std::ostream& operator<<(std::ostream& os, const $ClassName$& s)"):
-				cpp("os<<\"$ClassName$:\"<<std::endl;")
-				cpp("os<<\"header.stamp:\"<<s.header.stamp<<std::endl;")
+				cpp("os<<\"$ClassName$\"<<std::endl;")
+				cpp("os<<\"\theader.stamp:\"<<s.header.stamp<<std::endl;")
 				#cpp("SensorData::operator<<(s);")
 				for var in VARS:
 					if isVarConst(var["type"]) or isVarSTD(var["type"]):
 						continue
 					with cpp.subs(var=var["name"]):
-						cpp("os<<\"$var$: \"<<s.$var$<<std::endl;")
+						cpp("os<<\"\t$var$: \"<<s.$var$<<std::endl;")
 				cpp("return os;")
 
 			MATVARS = []

@@ -2,7 +2,6 @@
 #include "tkCommon/gui/Drawables/Axis.h"
 #include "tkCommon/gui/Drawables/Grid.h"
 #include "tkCommon/gui/Drawables/Cloud4f.h"
-#include "tkCommon/gui/Drawables/Cloud4fFeatures.h"
 #include "tkCommon/gui/Drawables/Mesh.h"
 #include "tkCommon/gui/Drawables/Gps.h"
 
@@ -29,6 +28,8 @@ void read_cloud() {
 
 	cloud.header.name = "LiDAR cloud";
 
+	cloud.features_map[tk::data::CloudData_gen::FEATURES_I] = 0;
+
 	Eigen::MatrixXf points;
 	Eigen::MatrixXf intensity;
 	tk::math::MatIO::var_t var;
@@ -46,12 +47,12 @@ void read_cloud() {
 
 		cloud.points.copyFrom(points.data(),points.rows(),points.cols());
 		cloud.features.copyFrom(intensity.data(),intensity.rows(),intensity.cols());
-		cloud.gammaCorrectionIntensity();
+		//cloud.gammaCorrectionIntensity();
 
 		cloud.unlockWrite();
 
 		gps.lock();
-		gps.lat += 0.00001;
+		gps.lat += 0.000001;
 		gps.unlockWrite();
 
 		usleep(100000);
@@ -84,8 +85,6 @@ int main(){
 	viewer->add(new tk::gui::Mesh(std::string(tkCommon_PATH) + "data/levante.obj"));
 	viewer->add(new tk::gui::Cloud4f(&cloud));
 	viewer->add(new tk::gui::Gps(&gps));
-
-	//viewer->add(new tk::gui::Cloud4fFeatures(&cloud));
 
 	std::thread read_cloud_th(read_cloud);
 
