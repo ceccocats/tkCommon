@@ -105,7 +105,7 @@ namespace tk{ namespace gui{
                 col.g = color.g;
                 col.b = color.b;
                 for(int i = 0; i < nPos; i++){
-                    col.a = color.a / ((i+1)/4.0f);
+                    col.a = color.a / (((float)i+1)/4.0f);
                     shaderLines->draw(&glbuffer[i], glbuffer[i].size()/3, lineSize, col, GL_LINE_LOOP);
                 }
                     	
