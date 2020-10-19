@@ -11,6 +11,9 @@
 #include "tkCommon/CudaCommon.h"
 #include "tkCommon/math/MatIO.h"
 
+//#define STATIC  0
+//#define DYNAMIC 1
+
 namespace tk { namespace math {
 
 /**
@@ -20,7 +23,7 @@ namespace tk { namespace math {
 template<class T>
 class Mat : public tk::math::MatDump {
 
-    private:
+    protected:
         static const int MAXSIZE_MARGIN = 0;
         int     _maxSize = 0;
         int     _rows = 0;
@@ -29,12 +32,13 @@ class Mat : public tk::math::MatDump {
         bool    _gpu  = false;
 
     public:
-        T*      data_d = nullptr;
-        T*      data_h = nullptr;
+        T*      data_d;
+        T*      data_h;
 
         __host__
         Mat(){
-
+            data_d = nullptr;
+            data_h = nullptr;
         }
 
         __host__
@@ -178,7 +182,7 @@ class Mat : public tk::math::MatDump {
         }
 
         __host__ 
-        Mat& operator=(const Mat& s) {
+        Mat<T>& operator=(const Mat<T>& s) {
             cloneCPU(s);
             if(s.hasGPU() == true)
                 cloneGPU(s);
@@ -189,174 +193,62 @@ class Mat : public tk::math::MatDump {
             os<<"Mat ("<<s.rows()<<"x"<<s.cols()<<")";
             return os;
         }
-};
 
-
-/**
- * @brief   Matrix static in cuda. Matrix in COLS order.
- * @tparam  T matrix class type
- */
-template<class T, int ROWS, int COLS>
-class MatXX : public tk::math::MatDump {
-
-    private:
-        bool    _gpu    = false;
-
-    public:
-        T*      data_d = nullptr;
-        T       data_h[ ROWS * COLS ];
-
-        __host__
-        MatXX(){
-
-        }
-
-        __host__
-        ~MatXX(){
-            if(_gpu == true){
-                HANDLE_ERROR( cudaFree(data_d) );
-            } 
-        }
-
-        __host__ void
-        useGPU(){
-            if(_gpu == false)
-                HANDLE_ERROR( cudaMalloc(&data_d, ROWS * COLS * sizeof(T)) );
-            _gpu = true;
-        }
-
-        __host__ bool
-        hasGPU() const {
-            return _gpu;
-        }
-
-        __host__ void 
-        copyFrom(T*data, int r, int c) {
-            if(r > ROWS && c > COLS){
-                clsErr("Input data is too big that your\n")
-            }else{
-                memcpy(data_h, data, r * c * sizeof(T));
-                if(_gpu == true)
-                    synchGPU();
+        void print() {
+            for(int i = 0; i < rows(); ++i) {
+                std::cout << std::endl;
+                for(int j = 0; j < rows(); ++j) {
+                    std::cout << std::right << std::setw(20) << data_h[i+j*rows()];
+                }
             }
-        }
-
-        __host__ void 
-        copyTo(T*data) {
-            memcpy(data, data_h, ROWS * COLS * sizeof(T)); 
-        }
-        
-        __host__ void 
-        synchGPU(){ 
-
-            useGPU();
-            HANDLE_ERROR( cudaMemcpy(data_d, data_h, COLS * ROWS * sizeof(T), cudaMemcpyHostToDevice) ); 
-        }
-
-        __host__ void 
-        synchCPU(){ 
-
-            tkASSERT(_gpu == true,"You set mat only on CPU\n");
-            HANDLE_ERROR( cudaMemcpy(data_h, data_d, COLS * ROWS * sizeof(T), cudaMemcpyDeviceToHost) ); 
-        }
-
-        __host__ __device__ int 
-        rows() const { 
-            return ROWS; 
-        }
-
-        __host__ __device__ int 
-        cols() const { 
-            return COLS; 
-        }
-        
-        __host__ __device__ int 
-        size() const { 
-            return ROWS * COLS; 
-        }
-        
-        __host__ T&  
-        atCPU(int r, int c) { 
-            int pos = r + c * COLS;
-            if(pos > ROWS*COLS){
-                clsErr("Out of matrix\n")
-                return nullptr;
-            }
-            return data_h[pos]; 
-        }
-        
-        __device__ T&  
-        atGPU(int r, int c) { 
-            if(_gpu == true){
-                return data_d[r + c * ROWS];
-            }
-            return nullptr;
-        }
-
-        __host__ void 
-        set(std::initializer_list<T> a_args) {
-            if(a_args.size() != size()) {
-                std::cout<<"ERROR: you must set all data\n";
-                std::cout<<"try insert: "<<a_args.size()<<" in size: "<<size()<<"\n";
-                exit(1);
-            }
-            int i=0;
-            for(auto a : a_args) {
-                atCPU(i/COLS, i%COLS) = a;
-                i++;
-            }
-
-            if(_gpu == true){
-                synchGPU();
-            }
-        }
-
-        __host__ void 
-        cloneGPU(const MatXX &m) {
-
-            tkASSERT(m.hasGPU() == true, "Could not clone from GPU")
-
-            if(m.cols() == COLS && m.rows() == ROWS){
-                useGPU();
-                HANDLE_ERROR( cudaMemcpy(data_d, m.data_d, COLS * ROWS * sizeof(T), cudaMemcpyDeviceToDevice) ); 
-            }else{
-                clsErr("Incopatible matrices")
-            }
-        }
-
-        __host__ void 
-        cloneCPU(const MatXX &m) {
-            if(m.cols() == COLS && m.rows() == ROWS){
-                memcpy(data_h, m.data_h, ROWS * COLS * sizeof(T)); 
-            }else{
-                clsErr("Incopatible matrices")
-            }
-        }
-
-        __host__ 
-        MatXX& operator=(const MatXX& s) {
-            cloneCPU(s);
-            if(s.hasGPU() == true)
-                cloneGPU(s);
-            return *this;
-        }
-
-        friend std::ostream& operator<<(std::ostream& os, const MatXX& s) {
-            os<<"Mat ("<<s.rows()<<"x"<<s.cols()<<")";
-            return os;
+            std::cout<<std::endl;
         }
 };
 
-#define Mat2d MatXX<double,2,2>
-#define Mat3d MatXX<double,3,3>
-#define Mat4d MatXX<double,4,4>
+template<class T, int R, int C>
+class MatStatic : public tk::math::Mat<T> {
+private:
+        T staticdata_h[R*C];
 
-#define Mat2i MatXX<int,2,2>
-#define Mat3i MatXX<int,3,3>
-#define Mat4i MatXX<int,4,4>
+public:
+    MatStatic() : Mat<T>() {
+        
+        this->data_h = staticdata_h;
+        this->_maxSize = R*C;
+        this->_rows    = R;
+        this->_cols    = C;
+        this->_size    = R*C;
+    }
 
-#define Mat2f MatXX<float,2,2>
-#define Mat3f MatXX<float,3,3>
-#define Mat4f MatXX<float,4,4>
+    ~MatStatic() {
+        this->data_h = nullptr;
+    }
+
+    __host__ void 
+    resize(int r, int c) {
+        tkASSERT(r==R && c==C, "unable to resize a static Mat");
+    }
+
+    __host__ 
+    MatStatic<T,R,C>& operator=(const Mat<T>& s) {
+        this->cloneCPU(s);
+        if(s.hasGPU() == true)
+            this->cloneGPU(s);
+        return *this;
+    }
+
+};
+
+typedef MatStatic<double,2,2> Mat2d;
+typedef MatStatic<double,3,3> Mat3d;
+typedef MatStatic<double,4,4> Mat4d;
+
+typedef MatStatic<int,2,2> Mat2i;
+typedef MatStatic<int,3,3> Mat3i;
+typedef MatStatic<int,4,4> Mat4i;
+
+typedef MatStatic<float,2,2> Mat2f; 
+typedef MatStatic<float,3,3> Mat3f; 
+typedef MatStatic<float,4,4> Mat4f; 
 
 }}
