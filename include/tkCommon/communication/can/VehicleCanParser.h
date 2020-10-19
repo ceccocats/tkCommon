@@ -53,7 +53,7 @@ namespace tk { namespace communication {
         }
 
         //write data
-        veh->odom.tf = tk::common::odom2tf(veh->x, veh->y, -veh->carDirection +M_PI/2).matrix();
+        veh->odom.tf.copyFrom(tk::common::odom2tf(veh->x, veh->y, -veh->carDirection +M_PI/2).matrix().data(), 4,4);
         veh->odom.header.stamp = t;
     }
 
