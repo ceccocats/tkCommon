@@ -42,6 +42,8 @@ class lines : public tk::gui::shader::generic
             
             shader.init(vertex, fragment, geometry);
 
+            shader.setMat4("modelview",modelview);
+            
             vertexPointer.resize(2);
             vertexPointer[0] = {3,7,0};
             vertexPointer[1] = {4,7,3};
@@ -54,7 +56,6 @@ class lines : public tk::gui::shader::generic
             buffer->setVertexAttribs(vertexPointer);
 
             shader.use();
-            shader.setMat4("modelview",modelview);
 
             buffer->use();
             glLineWidth(size);

@@ -29,9 +29,7 @@ class pointcloud4f  : public tk::gui::shader::generic
             std::string geometry    = "";
             std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloudFrag/pointcloudFrag_uniformColor.frag";
             
-            bool status = shader.init(vertex, fragment, geometry);
-            if(status == false)
-                return;
+            shader.init(vertex, fragment, geometry);
 
             vertexPointer.push_back({4,4,0});
         }

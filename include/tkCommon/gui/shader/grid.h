@@ -32,15 +32,18 @@ class grid : public tk::gui::shader::generic
         }
 
         void draw(float dim = 1.0f, int n = 50){
+
             glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
 
             shader.use();
+
             shader.setMat4("modelview", modelview);
             shader.setInt("n", n);
             shader.setFloat("dim", dim);
 
             shader.setInt("dir", 0);
             glDrawArrays(GL_LINES, 0, n*2 +2);
+            
             shader.setInt("dir", 1);
             glDrawArrays(GL_LINES, 0, n*2 +2);
 
