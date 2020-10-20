@@ -20,6 +20,8 @@ namespace tk { namespace gui { namespace shader {
  */
 class linesMonocolor : public tk::gui::shader::generic
 {
+    private:
+        glm::vec4 linesColor;
 
     public:
 
@@ -56,11 +58,7 @@ class linesMonocolor : public tk::gui::shader::generic
 
             buffer->setVertexAttribs(vertexPointer);
 
-            glm::vec4 linesColor(   float(color.r)/255.0f,
-                                    float(color.g)/255.0f,
-                                    float(color.b)/255.0f,
-                                    float(color.a)/255.0f    
-                                );
+            std::memcpy(glm::value_ptr(linesColor), color.color, sizeof(linesColor));
 
             shader.use();
             shader.setMat4("modelview",modelview);

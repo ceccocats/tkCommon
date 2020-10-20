@@ -42,16 +42,11 @@ class cubes3D : public tk::gui::shader::generic
             return true;
         }
 
-        void draw(tk::gui::Buffer<float>* buffer, int n, glm::vec3& lightPos, tk::gui::Color_t color = tk::gui::color::WHITE){
+        void draw(tk::gui::Buffer<float>* buffer, int n, glm::vec3& lightPos){
 
 		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
             buffer->setVertexAttribs(vertexPointer);
 
-            glm::vec4 pointColor(   float(color.r)/255.0f,
-                                    float(color.g)/255.0f,
-                                    float(color.b)/255.0f,
-                                    float(color.a)/255.0f    
-                                );
             shader.use();
             shader.setMat4("modelview",modelview);
             shader.setVec3("lightPos", lightPos);

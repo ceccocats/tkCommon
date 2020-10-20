@@ -30,6 +30,9 @@ namespace tk { namespace gui { namespace shader {
  */
 class mesh : public tk::gui::shader::generic
 {
+    private:
+        glm::vec4 meshColor;
+
     public:
         
         mesh(){
@@ -58,14 +61,11 @@ class mesh : public tk::gui::shader::generic
 		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
             buffer->setVertexAttribs(vertexPointer);
 
-            glm::vec4 pointColor(   float(color.r)/255.0f,
-                                    float(color.g)/255.0f,
-                                    float(color.b)/255.0f,
-                                    float(color.a)/255.0f    
-                                );
+            std::memcpy(glm::value_ptr(meshColor), color.color, sizeof(meshColor));
+
             shader.use();
             shader.setMat4("modelview",modelview);
-            shader.setVec4("color", pointColor);
+            shader.setVec4("color", meshColor);
             shader.setVec3("lightPos",lightPos);
             shader.setFloat("ambientStrength",ambientStrength);
             shader.setBool("useLight",useLight);

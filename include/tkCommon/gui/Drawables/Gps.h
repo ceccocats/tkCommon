@@ -20,7 +20,6 @@ namespace tk{ namespace gui{
 
             tk::common::GeodeticConverter geoConv;
 
-            float   imgui_color[4];
             float   lineSize = 2.0f;
             float   radius;
 
@@ -47,11 +46,6 @@ namespace tk{ namespace gui{
 
             void onInit(tk::gui::Viewer *viewer){
                 shader = new tk::gui::shader::linesMonocolor();
-
-                imgui_color[0] = color.r/255.0f;
-                imgui_color[1] = color.g/255.0f;
-                imgui_color[2] = color.b/255.0f;
-                imgui_color[3] = color.a/255.0f; 
 
                 lines.resize(1,circlePoints);
                 points.resize(1,lastPos);
@@ -101,27 +95,23 @@ namespace tk{ namespace gui{
                 tk::gui::shader::linesMonocolor* shaderLines = (tk::gui::shader::linesMonocolor*) shader;
 
                 tk::gui::Color_t col;
-                col.r = color.r;
-                col.g = color.g;
-                col.b = color.b;
+                col.r() = color.r();
+                col.g() = color.g();
+                col.b() = color.b();
                 for(int i = 0; i < nPos; i++){
-                    col.a = color.a / (((float)i+1)/4.0f);
+                    col.a() = color.a() / (((float)i+1)*0.5);
                     shaderLines->draw(&glbuffer[i], glbuffer[i].size()/3, lineSize, col, GL_LINE_LOOP);
                 }
                     	
             }
 
             void imGuiSettings(){
-                ImGui::ColorEdit4("Color", imgui_color);
+                ImGui::ColorEdit4("Color", color.color);
                 ImGui::SliderFloat("Size",&lineSize,1.0f,20.0f,"%.1f");
                 if(ImGui::SliderInt("Last n pos",&nPos,1,lastPos)){
                     update = true;
                 }
                 ImGui::SliderFloat("Radius",&radius,1.0f,40.0f,"%.1f");
-                color.r = 255 * imgui_color[0];
-                color.g = 255 * imgui_color[1];
-                color.b = 255 * imgui_color[2];
-                color.a = 255 * imgui_color[3];
             }
 
             void imGuiInfos(){

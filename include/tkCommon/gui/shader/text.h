@@ -40,6 +40,8 @@ class text : public tk::gui::shader::generic
         unsigned int VAO, VBO;
         glm::mat4 projection;
 
+        glm::vec4 textColor;
+
     public:
         bool init(std::string font = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"){
 
@@ -107,17 +109,13 @@ class text : public tk::gui::shader::generic
 
         void draw(std::string text, float x, float y, float scale = 1.3f, tk::gui::Color_t color = tk::gui::color::WHITE){
             
-            glm::vec4 pointColor(   float(color.r)/255.0f,
-                                    float(color.g)/255.0f,
-                                    float(color.b)/255.0f,
-                                    float(color.a)/255.0f    
-                                );
+            std::memcpy(glm::value_ptr(textColor), color.color, sizeof(textColor));
             
             //TODO: Removing in future
             projection = glm::ortho(0.0f, (float)glutGet(GLUT_SCREEN_WIDTH), 0.0f, (float)glutGet(GLUT_SCREEN_HEIGHT));
             
             shader.use();
-            shader.setVec4("textColor", pointColor);
+            shader.setVec4("textColor", textColor);
             shader.setMat4("projection", projection);
 
             glActiveTexture(GL_TEXTURE0);

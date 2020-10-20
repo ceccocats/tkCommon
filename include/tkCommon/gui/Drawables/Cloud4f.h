@@ -24,7 +24,6 @@ namespace tk{ namespace gui{
             const char* useFeatures[maxItems];
 
             std::string cloudcolor = "Colored Cloud";
-            float imgui_color[4];
             tk::gui::shader::pointcloud4f* shCloudColor;
 
             std::string axisx = "axis x";
@@ -128,11 +127,6 @@ namespace tk{ namespace gui{
 
                 shCloudColor = new tk::gui::shader::pointcloud4f();
 
-                imgui_color[0] = color.r/255.0f;
-                imgui_color[1] = color.g/255.0f;
-                imgui_color[2] = color.b/255.0f;
-                imgui_color[3] = color.a/255.0f; 
-
                 useFeatures[0] = axisx.c_str();
                 useFeatures[1] = axisy.c_str();
                 useFeatures[2] = axisz.c_str();
@@ -188,11 +182,7 @@ namespace tk{ namespace gui{
                 }
 
                 if(selectedColorMap == 0){
-                    ImGui::ColorEdit4("Color", imgui_color);
-                    color.r = 255 * imgui_color[0];
-                    color.g = 255 * imgui_color[1];
-                    color.b = 255 * imgui_color[2];
-                    color.a = 255 * imgui_color[3];
+                    ImGui::ColorEdit4("Color", color.color);
                 }else{
                     if(ImGui::Combo("feature", &useFeatureN, useFeatures, nFeatures)){
                         update = true;

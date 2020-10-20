@@ -20,6 +20,9 @@ namespace tk { namespace gui { namespace shader {
  */
 class pointcloud3f  : public tk::gui::shader::generic
 {
+    private:
+        glm::vec4 pointColor;
+
     public:
         bool init(){
             std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloud3f.vert";
@@ -39,11 +42,8 @@ class pointcloud3f  : public tk::gui::shader::generic
 		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
             buffer->setVertexAttribs(vertexPointer);
 
-            glm::vec4 pointColor(   float(color.r)/255.0f,
-                                    float(color.g)/255.0f,
-                                    float(color.b)/255.0f,
-                                    float(color.a)/255.0f    
-                                );
+            std::memcpy(glm::value_ptr(pointColor), color.color, sizeof(pointColor));
+
             shader.use();
             shader.setMat4("modelview",modelview);
             shader.setVec4("color",pointColor);

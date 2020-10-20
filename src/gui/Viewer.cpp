@@ -386,7 +386,7 @@ Viewer::runloop() {
         glLoadIdentity() ;
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(float(background.r)/255, float(background.g)/255, float(background.b)/255, float(background.a)/255);
+        glClearColor(background.r(), background.g(), background.b(), background.a());
 
         glPushMatrix();
 
