@@ -1,6 +1,6 @@
 #pragma once
 /**
- * @file    stripline.h
+ * @file    lines.h
  * @author  Luca Bartoli, Fabio bagni, Gatti Francesco, Massimiliano bosi (you@domain.com)
  * @brief   class that draw lines from points
  * @version 1.0
@@ -49,7 +49,7 @@ class lines : public tk::gui::shader::generic
             vertexPointer[1] = {4,7,3};
         }
 
-        void draw(tk::gui::Buffer<float>* buffer, int n, int size = 1.0f, GLenum linemode = GL_LINE_STRIP){
+        void draw(tk::gui::Buffer<float>* buffer, int n, float size = 1.0f, GLenum linemode = GL_LINE_STRIP){
 
 		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview));
 

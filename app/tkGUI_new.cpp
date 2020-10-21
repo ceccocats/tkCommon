@@ -4,6 +4,7 @@
 #include "tkCommon/gui/Drawables/Cloud4f.h"
 #include "tkCommon/gui/Drawables/Mesh.h"
 #include "tkCommon/gui/Drawables/Gps.h"
+#include "tkCommon/gui/Drawables/Plot.h"
 
 
 #include "tkCommon/data/CloudData.h"
@@ -12,11 +13,11 @@
 
 #include <thread>
 
-tk::data::CloudData cloud;
+
 tk::data::GPSData	gps;
 tk::gui::Viewer* 	viewer = tk::gui::Viewer::getIstance();
 
-void read_cloud() {
+void read_cloud(tk::data::CloudData& cloud) {
 
 	tk::math::MatIO mat;
 	mat.open("/home/alice/Documents/dataset/masa_ouster.mat");
@@ -77,19 +78,23 @@ int main(){
 	cloud.header.name = "LiDAR cloud";
 	cloud.notifyUpdate();*/
 
+	tk::data::CloudData cloud;
 
 	viewer->start();
 
+	tk::gui::Plot *plt = new tk::gui::Plot("provaPlot", 10000, tk::gui::Plot::type_t::LINE, 1);
 	viewer->add(new tk::gui::Grid());
 	viewer->add(new tk::gui::Axis());
 	viewer->add(new tk::gui::Mesh(std::string(tkCommon_PATH) + "data/levante.obj"));
 	viewer->add(new tk::gui::Cloud4f(&cloud));
 	viewer->add(new tk::gui::Gps(&gps));
+	viewer->add(plt);
 
-	std::thread read_cloud_th(read_cloud);
+	read_cloud(cloud);
+	//std::thread read_cloud_th(read_cloud);
 
 	viewer->join();
-	read_cloud_th.join();
+	//read_cloud_th.join();
 }
 
 

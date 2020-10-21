@@ -2,6 +2,7 @@
 #include "tkCommon/gui/Drawables/Drawable.h"
 #include "tkCommon/gui/shader/linesMonocolor.h"
 #include "tkCommon/data/GPSData.h"
+#include "tkCommon/gui/shader/circle.h"
 
 namespace tk{ namespace gui{
 
@@ -10,13 +11,18 @@ namespace tk{ namespace gui{
         private:
             tk::data::GPSData* gps;
 
-            static const int        lastPos = 40;
+            int nPos;
+            static const int maxPos = 40;
+            tk::math::Mat<tk::gui::shader::circle*> circles;
+
+
+            /*static const int        lastPos = 40;
             int                     nPos;
             tk::gui::Buffer<float>  glbuffer[lastPos];
 
             static const int circlePoints = 300;
             tk::math::Mat<tk::gui::shader::linesMonocolor::line_color_t> points;
-            tk::math::Mat<tk::gui::shader::linesMonocolor::line_color_t> lines;
+            tk::math::Mat<tk::gui::shader::linesMonocolor::line_color_t> lines;*/
 
             tk::common::GeodeticConverter geoConv;
 
@@ -45,7 +51,7 @@ namespace tk{ namespace gui{
             }
 
             void onInit(tk::gui::Viewer *viewer){
-                shader = new tk::gui::shader::linesMonocolor();
+                /*shader = new tk::gui::shader::linesMonocolor();
 
                 lines.resize(1,circlePoints);
                 points.resize(1,lastPos);
@@ -55,6 +61,10 @@ namespace tk{ namespace gui{
                     points.atCPU(0,i).x = 0;
                     points.atCPU(0,i).y = 0;
                     points.atCPU(0,i).z = 0;
+                }*/
+
+                for(int i = 0; i < maxPos; i++){
+                    circles.atCPU(0,i) = new tk::gui::shader::circle();
                 }
             }
 
@@ -72,7 +82,7 @@ namespace tk{ namespace gui{
                     geoConv.geodetic2Enu(gps->lat,gps->lon,gps->heigth,&x, &y, &z);
 
                     // Shifting
-                    for(int i = lastPos-1; i > 0; i--){
+                    /*for(int i = lastPos-1; i > 0; i--){
                         points.atCPU(0,i) = points.atCPU(0,i-1);
                     }
                     points.atCPU(0,0).x = x;
@@ -89,7 +99,7 @@ namespace tk{ namespace gui{
                         }
                         glbuffer[j].setData((float*)lines.data_h,circlePoints*3);
                     }
-                    gps->unlockRead();
+                    gps->unlockRead();*/
                 }
 
                 tk::gui::shader::linesMonocolor* shaderLines = (tk::gui::shader::linesMonocolor*) shader;
@@ -100,7 +110,7 @@ namespace tk{ namespace gui{
                 col.b() = color.b();
                 for(int i = 0; i < nPos; i++){
                     col.a() = color.a() / (((float)i+1)*0.5);
-                    shaderLines->draw(&glbuffer[i], glbuffer[i].size()/3, lineSize, col, GL_LINE_LOOP);
+                    //shaderLines->draw(&glbuffer[i], glbuffer[i].size()/3, lineSize, col, GL_LINE_LOOP);
                 }
                     	
             }
@@ -108,10 +118,10 @@ namespace tk{ namespace gui{
             void imGuiSettings(){
                 ImGui::ColorEdit4("Color", color.color);
                 ImGui::SliderFloat("Size",&lineSize,1.0f,20.0f,"%.1f");
-                if(ImGui::SliderInt("Last n pos",&nPos,1,lastPos)){
+                /*if(ImGui::SliderInt("Last n pos",&nPos,1,lastPos)){
                     update = true;
                 }
-                ImGui::SliderFloat("Radius",&radius,1.0f,40.0f,"%.1f");
+                ImGui::SliderFloat("Radius",&radius,1.0f,40.0f,"%.1f");*/
             }
 
             void imGuiInfos(){
@@ -124,9 +134,9 @@ namespace tk{ namespace gui{
             void onClose(){
                 tk::gui::shader::linesMonocolor* shaderLines = (tk::gui::shader::linesMonocolor*) shader;
                 shaderLines->close();
-                for(int i = 0; i < lastPos; i++){
+                /*for(int i = 0; i < lastPos; i++){
                     glbuffer[i].release();
-                }
+                }*/
                 delete shader;
             }
 
