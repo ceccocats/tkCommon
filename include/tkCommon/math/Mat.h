@@ -44,10 +44,12 @@ class Mat : public tk::math::MatDump {
         __host__
         ~Mat(){
             if(data_h != nullptr){
-                HANDLE_ERROR( cudaFreeHost(data_h) );
+                delete [] data_h;
+                data_h = nullptr;
             } 
             if(data_d != nullptr && _gpu == true){
                 HANDLE_ERROR( cudaFree(data_d) );
+                data_d = nullptr;
             } 
         }
 
@@ -117,15 +119,17 @@ class Mat : public tk::math::MatDump {
         __host__ void 
         resize(int r, int c) {
 
-            if(_maxSize < r * c || data_h == nullptr){
+            if(_maxSize < r * c){
                 _maxSize = r * c + MAXSIZE_MARGIN;
-                HANDLE_ERROR( cudaFreeHost(data_h) );
-                HANDLE_ERROR( cudaMallocHost(&data_h, _maxSize * sizeof(T)) );
+                if(data_h != nullptr)
+                    delete [] data_h;
+                data_h = new T[_maxSize];
             }
 
             if(_gpu == true){
-                if(_maxSize < r * c || data_d == nullptr){
-                    HANDLE_ERROR( cudaFree(data_d) );
+                if(_maxSize < r * c) {
+                    if(data_d != nullptr)
+                        HANDLE_ERROR( cudaFree(data_d) );
                     HANDLE_ERROR( cudaMalloc(&data_d, _maxSize * sizeof(T)) );
                 }
             }
@@ -150,8 +154,8 @@ class Mat : public tk::math::MatDump {
             return _size; 
         }
         
-        __host__ T&  
-        atCPU(int r, int c) { 
+        __host__ T&
+        operator()(int r, int c) {
             return data_h[r+c*_rows]; 
         }
         
@@ -172,7 +176,7 @@ class Mat : public tk::math::MatDump {
             }
             int i=0;
             for(auto a : a_args) {
-                atCPU(i/_cols, i%_cols) = a;
+                (*this)(i/_cols, i%_cols) = a;
                 i++;
             }
 

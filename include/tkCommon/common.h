@@ -20,6 +20,7 @@
 #include "tkCommon/exceptions.h"
 #include "tkCommon/math/Mat.h"
 
+extern const std::string tkCommon_PATH;
 namespace tk { namespace common {
 
     /**
@@ -602,8 +603,8 @@ namespace tk { namespace common {
             }
         }  
     private: 
-        // unordered_map in tteory has access time of o(1)
-        // we esperienced the std::map haw anyway better performance 
+        // unordered_map in theory has access time of o(1)
+        // we esperienced the std::map has anyway better performance 
         std::map<unsigned, T> _map;
         std::map<unsigned, std::string> _mapKeys;
     };

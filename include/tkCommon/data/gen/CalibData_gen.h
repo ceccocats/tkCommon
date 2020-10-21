@@ -31,7 +31,8 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const CalibData_gen& s)
     {
         os<<"CalibData_gen"<<std::endl;
-        os<<"	header.stamp:"<<s.header.stamp<<std::endl;
+        os<<"	header.name:  "<<s.header.name<<std::endl;
+        os<<"	header.stamp: "<<s.header.stamp<<std::endl;
         os<<"	K: "<<s.K<<std::endl;
         os<<"	D: "<<s.D<<std::endl;
         os<<"	R: "<<s.R<<std::endl;

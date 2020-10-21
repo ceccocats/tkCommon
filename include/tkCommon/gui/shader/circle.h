@@ -42,9 +42,9 @@ class circle : public tk::gui::shader::generic
         void makeCircle(float x, float y, float z, float radius){
             for(int i = 0; i < resolution; i++){
                 float angle = 2.0f * M_PI * (float)i/(float)resolution;
-                linesBufData.atCPU(0,i).x = x + cos(angle) * radius;
-                linesBufData.atCPU(0,i).y = y + sin(angle) * radius;
-                linesBufData.atCPU(0,i).z = z;
+                linesBufData(0,i).x = x + cos(angle) * radius;
+                linesBufData(0,i).y = y + sin(angle) * radius;
+                linesBufData(0,i).z = z;
             }
             linesGlBuf.setData((float*)linesBufData.data_h,resolution*3);
         }
@@ -52,9 +52,9 @@ class circle : public tk::gui::shader::generic
         void makeCircles(tk::math::Mat<float> points, float radius){
             for(int i = 0; i < resolution; i++){
                 float angle = 2.0f * M_PI * (float)i/(float)resolution;
-                linesBufData.atCPU(0,i).x = points.atCPU(0,0) + cos(angle) * radius;
-                linesBufData.atCPU(0,i).y = points.atCPU(0,1) + sin(angle) * radius;
-                linesBufData.atCPU(0,i).z = points.atCPU(0,2);
+                linesBufData(0,i).x = points(0,0) + cos(angle) * radius;
+                linesBufData(0,i).y = points(0,1) + sin(angle) * radius;
+                linesBufData(0,i).z = points(0,2);
             }
             linesGlBuf.setData((float*)linesBufData.data_h,resolution*3);
         }

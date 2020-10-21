@@ -24,7 +24,8 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const CanData_gen& s)
     {
         os<<"CanData_gen"<<std::endl;
-        os<<"	header.stamp:"<<s.header.stamp<<std::endl;
+        os<<"	header.name:  "<<s.header.name<<std::endl;
+        os<<"	header.stamp: "<<s.header.stamp<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)

@@ -30,7 +30,6 @@ set(tkCommon_LIBRARIES
     tkMath
     tkCommunication
     ${FREETYPE_LIBRARIES}
-    tklibDrawText
     matio
     tkJoystick
 )

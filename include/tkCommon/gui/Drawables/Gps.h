@@ -58,13 +58,13 @@ namespace tk{ namespace gui{
 
                 for(int i = 0; i < lastPos; i++){
                     glbuffer[i].init();
-                    points.atCPU(0,i).x = 0;
-                    points.atCPU(0,i).y = 0;
-                    points.atCPU(0,i).z = 0;
+                    points(0,i).x = 0;
+                    points(0,i).y = 0;
+                    points(0,i).z = 0;
                 }*/
 
                 for(int i = 0; i < maxPos; i++){
-                    circles.atCPU(0,i) = new tk::gui::shader::circle();
+                    circles(0,i) = new tk::gui::shader::circle();
                 }
             }
 
@@ -83,19 +83,19 @@ namespace tk{ namespace gui{
 
                     // Shifting
                     /*for(int i = lastPos-1; i > 0; i--){
-                        points.atCPU(0,i) = points.atCPU(0,i-1);
+                        points(0,i) = points(0,i-1);
                     }
-                    points.atCPU(0,0).x = x;
-                    points.atCPU(0,0).y = y;
-                    points.atCPU(0,0).z = z;
+                    points(0,0).x = x;
+                    points(0,0).y = y;
+                    points(0,0).z = z;
 
 
                     for(int j = 0; j < nPos; j++){
                         for(int i = 0; i < circlePoints; i++){
                             float angle = 2.0f * M_PI * (float)i/(float)circlePoints;
-                            lines.atCPU(0,i).x = points.atCPU(0,j).x + cos(angle) * radius;
-                            lines.atCPU(0,i).y = points.atCPU(0,j).y + sin(angle) * radius;
-                            lines.atCPU(0,i).z = points.atCPU(0,j).z;
+                            lines(0,i).x = points(0,j).x + cos(angle) * radius;
+                            lines(0,i).y = points(0,j).y + sin(angle) * radius;
+                            lines(0,i).z = points(0,j).z;
                         }
                         glbuffer[j].setData((float*)lines.data_h,circlePoints*3);
                     }

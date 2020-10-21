@@ -23,7 +23,8 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const OdomData_gen& s)
     {
         os<<"OdomData_gen"<<std::endl;
-        os<<"	header.stamp:"<<s.header.stamp<<std::endl;
+        os<<"	header.name:  "<<s.header.name<<std::endl;
+        os<<"	header.stamp: "<<s.header.stamp<<std::endl;
         os<<"	tf: "<<s.tf<<std::endl;
         return os;
     }

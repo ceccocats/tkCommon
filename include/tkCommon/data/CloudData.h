@@ -11,6 +11,13 @@ namespace tk { namespace data {
         
         public:
 
+        void printFeaturesMap() {
+            std::cout<<"Cloud Avaible features: \n";
+            for(auto i : features_map) {
+                std::cout<<"\t"<<i.first<<": "<<i.second<<"\n";
+            }
+        }
+
         void gammaCorrectionIntensity(){
 
             if(features.size() == 0){

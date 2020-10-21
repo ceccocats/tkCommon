@@ -12,7 +12,7 @@ namespace tk{ namespace gui{
             tk::data::CloudData*    cloud;
             tk::gui::Buffer<float>  glbuffer;
             float                   pointSize = 1.0f;
-            bool                    update = false;
+            bool                    update;
 
             static const int    maxItems = 30;
             int                 nItems;
@@ -38,7 +38,7 @@ namespace tk{ namespace gui{
                 // use x, y or z
                 if(useFeatureN < 3){
                     for(int i = 0; i < cloud->points.cols(); i++){
-                         float value = cloud->points.atCPU(useFeatureN,i);
+                         float value = cloud->points(useFeatureN,i);
 
                         if(value > max) max = value;
                         if(value < min) min = value;
@@ -69,6 +69,7 @@ namespace tk{ namespace gui{
                 this->selectedColorMap  = 0;
                 this->color             = tk::gui::color::WHITE;
                 this->useFeatureN       = 0;
+                this->update            = true;
             }
 
             /**

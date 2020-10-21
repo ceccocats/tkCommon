@@ -41,7 +41,8 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const ImuData_gen& s)
     {
         os<<"ImuData_gen"<<std::endl;
-        os<<"	header.stamp:"<<s.header.stamp<<std::endl;
+        os<<"	header.name:  "<<s.header.name<<std::endl;
+        os<<"	header.stamp: "<<s.header.stamp<<std::endl;
         os<<"	acc: "<<s.acc<<std::endl;
         os<<"	angleVel: "<<s.angleVel<<std::endl;
         os<<"	angle: "<<s.angle<<std::endl;

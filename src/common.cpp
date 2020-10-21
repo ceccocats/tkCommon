@@ -1,5 +1,7 @@
 #include <tkCommon/common.h>
 
+const std::string tkCommon_PATH = TKPROJ_PATH;
+
 namespace tk { namespace common {
 
     Tfpose odom2tf(float x, float y, float yaw) {

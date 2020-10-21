@@ -9,7 +9,7 @@ Viewer::Viewer(){
 
 
 Viewer::~Viewer(){
-    delete Viewer::instance;
+    //delete Viewer::instance;
 }
 
 void 

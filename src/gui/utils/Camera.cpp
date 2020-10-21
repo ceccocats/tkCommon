@@ -28,10 +28,6 @@ void Camera::init() {
     lastMousePos = glm::vec2(0);
     lastAngles   = glm::vec2(0);
     lastCenter   = glm::vec3(0);
-
-    // update matrix
-    updateEye();
-    updateMatrices();
 }
 
 void Camera::updateEye() {
