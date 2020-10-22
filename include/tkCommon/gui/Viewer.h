@@ -1,7 +1,7 @@
 #pragma once
-#include <GL/glew.h> 
-#include <GL/freeglut.h>
-#include <GLFW/glfw3.h>
+#include "tkCommon/gui/tkShader.h"
+#include "tkCommon/gui/tkBufferGl.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <signal.h>
@@ -48,6 +48,8 @@ namespace tk { namespace gui {
             self->init();
             self->init_mutex.unlock();
             self->run();
+
+            pthread_exit(0);
         }
 
         void initOnThread(bool splashScreen = true) {
@@ -91,7 +93,7 @@ namespace tk { namespace gui {
         
         static int  tkLoadTexture(std::string filename, GLuint &tex);
         static int  tkLoadOBJ(std::string filename, object3D_t &obj);
-        static void tkLoadLogo(std::string filename, std::vector<common::Vector3<float>> &logo);
+        static void tkLoadLogo(std::string filename, std::vector<tk::common::Vector3<float>> &logo);
         
         static void tkSetColor(tk::gui::Color_t c, float alpha = -1);
         static void tkApplyTf(tk::common::Tfpose tf);
@@ -101,6 +103,7 @@ namespace tk { namespace gui {
         static void tkDrawSphere(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = true);
         static void tkDrawCloud(Eigen::MatrixXf *data);
         static void tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx, float maxval=1.0);
+        static void tkDrawCloudClass(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx);
         static void tkDrawCloudRGB(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int r, int g, int b);
         static void tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght, float radius = -1.0, int nbSubdivisions = 12);
         static void tkDrawArrow(float length = 1.0, float radius = -1.0, int nbSubdivisions = 12);

@@ -79,7 +79,9 @@ class obj_class{
         CYCLE       = 1,
         // Added later
 		ROADSIGN	= 8,
-		LIGHT		= 7};
+		LIGHT		= 7,
+        BUS         = 9,
+        TRUCK       = 10};
 
 		static tk::gui::Color_t objects_colors[15];
 
@@ -94,6 +96,8 @@ class obj_class{
             if(value == obj_class::CYCLE)        return std::string{"cycle"};
 			if(value == obj_class::ROADSIGN)     return std::string{"road sign"};
 			if(value == obj_class::LIGHT)     	 return std::string{"traffic light"};
+			if(value == obj_class::BUS)          return std::string{"bus"};
+			if(value == obj_class::TRUCK)     	 return std::string{"truck"};
             return std::string{"type error"};
         }
 
@@ -135,6 +139,10 @@ class obj_class{
 					return tk::gui::color::BLUE;	// blue    (motor bike)
         		case tk::perception::obj_class::PEDESTRIAN:
 					return tk::gui::color::ORANGE;	// orange  (pedestrian)
+        		case tk::perception::obj_class::BUS:
+					return tk::gui::color::LIGHT_BLUE;	// light blue    (bus)
+        		case tk::perception::obj_class::TRUCK:
+					return tk::gui::color::LIGHT_GREEN;	// light green  (truck)
         		default:
 					return tk::gui::color::RED;		// red (unused)
         	}
@@ -390,6 +398,7 @@ class boundary : public generic{
 
 		bool init(){
 			classtype = type::BOUNDARY;
+            return true;
 		}
 
 		boundary& operator=(const boundary& s){
@@ -461,6 +470,7 @@ class rotatedBox3D : public generic{
         tk::common::Vector3<float>  dim;
         tk::common::Vector3<float>  rot;
 		obj_class                    objType;
+        int                         id;
     
     public:
         bool init(){
@@ -473,6 +483,7 @@ class rotatedBox3D : public generic{
             this->dim       = s.dim;
             this->rot       = s.rot;
             this->objType   = s.objType;
+            this->id        = s.id;
             return *this;
         }
         void draw(tk::gui::Viewer *viewer){
@@ -555,6 +566,8 @@ class perceptionData : public tk::data::SensorData{
         void init() override {
             tk::data::SensorData::init();
             header.sensorID = tk::data::sensorName::PERCEPTION;
+            header.tf.setIdentity();
+
         }
 
         void release() override {}
@@ -565,6 +578,8 @@ class perceptionData : public tk::data::SensorData{
 
         perceptionData& operator=(const perceptionData &s) {
             SensorData::operator=(s);
+
+            this->header = s.header;
 
             this->boxes  = s.boxes;
             this->signs = s.signs;
@@ -586,23 +601,28 @@ class perceptionData : public tk::data::SensorData{
 
 		void draw(tk::gui::Viewer *viewer){
 
-			for(int i = 0; i < signs.size(); i++){
-				tk::gui::Color_t c = obj_class::getColor(obj_class::ROADSIGN);
-				viewer->tkDrawPerceptionPyramid(signs[i].pos, rotation, c, 100);
-			}
+            glPushMatrix();
+            {
+                viewer->tkApplyTf(header.tf);
+                for(int i = 0; i < signs.size(); i++){
+                    tk::gui::Color_t c = obj_class::getColor(obj_class::ROADSIGN);
+                    viewer->tkDrawPerceptionPyramid(signs[i].pos, rotation, c, 100);
+                }
 
-        	if(!draw_masa_style){
-				for(int i = 0; i < boxes.size(); i++){
-					viewer->tkDrawRotatedBox3D(boxes[i].pos, boxes[i].dim, boxes[i].rot, obj_class::getColor(boxes[i].objType), 150);
-				}
-        	}
-        	else{
-        		for(int i = 0; i < boxes.size(); i++){
-					viewer->tkDrawPerceptionPyramid(boxes[i].pos, rotation, obj_class::getColor(boxes[i].objType), 100);
-        		}
-        	}
+                if(!draw_masa_style){
+                    for(int i = 0; i < boxes.size(); i++){
+                        viewer->tkDrawRotatedBox3D(boxes[i].pos, boxes[i].dim, boxes[i].rot, obj_class::getColor(boxes[i].objType), 150);
+                    }
+                }
+                else{
+                    for(int i = 0; i < boxes.size(); i++){
+                        viewer->tkDrawPerceptionPyramid(boxes[i].pos, rotation, obj_class::getColor(boxes[i].objType), 100);
+                    }
+                }
 
-			rotation += 1;
+                rotation += 1;
+            }
+            glPopMatrix();			
 
 		}
 };
@@ -625,6 +645,7 @@ struct ObjectData2D_t{
         box = s.box;
         color = s.color;
         label = s.label;
+        return *this;
     }
 };
 
@@ -638,7 +659,8 @@ struct ObjectData3D_t{
         pose = s.pose;
         size = s.size;
         color = s.color;
-        label = s.label;
+        label = s.label;   
+        return *this;        
     }
 };
 
@@ -654,6 +676,7 @@ struct LineData_t{
         type =s.type;
         points = s.points;
         color = s.color;
+        return *this;
     }
     void push(T point){
         points.push_back(point);

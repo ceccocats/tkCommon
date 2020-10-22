@@ -8,6 +8,11 @@ namespace tk { namespace data {
     public:
 
         /**
+         * @brief Points photons
+         */
+        Eigen::MatrixXf noise_photons;
+
+        /**
          * @brief Points intensity
          */
         Eigen::MatrixXf intensity;
@@ -23,14 +28,13 @@ namespace tk { namespace data {
          */
         Eigen::MatrixXi idMatrix;
 
-
         /**
          * @brief PolarCloud
          */
-        Eigen::MatrixXi polarCloud;
+        Eigen::MatrixXf polarCloud;
 
         /**
-         * @brief Initialization method only for Eigen points and intensity.
+         * @brief Initialization method
          */
         void init(){
             SensorData::init();
@@ -38,6 +42,7 @@ namespace tk { namespace data {
             this->points.resize(4,CLOUD_MAX_POINTS);
             this->intensity.resize(1,CLOUD_MAX_POINTS);
             this->laserID.resize(1,CLOUD_MAX_POINTS);
+            this->noise_photons.resize(1,CLOUD_MAX_POINTS);
             this->idMatrix.resize(0,0);
 
             this->points.setZero();
@@ -47,6 +52,22 @@ namespace tk { namespace data {
 
             header.sensor = sensorName::LIDAR;
         }
+
+        /**
+         * @brief Initialization method
+         * @param n     points   
+         */
+        void init(int n){
+            SensorData::init();
+            this->nPoints = 0;
+            this->points.resize(4,n);
+            this->intensity.resize(1,n);
+            this->laserID.resize(1,n);
+            this->noise_photons.resize(1,n);
+            this->idMatrix.resize(0,0);
+            header.sensor = sensorName::LIDAR;
+        }
+
         /**
          * @brief Initialization method for all data
          * 
@@ -101,6 +122,7 @@ namespace tk { namespace data {
             this->points    = s.points;
             this->intensity = s.intensity;
             this->laserID   = s.laserID;
+            this->noise_photons = s.noise_photons;
             return *this;
         }
 
@@ -110,9 +132,13 @@ namespace tk { namespace data {
 
         void draw(tk::gui::Viewer *viewer){
 
-			tk::gui::Viewer::tkDrawTf(header.name, header.tf);
-    		tk::gui::Viewer::tkApplyTf(header.tf);
-			viewer->tkDrawLidarCloud(points, nPoints, intensity);
+            glPushMatrix();
+            {
+                tk::gui::Viewer::tkDrawTf(header.name, header.tf);
+                tk::gui::Viewer::tkApplyTf(header.tf);
+                viewer->tkDrawLidarCloud(points, nPoints, intensity);
+            }
+			glPopMatrix();
         }
     };
 }}

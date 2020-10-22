@@ -13,8 +13,9 @@ namespace tk{namespace gui{
 
 	public:
 		std::mutex *draw_mutex = nullptr;
+		bool enabled = true;
 
-		Drawable & operator=(const Drawable& obj) { }
+		Drawable & operator=(const Drawable& obj) { return *this; }
 
 		//virtual void draw() {}
 
@@ -26,7 +27,9 @@ namespace tk{namespace gui{
 
 		virtual void draw2D(tk::gui::Viewer *viewer) {}
 
-		~Drawable(){if(draw_mutex != nullptr) delete draw_mutex;}
+		virtual ~Drawable(){
+			if(draw_mutex != nullptr) delete draw_mutex;
+		}
 
 	};
 
@@ -131,6 +134,9 @@ namespace tk{namespace gui{
 
 		void draw2D(Viewer *viewer){
 			for (std::map<std::string,Drawable*>::iterator it = map.begin(); it!=map.end(); ++it){
+				if(!it->second->enabled)
+					continue;
+				
 				if(it->second->draw_mutex != nullptr)
 					it->second->draw_mutex->lock();
 				it->second->draw2D(viewer);
@@ -141,6 +147,9 @@ namespace tk{namespace gui{
 
 		void draw(Viewer *viewer){
 			for (std::map<std::string,Drawable*>::iterator it = map.begin(); it!=map.end(); ++it){
+				if(!it->second->enabled)
+					continue;
+
 				if(it->second->draw_mutex != nullptr)
 					it->second->draw_mutex->lock();
 				it->second->draw(viewer);

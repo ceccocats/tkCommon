@@ -1,8 +1,11 @@
+#pragma once
+
 #include "tkCommon/common.h"
+#include "tkCommon/math/MatIO.h"
 
 namespace tk{ namespace data{
 
-    class CalibData{
+    class CalibData : public tk::math::MatDump {
     
     public:
 

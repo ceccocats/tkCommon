@@ -6,6 +6,7 @@
 #include <execinfo.h>
 #include <regex>
 #include <fstream>
+#include <stdexcept>
 #include <tkCommon/terminalFormat.h>
 
 
@@ -35,13 +36,13 @@ namespace tk{
                     if(msg != "")
                         tk::tformat::printErr("tkAssert", msg+"\n");
                     tk::tformat::printErr("tkAssert", "function: "+std::string(funz)+" at "+file+":"+ std::to_string(line)+"\n");
-                    exit(-1);
+                    throw std::runtime_error("tkAssert");
                 }
             }
 
             inline static void raise_error(const char *file, const char *funz, int line, std::string msg) {
                 tk::tformat::printErr("tkFatal", msg+"\nfunction: "+std::string(funz)+" at "+file+":"+ std::to_string(line)+"\n");
-                exit(-1);
+                throw std::runtime_error("tkAssert");
             }
         
         private:

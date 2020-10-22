@@ -87,6 +87,8 @@ namespace tk { namespace communication {
             for(auto m : msgs) {
                 printMsg(m.first);
             }
+
+            return true;
         }
 
         void printMsg(int id) {
@@ -113,13 +115,15 @@ namespace tk { namespace communication {
 
                 // check dlc
                 tkASSERT(frame.frame.can_dlc == msgs[frame.id()].getDlc());
-                tkASSERT(sig.getByteOrder() == tk::communication::ByteOrder::MOTOROLA);
 
                 // decode
                 int sigLength = sig.getLength();
-                x = reverse_byte_order(x);
-                uint64_t lmask = 0xffffffffffffffff >> 64 - sigLength;
-                int      shift = 64 - (7 - sig.getStartbit()%8 + 8*(sig.getStartbit()/8) + sigLength);
+                int shift = sig.getStartbit();
+                if(sig.getByteOrder() == tk::communication::ByteOrder::MOTOROLA) {
+                    x = reverse_byte_order(x);
+                    shift = 64 - (7 - sig.getStartbit()%8 + 8*(sig.getStartbit()/8) + sigLength);
+                }
+                uint64_t lmask = 0xffffffffffffffff >> (64 - sigLength);
                 x = (x >> shift) & lmask;
 
                 double val;

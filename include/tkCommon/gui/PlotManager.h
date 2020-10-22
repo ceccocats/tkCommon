@@ -64,6 +64,7 @@ namespace tk { namespace gui {
 
         bool plotExist(std::string id);
         plot_t *getPlot(std::string id);
+        int plotsSize() { return plots.size(); }
         void set2d(std::string id, bool is2d);
 
         void drawPlots();

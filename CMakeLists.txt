@@ -34,7 +34,10 @@ set(GUI_LIBS
     ${GLFW3_LIBRARY}
     glut
     ${FREETYPE_LIBRARIES}
+    Xxf86vm
+    X11
 )
+message(${GUI_LIBS})
 
 
 #-------------------------------------------------------------------------------
@@ -53,6 +56,10 @@ add_library(tkGUI SHARED
     src/gui/Viewer.cpp
     src/gui/PlotManager.cpp
     src/gui/lodepng.cpp
+    src/gui/tkBufferGl.cpp
+    src/gui/tkShader.cpp
+    src/gui/tkTexture.cpp
+    src/gui/stb_image.cpp
     src/gui/Camera3D.cpp
     src/gui/imgui/imgui_demo.cpp
     src/gui/imgui/imgui_draw.cpp
@@ -69,6 +76,7 @@ add_library(tkCommon SHARED
     src/common.cpp
     src/version.cpp
     src/CmdParser.cpp    
+    src/PID.cpp
 )
 target_link_libraries(tkCommon tkGUI yaml-cpp matio dl)
 
@@ -118,15 +126,48 @@ add_dependencies(tkGUI tkversiongit)
 #-------------------------------------------------------------------------------
 # Build apps
 #-------------------------------------------------------------------------------
-file(GLOB tkpackage_APPScpp "app/*.cpp")
-foreach(cpp ${tkpackage_APPScpp})
-    get_filename_component(app "${cpp}" NAME_WE)
-    list(APPEND tkpackage_APPS ${app})
-endforeach()
-foreach(app ${tkpackage_APPS})
-    add_executable(${app} "app/${app}.cpp")
-    target_link_libraries(${app} tkCommon tkCommunication tkJoystick ${GUI_LIBS})
-endforeach()
+#file(GLOB tkpackage_APPScpp "app/*.cpp")
+#foreach(cpp ${tkpackage_APPScpp})
+#    get_filename_component(app "${cpp}" NAME_WE)
+#    list(APPEND tkpackage_APPS ${app})
+#endforeach()
+#foreach(app ${tkpackage_APPS})
+#    add_executable(${app} "app/${app}.cpp")
+#    target_link_libraries(${app} tkCommon tkCommunication tkJoystick ${GUI_LIBS})
+#endforeach()
+
+#add_executable(tkGUI_simple app/tkGUI_simple.cpp)
+#target_link_libraries(tkGUI_simple tkCommon ${GUI_LIBS})
+
+add_executable(tkGUI_new app/tkGUI_new.cpp)
+target_link_libraries(tkGUI_new tkCommon ${GUI_LIBS})
+
+add_executable(tkCommon_cmd app/tkCommon_cmd.cpp)
+target_link_libraries(tkCommon_cmd tkCommon)
+
+add_executable(tkCommon_matio app/tkCommon_matio.cpp)
+target_link_libraries(tkCommon_matio tkCommon)
+
+add_executable(tkCommon_eth_pcap app/tkCommon_eth_pcap.cpp)
+target_link_libraries(tkCommon_eth_pcap tkCommon tkCommunication)
+
+add_executable(tkCommon_pcap_replay app/tkCommon_pcap_replay.cpp)
+target_link_libraries(tkCommon_pcap_replay tkCommon tkCommunication)
+
+add_executable(tkCommon_eth_socket app/tkCommon_eth_socket.cpp)
+target_link_libraries(tkCommon_eth_socket tkCommon tkCommunication)
+
+add_executable(tkCommon_terminal_format app/tkCommon_terminal_format.cpp)
+target_link_libraries(tkCommon_terminal_format)
+
+add_executable(tkCommon_pcap_gui_replay app/tkCommon_pcap_gui_replay.cpp)
+target_link_libraries(tkCommon_pcap_gui_replay tkCommon tkCommunication ${GUI_LIBS})
+
+add_executable(tkCommon_segfault app/tkCommon_segfault.cpp)
+target_link_libraries(tkCommon_segfault tkCommon)
+
+add_executable(tkCommon_geoconv app/tkCommon_geoconv.cpp)
+target_link_libraries(tkCommon_geoconv tkCommon)
 
 
 #-------------------------------------------------------------------------------

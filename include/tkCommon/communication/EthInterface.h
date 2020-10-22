@@ -2,6 +2,7 @@
 
 #include "tkCommon/communication/ethernet/PCAPHandler.h"
 #include "tkCommon/communication/ethernet/UDPSocket.h"
+#include "tkCommon/communication/ethernet/TCPSocket.h"
 
 namespace tk { namespace communication {
     class Ethinterface {

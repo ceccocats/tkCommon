@@ -36,6 +36,11 @@ namespace tk{namespace data{
             header.name = sensorName::CAMDATA;
         }
 
+        T* at(int row, int col){
+
+            return &this->data[(row*width + col) * channels];
+        }
+
         bool empty() {return channels == 0 || width == 0 || height == 0 || data == nullptr; }
 
 		bool checkDimension(SensorData *s){
@@ -49,10 +54,10 @@ namespace tk{namespace data{
         ImageData<T>& operator=(const ImageData<T>& s){
         	SensorData::operator=(s);
 			index = s.index;
-            //if(s.width != width || s.height != height || s.channels != channels){
-            //    release();
-            //    init(s.width, s.height, s.channels);
-            //}
+            if(s.width != width || s.height != height || s.channels != channels){
+                release();
+                init(s.width, s.height, s.channels);
+            }
             mtx->lock();
             memcpy(data, s.data, width * height * channels * sizeof(T));
             mtx->unlock();
@@ -96,6 +101,11 @@ namespace tk{namespace data{
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
+                glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+                glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+                glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+                glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+
 				if(this->channels == 4) {
 					glTexImage2D(GL_TEXTURE_2D,         // Type of texture
 								 0,                   // Pyramid level (for mip-mapping) - 0 is the top level
@@ -104,7 +114,7 @@ namespace tk{namespace data{
 								 this->height,          // Image height i.e. 480 for Kinect in standard mode
 								 0,                   // Border width in pixels (can either be 1 or 0)
 								 GL_RGBA,              // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
-								 GL_UNSIGNED_BYTE,    // Image data type
+								 sizeof(T) == 1 ? GL_UNSIGNED_BYTE: GL_FLOAT,    // Image data type
 								 this->data);        // The actual image data itself
 				}else if(this->channels == 3){
 					glTexImage2D(GL_TEXTURE_2D,         // Type of texture
@@ -114,7 +124,18 @@ namespace tk{namespace data{
 								 this->height,          // Image height i.e. 480 for Kinect in standard mode
 								 0,                   // Border width in pixels (can either be 1 or 0)
 								 GL_RGB,              // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
-								 GL_UNSIGNED_BYTE,    // Image data type
+								 sizeof(T) == 1 ? GL_UNSIGNED_BYTE: GL_FLOAT,    // Image data type
+								 this->data);        // The actual image data itself
+				}
+                else if(this->channels == 1){
+					glTexImage2D(GL_TEXTURE_2D,         // Type of texture
+								 0,                   // Pyramid level (for mip-mapping) - 0 is the top level
+								 GL_LUMINANCE,              // Internal colour format to convert to
+								 this->width,          // Image width  i.e. 640 for Kinect in standard mode
+								 this->height,          // Image height i.e. 480 for Kinect in standard mode
+								 0,                   // Border width in pixels (can either be 1 or 0)
+								 GL_LUMINANCE,              // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
+								 sizeof(T) == 1 ? GL_UNSIGNED_BYTE: GL_FLOAT,    // Image data type
 								 this->data);        // The actual image data itself
 				}
 			}

@@ -35,6 +35,12 @@ namespace tk { namespace common {
         return isometry;
     }
 
+    Tfpose tf2D(Tfpose tf) {
+        tk::common::Vector3<float> p = tk::common::tf2pose(tf);
+        tk::common::Vector3<float> r = tk::common::tf2rot(tf);
+        return odom2tf(p.x, p.y, 0, 0, 0, r.z);    
+    }
+
     bool readOdom(std::ifstream &is, Tfpose &out, uint64_t &stamp) {
 
         float x, y, yaw;

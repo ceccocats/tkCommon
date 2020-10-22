@@ -82,6 +82,22 @@ class Camera3D
         return m_mouseRight;
     }
 
+    void setPerspective(bool set) {
+        this->m_perspective = set;
+    }
+
+    bool isPerspective() {
+        return m_perspective;
+    }
+
+    void setZoom(float radius) {
+        m_radius = radius;
+        updateEye();
+    }
+
+  public:
+    bool m_perspective = true;
+
     Eigen::Matrix4f m_modelView;
     Eigen::Matrix4f m_projection;
 

@@ -73,12 +73,12 @@ Eigen::Matrix<typename Derived::Scalar,4,4> lookAt(Derived const & eye, Derived 
 
 /// @see glm::ortho
 template<typename Scalar>
-Eigen::Matrix<Scalar,4,4> ortho( Scalar const& left,
-                                 Scalar const& right,
-                                 Scalar const& bottom,
-                                 Scalar const& top,
-                                 Scalar const& zNear,
-                                 Scalar const& zFar ) {
+Eigen::Matrix<Scalar,4,4> ortho( Scalar left,
+                                 Scalar right,
+                                 Scalar bottom,
+                                 Scalar top,
+                                 Scalar zNear,
+                                 Scalar zFar ) {
     Eigen::Matrix<Scalar,4,4> mat = Eigen::Matrix<Scalar,4,4>::Identity();
     mat(0,0) = Scalar(2) / (right - left);
     mat(1,1) = Scalar(2) / (top - bottom);

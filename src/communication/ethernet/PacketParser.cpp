@@ -90,7 +90,18 @@ tk::communication::PacketParser::computeNextPacket(pcap_t* pcapFile,uint8_t* buf
         return payload_lenght;
     }
 
+    // not recognized header
+    if(payload_lenght == 0) {
+        payload_lenght = header->len;
+        std::memcpy(buffer,pkt_data, payload_lenght);
+        return payload_lenght;
+    }
+
     int header_lenght = size_ip + SIZE_ETHERNET;
+
+    if(payload_lenght < 1){
+        return 0;
+    }
 
     //get if udp
     if(ip->ip_p == IPPROTO_UDP){

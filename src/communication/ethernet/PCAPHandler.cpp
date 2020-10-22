@@ -92,10 +92,16 @@ int tk::communication::PCAPHandler::getPacket(uint8_t* buffer, timeStamp_t& stam
 
     if (!pcapFile){
         clsErr("pcap error.\n");
+        sleep(1);
         return -1;
     }
 
     int len = parser.computeNextPacket(pcapFile,buffer,stamp);
+
+    if(len == 0){
+        clsWrn("packet file end.\n");
+        return 0;
+    }
 
     if(len < 0){
         clsWrn("Reading error.\n");

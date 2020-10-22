@@ -16,6 +16,7 @@ namespace tk { namespace data {
         RADAR       = 5,
         LINES       = 6,
         PERCEPTION  = 7,
+        IMU         = 8
         };
 
         /**
@@ -29,6 +30,7 @@ namespace tk { namespace data {
             if(value == sensorName::CAMDATA)    return std::string{"camera"};
             if(value == sensorName::RADAR)      return std::string{"radar"};
             if(value == sensorName::PERCEPTION) return std::string{"perception"};
+            if(value == sensorName::IMU)        return std::string{"imu"};
             return std::string{"type error"};
         }
 

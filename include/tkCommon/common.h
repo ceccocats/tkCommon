@@ -69,7 +69,6 @@ namespace tk { namespace common {
         else
             return false;
     }
-    
 
     /**
      * Convert odometry to TfPose
@@ -163,6 +162,16 @@ namespace tk { namespace common {
             }
 
             /**
+             * init with array
+             */
+            Vector4(T* data) {
+                x = data[0];
+                y = data[1];
+                z = data[2];
+                i = data[3];
+            }
+
+            /**
              * init with values
              * @param x
              * @param y
@@ -188,6 +197,25 @@ namespace tk { namespace common {
                 os << "v4(" << v.x <<", "<< v.y <<", "<< v.z <<", "<< v.i <<")";
                 return os;
             }  
+
+            Vector4 operator-(Vector4 const &obj) { 
+                Vector4 res; 
+                res.x = x - obj.x; 
+                res.y = y - obj.y; 
+                res.z = z - obj.z; 
+                res.i = i - obj.i; 
+                return res; 
+            } 
+
+            Vector4& operator=(const Vector4& s){
+
+                x = s.x;
+                y = s.y;
+                z = s.z;
+                i = s.i;
+
+                return *this;
+            }
 
             bool isZero() { return x == 0 && y == 0 && z == 0 && i == 0; } 
     };
@@ -219,6 +247,15 @@ namespace tk { namespace common {
                 this->x = x;
                 this->y = y;
                 this->z = z;
+            }
+
+            /**
+             * init with array
+             */
+            Vector3(T* data) {
+                x = data[0];
+                y = data[1];
+                z = data[2];
             }
 
             ~Vector3() {}
@@ -259,6 +296,14 @@ namespace tk { namespace common {
                 os << "v3(" << v.x <<", "<< v.y <<", "<< v.z <<")";
                 return os;
             }  
+
+            Vector3 operator-(Vector3 const &obj) { 
+                Vector3 res; 
+                res.x = x - obj.x; 
+                res.y = y - obj.y; 
+                res.z = z - obj.z; 
+                return res; 
+            } 
 
             bool isZero() { return x == 0 && y == 0 && z == 0; }
 
@@ -363,6 +408,11 @@ namespace tk { namespace common {
      * @return
      */
     Vector3<float> tf2pose(Tfpose tf);
+
+    /**
+     * Keep only x,y,yaw from TF
+     */
+    Tfpose tf2D(Tfpose tf);
 
 
     /**

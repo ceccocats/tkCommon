@@ -59,7 +59,7 @@ namespace tk { namespace communication {
             }
         }else{
 
-            clsSuc("socket port created.\n");
+            clsSuc("socket created on port "+std::to_string(port)+"\n");
         }
 
 

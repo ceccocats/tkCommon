@@ -115,12 +115,19 @@ Viewer::init() {
     plotManger = new PlotManager();
 
     // OPENGL confs
-    glDisable(GL_LIGHTING);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glDisable(GL_CULL_FACE);
+    
     glEnable(GL_DEPTH_TEST);
     //glDepthFunc(GL_GEQUAL);
     //glEnable(GL_LINE_SMOOTH);
+
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glEnable(GL_BLEND);
+    //glEnable(GL_ALPHA_TEST);
+    //glDepthMask(GL_FALSE); // make the depth buffer read-only
+    
+
+    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
     std::string msg =   std::string{"OPENGL running on:"} + 
                         std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))) + " -- " +
@@ -153,7 +160,7 @@ Viewer::draw() {
     glPushMatrix();
     tk::common::Vector3<float> p = Viewer::mouseView.getWorldPos();
     tkApplyTf(tk::common::odom2tf(p.x, p.y, 0));
-    tkDrawAxis();
+    //tkDrawAxis();
     glPopMatrix();
 }
 
@@ -425,15 +432,17 @@ Viewer::tkLoadOBJ(std::string filename, object3D_t &obj) {
 
 
             //std::cout<<"mat: "<<loader.LoadedMeshes[o].MeshMaterial.name<<" diffuse: "<<obj.colors[o]<<"\n";
-            
-            obj.triangles[o] = Eigen::MatrixXf(5, indices.size());
+            obj.triangles[o] = Eigen::MatrixXf(8, indices.size());
             for(int i=0; i<indices.size(); i++) {
                 int idx = indices[i];
                 obj.triangles[o](0,i) = verts[idx].Position.X;
                 obj.triangles[o](1,i) = verts[idx].Position.Y;
                 obj.triangles[o](2,i) = verts[idx].Position.Z;
-                obj.triangles[o](3,i) = verts[idx].TextureCoordinate.X;
-                obj.triangles[o](4,i) = 1 - verts[idx].TextureCoordinate.Y;
+                obj.triangles[o](3,i) = verts[idx].Normal.X;
+                obj.triangles[o](4,i) = verts[idx].Normal.Y;
+                obj.triangles[o](5,i) = verts[idx].Normal.Z;
+                obj.triangles[o](6,i) = verts[idx].TextureCoordinate.X;
+                obj.triangles[o](7,i) = 1 - verts[idx].TextureCoordinate.Y;
             }
         }
 
@@ -612,6 +621,35 @@ Viewer::tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, 
 
         Eigen::Vector4f v = points->col(p);
         glVertex3f(v(0), v(1), v(2));
+    }
+    glEnd();
+}
+
+void
+Viewer::tkDrawCloudClass(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx) {
+
+    //glPointSize(1.0f);
+    //tkSetColor(tk::gui::color::WHITE);
+    //glBegin(GL_POINTS);
+    //for (int p = 0; p < points->cols(); p++) {
+    //    Eigen::Vector4f v = points->col(p);
+    //    glVertex3f(v(0), v(1), v(2));
+    //}
+    //glEnd();
+
+    //sharp and corner features
+    glPointSize(5.0f);
+    glBegin(GL_POINTS);
+    for (int p = 0; p < points->cols(); p++) {
+        if(features->coeff(idx, p) == 10 ) {
+            Eigen::Vector4f v = points->col(p);
+            tkSetColor(tk::gui::color::RED);
+            glVertex3f(v(0), v(1), v(2));
+        } else if(features->coeff(idx, p) == 11 ) {
+            Eigen::Vector4f v = points->col(p);
+            tkSetColor(tk::gui::color::BLUE);
+            glVertex3f(v(0), v(1), v(2));
+        }
     }
     glEnd();
 }
@@ -1180,7 +1218,7 @@ Viewer::tkDrawTf(std::string name, tk::common::Tfpose tf) {
                                 tk::common::Vector3<float>{0.01,0.01,0},
                                 tk::common::Vector3<float>{M_PI/2,0,0},
                                 tk::common::Vector3<float>{0.08,0.08,0});
-    tk::gui::Viewer::tkDrawAxis(0.1);
+    //tk::gui::Viewer::tkDrawAxis(0.1);
     glPopMatrix();
 }
 
@@ -1193,6 +1231,15 @@ void
 Viewer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+        mouseView.setPerspective(!mouseView.isPerspective()); 
+        if(mouseView.isPerspective()) {
+            tk::tformat::printMsg("Viewer", "set to perspective view\n");
+        } else {
+            tk::tformat::printMsg("Viewer", "set to ortho view\n");
+        }
+    }   
 
     if (key < MAX_KEYS) {
         if(action == GLFW_PRESS)
