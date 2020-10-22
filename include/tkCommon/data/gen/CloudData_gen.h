@@ -1,7 +1,7 @@
 // this file is generated DO NOT DIRECTLY MODIFY
 #pragma once
 #include "tkCommon/data/SensorData.h"
-#include "tkCommon/math/Mat.h"
+#include "tkCommon/math/Vec.h"
 
 
 namespace tk { namespace data {
@@ -31,8 +31,7 @@ public:
     static const featureType_t FEATURES_NEAR_SCAN;
     tk::math::Mat<float> points;
     tk::math::Mat<float> ranges;
-    tk::math::Mat<float> features;
-    std::map<featureType_t, int> features_map;
+    std::map<featureType_t, tk::math::Vec<float>> features;
     
     void init() override
     {
@@ -44,7 +43,6 @@ public:
         points = s.points;
         ranges = s.ranges;
         features = s.features;
-        features_map = s.features_map;
         return *this;
     }
     friend std::ostream& operator<<(std::ostream& os, const CloudData_gen& s)
@@ -54,16 +52,14 @@ public:
         os<<"	header.stamp: "<<s.header.stamp<<std::endl;
         os<<"	points: "<<s.points<<std::endl;
         os<<"	ranges: "<<s.ranges<<std::endl;
-        os<<"	features: "<<s.features<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)
     {
-        std::vector<tk::math::MatIO::var_t> structVars(4);
+        std::vector<tk::math::MatIO::var_t> structVars(3);
         structVars[0].set("header", header);
         structVars[1].set("points", points);
         structVars[2].set("ranges", ranges);
-        structVars[3].set("features", features);
         return var.setStruct(name, structVars);
     }
     bool fromVar(tk::math::MatIO::var_t &var)
@@ -72,7 +68,6 @@ public:
         var["header"].get(header);
         var["points"].get(points);
         var["ranges"].get(ranges);
-        var["features"].get(features);
         return true;
     }
 };

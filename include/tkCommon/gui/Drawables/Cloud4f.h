@@ -46,8 +46,15 @@ namespace tk{ namespace gui{
                 
                 //use feature ONLY I NOWWWWW
                 }else{
-                    for(int i = 0; i < cloud->features.cols(); i++){
-                        float value = cloud->features.data_h[i];/////////////////////For now I
+
+                    if(cloud->features.count(tk::data::CloudData::FEATURES_I) == 0){
+                            tkFATAL("Error\n");
+                            return;
+                    }
+                    tk::math::Vec<float> *f = &cloud->features[tk::data::CloudData::FEATURES_I];
+
+                    for(int i = 0; i < f->size(); i++){
+                        float value = f->data_h[i];/////////////////////For now I
 
                         if(value > max) max = value;
                         if(value < min) min = value;
@@ -97,7 +104,7 @@ namespace tk{ namespace gui{
                 this->cloud             = cloud;   
                 this->selectedColorMap  = selectedColorMap;
                 this->color             = tk::gui::color::WHITE;
-                this->useFeatureN       = cloud->features_map[feature] + 3;
+                this->useFeatureN       = 0; //TODO cloud->features_map[feature] + 3;
             }
 
             ~Cloud4f(){
@@ -139,18 +146,21 @@ namespace tk{ namespace gui{
                    update = false;
 
                     int i = 3;
-                    for (auto const& f : cloud->features_map){
+                    for (auto const& f : cloud->features){
                         useFeatures[i] = f.first.c_str();
                         i++;
                         nFeatures = i;
                     }
 
+                    if(cloud->features.count(tk::data::CloudData::FEATURES_I) == 0){
+                            tkFATAL("Error\n");
+                    }
+                    tk::math::Vec<float> *f = &cloud->features[tk::data::CloudData::FEATURES_I];
+
                     cloud->lock();
                     glbuffer.setData(cloud->points.data_h,cloud->points.size());
                     if(selectedColorMap != 0 && useFeatureN > 2){
-                        tkASSERT(cloud->features.cols() == cloud->features.size() && cloud->features.size() > 0, 
-                        "controllo temporaneo fino alla definizione della matrice features per colonne")
-                        glbuffer.setData(cloud->features.data_h,cloud->features.cols(),cloud->points.size());
+                        glbuffer.setData(f->data_h, f->size(), cloud->points.size());
                     }
                     cloud->unlockRead();
                     minMaxFeatures();
