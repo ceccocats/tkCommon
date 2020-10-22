@@ -24,8 +24,9 @@ template<class T>
 class Mat : public tk::math::MatDump {
 
     protected:
-        static const int MAXSIZE_MARGIN = 0;
+        const float MAXSIZE_MARGIN = 1.5f;
         int     _maxSize = 0;
+        int     _maxSizeGPU = 0;
         int     _rows = 0;
         int     _cols = 0;
         int     _size = 0;
@@ -112,7 +113,7 @@ class Mat : public tk::math::MatDump {
         __host__ void 
         synchCPU(){ 
 
-            tkASSERT(_gpu == true,"You set mat only on CPU\n");
+            tkASSERT(_gpu == true, "You set mat only on CPU\n");
             HANDLE_ERROR( cudaMemcpy(data_h, data_d, _size * sizeof(T), cudaMemcpyDeviceToHost) ); 
         }
         
@@ -120,19 +121,22 @@ class Mat : public tk::math::MatDump {
         resize(int r, int c) {
 
             if(_maxSize < r * c){
-                _maxSize = r * c + MAXSIZE_MARGIN;
+                _maxSize = (r * c) * MAXSIZE_MARGIN;
                 if(data_h != nullptr)
                     delete [] data_h;
                 data_h = new T[_maxSize];
             }
 
             if(_gpu == true){
-                if(_maxSize < r * c) {
+                if(_maxSizeGPU < r * c) {
+                    _maxSizeGPU = (r * c) * MAXSIZE_MARGIN;
                     if(data_d != nullptr)
                         HANDLE_ERROR( cudaFree(data_d) );
-                    HANDLE_ERROR( cudaMalloc(&data_d, _maxSize * sizeof(T)) );
-                }
+                    HANDLE_ERROR( cudaMalloc(&data_d, _maxSizeGPU * sizeof(T)) );
+                }        
+                tkASSERT(_maxSizeGPU == _maxSize);
             }
+
             _rows = r;
             _cols = c;
             _size = r * c;
@@ -163,10 +167,10 @@ class Mat : public tk::math::MatDump {
         
         __device__ T&  
         atGPU(int r, int c) { 
-            if(_gpu == true){
-                return data_d[r+c*_rows];
-            }
-            return nullptr;
+            tkASSERT(_gpu == true, "You set mat only on CPU\n");
+            tkASSERT(r < this->_rows && r >= 0, "Out of memory, rows "+std::to_string(r)+" > "+std::to_string(this->_rows)+"\n")
+            tkASSERT(c < this->_cols && c >= 0, "Out of memory, cols "+std::to_string(c)+" > "+std::to_string(this->_cols)+"\n")    
+            return data_d[r+c*_rows];
         }
 
         __host__ void 
@@ -187,20 +191,33 @@ class Mat : public tk::math::MatDump {
             }
         }
 
-        __host__ 
-        Mat<T>& operator=(const Mat<T>& s) {
+        __host__ void
+        fill(T value) {
+            for (int i = 0; i < _size; i++) {
+                data_h[i] = value;
+            }
+
+            if(_gpu == true){
+                synchGPU();
+            }
+        }
+
+        __host__ Mat<T>& 
+        operator=(const Mat<T>& s) {
             cloneCPU(s);
             if(s.hasGPU() == true)
                 cloneGPU(s);
             return *this;
         }
 
-        friend std::ostream& operator<<(std::ostream& os, const Mat& s) {
+        friend std::ostream& 
+        operator<<(std::ostream& os, const Mat& s) {
             os<<"Mat ("<<s.rows()<<"x"<<s.cols()<<")";
             return os;
         }
 
-        void print() {
+        void 
+        print() {
             for(int i = 0; i < rows(); ++i) {
                 std::cout << std::endl;
                 for(int j = 0; j < rows(); ++j) {
