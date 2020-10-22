@@ -28,7 +28,7 @@ public:
         speed = s.speed;
         return *this;
     }
-    friend std::ostream& operator<<(std::ostream& os, const ActuationData_gen& s)
+    friend std::ostream& operator<<(std::ostream& os, ActuationData_gen& s)
     {
         os<<"ActuationData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;

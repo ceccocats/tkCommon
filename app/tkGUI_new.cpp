@@ -29,7 +29,7 @@ void read_cloud(tk::data::CloudData& cloud) {
 
 	cloud.header.name = "LiDAR cloud";
 
-	cloud.features[tk::data::CloudData_gen::FEATURES_I] = tk::math::Vec<float>();
+	cloud.features.add(tk::data::CloudData_gen::FEATURES_I);
 
 	Eigen::MatrixXf points;
 	Eigen::MatrixXf intensity;

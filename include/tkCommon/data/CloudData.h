@@ -11,13 +11,6 @@ namespace tk { namespace data {
         
         public:
 
-        void printFeaturesMap() {
-            std::cout<<"Cloud Avaible features: \n";
-            for(auto i : features) {
-                std::cout<<"\t"<<i.first<<": "<<i.second<<"\n";
-            }
-        }
-
         void gammaCorrectionIntensity(){
 
             if(features.size() == 0){
@@ -25,11 +18,11 @@ namespace tk { namespace data {
                     return;
             }
 
-            if(features.count(tk::data::CloudData::FEATURES_I) == 0){
+            if(!features.exists(tk::data::CloudData::FEATURES_I)){
                     clsErr("Error\n");
                     return;
             }
-            tk::math::Vec<float> *f = &features[tk::data::CloudData::FEATURES_I];
+            const tk::math::Vec<float> *f = &features[tk::data::CloudData::FEATURES_I];
 
             // Get low and high value
             double lo = 99999.0f; 

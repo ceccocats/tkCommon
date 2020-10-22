@@ -18,6 +18,7 @@
 #include "tkCommon/CmdParser.h"
 #include "tkCommon/printTerminal.h"
 #include "tkCommon/exceptions.h"
+#include "tkCommon/Map.h"
 #include "tkCommon/math/Mat.h"
 
 extern const std::string tkCommon_PATH;
@@ -568,46 +569,4 @@ namespace tk { namespace common {
         return tk::common::odom2tf(x,y,z,roll,pitch,yaw);
     }
 
-
-    template<unsigned N> unsigned force_constexpr_eval() {
-        return N;
-    };
-    unsigned constexpr key(char const *input) {
-        return *input ?
-            static_cast<unsigned int>(*input) + 33 * key(input + 1) :
-            5381;
-    }
-    template <class T>
-    class Map {
-    public:
-        void addKey(const char *key) {
-            unsigned hash_key = tk::common::key(key);
-            _mapKeys[hash_key] = key;
-        }
-        bool exists(unsigned key) {
-            return _map.count(key);
-        }
-        T& operator[](unsigned key) {
-            return _map[key];
-        }
-        void print() {
-            std::cout << "Map: \n";
-            for (auto const&val : _map) {
-                std::string name;
-                if(_mapKeys.count(val.first) == 0) {
-                    name = std::to_string(val.first);
-                } else {
-                    name = _mapKeys[val.first];
-                }
-                std::cout << "\t[ "<< name <<" ] -> "<< val.second <<"\n";
-            }
-        }  
-    private: 
-        // unordered_map in theory has access time of o(1)
-        // we esperienced the std::map has anyway better performance 
-        std::map<unsigned, T> _map;
-        std::map<unsigned, std::string> _mapKeys;
-    };
-
-    #define tkKey(A) tk::common::force_constexpr_eval<tk::common::key(A)>()
 }}

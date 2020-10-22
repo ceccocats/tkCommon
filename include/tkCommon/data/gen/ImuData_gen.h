@@ -38,7 +38,7 @@ public:
         sideSlip = s.sideSlip;
         return *this;
     }
-    friend std::ostream& operator<<(std::ostream& os, const ImuData_gen& s)
+    friend std::ostream& operator<<(std::ostream& os, ImuData_gen& s)
     {
         os<<"ImuData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;

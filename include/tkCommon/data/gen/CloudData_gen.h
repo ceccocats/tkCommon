@@ -31,7 +31,7 @@ public:
     static const featureType_t FEATURES_NEAR_SCAN;
     tk::math::Mat<float> points;
     tk::math::Mat<float> ranges;
-    std::map<featureType_t, tk::math::Vec<float>> features;
+    tk::common::Map<tk::math::Vec<float>> features;
     
     void init() override
     {
@@ -45,21 +45,23 @@ public:
         features = s.features;
         return *this;
     }
-    friend std::ostream& operator<<(std::ostream& os, const CloudData_gen& s)
+    friend std::ostream& operator<<(std::ostream& os, CloudData_gen& s)
     {
         os<<"CloudData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;
         os<<"	header.stamp: "<<s.header.stamp<<std::endl;
         os<<"	points: "<<s.points<<std::endl;
         os<<"	ranges: "<<s.ranges<<std::endl;
+        os<<"	features: "<<s.features<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)
     {
-        std::vector<tk::math::MatIO::var_t> structVars(3);
+        std::vector<tk::math::MatIO::var_t> structVars(4);
         structVars[0].set("header", header);
         structVars[1].set("points", points);
         structVars[2].set("ranges", ranges);
+        structVars[3].set("features", features);
         return var.setStruct(name, structVars);
     }
     bool fromVar(tk::math::MatIO::var_t &var)
@@ -68,6 +70,7 @@ public:
         var["header"].get(header);
         var["points"].get(points);
         var["ranges"].get(ranges);
+        var["features"].get(features);
         return true;
     }
 };

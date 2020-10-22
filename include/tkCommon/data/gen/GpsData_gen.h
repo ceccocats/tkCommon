@@ -47,7 +47,7 @@ public:
         temp = s.temp;
         return *this;
     }
-    friend std::ostream& operator<<(std::ostream& os, const GpsData_gen& s)
+    friend std::ostream& operator<<(std::ostream& os, GpsData_gen& s)
     {
         os<<"GpsData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;
