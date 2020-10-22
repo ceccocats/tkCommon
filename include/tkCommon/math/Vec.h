@@ -40,6 +40,18 @@ public:
     resize(int n) {
         Mat<T>::resize(1,n);
     }
+
+    __host__ T&
+    operator()(int n) {
+        tkASSERT(n < this->_size, "Out of memory")
+        return this->data_h[n]; 
+    }
+
+    __host__ T&
+    operator[](int n) {
+        tkASSERT(n < this->_size, "Out of memory")
+        return this->data_h[n]; 
+    }
 };
 
 template<class T, int N>
@@ -65,6 +77,18 @@ public:
             os<<")";
         }
         return os;
+    }
+
+     __host__ T&
+    operator()(int n) {
+        tkASSERT(n < this->_size, "Out of memory, "+std::to_string(n)+" > "+std::to_string(this->_size)+"\n")
+        return this->data_h[n]; 
+    }
+
+    __host__ T&
+    operator[](int n) {
+        tkASSERT(n < this->_size, "Out of memory, "+std::to_string(n)+" > "+std::to_string(this->_size)+"\n")
+        return this->data_h[n]; 
     }
 };
 
