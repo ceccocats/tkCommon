@@ -112,7 +112,7 @@ VARS = [ {"name": "featureType_t", "type": "typedef std::string"},
          {"name": "FEATURES_NEAR_SCAN"   , "type": "static const featureType_t", "default": "\"f_near_scan\""},
          {"name":"points",   "type":"tk::math::Mat<float>"},
          {"name":"ranges",   "type":"tk::math::Mat<float>"},
-         {"name":"features", "type":"std::map<featureType_t, tk::math::Vec<float>>"}]
+         {"name":"features", "type":"tk::common::Map<tk::math::Vec<float>>"}]
 genData(className, VARS, DEPS)
 
 className = "ImageData_gen"

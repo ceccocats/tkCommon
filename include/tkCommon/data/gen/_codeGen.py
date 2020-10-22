@@ -135,7 +135,7 @@ def genData(className, VARS, DEPS = []):
 						cpp("$var$ = s.$var$;")
 				cpp("return *this;")
 
-			with cpp.block("friend std::ostream& operator<<(std::ostream& os, const $ClassName$& s)"):
+			with cpp.block("friend std::ostream& operator<<(std::ostream& os, $ClassName$& s)"):
 				cpp("os<<\"$ClassName$\"<<std::endl;")
 				cpp("os<<\"\theader.name:  \"<<s.header.name<<std::endl;")
 				cpp("os<<\"\theader.stamp: \"<<s.header.stamp<<std::endl;")

@@ -20,7 +20,7 @@ public:
         tf = s.tf;
         return *this;
     }
-    friend std::ostream& operator<<(std::ostream& os, const OdomData_gen& s)
+    friend std::ostream& operator<<(std::ostream& os, OdomData_gen& s)
     {
         os<<"OdomData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;

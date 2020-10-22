@@ -28,7 +28,7 @@ public:
         R = s.R;
         return *this;
     }
-    friend std::ostream& operator<<(std::ostream& os, const CalibData_gen& s)
+    friend std::ostream& operator<<(std::ostream& os, CalibData_gen& s)
     {
         os<<"CalibData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;

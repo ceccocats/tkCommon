@@ -271,6 +271,11 @@ public:
             memcpy( (void*)vec.data(), var->data, vec.size()*var->data_size);
             return true;
         }
+        template<typename T>
+        bool get(tk::common::Map<T> &map) {
+            tkFATAL("to impl");
+            return true;
+        }
 
 
         template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
@@ -303,6 +308,11 @@ public:
             release();
             size_t dim[2] = { 1, (size_t) vec.size() }; 
             var = Mat_VarCreate(name.c_str(), MAT_C_CHAR, MAT_T_INT8, 2, dim, (void*)vec.data(), 0);
+            return true;
+        }
+        template<typename T>
+        bool set(std::string name, tk::common::Map<T> &map) {
+            tkFATAL("to impl");
             return true;
         }
 
