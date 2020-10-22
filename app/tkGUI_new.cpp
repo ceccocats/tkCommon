@@ -29,7 +29,7 @@ void read_cloud(tk::data::CloudData& cloud) {
 
 	cloud.header.name = "LiDAR cloud";
 
-	cloud.features_map[tk::data::CloudData_gen::FEATURES_I] = 0;
+	cloud.features[tk::data::CloudData_gen::FEATURES_I] = tk::math::Vec<float>();
 
 	Eigen::MatrixXf points;
 	Eigen::MatrixXf intensity;
@@ -47,7 +47,7 @@ void read_cloud(tk::data::CloudData& cloud) {
 		cloud.lock();
 
 		cloud.points.copyFrom(points.data(),points.rows(),points.cols());
-		cloud.features.copyFrom(intensity.data(),intensity.rows(),intensity.cols());
+		cloud.features[tk::data::CloudData_gen::FEATURES_I].copyFrom(intensity.data(),intensity.rows(),intensity.cols());
 		//cloud.gammaCorrectionIntensity();
 
 		cloud.unlockWrite();

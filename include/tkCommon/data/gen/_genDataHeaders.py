@@ -89,6 +89,7 @@ genData(className, VARS, DEPS)
 
 className = "CloudData_gen"
 DEPS = ["#include \"tkCommon/math/Mat.h\"\n"]
+DEPS = ["#include \"tkCommon/math/Vec.h\"\n"]
 VARS = [ {"name": "featureType_t", "type": "typedef std::string"},
          {"name": "FEATURES_NONE"        , "type": "static const featureType_t", "default": "\"f_none\""},
          {"name": "FEATURES_I"           , "type": "static const featureType_t", "default": "\"f_intensity\""},
@@ -111,8 +112,7 @@ VARS = [ {"name": "featureType_t", "type": "typedef std::string"},
          {"name": "FEATURES_NEAR_SCAN"   , "type": "static const featureType_t", "default": "\"f_near_scan\""},
          {"name":"points",   "type":"tk::math::Mat<float>"},
          {"name":"ranges",   "type":"tk::math::Mat<float>"},
-         {"name":"features", "type":"tk::math::Mat<float>"},
-         {"name":"features_map", "type":"std::map<featureType_t, int>"} ]
+         {"name":"features", "type":"std::map<featureType_t, tk::math::Vec<float>>"}]
 genData(className, VARS, DEPS)
 
 className = "ImageData_gen"
