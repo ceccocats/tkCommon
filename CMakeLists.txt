@@ -154,6 +154,13 @@ foreach(app ${tkpackage_APPS})
     target_link_libraries(${app} tkCommon tkCommunication tkJoystick ${GUI_LIBS})
 endforeach()
 
+#-------------------------------------------------------------------------------
+# Build tests
+#-------------------------------------------------------------------------------
+file(GLOB tkpackage_TESTScpp "app/test/*.cpp")
+add_executable(tkTest "${tkpackage_TESTScpp}")
+target_link_libraries(tkTest tkCommon tkCommunication tkJoystick ${GUI_LIBS})
+
 
 #-------------------------------------------------------------------------------
 # Install
