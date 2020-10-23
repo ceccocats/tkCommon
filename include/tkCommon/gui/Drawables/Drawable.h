@@ -47,3 +47,4 @@ namespace tk{ namespace gui{
 		tk::gui::shader::generic*	shader;
 	};
 }}
+#include "tkCommon/gui/Viewer.h"

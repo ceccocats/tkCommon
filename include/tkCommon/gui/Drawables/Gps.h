@@ -12,33 +12,22 @@ namespace tk{ namespace gui{
             tk::data::GPSData* gps;
 
             int nPos;
-            static const int maxPos = 40;
-            tk::math::Mat<tk::gui::shader::circle*> circles;
-
-
-            /*static const int        lastPos = 40;
-            int                     nPos;
-            tk::gui::Buffer<float>  glbuffer[lastPos];
-
-            static const int circlePoints = 300;
-            tk::math::Mat<tk::gui::shader::linesMonocolor::line_color_t> points;
-            tk::math::Mat<tk::gui::shader::linesMonocolor::line_color_t> lines;*/
+            int lastPos;
+            tk::math::VecStatic<tk::gui::shader::circle*,40> circles;
 
             tk::common::GeodeticConverter geoConv;
 
-            float   lineSize = 2.0f;
-            float   radius;
-
-            bool update = false;
+            float lineSize = 2.0f;
+            bool  update = false;
 
         public:
             tk::gui::Color_t        color;
 
-            Gps(tk::data::GPSData* gps, int nPos = 10, float radius = 3.0f, tk::gui::Color_t color = tk::gui::color::RED){
+            Gps(tk::data::GPSData* gps, int nPos = 10, tk::gui::Color_t color = tk::gui::color::RED){
                 this->gps = gps;
                 this->color = color;  
-                this->radius = radius;
                 this->nPos = nPos;
+                this->lastPos = -1;
             }
 
             ~Gps(){
@@ -51,20 +40,8 @@ namespace tk{ namespace gui{
             }
 
             void onInit(tk::gui::Viewer *viewer){
-                /*shader = new tk::gui::shader::linesMonocolor();
-
-                lines.resize(1,circlePoints);
-                points.resize(1,lastPos);
-
-                for(int i = 0; i < lastPos; i++){
-                    glbuffer[i].init();
-                    points(0,i).x = 0;
-                    points(0,i).y = 0;
-                    points(0,i).z = 0;
-                }*/
-
-                for(int i = 0; i < maxPos; i++){
-                    circles(0,i) = new tk::gui::shader::circle();
+                for(int i = 0; i < circles.size(); i++){
+                    circles[i] = new tk::gui::shader::circle();
                 }
             }
 
@@ -73,55 +50,28 @@ namespace tk{ namespace gui{
                     update = false;
 
                     gps->lock();
-
                     if(!geoConv.isInitialised()) {
                         geoConv.initialiseReference(gps->lat,gps->lon,gps->heigth);
                     }
-
                     double x, y, z;
                     geoConv.geodetic2Enu(gps->lat,gps->lon,gps->heigth,&x, &y, &z);
+                    gps->unlockRead();
 
-                    // Shifting
-                    /*for(int i = lastPos-1; i > 0; i--){
-                        points(0,i) = points(0,i-1);
-                    }
-                    points(0,0).x = x;
-                    points(0,0).y = y;
-                    points(0,0).z = z;
-
-
-                    for(int j = 0; j < nPos; j++){
-                        for(int i = 0; i < circlePoints; i++){
-                            float angle = 2.0f * M_PI * (float)i/(float)circlePoints;
-                            lines(0,i).x = points(0,j).x + cos(angle) * radius;
-                            lines(0,i).y = points(0,j).y + sin(angle) * radius;
-                            lines(0,i).z = points(0,j).z;
-                        }
-                        glbuffer[j].setData((float*)lines.data_h,circlePoints*3);
-                    }
-                    gps->unlockRead();*/
+                    
+                    float RAGGIO = 2.0f; //TODO: BOSI
+                    lastPos = (lastPos+1) % nPos;
+                    circles[lastPos]->makeCircle(x,y,z,RAGGIO);                
                 }
 
-                tk::gui::shader::linesMonocolor* shaderLines = (tk::gui::shader::linesMonocolor*) shader;
-
-                tk::gui::Color_t col;
-                col.r() = color.r();
-                col.g() = color.g();
-                col.b() = color.b();
                 for(int i = 0; i < nPos; i++){
-                    col.a() = color.a() / (((float)i+1)*0.5);
-                    //shaderLines->draw(&glbuffer[i], glbuffer[i].size()/3, lineSize, col, GL_LINE_LOOP);
-                }
-                    	
+                    circles[i]->draw(color,lineSize);
+                }   	
             }
 
             void imGuiSettings(){
                 ImGui::ColorEdit4("Color", color.color);
                 ImGui::SliderFloat("Size",&lineSize,1.0f,20.0f,"%.1f");
-                /*if(ImGui::SliderInt("Last n pos",&nPos,1,lastPos)){
-                    update = true;
-                }
-                ImGui::SliderFloat("Radius",&radius,1.0f,40.0f,"%.1f");*/
+                ImGui::SliderInt("Last poses",&nPos,1,40);
             }
 
             void imGuiInfos(){
@@ -134,10 +84,12 @@ namespace tk{ namespace gui{
             void onClose(){
                 tk::gui::shader::linesMonocolor* shaderLines = (tk::gui::shader::linesMonocolor*) shader;
                 shaderLines->close();
-                /*for(int i = 0; i < lastPos; i++){
-                    glbuffer[i].release();
-                }*/
                 delete shader;
+
+                for(int i = 0; i < circles.size(); i++){
+                    circles[i]->close();
+                    delete circles[i];
+                }
             }
 
             std::string toString(){
