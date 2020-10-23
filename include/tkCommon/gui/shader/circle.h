@@ -12,6 +12,7 @@
 
 #include "tkCommon/gui/shader/generic.h"
 #include "tkCommon/gui/shader/linesMonocolor.h"
+#include "tkCommon/math/Vec.h"
 
 namespace tk { namespace gui { namespace shader {
 

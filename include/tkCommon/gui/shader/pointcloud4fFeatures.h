@@ -29,7 +29,7 @@ class pointcloud4fFeatures  : public tk::gui::shader::generic
         std::vector<std::string> colormaps;
 
         pointcloud4fFeatures(){
-            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloud4fFeatures.vert";
+            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloud4fFeaturesColMaps.vert";
             std::string vertexZ     = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloud4fFeaturesZ.vert";
             std::string geometry    = "";
 
