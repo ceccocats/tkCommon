@@ -21,7 +21,7 @@ public:
         frame = s.frame;
         return *this;
     }
-    friend std::ostream& operator<<(std::ostream& os, const CanData_gen& s)
+    friend std::ostream& operator<<(std::ostream& os, CanData_gen& s)
     {
         os<<"CanData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;

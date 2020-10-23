@@ -36,19 +36,15 @@ int main(int argc, char* argv[]){
         }
         TIMER_STOP(mapcxxInt)
 
+        // ASSERTS inside [] check make it slow 
         // tk implementation with string converted to int at compile time
         tk::common::Map<float> map;
         // tell the key -> string association
         // is not mandatory, but if we dont insert the key the Map cant retrive the original string
-        map.addKey("ciao1");
-        map.addKey("ciao2");
-        map.addKey("ciao3");
-        map.addKey("ciao4");
-        // insert
-        map[tkKey("ciao1")] = 0; 
-        map[tkKey("ciao2")] = 0;
-        map[tkKey("ciao3")] = 0;
-        map[tkKey("ciao4")] = 0;
+        map.add("ciao1");
+        map.add("ciao2");
+        map.add("ciao3");
+        map.add("ciao4");
         TIMER_START(tkMap)
         for(int i=0; i<limit; i++) {
             map[tkKey("ciao1")] = i*1;

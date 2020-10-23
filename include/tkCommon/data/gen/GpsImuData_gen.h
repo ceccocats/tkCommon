@@ -27,7 +27,7 @@ public:
         imu = s.imu;
         return *this;
     }
-    friend std::ostream& operator<<(std::ostream& os, const GpsImuData_gen& s)
+    friend std::ostream& operator<<(std::ostream& os, GpsImuData_gen& s)
     {
         os<<"GpsImuData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;

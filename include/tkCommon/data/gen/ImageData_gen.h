@@ -30,7 +30,7 @@ public:
         channels = s.channels;
         return *this;
     }
-    friend std::ostream& operator<<(std::ostream& os, const ImageData_gen& s)
+    friend std::ostream& operator<<(std::ostream& os, ImageData_gen& s)
     {
         os<<"ImageData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;

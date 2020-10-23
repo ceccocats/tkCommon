@@ -1,12 +1,51 @@
 #include "tkCommon/catch2/catch.hpp"
-unsigned int Factorial( unsigned int number ) {
-    return number > 1 ? Factorial(number-1)*number : 1;
-}
+#include "tkCommon/math/Mat.h"
 
-TEST_CASE( "Factorials are computed", "[factorial]" ) {
-    REQUIRE( Factorial(0) == 1 ); 
-    REQUIRE( Factorial(1) == 1 );
-    REQUIRE( Factorial(2) == 2 );
-    REQUIRE( Factorial(3) == 6 );
-    REQUIRE( Factorial(10) == 3628800 );
+TEST_CASE("Test mat class") {
+    tk::math::Mat<float> mat;
+    mat.resize(4, 3);
+
+    SECTION("resizing changes rows, cols and size") {
+        REQUIRE(mat.rows() == 4);
+        REQUIRE(mat.cols() == 3);
+        REQUIRE(mat.size() == (mat.rows() * mat.cols()));
+    }
+
+    SECTION("Accessing out of matrix rise an exception") {
+        REQUIRE_THROWS(mat(7, 2));
+        REQUIRE_THROWS(mat(-5, 2));
+        REQUIRE_THROWS(mat(3, -2222));
+        REQUIRE_THROWS(mat(2, 66));
+    }
+
+    SECTION("Copy to gpu") {
+        mat(1, 2) = 5.0f;
+        mat.synchGPU();
+        mat.synchCPU();
+        REQUIRE(mat(1, 2) == 5.0f);
+    }
+
+    SECTION("Fill matrix") {
+        float value = 10.0f;
+        mat.fill(value);
+
+        for (int i = 0; i < mat.rows(); i++) {
+            for (int j = 0; j < mat.cols(); j++) {
+                REQUIRE(mat(i, j) == Approx(value));
+            }
+        }
+    }
+
+    SECTION("Operator =") {
+        mat.resize(2, 2);
+        mat.set({40.0f, 10.0f, 25.0f, 33.0f});
+        tk::math::Mat<float> mat2;
+        mat2 = mat;
+
+        for (int i = 0; i < mat.rows(); i++) {
+            for (int j = 0; j < mat.cols(); j++) {
+                REQUIRE(mat(i, j) == mat2(i, j));
+            }
+        }
+    }
 }

@@ -46,12 +46,7 @@ namespace tk{ namespace gui{
                 
                 //use feature ONLY I NOWWWWW
                 }else{
-
-                    if(cloud->features.count(tk::data::CloudData::FEATURES_I) == 0){
-                            tkFATAL("Error\n");
-                            return;
-                    }
-                    tk::math::Vec<float> *f = &cloud->features[tk::data::CloudData::FEATURES_I];
+                    const tk::math::Vec<float> *f = &cloud->features[tk::data::CloudData::FEATURES_I];
 
                     for(int i = 0; i < f->size(); i++){
                         float value = f->data_h[i];/////////////////////For now I
@@ -146,16 +141,14 @@ namespace tk{ namespace gui{
                    update = false;
 
                     int i = 3;
-                    for (auto const& f : cloud->features){
-                        useFeatures[i] = f.first.c_str();
+                    for (auto const& f : cloud->features.keys()){
+                        useFeatures[i] = f.c_str();
                         i++;
                         nFeatures = i;
                     }
 
-                    if(cloud->features.count(tk::data::CloudData::FEATURES_I) == 0){
-                            tkFATAL("Error\n");
-                    }
-                    tk::math::Vec<float> *f = &cloud->features[tk::data::CloudData::FEATURES_I];
+
+                    const tk::math::Vec<float> *f = &cloud->features[tk::data::CloudData::FEATURES_I];
 
                     cloud->lock();
                     glbuffer.setData(cloud->points.data_h,cloud->points.size());

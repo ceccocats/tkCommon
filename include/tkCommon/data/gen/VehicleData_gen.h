@@ -117,7 +117,7 @@ public:
         odom = s.odom;
         return *this;
     }
-    friend std::ostream& operator<<(std::ostream& os, const VehicleData_gen& s)
+    friend std::ostream& operator<<(std::ostream& os, VehicleData_gen& s)
     {
         os<<"VehicleData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;

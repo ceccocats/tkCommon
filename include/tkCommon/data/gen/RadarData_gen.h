@@ -25,7 +25,7 @@ public:
         far = s.far;
         return *this;
     }
-    friend std::ostream& operator<<(std::ostream& os, const RadarData_gen& s)
+    friend std::ostream& operator<<(std::ostream& os, RadarData_gen& s)
     {
         os<<"RadarData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;
