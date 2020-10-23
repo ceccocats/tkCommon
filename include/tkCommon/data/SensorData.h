@@ -27,8 +27,6 @@ namespace tk { namespace data {
          */
         virtual void release() { clsErr("release method not implemented"); tkFATAL("abort"); };
 
-        virtual bool checkDimension(SensorData *s) { clsErr("check dimension method not implemented"); tkFATAL("abort"); };
-
         /**
          * @brief Overloading of operator =
          * Copy only the header.
@@ -37,8 +35,7 @@ namespace tk { namespace data {
          * @return
          */
         SensorData& operator=(const SensorData &s) {
-            tkASSERT(checkDimension((SensorData*)&s));
-            this->header        = s.header;
+            this->header = s.header;
             return *this;
         }
 

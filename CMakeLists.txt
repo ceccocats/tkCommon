@@ -94,7 +94,8 @@ target_link_libraries(tkGUI ${GUI_LIBS})
 add_library(tkCommon SHARED
     src/common.cpp
     src/version.cpp
-    src/CmdParser.cpp    
+    src/CmdParser.cpp 
+    include/tkCommon/data/gen/CloudData_gen.cpp   
 )
 target_link_libraries(tkCommon tkGUI yaml-cpp matio dl)
 
@@ -158,8 +159,8 @@ endforeach()
 # Build tests
 #-------------------------------------------------------------------------------
 file(GLOB tkpackage_TESTScpp "app/test/*.cpp")
-add_executable(tkTest "${tkpackage_TESTScpp}")
-target_link_libraries(tkTest tkCommon tkCommunication tkJoystick ${GUI_LIBS})
+add_executable(tkCommon_test "${tkpackage_TESTScpp}")
+target_link_libraries(tkCommon_test tkCommon tkCommunication tkJoystick ${GUI_LIBS})
 
 
 #-------------------------------------------------------------------------------
