@@ -147,7 +147,7 @@ namespace tk{ namespace gui{
                         nFeatures = i;
                     }
 
-                    const tk::math::Vec<float> *f = &cloud->features[tk::data::CloudData::FEATURES_I];
+                    //const tk::math::Vec<float> *f = &cloud->features[tk::data::CloudData::FEATURES_I];
 
                     cloud->lock();
                     glbuffer.setData(cloud->points.data_h,cloud->points.size());
