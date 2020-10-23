@@ -87,7 +87,7 @@ int main(){
 	viewer->add(new tk::gui::Axis());
 	viewer->add(new tk::gui::Mesh(std::string(tkCommon_PATH) + "data/levante.obj"));
 	viewer->add(new tk::gui::Cloud4f(&cloud));
-	//viewer->add(new tk::gui::Gps(&gps));
+	viewer->add(new tk::gui::Gps(&gps));
 	viewer->add(plt);
 
 	read_cloud(cloud);

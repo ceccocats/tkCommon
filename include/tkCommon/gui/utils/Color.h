@@ -3,7 +3,7 @@
 
 namespace tk { namespace gui {
 
-    struct Color_t{
+    class Color_t{
         public:
             float color[4];
             void set(float r, float g, float b, float a){

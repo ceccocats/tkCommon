@@ -147,14 +147,13 @@ namespace tk{ namespace gui{
                         nFeatures = i;
                     }
 
-
                     const tk::math::Vec<float> *f = &cloud->features[tk::data::CloudData::FEATURES_I];
 
                     cloud->lock();
                     glbuffer.setData(cloud->points.data_h,cloud->points.size());
-                    if(selectedColorMap != 0 && useFeatureN > 2){
+                    /*if(selectedColorMap != 0 && useFeatureN > 2){
                         glbuffer.setData(f->data_h, f->size(), cloud->points.size());
-                    }
+                    }*/
                     cloud->unlockRead();
                     minMaxFeatures();
                 }
@@ -165,7 +164,7 @@ namespace tk{ namespace gui{
                     shCloudColor->draw(&glbuffer, cloud->points.size()/4,color);
                 }else{
                     if(useFeatureN > 2){
-                        shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1],&glbuffer, glbuffer.size()/5,min,max,0);
+                        //shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1],&glbuffer, glbuffer.size()/5,min,max,0);
                     }else{
                         if(useFeatureN == 0) //Drawing x
                             shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1],&glbuffer, cloud->points.cols(),min,max,1);
