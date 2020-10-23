@@ -25,12 +25,12 @@ class Mat : public tk::math::MatDump {
 
     protected:
         const float MAXSIZE_MARGIN = 1.5f;
-        int     _maxSize = 0;
-        int     _maxSizeGPU = 0;
-        int     _rows = 0;
-        int     _cols = 0;
-        int     _size = 0;
-        bool    _gpu  = false;
+        int     _maxSize;
+        int     _maxSizeGPU;
+        int     _rows;
+        int     _cols;
+        int     _size;
+        bool    _gpu;
 
     public:
         T*      data_d;
@@ -40,6 +40,12 @@ class Mat : public tk::math::MatDump {
         Mat(){
             data_d = nullptr;
             data_h = nullptr;
+            _maxSize = 0;
+            _maxSizeGPU = 0;
+            _rows = 0;
+            _cols = 0;
+            _size = 0;
+            _gpu  = false;
         }
 
         __host__

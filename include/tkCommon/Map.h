@@ -56,8 +56,9 @@ namespace tk { namespace common {
             return _keys;
         }
         friend std::ostream& operator<<(std::ostream& os, Map& s) {
+            std::cout<<"KeyMap:\n";
             for(int i=0; i<s.size(); i++) {
-                os<<s.keys()[i]<<" "<<s[s.keys()[i]]<<"\n";
+                os<<i<<": "<<s.keys()[i]<<" "<<s[s.keys()[i]]<<"\n";
             }
             return os;
         }

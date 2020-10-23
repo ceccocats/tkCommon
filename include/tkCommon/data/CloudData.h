@@ -13,8 +13,8 @@ namespace tk { namespace data {
 
         void print() {
             points.print();
-            const auto k = features.keys();
-            const auto f = features.vals();
+            const auto &k = features.keys();
+            const auto &f = features.vals();
             for(int i=0; i<f.size(); i++) {
                 std::cout<<k[i]<<":\n";
                 f[i]->print();
