@@ -9,7 +9,6 @@ out float feature;
 
 void main(){
 
-	// write point
     feature    		= featurePoint;
 	gl_Position 	= modelview * vec4(point.xyz, 1.0);
 }
