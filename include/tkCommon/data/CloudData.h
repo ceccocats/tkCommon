@@ -11,6 +11,60 @@ namespace tk { namespace data {
         
         public:
 
+        void print() {
+            points.print();
+            const auto k = features.keys();
+            const auto f = features.vals();
+            for(int i=0; i<f.size(); i++) {
+                std::cout<<k[i]<<":\n";
+                f[i]->print();
+            }
+        }
+
+        void resize(int n) {
+            points.resize(4, n);
+            const auto fts = features.vals();
+            for(int i=0; i<fts.size(); i++) {
+                fts[i]->resize(n);
+            }
+        }
+
+        int pointsN() {
+            return points.cols();
+        }
+
+        bool checkConsistency() {
+            int n = pointsN();
+            if(n>0 && points.rows() != 4) return false;
+            if(n != points.cols()) return false;
+            for(int i=0; i<features.vals().size(); i++) {
+                if(features.vals()[i]->size() != n)
+                    return false;
+            }
+            return true;
+        }
+
+        /**
+         *  WARING: slow do not use in performance loop
+         */
+        void setPoint(int pos, tk::math::Vec3f pt) {
+            points(0, pos) = pt.x();
+            points(1, pos) = pt.y();
+            points(2, pos) = pt.z();
+            points(3, pos) = 1;
+        }
+        /**
+         *  WARING: slow do not use in performance loop
+         */
+        void setFeature(int pos, featureType_t f, float val) {
+            features[f][pos] = val;
+        }
+
+        void addFeature(featureType_t f) {
+            features.add(f);
+            features[f].resize(pointsN());
+        }
+
         void gammaCorrectionIntensity(){
 
             if(features.size() == 0){

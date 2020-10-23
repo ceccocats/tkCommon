@@ -220,7 +220,7 @@ class Mat : public tk::math::MatDump {
         print() {
             for(int i = 0; i < rows(); ++i) {
                 std::cout << std::endl;
-                for(int j = 0; j < rows(); ++j) {
+                for(int j = 0; j < cols(); ++j) {
                     std::cout << std::right << std::setw(20) << data_h[i+j*rows()];
                 }
             }

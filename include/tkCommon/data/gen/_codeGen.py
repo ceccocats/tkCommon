@@ -172,15 +172,31 @@ def genData(className, VARS, DEPS = []):
 
 
 		cpp("")
-		for var in VARS:
-			if(isVarStatic(var["type"]) and "default" in var):
-				tp = (var["type"][len("static"):]).split(" ")
-				tp.insert(-1, " "+className +"::")
-				tp = "".join(tp)
-				with cpp.subs(type=tp, var=var["name"], default=var["default"]):
-					cpp("$type$ $ClassName$::$var$ = $default$;")
-		cpp("")
 	cpp("\n}}")
 
 	cpp.close()
 
+	genCPP = False
+	for var in VARS:
+		if(isVarStatic(var["type"]) and "default" in var):
+			genCPP = True
+	if(genCPP):
+
+		print("[....] Generating CPP: ", className)
+		cpp = CppFile(className + ".cpp")
+		with cpp.subs(ClassName=className):
+
+			cpp("// this file is generated DO NOT DIRECTLY MODIFY")
+			cpp("#include \"tkCommon/data/gen/$ClassName$.h\"")
+			cpp("")
+			cpp("namespace tk { namespace data {\n")
+			for var in VARS:
+				if(isVarStatic(var["type"]) and "default" in var):
+					tp = (var["type"][len("static"):]).split(" ")
+					tp.insert(-1, " "+className +"::")
+					tp = "".join(tp)
+					with cpp.subs(type=tp, var=var["name"], default=var["default"]):
+						cpp("$type$ $ClassName$::$var$ = $default$;")
+			cpp("")
+			cpp("\n}}")
+		cpp.close()

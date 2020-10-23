@@ -155,4 +155,14 @@ public:
     T& w(){return this->data_h[3];}
 };
 
+
+typedef Vec2<double> Vec2d;
+typedef Vec3<double> Vec3d;
+typedef Vec4<double> Vec4d;
+
+typedef Vec2<float> Vec2f;
+typedef Vec3<float> Vec3f;
+typedef Vec4<float> Vec4f;
+
+
 }}
