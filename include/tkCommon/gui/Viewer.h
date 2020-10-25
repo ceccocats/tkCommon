@@ -34,7 +34,7 @@ namespace tk { namespace gui {
         float getWidth();
         float getHeight();
 
-        static Viewer* getIstance(){
+        static Viewer* getInstance(){
              if (Viewer::instance == nullptr) {
                 Viewer::instance = new Viewer();
             }

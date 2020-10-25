@@ -8,6 +8,7 @@ find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glfw3 3 REQUIRED)
 find_library(GLFW3_LIBRARY NAMES glfw3 glfw)
+find_package(ROS QUIET)
 
 find_package(Freetype REQUIRED)
 
@@ -16,6 +17,7 @@ set(tkCommon_INCLUDE_DIRS
     ${GLEW_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
     ${FREETYPE_INCLUDE_DIRS}
+    ${ROS_INCLUDE_DIRS}
 )
 
 set(tkCommon_LIBRARIES 
@@ -32,6 +34,7 @@ set(tkCommon_LIBRARIES
     ${FREETYPE_LIBRARIES}
     matio
     tkJoystick
+    ${ROS_LIBRARIES}
 )
 
 set(tkCommon_FOUND true)

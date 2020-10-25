@@ -15,7 +15,7 @@
 
 
 tk::data::GPSData	gps;
-tk::gui::Viewer* 	viewer = tk::gui::Viewer::getIstance();
+tk::gui::Viewer* 	viewer = tk::gui::Viewer::getInstance();
 
 void read_cloud(tk::data::CloudData& cloud) {
 

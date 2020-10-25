@@ -33,6 +33,9 @@ find_library(GLFW3_LIBRARY NAMES glfw3 glfw)
 find_package(Freetype REQUIRED)
 include_directories(${FREETYPE_INCLUDE_DIRS})
 
+find_package(ROS QUIET)
+include_directories(${ROS_INCLUDE_DIRS})
+
 set(GUI_LIBS
     ${OPENGL_gl_LIBRARY}
     ${OPENGL_glu_LIBRARY}
@@ -51,11 +54,6 @@ set(GUI_LIBS
 #-------------------------------------------------------------------------------
 # Generate Data Headers
 #-------------------------------------------------------------------------------
-#add_custom_target(tkdataheaders_gen 
-#    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen
-#    COMMAND python3 _genDataHeaders.py)
-
-# definition of fidl_list
 add_custom_command(OUTPUT 
         ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/GpsData_gen.h
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen
@@ -63,6 +61,9 @@ add_custom_command(OUTPUT
     COMMAND python3 _genDataHeaders.py)
 add_custom_target(tkdataheaders_gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/GpsData_gen.h)
 
+#-------------------------------------------------------------------------------
+# Generate shaders colorsmaps
+#-----------------------------------------------------------------------------
 add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/shader/colormaps/*
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/shader/glsl/pointcloudFrag
     COMMAND python3 _colormapsGen.py)
