@@ -375,6 +375,7 @@ Viewer::runloop() {
         yLim = 1.0;
 
         initDrawables();
+        beforeDraw();
         follow();
         
         camera.setViewPort(0, 0, width, height);

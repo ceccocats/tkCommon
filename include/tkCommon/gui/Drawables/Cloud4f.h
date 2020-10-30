@@ -11,15 +11,11 @@ namespace tk{ namespace gui{
         private:
             tk::data::CloudData*    cloud;
             tk::gui::Buffer<float>  glbuffer;
-            float                   pointSize = 1.0f;
-            bool                    update;
 
             static const int    maxItems = 30;
             int                 nItems;
             const char*         items[maxItems];
-            int                 selectedColorMap = 0;
 
-            int         useFeatureN;
             int         nFeatures;
             const char* useFeatures[maxItems];
 
@@ -30,7 +26,6 @@ namespace tk{ namespace gui{
             std::string axisy = "axis y";
             std::string axisz = "axis z";
 
-            float  min, max;
             void minMaxFeatures(){
                 min = 99999;
                 max = -99999;
@@ -58,7 +53,14 @@ namespace tk{ namespace gui{
             }
 
         public:
+
+            // imgui settings
+            bool                    update;
             tk::gui::Color_t        color;
+            float  pointSize        = 1.0f;
+            int    selectedColorMap = 0;
+            int    useFeatureN;
+            float  min, max;
 
             /**
              * @brief Construct a new Cloud 4f using one color
@@ -164,14 +166,14 @@ namespace tk{ namespace gui{
                     shCloudColor->draw(&glbuffer, cloud->points.size()/4,color);
                 }else{
                     if(useFeatureN > 2){
-                        //shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1],&glbuffer, glbuffer.size()/5,min,max,0);
+                        //shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1],&glbuffer, glbuffer.size()/5,min,max,0,color.a());
                     }else{
                         if(useFeatureN == 0) //Drawing x
-                            shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1],&glbuffer, cloud->points.cols(),min,max,1);
+                            shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1],&glbuffer, cloud->points.cols(),min,max,1,color.a());
                         if(useFeatureN == 1) //Drawing y
-                            shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1],&glbuffer, cloud->points.cols(),min,max,2);
+                            shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1],&glbuffer, cloud->points.cols(),min,max,2,color.a());
                         if(useFeatureN == 2) //Drawing z
-                            shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1],&glbuffer, cloud->points.cols(),min,max,3);
+                            shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1],&glbuffer, cloud->points.cols(),min,max,3,color.a());
                     }
                     
                 }
@@ -180,12 +182,13 @@ namespace tk{ namespace gui{
 
             void imGuiSettings(){
                 ImGui::SliderFloat("Size",&pointSize,1.0f,20.0f,"%.1f");
+                ImGui::SliderFloat("Alpha",&color.a(),0,1.0f,"%.1f");
                 if(ImGui::Combo("Color maps", &selectedColorMap, items, nItems)){
                     update = true;
                 }
 
                 if(selectedColorMap == 0){
-                    ImGui::ColorEdit4("Color", color.color);
+                    ImGui::ColorEdit3("Color", color.color);
                 }else{
                     if(ImGui::Combo("feature", &useFeatureN, useFeatures, nFeatures)){
                         update = true;

@@ -29,12 +29,12 @@ namespace tk { namespace data {
             }
         }
 
-        int pointsN() {
+        int size() {
             return points.cols();
         }
 
         bool checkConsistency() {
-            int n = pointsN();
+            int n = size();
             if(n>0 && points.rows() != 4) return false;
             if(n != points.cols()) return false;
             for(int i=0; i<features.vals().size(); i++) {
@@ -62,7 +62,7 @@ namespace tk { namespace data {
 
         void addFeature(featureType_t f) {
             features.add(f);
-            features[f].resize(pointsN());
+            features[f].resize(size());
         }
 
         void gammaCorrectionIntensity(){

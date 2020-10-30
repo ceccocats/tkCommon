@@ -4,24 +4,32 @@
 namespace tk { namespace gui {
 
     class Color_t{
-        public:
-            float color[4];
-            void set(float r, float g, float b, float a){
-                color[0] = r;
-                color[1] = g;
-                color[2] = b;
-                color[3] = a;
-            }
-            void set(uint8_t r, uint8_t g, uint8_t b, uint8_t a){
-                color[0] = r/255.0f;
-                color[1] = g/255.0f;
-                color[2] = b/255.0f;
-                color[3] = a/255.0f;
-            }
-            float& r() {return color[0];}
-            float& g() {return color[1];}
-            float& b() {return color[2];}
-            float& a() {return color[3];}
+    public:
+        float color[4];
+        void set(float r, float g, float b, float a){
+            color[0] = r;
+            color[1] = g;
+            color[2] = b;
+            color[3] = a;
+        }
+        void set(uint8_t r, uint8_t g, uint8_t b, uint8_t a){
+            color[0] = r/255.0f;
+            color[1] = g/255.0f;
+            color[2] = b/255.0f;
+            color[3] = a/255.0f;
+        }
+        float& r() {return color[0];}
+        float& g() {return color[1];}
+        float& b() {return color[2];}
+        float& a() {return color[3];}
+
+        Color_t &operator=(const Color_t &c) {
+            color[0] = c.color[0];
+            color[1] = c.color[1];
+            color[2] = c.color[2];
+            color[3] = c.color[3];
+            return *this;
+        }
     };
 
 

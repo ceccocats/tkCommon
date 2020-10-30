@@ -68,7 +68,7 @@ class pointcloud4fFeatures  : public tk::gui::shader::generic
 
         }
 
-        void draw(std::string name, tk::gui::Buffer<float>* buffer, int n, float min, float max, int useAxis = 0){
+        void draw(std::string name, tk::gui::Buffer<float>* buffer, int n, float min, float max, int useAxis = 0, float alpha = 1.0){
 
 		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
 
@@ -82,6 +82,7 @@ class pointcloud4fFeatures  : public tk::gui::shader::generic
                 shaders[name]->setMat4("modelview",modelview);
                 shaders[name]->setFloat("minFeature",min);
                 shaders[name]->setFloat("maxFeature",max);
+                shaders[name]->setFloat("alpha",alpha);
 
                 buffer->use();
                 glDrawArrays(GL_POINTS, 0, n);
@@ -98,6 +99,7 @@ class pointcloud4fFeatures  : public tk::gui::shader::generic
                 shadersZ[name]->setMat4("modelview",modelview);
                 shadersZ[name]->setFloat("minFeature",min);
                 shadersZ[name]->setFloat("maxFeature",max);
+                shadersZ[name]->setFloat("alpha",alpha);
                 shadersZ[name]->setInt("axis",useAxis);
 
                 buffer->use();

@@ -27,12 +27,14 @@ def createFragShader(filename, header):
 
 		"in float feature;\n\n"+
 
+		"uniform float alpha;\n"+
 		"uniform float minFeature;\n"+
 		"uniform float maxFeature;\n\n"+
 
 		"void main(){\n"+
 		"\tfloat value\t= (feature - minFeature) / (maxFeature - minFeature);\n"+
 		"\tFragColor\t= colormap(value);\n"+
+		"\tFragColor.a\t= alpha;\n"+
 		"}\n"
 	)
 	f.close()

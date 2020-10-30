@@ -43,6 +43,10 @@ namespace tk { namespace gui {
 
         glm::vec3 getLightPos();
 
+        void setBackground(tk::gui::Color_t col) {
+            background = col;
+        }
+
     private:
         
         Viewer();
