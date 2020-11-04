@@ -17,6 +17,10 @@ namespace tk { namespace data {
          */
         Eigen::MatrixXf laserID;
 
+        /**
+         *  Laser ID
+         */
+        Eigen::MatrixXf time;
 
         /**
          * @brief ID matrix
@@ -38,11 +42,13 @@ namespace tk { namespace data {
             this->points.resize(4,CLOUD_MAX_POINTS);
             this->intensity.resize(1,CLOUD_MAX_POINTS);
             this->laserID.resize(1,CLOUD_MAX_POINTS);
+            this->time.resize(1,CLOUD_MAX_POINTS);
             this->idMatrix.resize(0,0);
 
             this->points.setZero();
             this->intensity.setZero();
             this->laserID.setZero();
+            this->time.setZero();
             this->idMatrix.setZero();
 
             header.sensor = sensorName::LIDAR;
@@ -87,6 +93,7 @@ namespace tk { namespace data {
             this->points.resize(0,0);
             this->intensity.resize(0,0);
             this->laserID.resize(0,0);
+            this->time.resize(0,0);
             this->idMatrix.resize(0,0);            
         }
         /**
@@ -101,6 +108,7 @@ namespace tk { namespace data {
             this->points    = s.points;
             this->intensity = s.intensity;
             this->laserID   = s.laserID;
+            this->time      = s.time;
             return *this;
         }
 
