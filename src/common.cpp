@@ -37,6 +37,15 @@ namespace tk { namespace common {
         return isometry;
     }
 
+    Tfpose odom2tf(float x, float y, float z, float qx, float qy, float qz, float qw) {
+        Eigen::Quaternionf quat(qx, qy, qz, qw);
+        Tfpose isometry = Eigen::Isometry3f::Identity();
+        isometry.linear() = quat.toRotationMatrix();
+        isometry.translation() = Eigen::Vector3f(x, y, z) ;
+        return isometry;
+    }
+
+
     bool readOdom(std::ifstream &is, Tfpose &out, uint64_t &stamp) {
 
         float x, y, yaw;
