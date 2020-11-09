@@ -163,7 +163,7 @@ namespace tk{ namespace gui{
                 tk::gui::shader::pointcloud4fFeatures* shaderCloud = (tk::gui::shader::pointcloud4fFeatures*) shader;
                 glPointSize(pointSize);
                 if(selectedColorMap == 0){
-                    shCloudColor->draw(&glbuffer, cloud->points.size()/4,color);
+                    shCloudColor->draw(&glbuffer, glbuffer.size()/4,color);
                 }else{
                     if(useFeatureN > 2){
                         //shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1],&glbuffer, glbuffer.size()/5,min,max,0,color.a());
