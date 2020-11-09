@@ -4,7 +4,7 @@
 
 int main(int argc, char* argv[]){
 
-    for(int limit = 1e4; limit < 1e9; limit*=10) {
+    for(int limit = 1e4; limit < 1e7; limit*=10) {
 
         // c++ implementation with string Key 
         std::map<std::string, float> mapcxx;

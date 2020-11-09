@@ -2,6 +2,7 @@
 
 namespace tk { namespace gui {
 Viewer* Viewer::instance = nullptr;
+bool Viewer::disabled = false;
 
 Viewer::Viewer(){
 
@@ -14,7 +15,7 @@ Viewer::~Viewer(){
 
 void 
 Viewer::start(bool useImGUI){
-    if(disabled) {
+    if(Viewer::disabled) {
         running = true;
         glThread.init(fake_run,Viewer::instance);
         return;
