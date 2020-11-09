@@ -1,6 +1,8 @@
 #include "tkCommon/CmdParser.h"
 #include "tkCommon/argh.h"
 
+#include "tkCommon/gui/Viewer.h"
+
 namespace tk { namespace common {
 
 CmdParser::CmdParser(char **argv, std::string info) {
@@ -10,6 +12,10 @@ CmdParser::CmdParser(char **argv, std::string info) {
 
     // add help opt
     addBoolOpt("-h", "print help");
+
+    // viewer opts
+    bool noviz = addBoolOpt("-noviz", "disable viewer output");
+    tk::gui::Viewer::getInstance()->setDisabled(noviz);
 }
 
 void CmdParser::setGeneralInfo(std::string info) {

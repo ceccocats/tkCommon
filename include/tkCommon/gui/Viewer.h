@@ -46,6 +46,10 @@ namespace tk { namespace gui {
         void setBackground(tk::gui::Color_t col) {
             background = col;
         }
+        
+        void setDisabled(bool set) {
+            disabled = set;
+        }
 
     private:
         
@@ -54,6 +58,7 @@ namespace tk { namespace gui {
         void  initDrawables();
 
         static void* run(void* istance);
+        static void* fake_run(void* istance);
         void  runloop();
 
         void  beforeDraw();
@@ -87,6 +92,7 @@ namespace tk { namespace gui {
         int     imguiSelected = -1;
 
         bool    running = false;
+        bool    disabled = false;
 
         Camera      camera;
 
