@@ -96,6 +96,7 @@ add_library(tkCommon SHARED
     src/common.cpp
     src/version.cpp
     src/CmdParser.cpp 
+    src/rt/Profiler.cpp
     include/tkCommon/data/gen/CloudData_gen.cpp   
 )
 target_link_libraries(tkCommon tkGUI yaml-cpp matio dl)

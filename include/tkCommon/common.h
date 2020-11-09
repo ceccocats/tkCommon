@@ -105,6 +105,19 @@ namespace tk { namespace common {
 
 
     /**
+     * Convert odometry to TfPose
+     * @param x   translation forward
+     * @param y   translation sideways
+     * @param z   translation upward
+     * @param qx  rotation quaternion x 
+     * @param qy  rotation quaternion y 
+     * @param qz  rotation quaternion z 
+     * @param qw  rotation quaternion w 
+     * @return transform
+     */
+    Tfpose odom2tf(float x, float y, float z, float qx, float qy, float qz, float qw);
+
+    /**
      * Rect [ x y w h ]
      * @tparam T
      */

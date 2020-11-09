@@ -14,6 +14,12 @@ Viewer::~Viewer(){
 
 void 
 Viewer::start(bool useImGUI){
+    if(disabled) {
+        running = true;
+        glThread.init(fake_run,Viewer::instance);
+        return;
+    }
+
     if(running == false){
         running = true;
         this->useImGUI=useImGUI;
@@ -50,6 +56,14 @@ Viewer::run(void* istance){
     viewer->init();
 
     viewer->runloop();
+}
+
+void* 
+Viewer::fake_run(void* istance){
+    Viewer* viewer = (Viewer*)istance;
+    while (viewer->isRunning()) {
+        sleep(100);
+    }
 }
 
 float 
