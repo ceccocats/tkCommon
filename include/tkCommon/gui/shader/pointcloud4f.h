@@ -25,7 +25,7 @@ class pointcloud4f  : public tk::gui::shader::generic
 
     public:
         pointcloud4f(){
-            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloud3f.vert";
+            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloud.vert";
             std::string geometry    = "";
             std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloudFrag/pointcloudFrag_uniformColor.frag";
             

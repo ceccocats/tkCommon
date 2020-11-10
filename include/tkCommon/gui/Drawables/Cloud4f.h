@@ -157,6 +157,7 @@ namespace tk{ namespace gui{
                         glbuffer.setData(f->data_h, f->size(), cloud->points.size());
                     }*/
                     cloud->unlockRead();
+                    this->tf = cloud->header.tf;
                     minMaxFeatures();
                 }
 
