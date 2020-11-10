@@ -14,7 +14,7 @@ CmdParser::CmdParser(char **argv, std::string info) {
     addBoolOpt("-h", "print help");
 
     // viewer opts
-    tk::gui::Viewer::disabled = addBoolOpt("-noviz", "disable viewer output");
+    //tk::gui::Viewer::disabled = addBoolOpt("-noviz", "disable viewer output");
 }
 
 void CmdParser::setGeneralInfo(std::string info) {
