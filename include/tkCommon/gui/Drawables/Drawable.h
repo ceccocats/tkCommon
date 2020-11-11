@@ -15,6 +15,8 @@ namespace tk{ namespace gui{
 		bool enabled = true;
 		bool follow = false;
 
+		bool update;
+
 		tk::common::Tfpose tf = tk::common::Tfpose::Identity();
 
 		/** init method */

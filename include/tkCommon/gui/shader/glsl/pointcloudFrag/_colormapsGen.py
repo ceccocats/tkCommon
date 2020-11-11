@@ -41,7 +41,7 @@ def createFragShader(filename, header):
 	print("[....] Generating "+filename)
 
 path = "../colormaps/"
-filename = "pointcloudFrag"
+filename = "pointcloud"
 
 from os import listdir
 from os.path import isfile, join
