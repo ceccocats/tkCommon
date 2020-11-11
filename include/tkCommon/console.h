@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <execinfo.h>
 #include <typeinfo>
@@ -10,10 +11,10 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#define tkMSG(...) { std::stringstream os; os<<__VA_ARGS__; tk::console::Console::getInstance().log(tk::console::LogLevel::INFO,  __PRETTY_FUNCTION__, os);}
-#define tkWRN(...) { std::stringstream os; os<<__VA_ARGS__; tk::console::Console::getInstance().log(tk::console::LogLevel::WARN,  __PRETTY_FUNCTION__, os);}
-#define tkDBG(...) { std::stringstream os; os<<__VA_ARGS__; tk::console::Console::getInstance().log(tk::console::LogLevel::DEBUG, __PRETTY_FUNCTION__, os);}
-#define tkERR(...) { std::stringstream os; os<<__VA_ARGS__; tk::console::Console::getInstance().log(tk::console::LogLevel::ERROR, __PRETTY_FUNCTION__, os);}
+#define tkMSG(...) { std::stringstream os; os<<__VA_ARGS__; tk::console::Console::get().log(tk::console::LogLevel::INFO,  __PRETTY_FUNCTION__, os.str());}
+#define tkWRN(...) { std::stringstream os; os<<__VA_ARGS__; tk::console::Console::get().log(tk::console::LogLevel::WARN,  __PRETTY_FUNCTION__, os.str());}
+#define tkDBG(...) { std::stringstream os; os<<__VA_ARGS__; tk::console::Console::get().log(tk::console::LogLevel::DEBUG, __PRETTY_FUNCTION__, os.str());}
+#define tkERR(...) { std::stringstream os; os<<__VA_ARGS__; tk::console::Console::get().log(tk::console::LogLevel::ERROR, __PRETTY_FUNCTION__, os.str());}
 
 namespace tk { namespace console {
     /**
@@ -60,26 +61,72 @@ namespace tk { namespace console {
     class Console
     {
     private:
+        /**
+         * 
+         */
         Console() {
-            verbosity = LogLevel::DEBUG;
+            verbosity       = LogLevel::DEBUG;
+            startStrFormat  = "\033[";
+            endStrFormat    = "\033[0m";
+            fileLogEnabled  = false;
         }
 
-        std::string applyColor(std::string s, int foreground_color, int background_color = 39, int text_format = 39);
-        std::string formatName(std::string s);
-        std::string formatMsg(std::string s);
+        /**
+         * 
+         */
+        std::string applyColor(const std::string &s, uint8_t textColor, uint8_t bgColor = predefined, uint8_t textFormat = predefined);
+        
+        /**
+         * 
+         */
+        std::string formatName(const std::string &s);
+        
+        /**
+         * 
+         */
+        std::string formatMsg(const std::string &s);
 
-        LogLevel    verbosity;
+        LogLevel        verbosity;
+        
+        bool            fileLogEnabled;
+        std::ofstream   fileLog;
+
+        std::string     startStrFormat;
+        std::string     endStrFormat;
+        struct winsize  winSize;
     public:
-        static Console& getInstance() 
+        /**
+         * 
+         */
+        static Console& get() 
         {
             static Console  instance;
             return instance;
         }
 
+        ~Console();
+
         Console(Console const&) = delete;
         void operator=(Console const&) = delete;
 
+        /**
+         * 
+         */
         void setVerbosity(LogLevel verbosityLevel);
-        void log(const LogLevel level, const std::string &pretty, const std::stringstream &args);
+
+        /**
+         * 
+         */
+        void enableFileLog(std::string fileName = "");
+
+        /**
+         * 
+         */
+        void disableFileLog();
+
+        /**
+         * 
+         */
+        void log(const LogLevel level, const std::string &pretty, const std::string &args);
     };
 }}

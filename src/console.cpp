@@ -1,19 +1,30 @@
 #include "tkCommon/console.h"
 
 namespace tk { namespace console {
+    Console::~Console() {
+        if (fileLogEnabled)
+            fileLog.close();
+    }
+
     void 
-    Console::log(const LogLevel level, const std::string &pretty, const std::stringstream &args) { 
+    Console::log(const LogLevel level, const std::string &pretty, const std::string &args) {        
         if (level < verbosity)
             return;
 
-        int color;
-        switch (level)
-        {
+        std::string msg     = formatMsg(args);
+        std::string name    = formatName(pretty); 
+
+        if (fileLogEnabled)
+            fileLog<<name<<msg;
+
+        // color name for termina output
+        uint8_t color;
+        switch (level) {
         case LogLevel::INFO:
             color = black;
             break;
         case LogLevel::DEBUG:
-            color = lightGray;
+            color = cyan;
             break;
         case LogLevel::WARN:
             color = yellow;
@@ -25,9 +36,11 @@ namespace tk { namespace console {
             color = white;
             break;
         }
+        name = applyColor(name, color);
 
-
-        std::cout<<applyColor(formatName(pretty), color)<<formatMsg(args.str());
+        
+        
+        std::cout<<name<<msg;
     };
 
     void 
@@ -35,45 +48,58 @@ namespace tk { namespace console {
         verbosity = verbosityLevel;
     }
 
-    std::string
-    Console::applyColor(std::string s, int foreground_color, int background_color, int text_format) {
-        std::string const start = "\033[";
-        std::string const end   = "\033[0m";
-
-        background_color += 10;
-
-        if(text_format == 30){
-            text_format = 0;
+    void 
+    Console::enableFileLog(std::string fileName) {
+        if (!fileLogEnabled) {
+            if (fileName.compare("") == 0)
+            fileLog.open("log.txt");
+            else 
+                fileLog.open(fileName);
+            
+            fileLogEnabled = true;
         }
+    }
 
-        return start + std::to_string(text_format) + std::string{";"} +
-                std::to_string(foreground_color) + std::string{";"} + std::to_string(background_color) + std::string{"m"} + s + end;
+    void Console::disableFileLog() {
+        if (fileLogEnabled) {
+            fileLog.close();
+            fileLogEnabled = false;
+        }
+    }
+
+    std::string
+    Console::applyColor(const std::string &s, uint8_t textColor, uint8_t bgColor, uint8_t textFormat) {
+        bgColor+=10;
+        if(textFormat == 30)
+            textFormat = 0;
+
+        return startStrFormat + std::to_string(textFormat) + std::string{";"} +
+               std::to_string(textColor) + std::string{";"} + std::to_string(bgColor) + std::string{"m"} + s + endStrFormat;
     }
 
     std::string 
-    Console::formatName(std::string s) {
-        // remove parameters and return type
-        int start   = s.find_first_of('(');
-        int len     = start - s.find_last_of(')');
-        s.erase(start, len);
-        s.erase(0, s.find_last_of(' '));
+    Console::formatName(const std::string &s) {
+        std::string out = "";
+        
+        int start   = s.find_last_of(' ', s.find_first_of('('));
+        int len     = s.find_first_of('(') - start;
+        out         += s.substr(start, len);
 
-        if(s.size() > LEN_CLASS_NAME)
-            s.resize(LEN_CLASS_NAME);
+        if(out.size() > LEN_CLASS_NAME)
+            out.resize(LEN_CLASS_NAME);
 
-        s += std::string(LEN_CLASS_NAME-s.size(), ' ');
+        out += std::string(LEN_CLASS_NAME - out.size(), ' ');
 
-        return s;
+        return out;
     }
     
     std::string 
-    Console::formatMsg(std::string s) {
+    Console::formatMsg(const std::string &s) {
         std::string out = "";
 
-        struct winsize size;
-        ioctl(STDOUT_FILENO, TIOCGWINSZ, &size);
+        ioctl(STDOUT_FILENO, TIOCGWINSZ, &winSize);
 
-        int len = size.ws_col - LEN_CLASS_NAME;
+        int len = winSize.ws_col - LEN_CLASS_NAME;
         if(len <= 0)
             len = 80;
 
