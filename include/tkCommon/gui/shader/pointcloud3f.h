@@ -1,8 +1,8 @@
 #pragma once
 /**
- * @file    pointcloud4f.h
+ * @file    pointcloud3f.h
  * @author  Luca Bartoli, Fabio bagni, Gatti Francesco, Massimiliano bosi (you@domain.com)
- * @brief   class that draw pointcloud formed by 4f with shaders
+ * @brief   class that draw pointcloud formed by 3f with shaders
  * @version 1.0
  * @date    2020-07-10
  * 
@@ -15,26 +15,26 @@
 namespace tk { namespace gui { namespace shader {
 
 /**
- * @brief class that draw a pointcloud organized in 3 points [X Y Z 1 X Y Z 1...]
+ * @brief class that draw a pointcloud organized in 3 points [X Y Z X Y Z...]
  * 
  */
-class pointcloud4f  : public tk::gui::shader::generic
+class pointcloud3f  : public tk::gui::shader::generic
 {
     private:
         glm::vec4 pointColor;
 
     public:
-        pointcloud4f(){
-            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloud.vert";
+        bool init(){
+            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloud3f.vert";
             std::string geometry    = "";
             std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloudFrag/pointcloud_uniformColor.frag";
             
-            shader.init(vertex, fragment, geometry);
-            vertexPointer.push_back({4,4,0});
-        }
+            bool status = shader.init(vertex, fragment, geometry);
+            if(status == false)
+                return false;
 
-        ~pointcloud4f(){
-
+            vertexPointer.push_back({3,3,0});
+            return true;
         }
 
         void draw(tk::gui::Buffer<float>* buffer, int n, tk::gui::Color_t color = tk::gui::color::WHITE){
@@ -60,6 +60,8 @@ class pointcloud4f  : public tk::gui::shader::generic
         bool close(){
             return shader.close();
         }
+
+
 };
 
 }}}

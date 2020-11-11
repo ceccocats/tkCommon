@@ -1,6 +1,6 @@
 #pragma once
 #include "tkCommon/gui/Drawables/Drawable.h"
-#include "tkCommon/gui/shader/pointcloud4fFeatures.h"
+#include "tkCommon/gui/shader/pointcloudColorMaps.h"
 #include "tkCommon/gui/shader/pointcloud4f.h"
 #include "tkCommon/data/CloudData.h"
 
@@ -9,58 +9,85 @@ namespace tk{ namespace gui{
 	class Cloud4f : public Drawable {
 
         private:
+            //Data
+            int points;
             tk::data::CloudData*    cloud;
             tk::gui::Buffer<float>  glbuffer;
 
-            static const int    maxItems = 30;
-            int                 nItems;
-            const char*         items[maxItems];
+            //ColorMaps
+            int selectedColorMap    = 0;
+            std::string cloudcolor  = "Colored Cloud";
+            std::vector<const char*> colorMaps;
+            
 
-            int         nFeatures;
-            const char* useFeatures[maxItems];
+            //Color values
+            float min           = 999;
+            float max           = -999;
+            int axisShader      = -1;
+            int useFeatureN     = 0;
+            std::string text0   = "x axis";
+            std::string text1   = "y axis";
+            std::string text2   = "z axis";
+            std::vector<const char*> features;
 
-            std::string cloudcolor = "Colored Cloud";
-            tk::gui::shader::pointcloud4f* shCloudColor;
+            //Monocolor pointcloud shader
+            tk::gui::shader::pointcloud4f* monocolorCloud;
+            
+            void updateData(){
+                float minv = 999;
+                float maxv = -999;
 
-            std::string axisx = "axis x";
-            std::string axisy = "axis y";
-            std::string axisz = "axis z";
+                //Update feature viz list
+                if(features.size() != (cloud->features.size()+3)){
+                    features.clear();
+                    features.push_back(text0.c_str());
+                    features.push_back(text1.c_str());
+                    features.push_back(text2.c_str());
+                    for(auto const& f : cloud->features.keys())
+                        features.push_back(f.c_str());
+                }
 
-            void minMaxFeatures(){
-                min = 99999;
-                max = -99999;
+                //Copy colud on gpu and features
+                cloud->lock();
+                points = cloud->points.cols();
+                glbuffer.setData(cloud->points.data_h,cloud->points.size());
+                if(useFeatureN > 2){
+                    axisShader = -1;
+                    //Copy feature               
+                    tk::math::Vec<float> *f = &cloud->features[features[useFeatureN]];
+                    glbuffer.setData(f->data_h, f->size(), cloud->points.size());
 
-                // use x, y or z
-                if(useFeatureN < 3){
-                    for(int i = 0; i < cloud->points.cols(); i++){
-                         float value = cloud->points(useFeatureN,i);
-
-                        if(value > max) max = value;
-                        if(value < min) min = value;
-                    }
-                
-                //use feature ONLY I NOWWWWW
-                }else{
-                    const tk::math::Vec<float> *f = &cloud->features[tk::data::CloudData::FEATURES_I];
-
+                    //Update min max
                     for(int i = 0; i < f->size(); i++){
-                        float value = f->data_h[i];/////////////////////For now I
-
-                        if(value > max) max = value;
-                        if(value < min) min = value;
+                        float value = (*f)[i];
+                        if(value > maxv) maxv = value;
+                        if(value < minv) minv = value;
                     }
+                }else{
+                    axisShader = useFeatureN;
+                    //Min Max axis
+                    for(int i = 0; i < cloud->points.cols(); i++){
+                        float value = cloud->points(useFeatureN,i);
+                        if(value > maxv) maxv = value;
+                        if(value < minv) minv = value;
+                    }
+                }
+                cloud->unlockRead();
+
+                if(min == 999){
+                    min = minv;
+                    max = maxv;
+                }else{
+                    min = 0.9*min + 0.1*minv;
+                    max = 0.9*max + 0.1*maxv;
                 }
             }
 
         public:
 
-            // imgui settings
-            bool                    update;
-            tk::gui::Color_t        color;
-            float  pointSize        = 1.0f;
-            int    selectedColorMap = 0;
-            int    useFeatureN;
-            float  min, max;
+            //imgui settings
+            tk::gui::Color_t color;
+            float pointSize = 1.0f;        
 
             /**
              * @brief Construct a new Cloud 4f using one color
@@ -69,39 +96,13 @@ namespace tk{ namespace gui{
              * @param color color
              */
             Cloud4f(tk::data::CloudData* cloud){
+                this->points            = 0;
                 this->cloud             = cloud;   
                 this->selectedColorMap  = 0;
                 this->color             = tk::gui::color::WHITE;
                 this->useFeatureN       = 0;
                 this->update            = true;
-            }
-
-            /**
-             * @brief Construct a new Cloud 4f object drawing colormap using one axis
-             * 
-             * @param cloud             pointcloud ref
-             * @param selectedColorMap  colormap to use
-             * @param useAxis           axis to use
-             */
-            Cloud4f(tk::data::CloudData* cloud, int selectedColorMap, int useAxis){
-                this->cloud             = cloud;   
-                this->selectedColorMap  = selectedColorMap;
-                this->color             = tk::gui::color::WHITE;
-                this->useFeatureN       = useAxis > 3 || useAxis < 0 ? 0 : useAxis;
-            }
-
-            /**
-             * @brief Construct a new Cloud 4f object drawing colormap using a feature
-             * 
-             * @param cloud             pointcloud ref
-             * @param selectedColorMap  colormap to use
-             * @param feature           feature to use
-             */
-            Cloud4f(tk::data::CloudData* cloud, int selectedColorMap, tk::data::CloudData_gen::featureType_t feature){
-                this->cloud             = cloud;   
-                this->selectedColorMap  = selectedColorMap;
-                this->color             = tk::gui::color::WHITE;
-                this->useFeatureN       = 0; //TODO cloud->features_map[feature] + 3;
+                this->tf                = tk::common::Tfpose::Identity();
             }
 
             ~Cloud4f(){
@@ -114,84 +115,55 @@ namespace tk{ namespace gui{
             }
 
             void onInit(tk::gui::Viewer *viewer){
-                shader = new tk::gui::shader::pointcloud4fFeatures();
+                shader = new tk::gui::shader::pointcloudColorMaps();
                 glbuffer.init();
 
-                tk::gui::shader::pointcloud4fFeatures* shaderCloud = (tk::gui::shader::pointcloud4fFeatures*) shader;
+                tk::gui::shader::pointcloudColorMaps* shaderCloud = (tk::gui::shader::pointcloudColorMaps*) shader;
 
-                items[0] = cloudcolor.c_str();
-                nItems = 1;
-                for(int i = 0; i < shaderCloud->colormaps.size(); i++){
-                    if(maxItems < i+1){
-                        clsWrn("too many colormaps, change maxItems. Skipping\n")
-                    }else{
-                        items[i+1] = shaderCloud->colormaps[i].c_str();
-                        nItems = i+2;
-                    }
-                }
+                colorMaps.push_back(cloudcolor.c_str());
+                for(int i = 0; i < shaderCloud->colormaps.size(); i++)
+                    colorMaps.push_back(shaderCloud->colormaps[i].c_str());
 
-                shCloudColor = new tk::gui::shader::pointcloud4f();
-
-                useFeatures[0] = axisx.c_str();
-                useFeatures[1] = axisy.c_str();
-                useFeatures[2] = axisz.c_str();
-                nFeatures = 3;
+                monocolorCloud = new tk::gui::shader::pointcloud4f();
             }
 
             void draw(tk::gui::Viewer *viewer){
-               if(cloud->isChanged() || update){
-                   update = false;
 
-                    int i = 3;
-                    for (auto const& f : cloud->features.keys()){
-                        useFeatures[i] = f.c_str();
-                        i++;
-                        nFeatures = i;
-                    }
-
-                    //const tk::math::Vec<float> *f = &cloud->features[tk::data::CloudData::FEATURES_I];
-
-                    cloud->lock();
-                    glbuffer.setData(cloud->points.data_h,cloud->points.size());
-                    /*if(selectedColorMap != 0 && useFeatureN > 2){
-                        glbuffer.setData(f->data_h, f->size(), cloud->points.size());
-                    }*/
-                    cloud->unlockRead();
-                    this->tf = cloud->header.tf;
-                    minMaxFeatures();
+                if(update == true){
+                    min = 999;
+                    max = -999;
                 }
 
-                tk::gui::shader::pointcloud4fFeatures* shaderCloud = (tk::gui::shader::pointcloud4fFeatures*) shader;
+                if(cloud->isChanged() || update){
+                    update = false;
+                    updateData();
+                }
+
                 glPointSize(pointSize);
+                glPushMatrix();
+                glMultMatrixf(this->tf.matrix().data());
                 if(selectedColorMap == 0){
-                    shCloudColor->draw(&glbuffer, glbuffer.size()/4,color);
+                    monocolorCloud->draw(&glbuffer, points, color);
                 }else{
-                    if(useFeatureN > 2){
-                        //shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1],&glbuffer, glbuffer.size()/5,min,max,0,color.a());
-                    }else{
-                        if(useFeatureN == 0) //Drawing x
-                            shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1],&glbuffer, cloud->points.cols(),min,max,1,color.a());
-                        if(useFeatureN == 1) //Drawing y
-                            shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1],&glbuffer, cloud->points.cols(),min,max,2,color.a());
-                        if(useFeatureN == 2) //Drawing z
-                            shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1],&glbuffer, cloud->points.cols(),min,max,3,color.a());
-                    }
-                    
+                    tk::gui::shader::pointcloudColorMaps* shaderCloud = (tk::gui::shader::pointcloudColorMaps*) shader;
+                    //std::cout<<shaderCloud->colormaps[selectedColorMap-1]<<",buffer,"<<points<<","<<min<<","<<max<<","<<axisShader<<","<<color.a()<<std::endl;
+                    shaderCloud->draw(shaderCloud->colormaps[selectedColorMap-1], &glbuffer, points, min, max, axisShader, color.a());
                 }
+                glPopMatrix();
                 glPointSize(1.0);		
             }
 
             void imGuiSettings(){
                 ImGui::SliderFloat("Size",&pointSize,1.0f,20.0f,"%.1f");
                 ImGui::SliderFloat("Alpha",&color.a(),0,1.0f,"%.1f");
-                if(ImGui::Combo("Color maps", &selectedColorMap, items, nItems)){
+                if(ImGui::Combo("Color maps", &selectedColorMap, colorMaps.data(), colorMaps.size())){
                     update = true;
                 }
 
                 if(selectedColorMap == 0){
                     ImGui::ColorEdit3("Color", color.color);
                 }else{
-                    if(ImGui::Combo("feature", &useFeatureN, useFeatures, nFeatures)){
+                    if(ImGui::Combo("feature", &useFeatureN, features.data(), features.size())){
                         update = true;
                     }
                 }
@@ -206,13 +178,13 @@ namespace tk{ namespace gui{
             }
 
             void onClose(){
-                tk::gui::shader::pointcloud4fFeatures* shaderCloud = (tk::gui::shader::pointcloud4fFeatures*) shader;
+                tk::gui::shader::pointcloudColorMaps* shaderCloud = (tk::gui::shader::pointcloudColorMaps*) shader;
                 shaderCloud->close();
                 glbuffer.release();
                 delete shader;
 
-                shCloudColor->close();
-                delete shCloudColor;
+                monocolorCloud->close();
+                delete monocolorCloud;
             }
 
             std::string toString(){

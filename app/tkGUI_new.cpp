@@ -27,7 +27,8 @@ void read_cloud(tk::data::CloudData& cloud) {
 	gps.heigth = 0.0f;
 	gps.header.name = "GPS";
 
-	cloud.header.name = "LiDAR cloud";
+	cloud.header.name   = "LiDAR cloud";
+	cloud.header.tf 	= tk::common::Tfpose::Identity();
 
 	cloud.features.add(tk::data::CloudData_gen::FEATURES_I);
 
