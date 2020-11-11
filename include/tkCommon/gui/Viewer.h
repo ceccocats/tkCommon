@@ -47,9 +47,7 @@ namespace tk { namespace gui {
             background = col;
         }
         
-        void setDisabled(bool set) {
-            disabled = set;
-        }
+        static bool disabled;
 
     private:
         
@@ -92,7 +90,6 @@ namespace tk { namespace gui {
         int     imguiSelected = -1;
 
         bool    running = false;
-        bool    disabled = false;
 
         Camera      camera;
 
