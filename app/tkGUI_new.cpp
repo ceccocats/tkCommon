@@ -14,10 +14,9 @@
 #include <thread>
 
 
-tk::data::GPSData	gps;
 tk::gui::Viewer* 	viewer = tk::gui::Viewer::getInstance();
 
-void read_cloud(tk::data::CloudData& cloud) {
+void read_cloud(tk::data::GPSData& gps, tk::data::CloudData& cloud) {
 
 	tk::math::MatIO mat;
 	mat.open("/home/alice/Documents/dataset/masa_ouster.mat");
@@ -80,6 +79,7 @@ int main(){
 	cloud.notifyUpdate();*/
 
 	tk::data::CloudData cloud;
+	tk::data::GPSData	gps;
 
 	viewer->start();
 
@@ -91,7 +91,7 @@ int main(){
 	viewer->add(new tk::gui::Gps(&gps));
 	viewer->add(plt);
 
-	read_cloud(cloud);
+	read_cloud(gps,cloud);
 	//std::thread read_cloud_th(read_cloud);
 
 	viewer->join();
