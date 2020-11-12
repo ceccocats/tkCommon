@@ -232,6 +232,21 @@ class Mat : public tk::math::MatDump {
             }
             std::cout<<std::endl;
         }
+
+        bool toVar(std::string name, MatIO::var_t &var) {
+            Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> mat;
+            mat.resize(rows(), cols());
+            memcpy(mat.data(), data_h, sizeof(T)*rows()*cols());
+            return var.set(name, mat);
+        }
+        bool fromVar(MatIO::var_t &var) {
+            Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> mat;
+            if(!var.get(mat))
+                return false;
+            resize(mat.rows(), mat.cols());
+            memcpy(data_h, mat.data(), sizeof(T)*rows()*cols());
+            return true;
+        }
 };
 
 template<class T, int R, int C>
