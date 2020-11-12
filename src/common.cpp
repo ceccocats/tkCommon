@@ -1,6 +1,6 @@
 #include <tkCommon/common.h>
 
-const std::string tkCommon_PATH = TKPROJ_PATH;
+const char* tkCommon_PATH = TKPROJ_PATH;
 
 namespace tk { namespace common {
 

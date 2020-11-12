@@ -21,7 +21,7 @@
 #include "tkCommon/Map.h"
 #include "tkCommon/math/Mat.h"
 
-extern const std::string tkCommon_PATH;
+extern const char* tkCommon_PATH;
 namespace tk { namespace common {
 
     /**
