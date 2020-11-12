@@ -1,5 +1,6 @@
 #include "tkCommon/catch2/catch.hpp"
 #include "tkCommon/math/Mat.h"
+#include "tkCommon/math/MatIO.h"
 
 TEST_CASE("Test mat class") {
     tk::math::Mat<float> mat;
@@ -47,5 +48,27 @@ TEST_CASE("Test mat class") {
                 REQUIRE(mat(i, j) == mat2(i, j));
             }
         }
+    }
+
+
+    SECTION("serialize") {
+        mat.resize(2, 3);
+        mat.set({0, 1, 2, 3, 4, 5});
+
+        tk::math::MatIO file;
+        file.create("test.mat");
+        file.write("mat", mat);
+        file.close();
+
+        tk::math::Mat<float> mat2;
+        file.open("test.mat");
+        file.read("mat", mat2);
+        file.close();
+
+        for (int i = 0; i < mat.rows(); i++) {
+            for (int j = 0; j < mat.cols(); j++) {
+                REQUIRE(mat(i, j) == mat2(i, j));
+            }
+        }  
     }
 }
