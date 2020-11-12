@@ -21,7 +21,7 @@ namespace tk { namespace math {
  * @tparam  T matrix class type
  */
 template<class T>
-class Mat : public tk::math::MatDump {
+class MatBase : public tk::math::MatDump {
 
     protected:
         const float MAXSIZE_MARGIN = 1.5f;
@@ -37,7 +37,7 @@ class Mat : public tk::math::MatDump {
         T*      data_h;
 
         __host__
-        Mat(){
+        MatBase(){
             data_d = nullptr;
             data_h = nullptr;
             _maxSize = 0;
@@ -49,7 +49,7 @@ class Mat : public tk::math::MatDump {
         }
 
         __host__
-        ~Mat(){
+        ~MatBase(){
             if(data_h != nullptr){
                 delete [] data_h;
                 data_h = nullptr;
@@ -61,7 +61,7 @@ class Mat : public tk::math::MatDump {
         }
 
         __host__ 
-        Mat(int r, int c){
+        MatBase(int r, int c){
             if(r > 0 && c > 0){
                 resize(r,c);
             }
@@ -93,7 +93,7 @@ class Mat : public tk::math::MatDump {
         }
 
         __host__ void 
-        cloneGPU(const Mat<T> &m) {
+        cloneGPU(const MatBase<T> &m) {
 
             tkASSERT(m.hasGPU() == true, "Could not clone from GPU")
 
@@ -103,7 +103,7 @@ class Mat : public tk::math::MatDump {
         }
 
         __host__ void 
-        cloneCPU(const Mat<T> &m) {
+        cloneCPU(const MatBase<T> &m) {
 
             resize(m.rows(), m.cols());
             memcpy(data_h, m.data_h, m.size() * sizeof(T)); 
@@ -208,8 +208,8 @@ class Mat : public tk::math::MatDump {
             }
         }
 
-        __host__ Mat<T>& 
-        operator=(const Mat<T>& s) {
+        __host__ MatBase<T>& 
+        operator=(const MatBase<T>& s) {
             cloneCPU(s);
             if(s.hasGPU() == true)
                 cloneGPU(s);
@@ -217,7 +217,7 @@ class Mat : public tk::math::MatDump {
         }
 
         friend std::ostream& 
-        operator<<(std::ostream& os, const Mat& s) {
+        operator<<(std::ostream& os, const MatBase& s) {
             os<<"Mat ("<<s.rows()<<"x"<<s.cols()<<")";
             return os;
         }
@@ -233,20 +233,32 @@ class Mat : public tk::math::MatDump {
             std::cout<<std::endl;
         }
 
-        bool toVar(std::string name, MatIO::var_t &var) {
-            Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> mat;
-            mat.resize(rows(), cols());
-            memcpy(mat.data(), data_h, sizeof(T)*rows()*cols());
-            return var.set(name, mat);
-        }
-        bool fromVar(MatIO::var_t &var) {
-            Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> mat;
-            if(!var.get(mat))
-                return false;
-            resize(mat.rows(), mat.cols());
-            memcpy(data_h, mat.data(), sizeof(T)*rows()*cols());
-            return true;
-        }
+};
+
+
+// spicialization for Mat<something>
+template<typename T, typename Enable = void>
+class Mat : public MatBase<T> { 
+public:
+};
+// spicialization for Mat<float> and other arithme
+template<typename T>
+class Mat<T, typename std::enable_if<std::is_arithmetic<T>::value>::type> : public MatBase<T> { 
+public:
+    bool toVar(std::string name, MatIO::var_t &var) {
+        Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> mat;
+        mat.resize(this->rows(), this->cols());
+        memcpy(mat.data(), this->data_h, sizeof(T)*this->rows()*this->cols());
+        return var.set(name, mat);
+    }
+    bool fromVar(MatIO::var_t &var) {
+        Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> mat;
+        if(!var.get(mat))
+            return false;
+        this->resize(mat.rows(), mat.cols());
+        memcpy(this->data_h, mat.data(), sizeof(T)*this->rows()*this->cols());
+        return true;
+    }
 };
 
 template<class T, int R, int C>
