@@ -14,17 +14,9 @@ namespace tk{ namespace gui{
             tk::data::CloudData*    cloud;
             tk::gui::Buffer<float>  glbuffer;
 
-            //ColorMaps
-            int selectedColorMap    = 0;
+        private:
             std::string cloudcolor  = "Colored Cloud";
             std::vector<const char*> colorMaps;
-            
-
-            //Color values
-            float min           = 999;
-            float max           = -999;
-            int axisShader      = -1;
-            int useFeatureN     = 0;
             std::string text0   = "x axis";
             std::string text1   = "y axis";
             std::string text2   = "z axis";
@@ -87,7 +79,13 @@ namespace tk{ namespace gui{
 
             //imgui settings
             tk::gui::Color_t color;
-            float pointSize = 1.0f;        
+            float min            =  999;
+            float max            = -999;
+            float pointSize      = 1.0f;        
+            int selectedColorMap =  0;
+            int axisShader       = -1;
+            int useFeatureN      =  0;
+
 
             /**
              * @brief Construct a new Cloud 4f using one color
