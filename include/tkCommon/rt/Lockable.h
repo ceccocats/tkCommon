@@ -24,6 +24,10 @@ class Lockable{
             mutex.unlock();
         }
 
+        bool tryLock() {
+            return mutex.try_lock();
+        }
+
         uint32_t getModCount(){
             return counter;
         }
