@@ -114,7 +114,10 @@ add_library(tkCommunication SHARED
 )
 target_link_libraries(tkCommunication pcap)
 
-add_library(tkMath SHARED src/math/CSpline.cpp src/math/CSpline2D.cpp src/math/CSpline3D.cpp)
+add_library(tkMath SHARED 
+    src/math/CSpline.cpp 
+    src/math/CSpline2D.cpp 
+    src/math/CSpline3D.cpp)
 
 add_library(tkJoystick SHARED 
     src/joystick/Joystick.cpp

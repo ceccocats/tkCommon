@@ -82,10 +82,6 @@ namespace tk{ namespace gui{
             }
 
             void onClose(){
-                tk::gui::shader::linesMonocolor* shaderLines = (tk::gui::shader::linesMonocolor*) shader;
-                shaderLines->close();
-                delete shader;
-
                 for(int i = 0; i < circles.size(); i++){
                     circles[i]->close();
                     delete circles[i];

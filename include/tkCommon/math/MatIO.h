@@ -273,7 +273,10 @@ public:
         }
         template<typename T>
         bool get(tk::common::Map<T> &map) {
-            tkFATAL("to impl");
+            for(int i=0; i<fields.size(); i++) {
+                map.add(fields[i]);
+                fieldMap[fields[i]].get(map[fields[i]]);
+            }
             return true;
         }
 
@@ -312,8 +315,11 @@ public:
         }
         template<typename T>
         bool set(std::string name, tk::common::Map<T> &map) {
-            tkFATAL("to impl");
-            return true;
+            std::vector<tk::math::MatIO::var_t> vars(map.size());
+            for(int i=0; i<map.size(); i++) {
+                vars[i].set(map.keys()[i], *map.vals()[i]);
+            }
+            return setStruct(name, vars);
         }
 
         /**

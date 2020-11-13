@@ -41,8 +41,6 @@ class lines : public tk::gui::shader::generic
             std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/lines.frag";
             
             shader.init(vertex, fragment, geometry);
-
-            shader.setMat4("modelview",modelview);
             
             vertexPointer.resize(2);
             vertexPointer[0] = {3,7,0};
@@ -56,6 +54,7 @@ class lines : public tk::gui::shader::generic
             buffer->setVertexAttribs(vertexPointer);
 
             shader.use();
+            shader.setMat4("modelview",modelview);
 
             buffer->use();
             glLineWidth(size);

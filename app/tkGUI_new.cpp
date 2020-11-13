@@ -13,14 +13,16 @@
 
 #include <thread>
 
+tk::gui::Plot *plt;
 
-tk::data::GPSData	gps;
 tk::gui::Viewer* 	viewer = tk::gui::Viewer::getInstance();
 
-void read_cloud(tk::data::CloudData& cloud) {
+void read_cloud(tk::data::GPSData& gps, tk::data::CloudData& cloud) {
 
 	tk::math::MatIO mat;
 	mat.open("/home/alice/Documents/dataset/masa_ouster.mat");
+
+	tk::common::Tfpose pose = tk::common::Tfpose::Identity();
 
 	gps.lat = 42.182945;
 	gps.lon = 12.477200;
@@ -35,12 +37,12 @@ void read_cloud(tk::data::CloudData& cloud) {
 	Eigen::MatrixXf points;
 	Eigen::MatrixXf intensity;
 	tk::math::MatIO::var_t var;
-	for(int i=0; i<mat.size() && viewer->isRunning(); i++) {
+	for(int i=0; viewer->isRunning(); i++) {
 
-		mat.read(mat[i], var);
+		mat.read(mat[i % mat.size()], var);
 		var["lidar"]["points"].get(points);
 
-		mat.read(mat[i], var);
+		mat.read(mat[i % mat.size()], var);
 		var["lidar"]["f_intensity"].get(intensity);
 
 		var.release();
@@ -57,7 +59,15 @@ void read_cloud(tk::data::CloudData& cloud) {
 		gps.lat += 0.000001;
 		gps.unlockWrite();
 
-		usleep(100000);
+		static float r = 0.0;
+		static float a = 0.0;
+		pose.matrix()(0,3) = sin(a)*r;
+		pose.matrix()(1,3) = cos(a)*r;
+		r+=0.01;
+		a+=0.001;
+		plt->addPoint(pose);
+
+		usleep(1000);
 	}
 
 	mat.close();
@@ -80,10 +90,11 @@ int main(){
 	cloud.notifyUpdate();*/
 
 	tk::data::CloudData cloud;
+	tk::data::GPSData	gps;
 
 	viewer->start();
 
-	tk::gui::Plot *plt = new tk::gui::Plot("provaPlot", 10000, tk::gui::Plot::type_t::LINE, 1);
+	plt = new tk::gui::Plot("provaPlot", 1000, tk::gui::Plot::type_t::LINE, 1);
 	viewer->add(new tk::gui::Grid());
 	viewer->add(new tk::gui::Axis());
 	viewer->add(new tk::gui::Mesh(std::string(tkCommon_PATH) + "data/levante.obj"));
@@ -91,7 +102,7 @@ int main(){
 	viewer->add(new tk::gui::Gps(&gps));
 	viewer->add(plt);
 
-	read_cloud(cloud);
+	read_cloud(gps,cloud);
 	//std::thread read_cloud_th(read_cloud);
 
 	viewer->join();

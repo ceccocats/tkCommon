@@ -163,9 +163,14 @@ struct CircularArray {
      * @param _dim
      */
     void setDim(int _dim) {
-        if(array != nullptr)
+        if(array != nullptr){
+            T* temp = new T[_dim];
+            memcpy(temp,array,std::min(dim,_dim)*sizeof(T));
             delete [] array;
-        array = new T[_dim];
+            array = temp;
+        }else{
+            array = new T[_dim];
+        }
         dim = _dim;
     }
 
