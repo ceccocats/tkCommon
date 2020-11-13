@@ -94,7 +94,7 @@ target_link_libraries(tkGUI ${GUI_LIBS})
 
 add_library(tkCommon SHARED
     src/common.cpp
-    src/console.cpp
+    src/log.cpp
     src/version.cpp
     src/CmdParser.cpp 
     src/rt/Profiler.cpp
