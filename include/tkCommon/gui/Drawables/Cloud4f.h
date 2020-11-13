@@ -9,12 +9,14 @@ namespace tk{ namespace gui{
 
 	class Cloud4f : public Drawable {
 
-        private:
-            int points;
+        public:
             tk::data::CloudData*    cloud;
-            tk::gui::Buffer<float>  glbuffer;
 
         private:
+            int points;
+            tk::gui::Buffer<float>  glbuffer;
+
+
             std::pair<std::string,int>  cloudMod0 = {"Colored Cloud",0};
             std::pair<std::string,int>  cloudMod1 = {"RGBA Cloud",1};
             std::pair<std::string,int>  cloudMod2 = {"Maps Cloud",2};
@@ -207,6 +209,7 @@ namespace tk{ namespace gui{
                 this->points       =  0;
                 this->cloud        =  cloud; 
                 this->color        =  tk::gui::color::WHITE;
+                this->color.a()    =  0.5;
                 this->update       =  true;
                 this->resetMinMax  =  true;
                 this->updateMinMax =  false;
