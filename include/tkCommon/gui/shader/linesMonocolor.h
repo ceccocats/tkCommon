@@ -15,7 +15,7 @@
 namespace tk { namespace gui { namespace shader {
 
 /**
- * @brief class that draw a lines formed by [X Y Z R G B A ...]
+ * @brief class that draw a lines formed by [X Y Z ...]
  * 
  */
 class linesMonocolor : public tk::gui::shader::generic
@@ -48,14 +48,14 @@ class linesMonocolor : public tk::gui::shader::generic
             shader.init(vertex, fragment, geometry);
 
             vertexPointer.resize(1);
-            vertexPointer[0] = {3,3,0};
         }
 
         void draw(tk::gui::Buffer<float>* buffer, int n, int size = 1.0f, 
-                tk::gui::Color_t color = tk::gui::color::WHITE, GLenum linemode = GL_LINE_STRIP){
+                tk::gui::Color_t color = tk::gui::color::WHITE, GLenum linemode = GL_LINE_STRIP, int offset = 0){
 
 		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview));
 
+            vertexPointer[0] = {3,3,offset};
             buffer->setVertexAttribs(vertexPointer);
 
             std::memcpy(glm::value_ptr(linesColor), color.color, sizeof(linesColor));

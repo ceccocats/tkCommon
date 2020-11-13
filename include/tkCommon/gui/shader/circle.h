@@ -24,13 +24,13 @@ class circle : public tk::gui::shader::generic
 {
     private:
         bool isFilled;
-        int resolution;
-        bool multiCircles;
+        int  multiCircles;
         linesMonocolor* linesShader;
         tk::gui::Buffer<float> linesGlBuf;
         tk::math::Vec<linesMonocolor::line_color_t> linesBufData;
 
     public:
+        int resolution;
         
         circle(int resolution = 32){
             linesShader      = new linesMonocolor();
@@ -51,7 +51,7 @@ class circle : public tk::gui::shader::generic
                 linesBufData[i].z = z;
             }
             linesGlBuf.setData((float*)linesBufData.data_h,resolution*3);
-            multiCircles = false;
+            multiCircles = 0;
         }
 
         void makeCircles(tk::math::Mat<float> points, float radius){
@@ -72,16 +72,38 @@ class circle : public tk::gui::shader::generic
 
                 linesGlBuf.setData((float*)linesBufData.data_h,resolution*3,j*resolution*3);
             }
-            multiCircles = true;
+            multiCircles = points.cols();
+        }
+
+        void makeCircles(float* points, int n, float radius){
+            isFilled = true;
+            for(int j = 0; j < n; j++){
+                float x = points[j*3 + 0];
+                float y = points[j*3 + 1];
+                float z = points[j*3 + 2];
+                for(int i = 0; i < resolution-1; i++){
+                    float angle = 2.0f * M_PI * (float)i/(float)resolution;
+                    linesBufData[i].x = x + cos(angle) * radius;
+                    linesBufData[i].y = y + sin(angle) * radius;
+                    linesBufData[i].z = z;
+                }
+                linesBufData[resolution-1].x = x + cos(0) * radius;
+                linesBufData[resolution-1].y = y + sin(0) * radius;
+                linesBufData[resolution-1].z = z;
+
+                linesGlBuf.setData((float*)linesBufData.data_h,resolution*3,j*resolution*3);
+            }
+            multiCircles = n;
         }
 
         void draw(tk::gui::Color_t color = tk::gui::color::WHITE, float size = 1.0f){
             if(isFilled == false)
                 return;
-            if(multiCircles == false){
-		        linesShader->draw(&linesGlBuf, linesGlBuf.size()/3, size, color, GL_LINE_LOOP);
+            if(multiCircles == 0){
+		        linesShader->draw(&linesGlBuf, resolution, size, color, GL_LINE_LOOP);
             }else{
-                linesShader->draw(&linesGlBuf, linesGlBuf.size()/3, size, color, GL_LINE_STRIP);
+                for(int i = 0; i < multiCircles; i++)
+                    linesShader->draw(&linesGlBuf, resolution, size, color, GL_LINE_LOOP, (i*(resolution*3)));
             }
         }
 
