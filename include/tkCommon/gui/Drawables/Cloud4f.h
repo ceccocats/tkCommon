@@ -341,6 +341,7 @@ namespace tk{ namespace gui{
                     if(ImGui::Combo("feature", &selected[0], features.data(), features.size())){
                         updateMinMax = true;
                     }
+                    ImGui::Text("Min %f Max %f", minMax[0][0], minMax[1][0]);
                     return;
                 }
             }
