@@ -94,7 +94,7 @@ int main(){
 
 	viewer->start();
 
-	plt = new tk::gui::Plot("provaPlot", 1000, tk::gui::Plot::type_t::LINE, 1);
+	plt = new tk::gui::Plot("provaPlot", 1, tk::gui::Plot::type_t::LINE, 1);
 	viewer->add(new tk::gui::Grid());
 	viewer->add(new tk::gui::Axis());
 	viewer->add(new tk::gui::Mesh(std::string(tkCommon_PATH) + "data/levante.obj"));
