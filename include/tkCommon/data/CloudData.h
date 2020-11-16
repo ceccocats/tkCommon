@@ -68,12 +68,12 @@ namespace tk { namespace data {
         void gammaCorrectionIntensity(){
 
             if(features.size() == 0){
-                clsErr("Empty\n");
+                tkERR("Empty\n");
                     return;
             }
 
             if(!features.exists(tk::data::CloudData::FEATURES_I)){
-                    clsErr("Error\n");
+                    tkERR("Error\n");
                     return;
             }
             const tk::math::Vec<float> *intensity = &features[tk::data::CloudData::FEATURES_I];

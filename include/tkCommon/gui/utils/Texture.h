@@ -185,7 +185,7 @@ void Texture<T>::renderWithoutAntialiasing(){
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO); 
         
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-            clsErr("Error in rendering on texture\n");
+            tkERR("Error in rendering on texture\n");
             return;
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -220,7 +220,7 @@ void Texture<T>::renderWithAntialiasing(){
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-            clsErr("Error in rendering on texture\n");
+            tkERR("Error in rendering on texture\n");
             return;
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -233,7 +233,7 @@ void Texture<T>::renderWithAntialiasing(){
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-            clsErr("Error in rendering on texture\n");
+            tkERR("Error in rendering on texture\n");
             return;
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);

@@ -175,7 +175,7 @@ void Buffer<T>::setVertexAttribs(std::vector<vertexAttribs_t>& vertexAttribs){
     
     //check if vertexAttribs is set
     if(vertexAttribs.size() == 0){
-        clsErr("You need to fill vertexAttribsPointer\n");
+        tkERR("You need to fill vertexAttribsPointer\n");
         return;
     }
 

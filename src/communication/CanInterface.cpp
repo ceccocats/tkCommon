@@ -23,7 +23,7 @@ namespace tk { namespace communication {
         // open socket
         soc = socket(PF_CAN, SOCK_RAW, CAN_RAW);
         if(soc < 0) {
-            clsErr("Error opening socket: " + port + "\n");
+            tkERR("Error opening socket: " + port + "\n");
             return false;
         }
 
@@ -31,7 +31,7 @@ namespace tk { namespace communication {
         strcpy(ifr.ifr_name, port.c_str());
 
         if (ioctl(soc, SIOCGIFINDEX, &ifr) < 0) {
-            clsErr("Error setting socket: " + port + "\n");
+            tkERR("Error setting socket: " + port + "\n");
             return false;
         }
 
@@ -42,7 +42,7 @@ namespace tk { namespace communication {
         //}
 
         if (bind(soc, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-            clsErr("Error binding socket: " + port + "\n");
+            tkERR("Error binding socket: " + port + "\n");
             return false;
         }
         return true;
@@ -63,9 +63,9 @@ namespace tk { namespace communication {
         }
 
         if(ok)
-            clsSuc("opened file: " + fileName + "\n")
+            tkMSG("opened file: " + fileName + "\n")
         else
-            clsErr("fail open file: " + fileName + "\n")
+            tkERR("fail open file: " + fileName + "\n")
         return ok;
     }
 
@@ -202,7 +202,7 @@ namespace tk { namespace communication {
         int val = pthread_create(&t1, NULL, CanInterface::record, this);
 
         if(val == -1){
-            clsErr("error creating recorder thread.\n");
+            tkERR("error creating recorder thread.\n");
             return false;
         }else{
             return true;
@@ -222,10 +222,10 @@ namespace tk { namespace communication {
         }else{
             int err = ::close(soc);
             if(err == -1) {
-                clsErr(std::string("CAN close ERROR: ") + strerror(errno) + "\n");
+                tkERR(std::string("CAN close ERROR: ") + strerror(errno) + "\n");
                 return false;
             } else {
-                clsMsg("CAN closed\n");
+                tkMSG("CAN closed\n");
                 return true;
             }
         }

@@ -19,7 +19,7 @@ tk::communication::TCPSocket::initClient(const int port, const std::string ip){
     // open socket
     this->sock_fd = socket(AF_INET, SOCK_STREAM, AF_INET);
     if (this->sock_fd < 0){
-        clsErr("error while opening socket.\n");
+        tkERR("error while opening socket.\n");
         perror("TCP error");
         return false;
     }
@@ -27,7 +27,7 @@ tk::communication::TCPSocket::initClient(const int port, const std::string ip){
     // bind socket
     int r = bind(this->sock_fd, (const struct sockaddr *)&this->sock_addr,  sizeof(this->sock_addr));
     if (r < 0) {
-        clsErr("error while binding the socket.\n");
+        tkERR("error while binding the socket.\n");
         perror("UDP error");
         return false;
     }
@@ -35,13 +35,13 @@ tk::communication::TCPSocket::initClient(const int port, const std::string ip){
     // listen socket
     r = connect(this->sock_fd, (const struct sockaddr *)&this->sock_addr,  sizeof(this->sock_addr));
         if (r < 0) {
-        clsErr("error while connecting to the socket.\n");
+        tkERR("error while connecting to the socket.\n");
         perror("TCP error");
         return false;
     }
 
     if(this->sock_client != 1){
-        clsSuc(std::string{"client TCP connected to server "}+ip+"\n")
+        tkMSG(std::string{"client TCP connected to server "}+ip+"\n")
     }
 
     return true;
@@ -59,16 +59,16 @@ tk::communication::TCPSocket::initServer(const int port){
     struct sockaddr client;
     memset(&client, 0, sizeof(client));
 
-    clsWrn("Server attending connection..\n")
+    tkWRN("Server attending connection..\n")
 
     this->sock_client = ::accept(this->sock_fd, (struct sockaddr *)&client, (socklen_t*)sizeof(client));
     if(this->sock_client < 0){
-        clsErr("error while connecting to the socket.\n");
+        tkERR("error while connecting to the socket.\n");
         perror("TCP error");
         return false;
     }
 
-    clsWrn(std::string{"Server accept connection from "}+client.sa_data+"\n")
+    tkWRN(std::string{"Server accept connection from "}+client.sa_data+"\n")
     return true;    
 }
 

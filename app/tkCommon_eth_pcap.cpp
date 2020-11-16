@@ -1,5 +1,6 @@
 #include <iostream>
 #include <tkCommon/common.h>
+#include <tkCommon/term_utils.h>
 #include <csignal>
 #include <tkCommon/communication/EthInterface.h>
 #include <tkCommon/exceptions.h>
@@ -26,9 +27,7 @@ void replayLoop(std::string file, std::string filter){
 
             gRun = false;
         }else{
-
-            tk::common::hex_dump(std::cout, buffer, n);
-
+            tk::term::hex_dump(std::cout, buffer, n);
             std::cout<<"Timestamp: "<<(long int)time<<"\n\n";
         }
     }
@@ -55,8 +54,6 @@ int main(int argc, char* argv[]){
     
     std::signal(SIGINT, signal_handler);
     std::signal(SIGTERM, signal_handler);
-
-    tk::exceptions::handleSegfault();
 
     std::string             file,filter,interface;
 

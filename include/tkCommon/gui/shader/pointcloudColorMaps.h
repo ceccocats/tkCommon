@@ -53,7 +53,7 @@ class pointcloudColorMaps  : public tk::gui::shader::generic
                 }
                 closedir (dir);
             } else {
-                clsErr("Directory not exists\n")
+                tkERR("Directory not exists\n")
                 return;
             }         
         }

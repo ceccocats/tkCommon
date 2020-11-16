@@ -1,4 +1,5 @@
 #include "tkCommon/gui/Viewer.h"
+#include "tkCommon/rt/Task.h"
 
 namespace tk { namespace gui {
 Viewer* Viewer::instance = nullptr;
@@ -26,7 +27,7 @@ Viewer::start(bool useImGUI){
         this->useImGUI=useImGUI;
         glThread.init(run,Viewer::instance);
     }else{
-        clsWrn("Thread is already started\n");
+        tkWRN("Thread is already started\n");
     }
 }
 
@@ -121,7 +122,7 @@ Viewer::init() {
 
     // Initialize OpenGL loader
     if (glewInit() != GLEW_OK) {
-        tk::tprint::printErr("Viewer", "Failed to initialize OpenGL loader!\n");
+        tkERR("Failed to initialize OpenGL loader!\n");
         exit(-1);
     }
 
@@ -158,7 +159,7 @@ Viewer::init() {
     // lights
     lightPos = glm::vec3(0.0f, 0.0f, 20.0f);
 
-    clsSuc  (   std::string{"OPENGL running on: "} + 
+    tkMSG  (   std::string{"OPENGL running on: "} + 
                 std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))) + " -- " +
                 std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))) + "\n"
             );
@@ -373,14 +374,15 @@ Viewer::close() {
         drawable.second->onClose();
         delete drawable.second;
     }   
-    clsMsg("closed\n");
+    tkMSG("closed\n");
 }
 
 void 
 Viewer::runloop() {
 
     timeStamp_t VIZ_DT_US = dt*1e6;
-    LoopRate rate((VIZ_DT_US), "VIZ_UPDATE");
+    tk::rt::Task rate;
+    rate.init(VIZ_DT_US);
 
     while (running) {
 
@@ -437,7 +439,8 @@ Viewer::runloop() {
         glfwPollEvents();
         glCheckError();
         running = running && !glfwWindowShouldClose(window);
-        rate.wait(false);
+        
+        rate.wait();
     }
 
     ImGui_ImplOpenGL3_Shutdown();
@@ -453,7 +456,7 @@ Viewer::runloop() {
 
 void 
 Viewer::errorCallback(int error, const char* description) {
-    tk::tprint::printErr("Viewer", std::string{"error: "}+std::to_string(error)+" "+description+"\n");
+    tkERR(std::string{"error: "}+std::to_string(error)+" "+description+"\n");
 }
 
 void 

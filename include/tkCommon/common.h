@@ -12,11 +12,10 @@
 #include <Eigen/Dense>
 
 #undef None // defined by X11 cause conflicts with YAML
+#include "tkCommon/time.h"
 #include "tkCommon/utils.h"
-#include "tkCommon/timer.h"
 #include "tkCommon/geodetic_conv.h"
 #include "tkCommon/CmdParser.h"
-#include "tkCommon/printTerminal.h"
 #include "tkCommon/exceptions.h"
 #include "tkCommon/Map.h"
 #include "tkCommon/math/Mat.h"
@@ -430,18 +429,6 @@ namespace tk { namespace common {
      */
     Eigen::Vector2f proj_2d(Eigen::Matrix4f p_mat, Eigen::Matrix4f v_mat,
                                    float screenW, float screenH, Eigen::Vector4f pos);
-
-
-    /**
-     * dump memory as hexdump
-     * @param os
-     * @param buffer
-     * @param bufsize
-     * @param showPrintableChars
-     * @return
-     */
-    std::ostream& hex_dump(std::ostream& os, const void *buffer,
-                                  std::size_t bufsize, bool showPrintableChars = true);
 
     /**
      * Serialize an eigen matrix in binary

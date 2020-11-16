@@ -1,4 +1,3 @@
-#define TIMER_ENABLE
 #include "tkCommon/CmdParser.h"
 #include "tkCommon/math/MatIO.h"
 #include <thread>

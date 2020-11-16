@@ -8,7 +8,7 @@ uint8_t* loadImage(std::string filename, int* width, int* height, int* channels)
 
     uint8_t* data = stbi_load(filename.c_str(),width,height,channels,0);
     if(data == NULL){
-        tk::tprint::printErr("Viewer",std::string{"Error opening: "+filename+"\n"});
+        tkERR(std::string{"Error opening: "+filename+"\n"});
     }
     return data;
 }
@@ -28,13 +28,13 @@ void copyVertexFromOBJL(vertex_t *tkv, objl::Vertex* v){
 
 bool loadOBJ(std::string filename, object3D_t &obj) {
     
-    tk::tprint::printMsg("Viewer",std::string{"loading: "+filename+"\n"});
+    tkMSG(std::string{"loading: "+filename+"\n"});
 
     //Load and check
     objl::Loader loader;
     bool status = loader.LoadFile(filename.c_str());
     if(status == false){
-         tk::tprint::printErr("Viewer",std::string{"Error opening: "+filename+"\n"});
+         tkERR(std::string{"Error opening: "+filename+"\n"});
          return false;
     }
 

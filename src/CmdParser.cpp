@@ -23,14 +23,14 @@ void CmdParser::setGeneralInfo(std::string info) {
 
 std::string CmdParser::addArg(std::string name, std::string default_val, std::string info) {
     if(name.size() <= 1 || name[0] == '-') {
-        clsErr(std::string{"arguments should not start with '-', this is not valid: "}+name+"\n");
+        tkERR(std::string{"arguments should not start with '-', this is not valid: "}+name+"\n");
         exit(1);
     }
 
     // error if ArgList before
     for(int i=0; i<args.size(); i++) {
         if(args[i].default_val.size() > 1) {
-            clsErr("You cant add an Arg after an ArgList\n");
+            tkERR("You cant add an Arg after an ArgList\n");
             exit(1);      
         }
     }
@@ -47,13 +47,13 @@ std::string CmdParser::addArg(std::string name, std::string default_val, std::st
 
 std::vector<std::string> CmdParser::addArgList(std::string name, std::vector<std::string> default_val, std::string info) {
     if(name.size() <= 1 || name[0] == '-') {
-        clsErr(std::string{"arguments should not start with '-', this is not valid: "}+name+"\n");
+        tkERR(std::string{"arguments should not start with '-', this is not valid: "}+name+"\n");
         exit(1);
     }
     // error if ArgList before
     for(int i=0; i<args.size(); i++) {
         if(args[i].default_val.size() > 1) {
-            clsErr("You cant add an Arg after an ArgList\n");
+            tkERR("You cant add an Arg after an ArgList\n");
             exit(1);      
         }
     }
@@ -77,14 +77,14 @@ std::vector<std::string> CmdParser::addArgList(std::string name, std::vector<std
 
 bool CmdParser::addBoolOpt(std::string opt, std::string info) {
     if(opt.size() <= 1 || opt[0] != '-') {
-        clsErr(std::string{"option must start with '-', this is not valid: "}+opt+"\n");
+        tkERR(std::string{"option must start with '-', this is not valid: "}+opt+"\n");
         exit(1);
     }
 
     argh::parser cmdl(argv_ptr, argv_mode);
 
     if(!cmdl(opt).str().empty()) {
-        clsErr(std::string{"you cant append values to boolean flag: "}+opt+"\n");
+        tkERR(std::string{"you cant append values to boolean flag: "}+opt+"\n");
         exit(-1);
     }
 
@@ -99,7 +99,7 @@ bool CmdParser::addBoolOpt(std::string opt, std::string info) {
 
 std::string CmdParser::addOpt(std::string opt, std::string default_val, std::string info) {
     if(opt.size() <= 1 || opt[0] != '-') {
-        clsErr(std::string{"option must start with '-', this is not valid: "}+opt+"\n");
+        tkERR(std::string{"option must start with '-', this is not valid: "}+opt+"\n");
         //std::cout<<"option must start with '-', this is not valid: "<<opt<<"\n";
         exit(1);
     }
@@ -184,7 +184,7 @@ void CmdParser::parse() {
                 found = true;
         }
         if(!found) {
-            clsErr(std::string{"flag not valid: -"}+flag+"\n");
+            tkERR(std::string{"flag not valid: -"}+flag+"\n");
             //std::cout<<"ERROR: flag not valid: -"<<flag<<"\n";
             printUsage(cmdl[0]);
             exit(1);
@@ -193,7 +193,7 @@ void CmdParser::parse() {
 
     // print exec info if avaible
     if (!generalInfo.empty()) {
-        clsMsg(generalInfo+"\n");
+        tkMSG(generalInfo+"\n");
         //std::cout << generalInfo << "\n";
     }
 

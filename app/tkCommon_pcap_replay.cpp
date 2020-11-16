@@ -1,7 +1,9 @@
 #include <iostream>
 #include <tkCommon/common.h>
+#include <tkCommon/log.h>
 #include <csignal>
 #include <tkCommon/communication/EthInterface.h>
+
 
 bool                            gRun = true;
 tk::communication::Ethinterface iface;
@@ -39,8 +41,7 @@ void replayLoop(std::string file, int port, std::string filter,std::string ip){
 
         count++;
         if(count%500 == 0){
-
-            tk::tprint::printMsg("pcapReplay", std::string{"send "}+std::to_string(count)+" packets\n");
+            tkMSG(std::string{"send "}+std::to_string(count)+" packets\n");
         }
     }
 
@@ -57,9 +58,6 @@ int main(int argc, char* argv[]){
     int port                = cmd.addIntOpt("-port", 2368, "pcap replay file");
     cmd.parse();
 
-    tk::exceptions::handleSegfault();
-
     replayLoop(file,port,filter,ip);
-
     return 0;
 }

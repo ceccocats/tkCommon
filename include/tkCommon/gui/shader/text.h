@@ -46,12 +46,12 @@ class text : public tk::gui::shader::generic
         bool init(std::string font = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"){
 
             if(FT_Init_FreeType(&ft)){
-                clsErr("Error creating freetype\n");
+                tkERR("Error creating freetype\n");
                 return false;
             }
 
             if (FT_New_Face(ft, font.c_str(), 0, &face)){
-                clsErr("Failed to load font\n");
+                tkERR("Failed to load font\n");
                 return false;
             }
 
@@ -62,7 +62,7 @@ class text : public tk::gui::shader::generic
 
                 // Load character glyph 
                 if (FT_Load_Char(face, c, FT_LOAD_RENDER)){
-                    clsErr("Failed to load character id"+std::to_string(c)+"\n");
+                    tkERR("Failed to load character id"+std::to_string(c)+"\n");
                     continue;
                 }
                 // generate texture
