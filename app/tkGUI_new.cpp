@@ -52,7 +52,7 @@ void read_cloud(tk::data::GPSData& gps, tk::data::CloudData& cloud) {
 
 		cloud.points.copyFrom(points.data(),points.rows(),points.cols());
 		cloud.features[tk::data::CloudData_gen::FEATURES_I].copyFrom(intensity.data(),intensity.rows(),intensity.cols());
-		//cloud.gammaCorrectionIntensity();
+		cloud.gammaCorrectionIntensity();
 
 		cloud.unlockWrite();
 
@@ -68,7 +68,7 @@ void read_cloud(tk::data::GPSData& gps, tk::data::CloudData& cloud) {
 		a+=0.001;
 		plt->addPoint(pose);
 
-		usleep(1000);
+		usleep(100000);
 	}
 
 	mat.close();
