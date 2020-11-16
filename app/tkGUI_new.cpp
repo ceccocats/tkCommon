@@ -10,6 +10,7 @@
 #include "tkCommon/data/CloudData.h"
 #include "tkCommon/data/GPSData.h"
 
+#include "tkCommon/gui/Drawables/Image.h"
 
 #include <thread>
 
