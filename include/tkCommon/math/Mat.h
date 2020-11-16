@@ -8,7 +8,7 @@
 #include <string>
 #include <sstream>
 #include <initializer_list>
-#include "tkCommon/CudaCommon.h"
+#include "tkCommon/cuda.h"
 #include "tkCommon/math/MatIO.h"
 
 //#define STATIC  0
@@ -55,7 +55,7 @@ class MatBase : public tk::math::MatDump {
                 data_h = nullptr;
             } 
             if(data_d != nullptr && _gpu == true){
-                HANDLE_ERROR( cudaFree(data_d) );
+                tkCUDA( cudaFree(data_d) );
                 data_d = nullptr;
             } 
         }
@@ -99,7 +99,7 @@ class MatBase : public tk::math::MatDump {
 
             resize(m.rows(), m.cols());
             useGPU();
-            HANDLE_ERROR( cudaMemcpy(data_d, m.data_d, m.size() * sizeof(T), cudaMemcpyDeviceToDevice) ); 
+            tkCUDA( cudaMemcpy(data_d, m.data_d, m.size() * sizeof(T), cudaMemcpyDeviceToDevice) ); 
         }
 
         __host__ void 
@@ -113,14 +113,14 @@ class MatBase : public tk::math::MatDump {
         synchGPU(){ 
 
             useGPU();
-            HANDLE_ERROR( cudaMemcpy(data_d, data_h, _size * sizeof(T), cudaMemcpyHostToDevice) ); 
+            tkCUDA( cudaMemcpy(data_d, data_h, _size * sizeof(T), cudaMemcpyHostToDevice) ); 
         }
 
         __host__ void 
         synchCPU(){ 
 
             tkASSERT(_gpu == true, "You set mat only on CPU\n");
-            HANDLE_ERROR( cudaMemcpy(data_h, data_d, _size * sizeof(T), cudaMemcpyDeviceToHost) ); 
+            tkCUDA( cudaMemcpy(data_h, data_d, _size * sizeof(T), cudaMemcpyDeviceToHost) ); 
         }
         
         __host__ void 
@@ -137,8 +137,8 @@ class MatBase : public tk::math::MatDump {
                 if(_maxSizeGPU < r * c) {
                     _maxSizeGPU = (r * c) * MAXSIZE_MARGIN;
                     if(data_d != nullptr)
-                        HANDLE_ERROR( cudaFree(data_d) );
-                    HANDLE_ERROR( cudaMalloc(&data_d, _maxSizeGPU * sizeof(T)) );
+                        tkCUDA( cudaFree(data_d) );
+                    tkCUDA( cudaMalloc(&data_d, _maxSizeGPU * sizeof(T)) );
                 }        
                 tkASSERT(_maxSizeGPU == _maxSize);
             }
