@@ -166,7 +166,7 @@ struct CircularArray {
         if(array != nullptr){
             T* temp = new T[_dim];
             memcpy(temp,array,std::min(dim,_dim)*sizeof(T));
-            delete [] array;
+            delete[] array;
             array = temp;
         }else{
             array = new T[_dim];

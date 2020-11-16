@@ -9,15 +9,13 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 
-#define clsName(X) (tk::tprint::printErr(abi::__cxa_demangle(typeid(*this).name());
+#define clsErr(X) (tk::tprint::printErr(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
 
-#define clsErr(X)  (tk::tprint::printErr(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
+#define clsSuc(X) (tk::tprint::printSuc(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
 
-#define clsSuc(X)  (tk::tprint::printSuc(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
+#define clsWrn(X) (tk::tprint::printWrn(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
 
-#define clsWrn(X)  (tk::tprint::printWrn(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
-
-#define clsMsg(X)  (tk::tprint::printMsg(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
+#define clsMsg(X) (tk::tprint::printMsg(abi::__cxa_demangle(typeid(*this).name(), 0, 0, NULL),X));
 
 namespace tk { namespace tprint{
 

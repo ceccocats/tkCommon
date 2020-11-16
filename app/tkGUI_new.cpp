@@ -6,11 +6,11 @@
 #include "tkCommon/gui/Drawables/Gps.h"
 #include "tkCommon/gui/Drawables/Plot.h"
 
-
 #include "tkCommon/data/CloudData.h"
 #include "tkCommon/data/GPSData.h"
 
 #include "tkCommon/gui/Drawables/Image.h"
+#include "tkCommon/gui/Drawables/DrawBuffer.h"
 
 #include <thread>
 

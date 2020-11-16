@@ -104,8 +104,9 @@ Viewer::init() {
     //Icon
     int channels;
     GLFWimage img;
-    img.pixels =tk::gui::common::loadImage(std::string(tkCommon_PATH) + "data/tkLogo.png", &img.width, &img.height, &channels);
+    img.pixels = tk::gui::common::loadImage(std::string(tkCommon_PATH) + "data/tkLogo.png", &img.width, &img.height, &channels);
     glfwSetWindowIcon(window,1,&img); 
+    free(img.pixels);
     glCheckError(); 
 
     //Callbacks

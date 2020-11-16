@@ -113,5 +113,9 @@ namespace tk{ namespace gui{
                 for(int i = 0; i< images.size(); i++)
                     textures[i]->release();
             }
+
+            std::string toString(){
+                return name;
+            }
 	};
 }}
