@@ -21,7 +21,7 @@ tk::gui::Viewer* 	viewer = tk::gui::Viewer::getInstance();
 void read_cloud(tk::data::GPSData& gps, tk::data::CloudData& cloud) {
 
 	tk::math::MatIO mat;
-	if(!mat.open("/home/alice/Documents/dataset/masa_ouster.mat"))
+	if(!mat.open(""))
 		return;
 	
 
