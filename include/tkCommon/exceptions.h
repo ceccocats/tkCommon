@@ -18,14 +18,14 @@ inline static void check_error(const char *file, const char *funz, int line, boo
     
     if(status == false){
         if(msg != "")
-            tkERR("tkAssert", msg+"\n");
-        tkERR("tkAssert", "function: "+std::string(funz)+" at "+file+":"+ std::to_string(line)+"\n");
+            tkERR(msg+"\n");
+        tkERR("function: "+std::string(funz)+" at "+file+":"+ std::to_string(line)+"\n");
         throw std::runtime_error("tkAssert");
     }
 }
 
 inline static void raise_error(const char *file, const char *funz, int line, std::string msg) {
-    tkERR("tkFatal", msg+"\nfunction: "+std::string(funz)+" at "+file+":"+ std::to_string(line)+"\n");
+    tkERR(msg+"\nfunction: "+std::string(funz)+" at "+file+":"+ std::to_string(line)+"\n");
     throw std::runtime_error("tkFatal");
 }
 
