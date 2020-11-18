@@ -1,6 +1,7 @@
 #pragma once
 #include "tkCommon/common.h"
-#include "tkCommon/gui/Color.h"
+#include "tkCommon/gui/utils/Color.h"
+#include "tkCommon/gui/Drawables/Drawable.h"
 #include "tkCommon/data/SensorData.h"
 #include "tkCommon/data/GPSData.h"
 #include "tkCommon/data/VehicleData.h"
@@ -333,7 +334,7 @@ class lane2D : public generic{
             return *this;
         }
 		void draw2D(tk::gui::Viewer *viewer) {
-        	viewer->tkDrawLineOnImage(points, sensorID, tk::gui::color::BLUE);
+        	//viewer->tkDrawLineOnImage(points, sensorID, tk::gui::color::BLUE);
 		}
 };
 
@@ -375,7 +376,7 @@ class object2D : public generic{
 
         void draw2D(tk::gui::Viewer *viewer) {
 
-			viewer->tkDrawBoxOnImage(box.x, box.y, box.w, box.h, sensorID, obj_class::getColor(objType.value));
+			//viewer->tkDrawBoxOnImage(box.x, box.y, box.w, box.h, sensorID, obj_class::getColor(objType.value));
 
         }
 };
@@ -400,7 +401,7 @@ class boundary : public generic{
 		}
 
 		void draw2D(tk::gui::Viewer *viewer) {
-			viewer->tkDrawLineOnImage(points, sensorID, tk::gui::color::RED);
+			//viewer->tkDrawLineOnImage(points, sensorID, tk::gui::color::RED);
 		}
 };
 
@@ -476,7 +477,7 @@ class rotatedBox3D : public generic{
             return *this;
         }
         void draw(tk::gui::Viewer *viewer){
-            viewer->tkDrawRotatedBox3D(pos, dim, rot, obj_class::getColor(objType), 150);
+            //viewer->tkDrawRotatedBox3D(pos, dim, rot, obj_class::getColor(objType), 150);
         }
 };
 
@@ -559,10 +560,6 @@ class perceptionData : public tk::data::SensorData{
 
         void release() override {}
 
-        bool checkDimension(SensorData *s) override {
-            return true;//TODO
-        }
-
         perceptionData& operator=(const perceptionData &s) {
             SensorData::operator=(s);
 
@@ -588,17 +585,17 @@ class perceptionData : public tk::data::SensorData{
 
 			for(int i = 0; i < signs.size(); i++){
 				tk::gui::Color_t c = obj_class::getColor(obj_class::ROADSIGN);
-				viewer->tkDrawPerceptionPyramid(signs[i].pos, rotation, c, 100);
+				//viewer->tkDrawPerceptionPyramid(signs[i].pos, rotation, c, 100);
 			}
 
         	if(!draw_masa_style){
 				for(int i = 0; i < boxes.size(); i++){
-					viewer->tkDrawRotatedBox3D(boxes[i].pos, boxes[i].dim, boxes[i].rot, obj_class::getColor(boxes[i].objType), 150);
+					//viewer->tkDrawRotatedBox3D(boxes[i].pos, boxes[i].dim, boxes[i].rot, obj_class::getColor(boxes[i].objType), 150);
 				}
         	}
         	else{
         		for(int i = 0; i < boxes.size(); i++){
-					viewer->tkDrawPerceptionPyramid(boxes[i].pos, rotation, obj_class::getColor(boxes[i].objType), 100);
+					//viewer->tkDrawPerceptionPyramid(boxes[i].pos, rotation, obj_class::getColor(boxes[i].objType), 100);
         		}
         	}
 
