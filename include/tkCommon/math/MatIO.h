@@ -68,26 +68,26 @@ public:
 
         bool check(matvar_t *var, matio_types tid, int rank, bool unary = false) {
             if(var == NULL) {
-                clsErr("unable to read var is NULL");
+                tkERR("unable to read var is NULL");
                 return false;
             }
             if(var->data == NULL) {
-                clsErr("unable to read var->data is NULL");
+                tkERR("unable to read var->data is NULL");
                 return false;
             }
             if(var->data_type != tid) {
-                clsErr("Unable to read value in var " + std::string(var->name) +"\n");
-                clsErr("type check failed: " + std::to_string(var->data_type) + " != " + std::to_string(tid) + "\n");
+                tkERR("Unable to read value in var " + std::string(var->name) +"\n");
+                tkERR("type check failed: " + std::to_string(var->data_type) + " != " + std::to_string(tid) + "\n");
                 return false;
             }
             if(var->rank != rank) {
-                clsErr("Unable to read value in var " + std::string(var->name) +"\n");
-                clsErr("Rank missmatch " + std::to_string(var->rank) + " != " + std::to_string(rank) + "\n");
+                tkERR("Unable to read value in var " + std::string(var->name) +"\n");
+                tkERR("Rank missmatch " + std::to_string(var->rank) + " != " + std::to_string(rank) + "\n");
                 return false;
             }
             if(unary && (var->dims[0] != 1 || var->dims[1] != 1) ) {
-                clsErr("Unable to read value in var " + std::string(var->name) +"\n");
-                clsErr("Dims are not unary: (" + std::to_string(var->dims[0]) + ", " + std::to_string(var->dims[1]) +")\n");
+                tkERR("Unable to read value in var " + std::string(var->name) +"\n");
+                tkERR("Dims are not unary: (" + std::to_string(var->dims[0]) + ", " + std::to_string(var->dims[1]) +")\n");
                 return false;
             }
             return true;
@@ -332,7 +332,7 @@ public:
             const char *names[fields.size()];
             for(int i=0; i<fields.size(); i++) {
                 if(fields[i].var == NULL) {
-                    clsErr("provided NULL field while creating struct: " + name  + "\n");
+                    tkERR("provided NULL field while creating struct: " + name  + "\n");
                     return false;
                 }
                 names[i] = fields[i].var->name;
@@ -365,7 +365,7 @@ public:
             matvar_t *cells[fields.size()];
             for(int i=0; i<fields.size(); i++) {
                 if(fields[i].var == NULL) {
-                    clsErr("provided NULL field while creating struct: " + name  + "\n");
+                    tkERR("provided NULL field while creating struct: " + name  + "\n");
                     return false;
                 }
                 cells[i] = fields[i].var;
@@ -394,7 +394,7 @@ public:
         
         matfp = Mat_CreateVer(mat_dir.c_str(), NULL, MAT_FT_MAT5);
         if(matfp == NULL) {
-            clsErr("can't create file: " + mat_dir + "\n");
+            tkERR("can't create file: " + mat_dir + "\n");
             return false;
         }
         return true;
@@ -409,7 +409,7 @@ public:
 
         matfp = Mat_Open(mat_dir.c_str(), MAT_ACC_RDWR);
         if(matfp == NULL) {
-            clsErr("can't open file: " + mat_dir + "\n");
+            tkERR("can't open file: " + mat_dir + "\n");
             return false;
         }
 
@@ -446,13 +446,13 @@ public:
      */
     void stats() {
         if(matfp == NULL) {
-            clsWrn("Matfile not opened\n");
+            tkWRN("Matfile not opened\n");
             return;
         }
         tkASSERT(fposes.size() == fposesMap.size());
 
-        clsMsg(std::string(matfp->header) + "\n");
-        clsMsg("file: " + std::string(matfp->filename) + "  ( " 
+        tkMSG(std::string(matfp->header) + "\n");
+        tkMSG("file: " + std::string(matfp->filename) + "  ( " 
                + std::to_string(fposesMap.size()) + " vars )\n");
     }
 

@@ -1,10 +1,43 @@
 #pragma once
 
 #include "tkCommon/gui/Viewer.h"
+#include "tkCommon/rt/Lockable.h"
 
 namespace tk{ namespace common{
 
-	class Polygon : public tk::gui::Drawable{
+	class Polygon : public tk::rt::Lockable{
+		public:
+			std::vector<tk::common::Vector2<float>> points;	
+
+			Polygon(){}
+			Polygon(const tk::common::Polygon& d){
+				this->points = d.points;
+			}
+			~Polygon(){}
+	};
+
+	class Prism : public Polygon{
+		public:
+			float base_z;
+			float height;
+
+			Prism(){}
+			Prism(const tk::common::Prism& d){
+				this->points = d.points;
+				this->height = d.height;
+				this->base_z = d.base_z;
+			}
+			~Prism(){}
+	};
+
+	class Prisms : public tk::rt::Lockable{
+		public:
+			std::vector<Prism> data;
+			Prisms(){}
+			~Prisms(){}
+	};
+
+	/*class Polygon : public tk::gui::Drawable{
 	public:
 		std::vector<tk::common::Vector2<float>> points;
 		tk::gui::Color_t color;
@@ -19,9 +52,9 @@ namespace tk{ namespace common{
 				glEnd();
 			}glPopMatrix();
 		}
-	};
+	};*/
 
-	class Prism : public Polygon {
+	/*class Prism : public Polygon {
 	public:
 		float base_z;
 		float height;
@@ -69,31 +102,5 @@ namespace tk{ namespace common{
 				glEnd();
 			}glPopMatrix();
 		}
-	};
-
-	typedef std::vector<Prism> Prisms;
-
-	class Polyhedron : public tk::gui::Drawable{
-	public:
-		tk::gui::Viewer::object3D_t obj;
-		tk::gui::Color_t color;
-		bool textured;
-
-		void load(std::string path){
-			if(path.substr(path.size()-4,4) == ".obj"){
-				path = path.substr(0,path.size()-4);
-			}
-			tk::gui::Viewer::tkLoadOBJ(path, obj);
-		}
-
-		void draw(tk::gui::Viewer *viewer){
-			glPushMatrix(); {
-				tk::gui::Viewer::tkSetColor(color);
-				tk::gui::Viewer::tkDrawObject3D(&obj, 1, textured);
-			} glPopMatrix();
-		}
-	};
-
-
-
+	};*/
 }}

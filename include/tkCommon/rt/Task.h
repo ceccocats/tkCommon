@@ -41,7 +41,7 @@ public:
         fd = timerfd_create(CLOCK_MONOTONIC, 0);
         timer_fd = fd;
         if (fd == -1) {
-            clsErr("could not init periodic task\n");
+            tkERR("could not init periodic task\n");
             return fd == 0;
         }
 
@@ -54,7 +54,7 @@ public:
         itval.it_value.tv_nsec = ns;
         ret = timerfd_settime(fd, 0, &itval, NULL);
         if(ret != 0) {
-            clsErr("could not init periodic task\n");
+            tkERR("could not init periodic task\n");
         }
         return ret == 0;
     }
@@ -68,7 +68,7 @@ public:
         number is written to "missed" */
         ret = read(timer_fd, &missed, sizeof(missed));
         if (ret == -1) {
-            clsErr("wait error periodic task\n");
+            tkERR("wait error periodic task\n");
             perror("read timer");
             return;
         }

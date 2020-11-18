@@ -94,7 +94,7 @@ namespace tk { namespace data {
 
             // safe string update
             if(this->name != s.name) {
-                clsWrn("Changing header name from " + name + " to " + s.name +
+                tkWRN("Changing header name from " + name + " to " + s.name +
                        " if this message appers it is a problem\n");
                 // this WARNING could be caused by the use of a tmpData in the sensor
                 // if you are using tmpData please be sure to not rewrite the header name

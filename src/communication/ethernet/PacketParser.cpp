@@ -5,7 +5,7 @@ tk::communication::PacketParser::firstFrame(pcap_t* pcapFile, timeStamp_t& stamp
                 
     int status = pcap_next_ex(pcapFile, &header, &pkt_data);
     if(status < 0) {
-        clsErr("PCAP error: " + std::to_string(status));
+        tkERR("PCAP error: " + std::to_string(status));
         return -1;
     }
 
@@ -34,7 +34,7 @@ tk::communication::PacketParser::firstFrame(pcap_t* pcapFile, timeStamp_t& stamp
         }
 
         if(detectFragment == false){
-            clsMsg("IP Fragment detected, auto defragment active\n");
+            tkMSG("IP Fragment detected, auto defragment active\n");
         }
         detectFragment = true;
         return firstFrame(pcapFile,stamp);

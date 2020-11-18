@@ -8,7 +8,7 @@
 #include <string>
 #include <sstream>
 #include <initializer_list>
-#include "tkCommon/CudaCommon.h"
+#include "tkCommon/cuda.h"
 #include "tkCommon/math/Mat.h"
 
 namespace tk { namespace math {

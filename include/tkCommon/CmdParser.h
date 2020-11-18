@@ -1,6 +1,5 @@
 #pragma once
 #include "tkCommon/common.h"
-#include <tkCommon/printTerminal.h>
 
 namespace tk { namespace common {
 

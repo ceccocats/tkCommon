@@ -12,12 +12,10 @@
 #include <Eigen/Dense>
 
 #undef None // defined by X11 cause conflicts with YAML
+#include "tkCommon/time.h"
 #include "tkCommon/utils.h"
-#include "tkCommon/timer.h"
 #include "tkCommon/geodetic_conv.h"
 #include "tkCommon/CmdParser.h"
-#include "tkCommon/printTerminal.h"
-#include "tkCommon/log.h"
 #include "tkCommon/exceptions.h"
 #include "tkCommon/Map.h"
 #include "tkCommon/math/Mat.h"
@@ -406,84 +404,6 @@ namespace tk { namespace common {
      * @return
      */
     Vector3<float> tf2rot(Tfpose tf);
-
-    /**
-     * project 2d point to 3d point
-     * @param p_mat projection matrix
-     * @param v_mat model view matrix
-     * @param screenW
-     * @param screenH
-     * @param pos expressed as (x, y, zplane)
-     * @return 3d point
-     */
-    Eigen::Vector3f unproj_3d(Eigen::Matrix4f p_mat, Eigen::Matrix4f v_mat,
-                                     float screenW, float screenH, Eigen::Vector3f pos);
-
-
-    /**
-     * Project 3d point to 2d screen coordinate
-     * @param p_mat projection matrix
-     * @param v_mat model view matrix
-     * @param screenW
-     * @param screenH
-     * @param pos expressed as (x, y, z, 1)
-     * @return 2d screen position
-     */
-    Eigen::Vector2f proj_2d(Eigen::Matrix4f p_mat, Eigen::Matrix4f v_mat,
-                                   float screenW, float screenH, Eigen::Vector4f pos);
-
-
-    /**
-     * dump memory as hexdump
-     * @param os
-     * @param buffer
-     * @param bufsize
-     * @param showPrintableChars
-     * @return
-     */
-    std::ostream& hex_dump(std::ostream& os, const void *buffer,
-                                  std::size_t bufsize, bool showPrintableChars = true);
-
-    /**
-     * Serialize an eigen matrix in binary
-     * @tparam T data type
-     * @tparam R number of rows (-1 is dynamic)
-     * @tparam C number of cols (-1 is dynamic)
-     * @param m
-     * @param os
-     * @return
-     */
-    template <class T, int R=-1, int C=-1>
-    inline bool serializeMatrix(Eigen::Matrix<T, R, C> &m, std::ofstream &os) {
-        int size[2];
-        size[0] = m.rows();
-        size[1] = m.cols();
-        //std::cout<<"Matrix serialize: ("<<size[0]<<"x"<<size[1]<<")";
-
-        os.write((char *)size, 2*sizeof(int));
-        os.write((char *)m.data(), m.size() * sizeof(T));
-        return os.is_open();
-    }
-
-
-    /**
-     * Deserialize an eigen matrix in binary
-     * @tparam T data type
-     * @tparam R number of rows (-1 is dynamic)
-     * @tparam C number of cols (-1 is dynamic)
-     * @param m
-     * @param os
-     * @return
-     */
-    template <class T, int R=-1, int C=-1>
-    inline bool deserializeMatrix(Eigen::Matrix<T, R, C> &m, std::ifstream &is) {
-        int size[2] = { 0, 0 };
-        is.read((char*)size, 2*sizeof(int));
-        //std::cout<<"Matrix deserialize: ("<<size[0]<<"x"<<size[1]<<")\n";
-        m.resize(size[0], size[1]);
-        is.read((char *)m.data(), m.size() * sizeof(T));
-        return is.is_open();
-    }
 
 
     /**

@@ -3,7 +3,6 @@
 
 #include "tkCommon/common.h"
 #include "tkCommon/utils.h"
-#include "tkCommon/printTerminal.h"
 #include "tkCommon/communication/ethernet/PacketParser.h"
 
 namespace tk { namespace communication {

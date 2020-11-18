@@ -10,7 +10,7 @@ void Texture<uint8_t>::init(int width, int height, int channels, bool anti_alias
     this->anti_aliasing = anti_aliasing;
 
     if(channels > 4 && channels < 1){
-        clsErr("You must set 1, 2, 3 or 4 channel. Abort\n");
+        tkERR("You must set 1, 2, 3 or 4 channel. Abort\n");
     }
 
     type =  GL_UNSIGNED_BYTE;
@@ -44,7 +44,7 @@ void Texture<float>::init(int width, int height, int channels, bool anti_aliasin
     this->anti_aliasing = anti_aliasing;
 
     if(channels > 4 && channels < 1){
-        clsErr("You must set 1, 2, 3 or 4 channel. Abort\n");
+        tkERR("You must set 1, 2, 3 or 4 channel. Abort\n");
     }
 
     type =  GL_FLOAT;

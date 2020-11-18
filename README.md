@@ -4,6 +4,8 @@
 ```
 sudo apt-get install libgles2-mesa-dev # NOT on aarch64
 sudo apt install git build-essential cmake rsync libeigen3-dev libglew-dev libglfw3-dev freeglut3-dev libfreetype6-dev libyaml-cpp-dev libpcap-dev libmatio-dev
+
+# optional: cuda, ros
 ```
 #### compile
 ```
@@ -22,4 +24,5 @@ make -j8
 |[OBJ-Loader](https://github.com/Bly7/OBJ-Loader)|Robert Smith| MIT|
 |[Argh!](https://github.com/adishavit/argh)| Adi Shavit| Argh! |
 |[geodetic_utils](https://github.com/ethz-asl/geodetic_utils)| Enric Galceran, Marija Popović |BSD3|
+|[gamepad](https://github.com/elanthis/gamepad)| seanmiddleditch | MIT|
 

@@ -27,12 +27,7 @@ class axisPlot : public tk::gui::shader::generic
             std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/axis.frag";
             
             shader.init(vertex, fragment, geometry);
-            
-            vertexPointer.resize(4);
-            vertexPointer[0] = {3,3,0};
-            vertexPointer[1] = {1,1,2};
-            vertexPointer[2] = {1,1,3};
-            vertexPointer[3] = {1,1,4};
+            vertexPointer.resize(2);
         }
 
         ~axisPlot(){
@@ -43,14 +38,18 @@ class axisPlot : public tk::gui::shader::generic
 
             glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
 
+            vertexPointer[0] = {3,3,0};
+            vertexPointer[1] = {3,3,n*3};
             buffer->setVertexAttribs(vertexPointer);
 
             shader.use();
             shader.setMat4("modelview",modelview);
 
+            buffer->use();
             glLineWidth(size);
             glDrawArrays(GL_POINTS, 0, n);
             glLineWidth(1.0);
+            buffer->unuse();
             
             shader.unuse();
 

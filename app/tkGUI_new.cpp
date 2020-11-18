@@ -6,10 +6,11 @@
 #include "tkCommon/gui/Drawables/Gps.h"
 #include "tkCommon/gui/Drawables/Plot.h"
 
-
 #include "tkCommon/data/CloudData.h"
 #include "tkCommon/data/GPSData.h"
 
+#include "tkCommon/gui/Drawables/Image.h"
+#include "tkCommon/gui/Drawables/DrawBuffer.h"
 
 #include <thread>
 
@@ -20,7 +21,9 @@ tk::gui::Viewer* 	viewer = tk::gui::Viewer::getInstance();
 void read_cloud(tk::data::GPSData& gps, tk::data::CloudData& cloud) {
 
 	tk::math::MatIO mat;
-	mat.open("/home/alice/Documents/dataset/masa_ouster.mat");
+	if(!mat.open(""))
+		return;
+	
 
 	tk::common::Tfpose pose = tk::common::Tfpose::Identity();
 
@@ -51,7 +54,7 @@ void read_cloud(tk::data::GPSData& gps, tk::data::CloudData& cloud) {
 
 		cloud.points.copyFrom(points.data(),points.rows(),points.cols());
 		cloud.features[tk::data::CloudData_gen::FEATURES_I].copyFrom(intensity.data(),intensity.rows(),intensity.cols());
-		//cloud.gammaCorrectionIntensity();
+		cloud.gammaCorrectionIntensity();
 
 		cloud.unlockWrite();
 
@@ -67,7 +70,7 @@ void read_cloud(tk::data::GPSData& gps, tk::data::CloudData& cloud) {
 		a+=0.001;
 		plt->addPoint(pose);
 
-		usleep(1000);
+		usleep(100000);
 	}
 
 	mat.close();
@@ -94,7 +97,7 @@ int main(){
 
 	viewer->start();
 
-	plt = new tk::gui::Plot("provaPlot", 1000, tk::gui::Plot::type_t::LINE, 1);
+	plt = new tk::gui::Plot("provaPlot", 1, tk::gui::Plot::type_t::LINE, 1);
 	viewer->add(new tk::gui::Grid());
 	viewer->add(new tk::gui::Axis());
 	viewer->add(new tk::gui::Mesh(std::string(tkCommon_PATH) + "data/levante.obj"));

@@ -6,8 +6,8 @@ namespace tk { namespace data {
     class CloudData : public CloudData_gen{
 
         private:
-            double lo_state_i = -1.0;
-            double hi_state_i = -1.0;
+            double lo_state = -1.0;
+            double hi_state = -1.0;
         
         public:
 
@@ -68,18 +68,18 @@ namespace tk { namespace data {
         void gammaCorrectionIntensity(){
 
             if(features.size() == 0){
-                clsErr("Empty\n");
+                tkERR("Empty\n");
                     return;
             }
 
             if(!features.exists(tk::data::CloudData::FEATURES_I)){
-                    clsErr("Error\n");
+                    tkERR("Error\n");
                     return;
             }
-            const tk::math::Vec<float> *f = &features[tk::data::CloudData::FEATURES_I];
+            const tk::math::Vec<float> *intensity = &features[tk::data::CloudData::FEATURES_I];
 
             // Get low and high value
-            double lo = 99999.0f; 
+            /*double lo = 99999.0f; 
             double hi = -9999.0f;
             for(int i = 0; i < f->size(); i++){
                 if(f->data_h[i] < lo)
@@ -96,17 +96,41 @@ namespace tk { namespace data {
                 hi_state_i = hi;
             }
             lo_state_i = 0.8f * lo_state_i + 0.2f * lo;
-            hi_state_i = 0.8f * hi_state_i + 0.2f * hi;
+            hi_state_i = 0.8f * hi_state_i + 0.2f * hi;*/
 
+
+
+            const size_t n = intensity->size();
+            const size_t kth_extreme = n / 100;
+            std::vector<size_t> indices(n);
+            for (size_t i = 0; i < n; i++) {
+                indices[i] = i;
+            }
+            auto cmp = [&](const size_t a, const size_t b) {
+                return intensity->data_h[a] < intensity->data_h[b];
+            };
+            std::nth_element(indices.begin(), indices.begin() + kth_extreme,
+                                indices.end(), cmp);
+            const double lo = intensity->data_h[*(indices.begin() + kth_extreme)];
+            std::nth_element(indices.begin() + kth_extreme,
+                                indices.end() - kth_extreme, indices.end(), cmp);
+            const double hi = intensity->data_h[*(indices.end() - kth_extreme)];
+            if (lo_state < 0) {
+                lo_state = lo;
+                hi_state = hi;
+            }
+            lo_state = 0.9 * lo_state + 0.1 * lo;
+            hi_state = 0.9 * hi_state + 0.1 * hi;
+            
             // Apply gamma correction
-            for(int i = 0; i < f->size(); i++){
+            for(int i = 0; i < intensity->size(); i++){
 
                 double value;
-                value = (f->data_h[i] - lo) / (hi - lo);
+                value = (intensity->data_h[i] - lo) / (hi - lo);
                 value = sqrt(value);
                 if(value > 1.0f) value = 1.0f;
                 if(value < 0.0f) value = 0.0f;
-                f->data_h[i] = value;
+                intensity->data_h[i] = value;
             }
         }
     };

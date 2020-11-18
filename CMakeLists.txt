@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.5)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.15)
 
 PROJECT(tkCommon)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
@@ -13,8 +13,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 #-------------------------------------------------------------------------------
 # CUDA
 #-------------------------------------------------------------------------------
-find_package(CUDA 9.0 REQUIRED)
+find_package(CUDA 9.0 QUIET)
 include_directories(${CUDA_INCLUDE_DIRS})
+if(CUDA_FOUND)
+    add_definitions(-DTKCUDA_ENABLED)
+endif()
 
 #-------------------------------------------------------------------------------
 # External Libraries
@@ -47,9 +50,7 @@ set(GUI_LIBS
     X11
     gcc_s
     gcc
-    ${CUDA_LIBRARIES}
 )
-
 
 #-------------------------------------------------------------------------------
 # Generate Data Headers
@@ -87,8 +88,6 @@ add_library(tkGUI SHARED
     src/gui/imgui/imgui.cpp
     src/gui/imgui/imgui_impl_glfw.cpp
     src/gui/imgui/imgui_impl_opengl3.cpp
-    src/common.cpp
-    src/version.cpp
 )
 target_link_libraries(tkGUI ${GUI_LIBS})
 
@@ -100,7 +99,7 @@ add_library(tkCommon SHARED
     src/rt/Profiler.cpp
     include/tkCommon/data/gen/CloudData_gen.cpp   
 )
-target_link_libraries(tkCommon tkGUI yaml-cpp matio dl)
+target_link_libraries(tkCommon yaml-cpp matio dl)
 
 add_library(tkCommunication SHARED
     src/communication/ethernet/UDPSocket.cpp
@@ -158,7 +157,7 @@ foreach(cpp ${tkpackage_APPScpp})
 endforeach()
 foreach(app ${tkpackage_APPS})
     add_executable(${app} "app/${app}.cpp")
-    target_link_libraries(${app} tkCommon tkCommunication tkJoystick ${GUI_LIBS})
+    target_link_libraries(${app} tkCommon tkGUI tkCommunication tkMath tkJoystick ${GUI_LIBS} ${CUDA_LIBRARIES})
 endforeach()
 
 #-------------------------------------------------------------------------------
@@ -166,14 +165,14 @@ endforeach()
 #-------------------------------------------------------------------------------
 file(GLOB tkpackage_TESTScpp "app/test/*.cpp")
 add_executable(tkCommon_test "${tkpackage_TESTScpp}")
-target_link_libraries(tkCommon_test tkCommon tkCommunication tkJoystick ${GUI_LIBS})
+target_link_libraries(tkCommon_test tkCommon tkGUI tkCommunication tkMath tkJoystick ${GUI_LIBS} ${CUDA_LIBRARIES})
 
 
 #-------------------------------------------------------------------------------
 # Install
 #-------------------------------------------------------------------------------
-#install(TARGETS ${tkpackage_APPS} DESTINATION bin )
-#install(TARGETS tkCommon tkGUI tkMath tklibDrawText tkCommunication DESTINATION lib)
+install(TARGETS ${tkpackage_APPS} DESTINATION bin )
+install(TARGETS tkCommon tkGUI tkCommunication tkMath tkJoystick DESTINATION lib)
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts/" # source directory
         DESTINATION "bin/"
 )

@@ -25,7 +25,7 @@ namespace tk { namespace data {
          * @brief Release method.
          * Must be implemented by child classes, and will handle the deallocation of member variables, if any,
          */
-        virtual void release() { clsErr("release method not implemented"); tkFATAL("abort"); };
+        virtual void release() { tkERR("release method not implemented"); tkFATAL("abort"); };
 
         /**
          * @brief Overloading of operator =

@@ -82,6 +82,10 @@ namespace tk{ namespace gui{
                 tk::gui::shader::mesh* shaderMesh= (tk::gui::shader::mesh*) shader;
                 shaderMesh->close();
                 delete shaderMesh;
+
+                for(int i = 0; i < obj.size(); i++){
+                    obj[i].release(); 
+                }
             }
 
             std::string toString(){

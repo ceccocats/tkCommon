@@ -3,7 +3,7 @@
 layout (location = 0) in vec3 point;
 layout (location = 1) in vec3 rot;
 
-const float lenght  =  0.04f;
+const float lenght  =  1.0f;
 
 out VS_OUT {
     vec3 rotPt;
