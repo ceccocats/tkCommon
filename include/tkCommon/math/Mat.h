@@ -32,6 +32,7 @@ class MatBase : public tk::math::MatDump {
         int     _size;
         bool    _gpu;
         Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> eigen;
+        bool    _isCopy;
 
     public:
         T*      data_d;
@@ -47,24 +48,45 @@ class MatBase : public tk::math::MatDump {
             _cols = 0;
             _size = 0;
             _gpu  = false;
+            _isCopy = false;
         }
 
         __host__
         ~MatBase(){
-            if(data_h != nullptr){
-                delete [] data_h;
-                data_h = nullptr;
-            } 
-            if(data_d != nullptr && _gpu == true){
-                tkCUDA( cudaFree(data_d) );
-                data_d = nullptr;
-            } 
+            if(_isCopy == false){
+                if(data_h != nullptr){
+                    delete [] data_h;
+                    data_h = nullptr;
+                } 
+                if(data_d != nullptr && _gpu == true){
+                    tkCUDA( cudaFree(data_d) );
+                    data_d = nullptr;
+                } 
+            }
         }
 
         __host__ 
-        MatBase(int r, int c){
+        MatBase(int r, int c) : MatBase<T>(){
             if(r > 0 && c > 0){
                 resize(r,c);
+            }
+        }
+
+        __host__ 
+        MatBase(const tk::math::MatBase<T>& m){
+            this->_isCopy  = true;
+            this->_size    = m.size();
+            this->_cols    = m.cols();
+            this->_rows    = m.rows();
+            this->_maxSize = m.maxSize();
+            this->data_h   = m.data_h;
+
+            if(m.hasGPU()){
+                this->_maxSizeGPU = m.maxSize();
+                this->data_d      = m.data_d;
+                this->_gpu = true;
+            }else{
+                this->_gpu = false;
             }
         }
 
@@ -164,12 +186,24 @@ class MatBase : public tk::math::MatDump {
         size() const { 
             return _size; 
         }
+
+        __host__ int 
+        maxSize() const { 
+            return _maxSize; 
+        }
         
         __host__ T&
         operator()(int r, int c) {
             //tkASSERT(r < this->_rows && r >= 0, "Out of memory, rows "+std::to_string(r)+" > "+std::to_string(this->_rows)+"\n")
             //tkASSERT(c < this->_cols && c >= 0, "Out of memory, cols "+std::to_string(c)+" > "+std::to_string(this->_cols)+"\n")
             return data_h[r+c*_rows]; 
+        }
+
+        __host__ T&
+        operator[](int i) {
+            //tkASSERT(r < this->_rows && r >= 0, "Out of memory, rows "+std::to_string(r)+" > "+std::to_string(this->_rows)+"\n")
+            //tkASSERT(c < this->_cols && c >= 0, "Out of memory, cols "+std::to_string(c)+" > "+std::to_string(this->_cols)+"\n")
+            return data_h[i]; 
         }
         
         __device__ T&  
@@ -239,6 +273,7 @@ class MatBase : public tk::math::MatDump {
             eigen = Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>>(data_h, _rows, _cols);
             return eigen;
         }
+        
 
 };
 

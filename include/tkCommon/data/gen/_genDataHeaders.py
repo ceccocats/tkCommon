@@ -117,7 +117,7 @@ genData(className, VARS, DEPS)
 
 className = "ImageData_gen"
 DEPS = ["#include \"tkCommon/math/Mat.h\"\n"]
-VARS = [ {"name":"data", "type":"tk::math::Mat<uint8_t>"},
+VARS = [ {"name":"data", "type":"uint8_t*"},
          {"name":"width", "type":"uint32_t", "default": "0"},
          {"name":"height", "type":"uint32_t", "default": "0"},
          {"name":"channels", "type":"uint32_t", "default": "0"}]
@@ -131,9 +131,9 @@ genData(className, VARS, DEPS)
 
 className = "CalibData_gen"
 DEPS = ["#include \"tkCommon/math/Mat.h\"\n"]
-VARS = [ {"name":"K",   "type":"tk::math::Mat<float>", "init":"K.resize(3,3)"},
-         {"name":"D",   "type":"tk::math::Mat<float>", "init":"D.resize(1,5)"},
-         {"name":"R",   "type":"tk::math::Mat<float>", "init":"R.resize(3,3)"} ]
+VARS = [ {"name":"k",   "type":"tk::math::Mat<float>", "init":"k.resize(3,3)"},
+         {"name":"d",   "type":"tk::math::Mat<float>", "init":"d.resize(1,5)"},
+         {"name":"r",   "type":"tk::math::Mat<float>", "init":"r.resize(3,3)"} ]
 genData(className, VARS, DEPS)
 
 className = "ActuationData_gen"

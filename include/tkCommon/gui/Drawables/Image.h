@@ -5,7 +5,7 @@
 
 namespace tk{ namespace gui{
 
-	class imguiTexture : public Drawable {
+	class Image : public Drawable {
 
         private:
             std::vector<tk::gui::Texture<uint8_t>*>  textures; 
@@ -16,10 +16,11 @@ namespace tk{ namespace gui{
             std::string name;
 
         public:
-            imguiTexture(std::string name, int n){
+            Image(std::string name, int n){
                 this->textures.resize(n);
                 this->images.resize(n);
                 this->updates.resize(n);
+                this->ready.resize(n);
                 for(int i = 0; i < n; i++){
                     this->updates[i] = false;
                     this->ready[i]   = false;
@@ -27,13 +28,14 @@ namespace tk{ namespace gui{
                 this->name = name;
             }
 
-            imguiTexture(std::string name, int n, ...){
+            Image(std::string name, int n, ...){
                 va_list arguments; 
 
                 va_start(arguments, n);   
                 this->textures.resize(n);
                 this->images.resize(n);
                 this->updates.resize(n);
+                this->ready.resize(n);
 
                 for(int i = 0; i < n; i++){
                     this->images[i]  = va_arg(arguments, tk::data::ImageData*);
@@ -44,7 +46,7 @@ namespace tk{ namespace gui{
                 this->name = name;
             }
 
-            ~imguiTexture(){
+            ~Image(){
 
             }
 
@@ -53,7 +55,7 @@ namespace tk{ namespace gui{
                     if(this->ready[i] == true){
                         textures[i] = new tk::gui::Texture<uint8_t>();
                         textures[i]->init(images[i]->width, images[i]->height, images[i]->channels);
-                        textures[i]->setData(images[i]->data.data_h);
+                        textures[i]->setData(images[i]->data);
                     }
 
                 }
@@ -78,17 +80,17 @@ namespace tk{ namespace gui{
                         }
                         //Copy data
                         images[i]->lock();
-                        textures[i]->setData(images[i]->data.data_h);
+                        textures[i]->setData(images[i]->data);
                         images[i]->unlockRead();
                     }
 
                     ImGui::Begin(name.c_str(), NULL, ImGuiWindowFlags_NoScrollbar);
                     if(this->ready[i] == true){
                         
-                        //int imgX = ImGui::GetWindowSize().x-20;
+                        float imgX = ImGui::GetWindowSize().x-20;
                         //int imgY = ImGui::GetWindowSize().y-35;
-                        float imgX = textures[i]->width;
-                        float imgY = textures[i]->height;
+                        //float imgX = textures[i]->width;
+                        float imgY = imgX / ((float)textures[i]->width / textures[i]->height);
                         ImGui::Text("%s",images[i]->header.name.c_str());
                         ImGui::Image((void*)(intptr_t)textures[i]->id(), ImVec2(imgX, imgY));
                         ImGui::Separator();
