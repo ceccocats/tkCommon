@@ -117,7 +117,7 @@ genData(className, VARS, DEPS)
 
 className = "ImageData_gen"
 DEPS = ["#include \"tkCommon/math/Mat.h\"\n"]
-VARS = [ {"name":"data", "type":"tk::math::Mat<uint8_t>"},
+VARS = [ {"name":"data", "type":"uint8_t*"},
          {"name":"width", "type":"uint32_t", "default": "0"},
          {"name":"height", "type":"uint32_t", "default": "0"},
          {"name":"channels", "type":"uint32_t", "default": "0"}]
