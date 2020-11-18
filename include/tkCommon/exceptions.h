@@ -18,7 +18,7 @@ inline static void check_error(const char *file, const char *funz, int line, boo
     
     if(status == false){
         if(msg != "")
-            tkERR(msg);
+            tkERR(msg+"\n");
         tkERR("function: "+std::string(funz)+" at "+file+":"+ std::to_string(line)+"\n");
         throw std::runtime_error("tkAssert");
     }

@@ -5,10 +5,10 @@
 #include <pthread.h>
 
 int size = 5;
-tk::common::Pool<tk::data::GPSData> pool;
-tk::data::GPSData                   *data = nullptr;
-const tk::data::GPSData             *cData = nullptr;
-bool    gRun = true;
+tk::rt::DataPool            pool;
+tk::data::GPSData           *data = nullptr;
+const tk::data::GPSData     *cData = nullptr;
+bool gRun = true;
 std::mutex mtx;
 
 void
@@ -26,15 +26,19 @@ void
     int idx;
     int counter = 0;
     while(gRun) {
-        data = pool.add(idx);
+        data = dynamic_cast<tk::data::GPSData*>(pool.add(idx));
 
         data->lat = counter;
         data->lon = counter;
 
+        mtx.lock();
+        std::cout<<"Ho inserito "<<data->lat<<", "<<data->lon<<"\n";
+        mtx.unlock();
+
         pool.releaseAdd(idx);
 
         counter++;
-        usleep(1000000);
+        usleep(10000);
     }
 
     pthread_exit(nullptr);
@@ -47,10 +51,10 @@ void
     
     int idx;
     while(gRun) {
-        cData = pool.getNew(idx);
+        cData = dynamic_cast<const tk::data::GPSData*>(pool.getNew(idx));
         if (cData!= nullptr)  {
             mtx.lock();
-            std::cout<<pthread_self()<<"\tlat "<<cData->lat<<", lon "<<cData->lon<<"\n";
+            std::cout<<"getNew "<<pthread_self()<<"\tlat "<<cData->lat<<", lon "<<cData->lon<<"\n";
             mtx.unlock();
             pool.releaseGet(idx);
         }
@@ -67,14 +71,14 @@ void
     
     int idx;
     while(gRun) {
-        cData = pool.getLast(idx);
+        cData = dynamic_cast<const tk::data::GPSData*>(pool.getLast(idx));
         
         mtx.lock();
-        std::cout<<"reader2"<<"\tlat "<<cData->lat<<", lon "<<cData->lon<<"\n";
+        std::cout<<"getLast"<<"\tlat "<<cData->lat<<", lon "<<cData->lon<<"\n";
         mtx.unlock();
         pool.releaseGet(idx);
 
-        usleep(500000);
+        usleep(5000);
     }
 
     pthread_exit(nullptr);
@@ -85,14 +89,7 @@ int main( int argc, char** argv){
     signal(SIGINT, my_handler);
     int idx;
     // init pool data 
-    pool.init(10);
-    for (int i = 0; i < size; i++) {
-        data = pool.add(idx);
-
-        data->init();
-
-        pool.releaseAdd(idx);
-    }
+    pool.init<tk::data::GPSData>(10);
 
     // spawn threads
     pthread_t pt1, pt2, pt3, pt4;

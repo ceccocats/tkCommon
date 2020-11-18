@@ -92,7 +92,7 @@ def isVarStatic(name):
 	
 
 def isVarSTD(name):
-	return name.startswith("std::") or name.startswith("struct")
+	return name.startswith("std::") or name.startswith("struct") or name.endswith("*")
 
 
 def genData(className, VARS, DEPS = []):
