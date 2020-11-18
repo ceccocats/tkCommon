@@ -8,7 +8,7 @@
                             const char *file,
                             int line ) {
         if (err != cudaSuccess) {
-            tkERR(cudaGetErrorString( err ));
+            tkERR(cudaGetErrorString( err )<<"\n");
             tkERR("file: "<<file<<":"<<line<<"\n");
             throw std::runtime_error("cudaError");
         }
