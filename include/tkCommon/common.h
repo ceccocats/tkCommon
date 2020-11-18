@@ -17,6 +17,7 @@
 #include "tkCommon/geodetic_conv.h"
 #include "tkCommon/CmdParser.h"
 #include "tkCommon/printTerminal.h"
+#include "tkCommon/log.h"
 #include "tkCommon/exceptions.h"
 #include "tkCommon/Map.h"
 #include "tkCommon/math/Mat.h"
