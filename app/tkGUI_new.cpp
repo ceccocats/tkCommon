@@ -5,6 +5,7 @@
 #include "tkCommon/gui/Drawables/Mesh.h"
 #include "tkCommon/gui/Drawables/Gps.h"
 #include "tkCommon/gui/Drawables/Plot.h"
+#include "tkCommon/gui/Drawables/PolyLine.h"
 
 #include "tkCommon/data/CloudData.h"
 #include "tkCommon/data/GPSData.h"
