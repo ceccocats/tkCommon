@@ -27,19 +27,19 @@ class box{
         }
 
         box(float x, float y, float w, float h){
-            this->x = b.x;
-            this->y = b.y;
-            this->w = b.w;
-            this->h = b.h;
+            this->x = x;
+            this->y = y;
+            this->w = w;
+            this->h = h;
         }
  
         box(float x, float y, float z, float w, float h, float d){
-            this->x = b.x;
-            this->y = b.y;
-            this->z = b.z;
-            this->w = b.w;
-            this->h = b.h;
-            this->d = b.d;
+            this->x = x;
+            this->y = y;
+            this->z = z;
+            this->w = w;
+            this->h = h;
+            this->d = d;
         }
 
         box& 
