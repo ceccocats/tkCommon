@@ -71,6 +71,14 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/shade
     add_custom_target(tkshaderpointcloud_gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/shader/colormaps/*)
 
 #-------------------------------------------------------------------------------
+# Generate Drawables include
+#-----------------------------------------------------------------------------
+add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/Drawables/*
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/Drawables
+    COMMAND python3 _drawables.py)
+    add_custom_target(tkdrawablesgen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/Drawables/*)
+
+#-------------------------------------------------------------------------------
 # Build Libraries
 #-------------------------------------------------------------------------------
 add_library(tkGUI SHARED
@@ -144,7 +152,7 @@ endif()
 add_custom_target(tkversiongit COMMAND rsync --checksum tkversion_git.tmp tkversion_git.h)
 add_dependencies(tkversiongit tkversiongit_tmp)
 add_dependencies(tkCommon tkversiongit tkdataheaders_gen)
-add_dependencies(tkGUI tkversiongit tkdataheaders_gen tkshaderpointcloud_gen)
+add_dependencies(tkGUI tkversiongit tkdataheaders_gen tkshaderpointcloud_gen tkdrawablesgen)
 
 
 #-------------------------------------------------------------------------------
@@ -171,7 +179,7 @@ target_link_libraries(tkCommon_test tkCommon tkGUI tkCommunication tkMath tkJoys
 #-------------------------------------------------------------------------------
 # Install
 #-------------------------------------------------------------------------------
-install(TARGETS ${tkpackage_APPS} DESTINATION bin )
+install(TARGETS ${tkpackage_APPS} DESTINATION bin)
 install(TARGETS tkCommon tkGUI tkCommunication tkMath tkJoystick DESTINATION lib)
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts/" # source directory
         DESTINATION "bin/"
