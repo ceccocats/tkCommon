@@ -252,6 +252,7 @@ class MatBase : public tk::math::MatDump {
 
         void 
         print() {
+            std::cout<<"Mat ("<<rows()<<"x"<<cols()<<")\n";
             for(int i = 0; i < rows(); ++i) {
                 std::cout << std::endl;
                 for(int j = 0; j < cols(); ++j) {
