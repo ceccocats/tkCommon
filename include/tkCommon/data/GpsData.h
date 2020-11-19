@@ -3,7 +3,7 @@
 
 namespace tk { namespace data {
 
-    class GPSData : public GpsData_gen {
+    class GpsData : public GpsData_gen {
    
     };
 }}

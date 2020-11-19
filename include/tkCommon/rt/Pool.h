@@ -22,7 +22,31 @@ private:
     int         last;
     int         locked;
     int         size;
+    int         inserted;
     bool        initted;
+
+    const tk::data::SensorData* 
+    getLast(int &id) {
+        gmtx.lock();
+
+            id = last;
+            // starting from last,
+            int i = 0;
+            while(true) {
+                // starting from last search for unlocked element
+                id = (id + (size-i)) % size;
+                if(data[id]->tryLock()) {
+                    nReader[id]++;
+                    data[id]->unlockRead();
+                    break;
+                }
+                i++;
+            }
+        gmtx.unlock();
+
+        return dynamic_cast<const tk::data::SensorData*>(data[id]);
+    }
+
 public:
     /**
      * @brief Construct a new DataPool object
@@ -32,6 +56,7 @@ public:
         last        = 0;
         locked      = 0;
         size        = 0;
+        inserted    = 0;
         initted     = false;
         gmtx.unlock();
     }
@@ -109,7 +134,7 @@ public:
      * @param id 
      */
     void 
-    releaseAdd(int id) {
+    releaseAdd(const int id) {
         gmtx.lock();
 
         // check if was really locked
@@ -120,6 +145,8 @@ public:
         // unlock anyway
         data[id]->unlockWrite(); 
 
+        inserted++;
+
         // notify new data available
         cv.notify_all();
 
@@ -127,61 +154,46 @@ public:
     }
 
     /**
-     * @brief Get the Last object
+     * @brief 
      * 
      * @param id 
+     * @param timeout 
      * @return const tk::data::SensorData* 
      */
     const tk::data::SensorData* 
-    getLast(int &id) {
-        gmtx.lock();
-
-            id = last;
-            // starting from last,
-            int i = 0;
-            while(true) {
-                // starting from last search for unlocked element
-                id = (id + (size-i)) % size;
-                if(data[id]->tryLock()) {
-                    nReader[id]++;
-                    data[id]->unlockRead();
-                    break;
-                }
-                i++;
-            }
-        gmtx.unlock();
-
-        return dynamic_cast<const tk::data::SensorData*>(data[id]);
-    }
-
-    /**
-     * @brief Get the New object
-     * 
-     * @param id 
-     * @return const tk::data::SensorData* 
-     */
-    const tk::data::SensorData*
-    getNew(int &id) {
-        std::unique_lock<std::mutex> lck(gmtx);
-            if (cv.wait_for(lck, std::chrono::seconds(1)) == std::cv_status::timeout) {
+    get(int &id, uint64_t timeout = 0) {
+        if (timeout != 0) {
+            std::unique_lock<std::mutex> lck(gmtx);
+            if (cv.wait_for(lck, std::chrono::microseconds(timeout)) == std::cv_status::timeout) { // locking get
                 id = -1;
                 lck.unlock();
                 return nullptr;
+            } else {
+                lck.unlock();
+                return getLast(id);    
             }
-        lck.unlock();
-        return getLast(id);
+        } else {
+            return getLast(id);
+        } 
     }
 
+
+    
     /**
      * @brief 
      * 
      * @param id 
      */
     void 
-    releaseGet(int id) {
+    releaseGet(const int id) {
         gmtx.lock();
             nReader[id]--;
         gmtx.unlock();
+    }
+
+    bool
+    newData(const int id) {
+        return (inserted > id)?true:false;
     }
 
     /**

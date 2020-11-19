@@ -1,0 +1,3 @@
+#!/bin/bash
+sudo /sbin/modprobe ftdi_sio
+echo 2639 0301 | sudo tee /sys/bus/usb-serial/drivers/ftdi_sio/new_id

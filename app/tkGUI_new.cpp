@@ -7,7 +7,7 @@
 #include "tkCommon/gui/Drawables/Plot.h"
 
 #include "tkCommon/data/CloudData.h"
-#include "tkCommon/data/GPSData.h"
+#include "tkCommon/data/GpsData.h"
 
 #include "tkCommon/gui/Drawables/Image.h"
 #include "tkCommon/gui/Drawables/DrawBuffer.h"
@@ -18,7 +18,7 @@ tk::gui::Plot *plt;
 
 tk::gui::Viewer* 	viewer = tk::gui::Viewer::getInstance();
 
-void read_cloud(tk::data::GPSData& gps, tk::data::CloudData& cloud) {
+void read_cloud(tk::data::GpsData& gps, tk::data::CloudData& cloud) {
 
 	tk::math::MatIO mat;
 	if(!mat.open(""))
@@ -93,7 +93,7 @@ int main(){
 	cloud.notifyUpdate();*/
 
 	tk::data::CloudData cloud;
-	tk::data::GPSData	gps;
+	tk::data::GpsData	gps;
 
 	viewer->start();
 

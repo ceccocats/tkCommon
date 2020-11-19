@@ -3,7 +3,7 @@
 #include "tkCommon/gui/utils/Color.h"
 #include "tkCommon/gui/Drawables/Drawable.h"
 #include "tkCommon/data/SensorData.h"
-#include "tkCommon/data/GPSData.h"
+#include "tkCommon/data/GpsData.h"
 #include "tkCommon/data/VehicleData.h"
 #include "tkCommon/data/ImageData.h"
 #include <vector>
