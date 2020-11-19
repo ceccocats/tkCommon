@@ -55,7 +55,7 @@ namespace tk { namespace data {
         }
 
     private:
-        sensorName::Value value;
+        sensorName::Value value = sensorName::Value::NOT_SPEC;
     };
 
 
@@ -65,13 +65,13 @@ namespace tk { namespace data {
      */
     class HeaderData : public tk::math::MatDump {
     public:
-        std::string         name;           /**< Name of the sensor. */
-        tk::common::Tfpose  tf;             /**< TF in respect to back axel, @see tk::common::Tfpose. */
+        std::string         name   = "";                             /**< Name of the sensor. */
+        tk::common::Tfpose  tf     = tk::common::Tfpose::Identity(); /**< TF in respect to back axel, @see tk::common::Tfpose. */
         sensorName          sensor;
         
-        timeStamp_t         stamp = 0;      /**< Time stamp, expressed in millisecond. */
-        int                 sensorID;       /**< ID of the sensor. */
-        int                 messageID;      /**< Incremental message counter. */
+        timeStamp_t         stamp     = 0; /**< Time stamp, expressed in millisecond. */
+        int                 sensorID  = 0; /**< ID of the sensor. */
+        int                 messageID = 0; /**< Incremental message counter. */
 
         void init() {
             this->stamp         = 0;
