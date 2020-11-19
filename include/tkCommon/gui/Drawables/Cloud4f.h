@@ -278,7 +278,7 @@ namespace tk{ namespace gui{
 
                 glPointSize(pointSize);
                 glPushMatrix();
-                glMultMatrixf(this->tf.matrix().data());
+                glMultMatrixf(this->cloud->header.tf.matrix().data());
                 if(cloudMod == cloudMod0.second){
                     monocolorCloud->draw(&glbuffer, points, color);
                 }

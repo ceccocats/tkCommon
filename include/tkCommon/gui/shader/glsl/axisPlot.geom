@@ -21,31 +21,31 @@ void main() {
         sin(rot.z)*cos(rot.y),  sin(rot.z)*sin(rot.y)*sin(rot.x) + cos(rot.z)*cos(rot.x),   sin(rot.z)*sin(rot.y)*cos(rot.x) - cos(rot.z)*sin(rot.x),   0,
         -sin(rot.y),            cos(rot.y)*sin(rot.x),                                      cos(rot.y)*cos(rot.x),                                      0,
         0,                      0,                                                          0,                                                          1                               
-    ) * modelview;
+    );
     
     // x-axis
     fColor      = vec3(1.0f, 0.3f, 0.3f);
-    gl_Position = rotation * center;
+    gl_Position = modelview * center;
     EmitVertex();
-    gl_Position = (rotation) * (vec4(lenght, 0.0f, 0.0f, 0.0f) + center);
+    gl_Position = modelview * center + (rotation) * vec4(lenght, 0.0f, 0.0f, 0.0f);
     EmitVertex();
 
     EndPrimitive();
 
     // y-axis
     fColor      = vec3(0.3f, 1.0f, 0.3f);
-    gl_Position = rotation * center;
+    gl_Position = modelview * center;
     EmitVertex();
-    gl_Position = (rotation) * (vec4(0.0f, lenght, 0.0f, 0.0f) + center);
+    gl_Position = modelview * center + (rotation) * vec4(0.0f, lenght, 0.0f, 0.0f);
     EmitVertex();
 
     EndPrimitive();
 
     // z-axis
     fColor      = vec3(0.3f, 0.3f, 1.0f);
-    gl_Position = rotation * center;
+    gl_Position = modelview * center;
     EmitVertex();
-    gl_Position = (rotation) * (vec4(0.0f, 0.0f, lenght, 0.0f) + center);
+    gl_Position = modelview * center + (rotation) * vec4(0.0f, 0.0f, lenght, 0.0f);
     EmitVertex();
 
     EndPrimitive();

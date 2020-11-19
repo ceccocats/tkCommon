@@ -2,6 +2,7 @@
 #include "tkCommon/gui/shader/axisPlot.h"
 #include "tkCommon/gui/Drawables/Drawable.h"
 #include "tkCommon/gui/shader/linesMonocolor.h"
+#include "tkCommon/gui/shader/circle.h"
 
 #include "tkCommon/math/Vec.h"
 
@@ -88,6 +89,8 @@ namespace tk{ namespace gui{
             tk::gui::Color_t color;
 
             Plot(std::string name, int maxDataDim, type_t type, float drawSize){
+                tkASSERT(drawSize >= 1.0);
+
                 this->name = name;
                 points.setDim(maxDataDim);
                 rots.setDim(maxDataDim);

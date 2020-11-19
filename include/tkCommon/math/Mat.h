@@ -198,6 +198,13 @@ class MatBase : public tk::math::MatDump {
             //tkASSERT(c < this->_cols && c >= 0, "Out of memory, cols "+std::to_string(c)+" > "+std::to_string(this->_cols)+"\n")
             return data_h[r+c*_rows]; 
         }
+
+        __host__ T&
+        operator[](int i) {
+            //tkASSERT(r < this->_rows && r >= 0, "Out of memory, rows "+std::to_string(r)+" > "+std::to_string(this->_rows)+"\n")
+            //tkASSERT(c < this->_cols && c >= 0, "Out of memory, cols "+std::to_string(c)+" > "+std::to_string(this->_cols)+"\n")
+            return data_h[i]; 
+        }
         
         __device__ T&  
         atGPU(int r, int c) { 
