@@ -543,7 +543,7 @@ class MatDump {
         tkFATAL("Not implemented");
     }
 
-    bool loadMat(std::string file, std::string name) {
+    bool loadMat(std::string file, std::string name = "data") {
         tk::math::MatIO mat;
         if(mat.open(file)) {
             tk::math::MatIO::var_t var;
@@ -556,7 +556,7 @@ class MatDump {
         return false;
     }
 
-    bool saveMat(std::string file, std::string name) {
+    bool saveMat(std::string file, std::string name = "data") {
         tk::math::MatIO mat;
         if(mat.create(file)) {
             tk::math::MatIO::var_t var;
