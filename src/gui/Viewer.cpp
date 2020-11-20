@@ -425,6 +425,15 @@ Viewer::runloop() {
         if(useImGUI == true)
             imguiDraw();
         draw();
+
+        glViewport(0, 0, width, height);
+        glOrtho(0, width, 0, height, -1, 1);
+        glLoadIdentity();
+        glMatrixMode( GL_PROJECTION );
+        glLoadIdentity();
+        glOrtho(-aspectRatio, aspectRatio, -1, 1, 1, -1);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
         draw2D();
 
         ImGui::Render();
