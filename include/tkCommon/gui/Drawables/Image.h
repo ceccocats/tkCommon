@@ -16,7 +16,7 @@ namespace tk{ namespace gui{
             std::string name;
 
         public:
-            Image(std::string name, int n){
+            Image(int n, std::string name){
                 this->textures.resize(n);
                 this->images.resize(n);
                 this->updates.resize(n);
