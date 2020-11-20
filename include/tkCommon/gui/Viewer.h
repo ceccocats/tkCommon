@@ -8,7 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include "tkCommon/gui/utils/CommonViewer.h"
-#include "tkCommon/gui/Drawables/Drawable.h"
+#include "tkCommon/gui/drawables/Drawable.h"
 #include "tkCommon/gui/utils/Camera.h"
 #include "tkCommon/gui/imgui/imgui.h"
 #include "tkCommon/gui/imgui/imgui_impl_glfw.h"

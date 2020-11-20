@@ -1,5 +1,5 @@
 #pragma once
-#include "tkCommon/gui/Drawables/Drawable.h"
+#include "tkCommon/gui/drawables/Drawable.h"
 #include "tkCommon/gui/shader/grid.h"
 
 namespace tk{ namespace gui{

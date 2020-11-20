@@ -1,17 +1,16 @@
 #include "tkCommon/gui/Viewer.h"
-#include "tkCommon/gui/Drawables/Axis.h"
-#include "tkCommon/gui/Drawables/Grid.h"
-#include "tkCommon/gui/Drawables/Cloud4f.h"
-#include "tkCommon/gui/Drawables/Mesh.h"
-#include "tkCommon/gui/Drawables/Gps.h"
-#include "tkCommon/gui/Drawables/Plot.h"
-#include "tkCommon/gui/Drawables/PolyLine.h"
+#include "tkCommon/gui/drawables/Axis.h"
+#include "tkCommon/gui/drawables/Grid.h"
+#include "tkCommon/gui/drawables/Cloud4f.h"
+#include "tkCommon/gui/drawables/Mesh.h"
+#include "tkCommon/gui/drawables/Gps.h"
+#include "tkCommon/gui/drawables/Plot.h"
+#include "tkCommon/gui/drawables/PolyLine.h"
+#include "tkCommon/gui/drawables/Image.h"
+#include "tkCommon/gui/drawables/DrawBuffer.h"
 
 #include "tkCommon/data/CloudData.h"
 #include "tkCommon/data/GpsData.h"
-
-#include "tkCommon/gui/Drawables/Image.h"
-#include "tkCommon/gui/Drawables/DrawBuffer.h"
 
 #include <thread>
 

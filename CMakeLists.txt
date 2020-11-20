@@ -73,10 +73,10 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/shade
 #-------------------------------------------------------------------------------
 # Generate Drawables include
 #-----------------------------------------------------------------------------
-add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/Drawables/*
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/Drawables
+add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawables/Drawables.h
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawables
     COMMAND python3 _drawables.py)
-    add_custom_target(tkdrawablesgen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/Drawables/*)
+    add_custom_target(tkdrawablesgen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawables/Drawables.h)
 
 #-------------------------------------------------------------------------------
 # Build Libraries
@@ -96,8 +96,10 @@ add_library(tkGUI SHARED
     src/gui/imgui/imgui.cpp
     src/gui/imgui/imgui_impl_glfw.cpp
     src/gui/imgui/imgui_impl_opengl3.cpp
+    src/gui/imgui/imgui_impl_opengl3.cpp
+    src/gui/drawables/Wrapper.cpp
 )
-target_link_libraries(tkGUI ${GUI_LIBS})
+target_link_libraries(tkGUI ${GUI_LIBS} ${CUDA_LIBRARIES})
 
 add_library(tkCommon SHARED
     src/common.cpp

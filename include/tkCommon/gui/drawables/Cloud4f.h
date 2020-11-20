@@ -1,5 +1,5 @@
 #pragma once
-#include "tkCommon/gui/Drawables/Drawable.h"
+#include "tkCommon/gui/drawables/Drawable.h"
 #include "tkCommon/gui/shader/pointcloudColorMaps.h"
 #include "tkCommon/gui/shader/pointcloudRGBA.h"
 #include "tkCommon/gui/shader/pointcloud4f.h"

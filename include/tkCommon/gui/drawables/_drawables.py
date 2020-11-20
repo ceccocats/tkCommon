@@ -7,5 +7,5 @@ f = open(filename, "w")
 f.write("// this file is generated DO NOT DIRECTLY MODIFY")
 for file in [s for s in listdir(".") if isfile(join(".", s))]:
 	if(file != sys.argv[0] and file != filename):
-		f.write("\n#include <tkCommon/gui/Drawables/"+file+">")
+		f.write("\n#include <tkCommon/gui/drawables/"+file+">")
 f.close()

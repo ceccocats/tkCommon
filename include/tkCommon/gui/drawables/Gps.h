@@ -1,5 +1,5 @@
 #pragma once
-#include "tkCommon/gui/Drawables/Drawable.h"
+#include "tkCommon/gui/drawables/Drawable.h"
 #include "tkCommon/gui/shader/linesMonocolor.h"
 #include "tkCommon/data/GpsData.h"
 #include "tkCommon/gui/shader/circle.h"
@@ -20,14 +20,27 @@ namespace tk{ namespace gui{
             float lineSize = 2.0f;
             bool  update = false;
 
+            bool initted = false;
+
+            std::string name = "";
+            std::stringstream print;
+
         public:
             tk::gui::Color_t        color;
+
+            Gps(int nPos = 10, tk::gui::Color_t color = tk::gui::color::RED){
+                this->color = color;  
+                this->nPos = nPos;
+                this->lastPos = -1;
+                this->initted = false;
+            }
 
             Gps(tk::data::GpsData* gps, int nPos = 10, tk::gui::Color_t color = tk::gui::color::RED){
                 this->gps = gps;
                 this->color = color;  
                 this->nPos = nPos;
                 this->lastPos = -1;
+                this->initted = true;
             }
 
             ~Gps(){
@@ -36,7 +49,7 @@ namespace tk{ namespace gui{
 
             void updateRef(tk::data::GpsData* gps){
                 this->gps = gps;   
-                update = true;
+                initted = update = true;
             }
 
             void onInit(tk::gui::Viewer *viewer){
@@ -46,26 +59,31 @@ namespace tk{ namespace gui{
             }
 
             void draw(tk::gui::Viewer *viewer){
-                if(gps->isChanged() || update){
-                    update = false;
+                if(initted == true){
+                    if(gps->isChanged() || update){
+                        update = false;
 
-                    gps->lockRead();
-                    if(!geoConv.isInitialised()) {
-                        geoConv.initialiseReference(gps->lat,gps->lon,gps->heigth);
+                        gps->lockRead();
+                        if(!geoConv.isInitialised() && gps->sats > 10) {
+                            geoConv.initialiseReference(gps->lat,gps->lon,gps->heigth);
+                        }
+                        name = gps->header.name;
+                        print.str("");
+                        print<<(*gps);
+                        double x, y, z;
+                        if (geoConv.isInitialised())
+                            geoConv.geodetic2Enu(gps->lat,gps->lon,gps->heigth,&x, &y, &z);
+                        gps->unlockRead();
+                        
+                        float RAGGIO = 2.0f; //TODO: BOSI
+                        lastPos = (lastPos+1) % nPos;
+                        circles[lastPos]->makeCircle(x,y,z,RAGGIO);                
                     }
-                    double x, y, z;
-                    geoConv.geodetic2Enu(gps->lat,gps->lon,gps->heigth,&x, &y, &z);
-                    gps->unlockRead();
 
-                    
-                    float RAGGIO = 2.0f; //TODO: BOSI
-                    lastPos = (lastPos+1) % nPos;
-                    circles[lastPos]->makeCircle(x,y,z,RAGGIO);                
+                    for(int i = 0; i < nPos; i++){
+                        circles[i]->draw(color,lineSize);
+                    }   	
                 }
-
-                for(int i = 0; i < nPos; i++){
-                    circles[i]->draw(color,lineSize);
-                }   	
             }
 
             void imGuiSettings(){
@@ -75,10 +93,7 @@ namespace tk{ namespace gui{
             }
 
             void imGuiInfos(){
-                std::stringstream print;
-                print<<(*gps);
                 ImGui::Text("%s",print.str().c_str());
-                print.clear();
             }
 
             void onClose(){
@@ -89,7 +104,7 @@ namespace tk{ namespace gui{
             }
 
             std::string toString(){
-                return gps->header.name;
+                return name;
             }
 	};
 }}

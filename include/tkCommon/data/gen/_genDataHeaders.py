@@ -80,10 +80,10 @@ VARS = [ {"name":"utcStamp","type":"timeStamp_t","default":"0"},
 genData(className, VARS, DEPS)
 
 className = "GpsImuData_gen"
-DEPS = ["#include \"tkCommon/data/gen/ImuData_gen.h\"\n", 
-        "#include \"tkCommon/data/gen/GpsData_gen.h\"\n"]
-VARS = [ {"name":"gps", "type":"tk::data::GpsData_gen", "init": "gps.init();"}, 
-         {"name":"imu", "type":"tk::data::ImuData_gen", "init": "imu.init();"},
+DEPS = ["#include \"tkCommon/data/ImuData.h\"\n", 
+        "#include \"tkCommon/data/GpsData.h\"\n"]
+VARS = [ {"name":"gps", "type":"tk::data::GpsData", "init": "gps.init();"}, 
+         {"name":"imu", "type":"tk::data::ImuData", "init": "imu.init();"},
         ]
 genData(className, VARS, DEPS)
 
