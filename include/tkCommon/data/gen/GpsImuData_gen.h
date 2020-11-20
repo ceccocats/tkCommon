@@ -1,9 +1,9 @@
 // this file is generated DO NOT DIRECTLY MODIFY
 #pragma once
 #include "tkCommon/data/SensorData.h"
-#include "tkCommon/data/gen/ImuData_gen.h"
+#include "tkCommon/data/ImuData.h"
 
-#include "tkCommon/data/gen/GpsData_gen.h"
+#include "tkCommon/data/GpsData.h"
 
 
 namespace tk { namespace data {
@@ -11,8 +11,8 @@ namespace tk { namespace data {
 class GpsImuData_gen : public SensorData
 {
 public:
-    tk::data::GpsData_gen gps;
-    tk::data::ImuData_gen imu;
+    tk::data::GpsData gps;
+    tk::data::ImuData imu;
     
     void init() override
     {

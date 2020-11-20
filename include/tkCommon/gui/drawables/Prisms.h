@@ -1,5 +1,5 @@
 #pragma once
-#include "tkCommon/gui/Drawables/Drawable.h"
+#include "tkCommon/gui/drawables/Drawable.h"
 #include "tkCommon/geometry.h"
 
 namespace tk{ namespace gui{
@@ -40,7 +40,7 @@ namespace tk{ namespace gui{
                 if(ref->isChanged() || update){
                     update      = false;
 
-                    ref->lock();
+                    ref->lockRead();
                     prisms.data.resize(ref->data.size());
                     for(int i = 0; i < ref->data.size(); i++){
                         prisms.data[i].height = ref->data[i].height;

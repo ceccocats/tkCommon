@@ -1,21 +1,23 @@
 #pragma once
 #include <iostream>
-#include "tkCommon/gui/Drawables/Drawables.h"
-
 #include "tkCommon/data/GpsImuData.h"
+#include "tkCommon/gui/drawables/Drawables.h"
 
 namespace tk{ namespace gui{
 
-    class WrapperGeneric{};
+    class WrapperGeneric{
+        public:
+            virtual void init() = 0;
+            virtual void updateRef(const tk::data::SensorData* data) = 0;
+    };
 
-    template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
-	class Wrapper<T> : public WrapperGeneric{
+    template<class T>
+	class Wrapper : public WrapperGeneric{
         private:
             tk::gui::Drawable* drawable;
 	    public:
             void init();
             void updateRef(const tk::data::SensorData* data);
-            void close();
 	};
 
 //void 
@@ -23,11 +25,6 @@ namespace tk{ namespace gui{
 //    drawable->updateRef((T*)data);
 //}
 
-void 
-close(){
-    drawable->close();
-    delete drawable;
-}
 }}
 
 

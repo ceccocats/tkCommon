@@ -1,5 +1,5 @@
 #pragma once
-#include "tkCommon/gui/Drawables/Drawable.h"
+#include "tkCommon/gui/drawables/Drawable.h"
 #include "tkCommon/gui/shader/linesMonocolor.h"
 #include "tkCommon/data/GpsData.h"
 #include "tkCommon/gui/shader/circle.h"
@@ -20,14 +20,24 @@ namespace tk{ namespace gui{
             float lineSize = 2.0f;
             bool  update = false;
 
+            bool initted = false;
+
         public:
             tk::gui::Color_t        color;
+
+            Gps(int nPos = 10, tk::gui::Color_t color = tk::gui::color::RED){
+                this->color = color;  
+                this->nPos = nPos;
+                this->lastPos = -1;
+                this->initted = false;
+            }
 
             Gps(tk::data::GpsData* gps, int nPos = 10, tk::gui::Color_t color = tk::gui::color::RED){
                 this->gps = gps;
                 this->color = color;  
                 this->nPos = nPos;
                 this->lastPos = -1;
+                this->initted = true;
             }
 
             ~Gps(){
@@ -36,7 +46,7 @@ namespace tk{ namespace gui{
 
             void updateRef(tk::data::GpsData* gps){
                 this->gps = gps;   
-                update = true;
+                initted = update = true;
             }
 
             void onInit(tk::gui::Viewer *viewer){

@@ -1,6 +1,6 @@
 #pragma once
 #include "tkCommon/gui/shader/axisPlot.h"
-#include "tkCommon/gui/Drawables/Drawable.h"
+#include "tkCommon/gui/drawables/Drawable.h"
 #include "tkCommon/gui/shader/linesMonocolor.h"
 #include "tkCommon/gui/shader/circle.h"
 
