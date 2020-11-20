@@ -110,6 +110,7 @@ Viewer::init() {
     free(img.pixels);
     glCheckError(); 
 
+
     //Callbacks
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetCursorPosCallback(window, cursor_position_callback);
@@ -165,6 +166,13 @@ Viewer::init() {
             );
 
     glCheckError();
+
+    //tkLogo
+    int height, width;
+    uint8_t* image = tk::gui::common::loadImage(std::string(tkCommon_PATH) + "data/tk.png", &width, &height, &channels);
+    logo.init(width,height,channels);
+    logo.setData(image);
+    free(image);
 }
 
 void 
@@ -326,7 +334,8 @@ Viewer::draw() {
 void 
 Viewer::draw2D() {
 
-    //TODO: mettere la camera in ambiente 2D e disegnare logo tk di default
+
+    
 
     for (auto const& drawable : drawables){
         if(drawable.second->enabled)
@@ -370,6 +379,7 @@ Viewer::follow() {
 
 void 
 Viewer::close() { 
+    logo.release();
     for (auto const& drawable : drawables){
         drawable.second->onClose();
         delete drawable.second;
@@ -426,6 +436,7 @@ Viewer::runloop() {
             imguiDraw();
         draw();
 
+        //Setting 2D view
         glViewport(0, 0, width, height);
         glOrtho(0, width, 0, height, -1, 1);
         glLoadIdentity();

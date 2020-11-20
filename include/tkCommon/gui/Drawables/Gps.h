@@ -1,7 +1,7 @@
 #pragma once
 #include "tkCommon/gui/Drawables/Drawable.h"
 #include "tkCommon/gui/shader/linesMonocolor.h"
-#include "tkCommon/data/GPSData.h"
+#include "tkCommon/data/GpsData.h"
 #include "tkCommon/gui/shader/circle.h"
 
 namespace tk{ namespace gui{
@@ -9,7 +9,7 @@ namespace tk{ namespace gui{
 	class Gps : public Drawable {
 
         private:
-            tk::data::GPSData* gps;
+            tk::data::GpsData* gps;
 
             int nPos;
             int lastPos;
@@ -23,7 +23,7 @@ namespace tk{ namespace gui{
         public:
             tk::gui::Color_t        color;
 
-            Gps(tk::data::GPSData* gps, int nPos = 10, tk::gui::Color_t color = tk::gui::color::RED){
+            Gps(tk::data::GpsData* gps, int nPos = 10, tk::gui::Color_t color = tk::gui::color::RED){
                 this->gps = gps;
                 this->color = color;  
                 this->nPos = nPos;
@@ -34,7 +34,7 @@ namespace tk{ namespace gui{
 
             }
 
-            void updateRef(tk::data::GPSData* gps){
+            void updateRef(tk::data::GpsData* gps){
                 this->gps = gps;   
                 update = true;
             }
@@ -49,7 +49,7 @@ namespace tk{ namespace gui{
                 if(gps->isChanged() || update){
                     update = false;
 
-                    gps->lock();
+                    gps->lockRead();
                     if(!geoConv.isInitialised()) {
                         geoConv.initialiseReference(gps->lat,gps->lon,gps->heigth);
                     }

@@ -6,22 +6,60 @@ namespace tk { namespace rt {
 class Lockable{
     private:
         std::mutex  mutex;
+        std::mutex  globalMutex;
         uint32_t    counter;
-        bool        modified = false;
+        uint32_t    nReader;
+        bool        modified;
 
     public:
-        void lock(){
-            mutex.lock();
+        Lockable() {
+            globalMutex.unlock();
+            mutex.unlock();
+
+            counter     = 0;
+            nReader     = 0;
+            modified    = false;
+        }
+
+        bool lockWrite(){
+            globalMutex.lock();
+            if (nReader == 0 && mutex.try_lock()) {
+                nReader++;
+                globalMutex.unlock();
+                return true;
+            } else {
+                globalMutex.unlock();
+                return false;
+            }
         }
 
         void unlockWrite(){
-            counter++;
-            modified = true;
-            mutex.unlock();
+            globalMutex.lock();
+                counter++;
+                nReader--;
+                modified = true;
+                mutex.unlock();
+            globalMutex.unlock();
+        }
+
+        bool lockRead(){
+            globalMutex.lock();
+            if (mutex.try_lock()) {
+                mutex.unlock();
+                nReader++;
+                
+                globalMutex.unlock();
+                return true;
+            } else {
+                globalMutex.unlock();
+                return false;
+            }
         }
 
         void unlockRead(){
-            mutex.unlock();
+            globalMutex.lock();
+                nReader--;
+            globalMutex.unlock();
         }
 
         bool tryLock() {
@@ -33,12 +71,15 @@ class Lockable{
         }
 
         bool isChanged(){
+            globalMutex.lock();
             if(mutex.try_lock() == true){
                 bool status = modified;
                 modified = false;
                 mutex.unlock();
+                globalMutex.unlock();
                 return status;
-            }else{
+            } else {
+                globalMutex.unlock();
                 return false;
             }
         }

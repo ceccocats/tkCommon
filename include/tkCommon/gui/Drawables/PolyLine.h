@@ -49,7 +49,7 @@ namespace tk{ namespace gui{
                 if(line->isChanged() || update){
                     update = false;
 
-                    line->lock();
+                    line->lockRead();
                     glData.setData((float*)line->points.data(),line->points.size()*3);
                     line->unlockRead();               
                 }

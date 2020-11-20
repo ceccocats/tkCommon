@@ -105,6 +105,8 @@ namespace tk { namespace gui {
         const int   nFPS = 30;
         float       vizFPS[30];
 
+        tk::gui::Texture<uint8_t> logo;
+
         // glfw callbacks
         static void errorCallback(int error, const char* description);
         static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
