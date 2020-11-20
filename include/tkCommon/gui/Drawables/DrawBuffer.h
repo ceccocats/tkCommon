@@ -5,10 +5,15 @@ namespace tk{ namespace gui{
 
 	class DrawBuffer : public Drawable {
 
-        std::vector<tk::gui::Drawable*> drawables;
         std::string name;
 
         public:
+            std::vector<tk::gui::Drawable*> drawables;
+            
+            DrawBuffer(){
+                this->name = "DrawBuffer";
+            }
+
             DrawBuffer(std::string name){
                 this->name = name;
             }
@@ -38,31 +43,32 @@ namespace tk{ namespace gui{
                 }
             }
 
-            void pushDrawable(tk::gui::Drawable* drawable){
-                this->drawables.push_back(drawable);
+            void beforeDraw(tk::gui::Viewer *viewer) {
+                for(int i = 0; i < drawables.size(); i++){
+                    drawables[i]->beforeDraw(viewer);
+                }            
             }
 
-            void updateDrawable(int n, tk::gui::Drawable* drawable){
-                tkASSERT(n < drawables.size());
-                this->drawables[n] = drawable;
-            }
 
             void draw(tk::gui::Viewer *viewer){
                 for(int i = 0; i < drawables.size(); i++){
+                    glPushMatrix();
+                    glMultMatrixf(drawables[i]->tf.matrix().data());
                     drawables[i]->draw(viewer);
+                    glPopMatrix();
                 }
             }
 
             void imGuiInfos(){
-                for(int i = 0; i < drawables.size(); i++){
-                    drawables[i]->imGuiInfos();
-                }
+                //for(int i = 0; i < drawables.size(); i++){
+                //    drawables[i]->imGuiInfos();
+                //}
             }
 
             void imGuiSettings(){
-                for(int i = 0; i < drawables.size(); i++){
-                    drawables[i]->imGuiSettings();
-                }
+                //for(int i = 0; i < drawables.size(); i++){
+                //    drawables[i]->imGuiSettings();
+                //}
             }
 
             void onClose(){

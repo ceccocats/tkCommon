@@ -18,7 +18,6 @@
 #include "tkCommon/CmdParser.h"
 #include "tkCommon/exceptions.h"
 #include "tkCommon/Map.h"
-#include "tkCommon/math/Mat.h"
 
 extern const char* tkCommon_PATH;
 namespace tk { namespace common {
@@ -504,3 +503,5 @@ namespace tk { namespace common {
     }
 
 }}
+
+#include "tkCommon/math/Mat.h"

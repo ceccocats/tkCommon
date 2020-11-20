@@ -542,6 +542,37 @@ class MatDump {
     virtual bool fromVar(MatIO::var_t &var) {
         tkFATAL("Not implemented");
     }
+
+    bool loadMat(std::string file, std::string name) {
+        tk::math::MatIO mat;
+        if(mat.open(file)) {
+            tk::math::MatIO::var_t var;
+            mat.read(name, var);
+            bool ok = fromVar(var);
+            var.release();
+            mat.close();
+            return ok;
+        }
+        return false;
+    }
+
+    bool saveMat(std::string file, std::string name) {
+        tk::math::MatIO mat;
+        if(mat.create(file)) {
+            tk::math::MatIO::var_t var;
+            bool ok = toVar(name, var);
+            mat.write(var);
+            std::string version_str = tk::common::tkVersionGit();
+            mat.write("tkversion", version_str);
+            std::string date_str = getTimeStampString();
+            mat.write("date", date_str);
+            var.release();
+            mat.close();
+            return ok;
+        }
+        return false;
+    }
+
 };
 
 // template specialization
