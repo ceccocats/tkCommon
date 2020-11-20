@@ -4,6 +4,8 @@ template <>
 void
 tk::gui::Wrapper<tk::data::GpsImuData>::init(){
     drawable = new tk::gui::Gps();
+    tk::gui::Viewer *viewer = tk::gui::Viewer::getInstance();
+    viewer->add(drawable);
 }
 
 template <>

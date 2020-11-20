@@ -22,6 +22,9 @@ namespace tk{ namespace gui{
 
             bool initted = false;
 
+            std::string name = "";
+            std::stringstream print;
+
         public:
             tk::gui::Color_t        color;
 
@@ -56,26 +59,31 @@ namespace tk{ namespace gui{
             }
 
             void draw(tk::gui::Viewer *viewer){
-                if(gps->isChanged() || update){
-                    update = false;
+                if(initted == true){
+                    if(gps->isChanged() || update){
+                        update = false;
 
-                    gps->lockRead();
-                    if(!geoConv.isInitialised()) {
-                        geoConv.initialiseReference(gps->lat,gps->lon,gps->heigth);
+                        gps->lockRead();
+                        if(!geoConv.isInitialised() && gps->sats > 10) {
+                            geoConv.initialiseReference(gps->lat,gps->lon,gps->heigth);
+                        }
+                        name = gps->header.name;
+                        print.str("");
+                        print<<(*gps);
+                        double x, y, z;
+                        if (geoConv.isInitialised())
+                            geoConv.geodetic2Enu(gps->lat,gps->lon,gps->heigth,&x, &y, &z);
+                        gps->unlockRead();
+                        
+                        float RAGGIO = 2.0f; //TODO: BOSI
+                        lastPos = (lastPos+1) % nPos;
+                        circles[lastPos]->makeCircle(x,y,z,RAGGIO);                
                     }
-                    double x, y, z;
-                    geoConv.geodetic2Enu(gps->lat,gps->lon,gps->heigth,&x, &y, &z);
-                    gps->unlockRead();
 
-                    
-                    float RAGGIO = 2.0f; //TODO: BOSI
-                    lastPos = (lastPos+1) % nPos;
-                    circles[lastPos]->makeCircle(x,y,z,RAGGIO);                
+                    for(int i = 0; i < nPos; i++){
+                        circles[i]->draw(color,lineSize);
+                    }   	
                 }
-
-                for(int i = 0; i < nPos; i++){
-                    circles[i]->draw(color,lineSize);
-                }   	
             }
 
             void imGuiSettings(){
@@ -85,10 +93,7 @@ namespace tk{ namespace gui{
             }
 
             void imGuiInfos(){
-                std::stringstream print;
-                print<<(*gps);
                 ImGui::Text("%s",print.str().c_str());
-                print.clear();
             }
 
             void onClose(){
@@ -99,7 +104,7 @@ namespace tk{ namespace gui{
             }
 
             std::string toString(){
-                return gps->header.name;
+                return name;
             }
 	};
 }}
