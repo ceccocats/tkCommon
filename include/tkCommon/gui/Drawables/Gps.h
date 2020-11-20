@@ -49,7 +49,7 @@ namespace tk{ namespace gui{
                 if(gps->isChanged() || update){
                     update = false;
 
-                    gps->lock();
+                    gps->lockRead();
                     if(!geoConv.isInitialised()) {
                         geoConv.initialiseReference(gps->lat,gps->lon,gps->heigth);
                     }

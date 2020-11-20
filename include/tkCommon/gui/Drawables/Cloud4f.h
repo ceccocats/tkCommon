@@ -256,7 +256,7 @@ namespace tk{ namespace gui{
                 if(updateMinMax == true){
                     updateMinMax = false;
                     resetMinMax  = true;
-                    cloud->lock();
+                    cloud->lockRead();
                     if(points != cloud->points.cols()){
                         points = cloud->points.cols();
                         glbuffer.setData(cloud->points.data_h,cloud->points.size());
@@ -269,7 +269,7 @@ namespace tk{ namespace gui{
 
                 if(cloud->isChanged() || update){
                     update = false;
-                    cloud->lock();
+                    cloud->lockRead();
                     points = cloud->points.cols();
                     glbuffer.setData(cloud->points.data_h,cloud->points.size());
                     updateData();

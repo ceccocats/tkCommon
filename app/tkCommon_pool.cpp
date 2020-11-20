@@ -11,6 +11,13 @@ const tk::data::GpsImuData     *cData = nullptr;
 bool gRun = true;
 std::mutex mtx;
 
+void pausetta(void) {
+  struct timespec t;
+  t.tv_sec = 0;
+  t.tv_nsec = (rand()%10+1)*1000000;
+  nanosleep(&t,NULL);
+}
+
 void
 my_handler(sig_atomic_t s)
 {
@@ -27,18 +34,20 @@ void
     int counter = 0;
     while(gRun) {
         data = dynamic_cast<tk::data::GpsImuData*>(pool.add(idx));
+        
+        if (data != nullptr) {
+            data->gps.lat = counter;
+            data->gps.lon = counter;
 
-        data->gps.lat = counter;
-        data->gps.lon = counter;
+            //mtx.lock();
+            printf("write\tlat %f, lon %f\n", data->gps.lat, data->gps.lon);
+            //mtx.unlock();
 
-        mtx.lock();
-        std::cout<<"Ho inserito "<<data->gps.lat<<", "<<data->gps.lon<<"\n";
-        mtx.unlock();
+            pool.releaseAdd(idx);
 
-        pool.releaseAdd(idx);
-
-        counter++;
-        usleep(1000);
+            counter++;
+        }
+        pausetta();
     }
 
     pthread_exit(nullptr);
@@ -52,10 +61,10 @@ void
     int idx;
     while(gRun) {
         cData = dynamic_cast<const tk::data::GpsImuData*>(pool.get(idx, (uint64_t)1e4));
-        if (cData!= nullptr)  {
-            mtx.lock();
-            std::cout<<"new\t"<<pthread_self()<<"\tlat "<<cData->gps.lat<<", lon "<<cData->gps.lon<<"\n";
-            mtx.unlock();
+        if (cData != nullptr)  {
+            //mtx.lock();
+            printf("new\tlat %f, lon %f\n", cData->gps.lat, cData->gps.lon);
+            //mtx.unlock();
             pool.releaseGet(idx);
         }
     }
@@ -71,13 +80,13 @@ void
     int idx;
     while(gRun) {
         cData = dynamic_cast<const tk::data::GpsImuData*>(pool.get(idx));
-        
-        mtx.lock();
-        std::cout<<"last\t"<<"\tlat "<<cData->gps.lat<<", lon "<<cData->gps.lon<<"\n";
-        mtx.unlock();
-        pool.releaseGet(idx);
-
-        usleep(500);
+        if (cData != nullptr) {
+            //mtx.lock();
+            printf("last\tlat %f, lon %f\n", cData->gps.lat, cData->gps.lon);
+            //mtx.unlock();
+            pool.releaseGet(idx);
+        }
+        pausetta();
     }
 
     pthread_exit(nullptr);
@@ -91,16 +100,16 @@ int main( int argc, char** argv){
     pool.init<tk::data::GpsImuData>(10);
 
     // spawn threads
-    pthread_t pt1, pt2, pt3, pt4;
-	pthread_create(&pt1, nullptr, writer, nullptr);
-    pthread_create(&pt2, nullptr, reader, nullptr);
-    pthread_create(&pt3, nullptr, reader, nullptr);
-    pthread_create(&pt4, nullptr, reader2, nullptr);
+    pthread_t pt[50];
+    
+	pthread_create(&pt[0], nullptr, writer, nullptr);
+    for (int i = 1; i < 20; i++) 
+        pthread_create(&pt[i], nullptr, reader, nullptr);
+    for (int i = 20; i < 25; i++)
+        pthread_create(&pt[i], nullptr, reader2, nullptr);
 
-    pthread_join(pt1, nullptr);
-    pthread_join(pt2, nullptr);
-    pthread_join(pt3, nullptr);
-    pthread_join(pt4, nullptr);
+    for (int i = 0; i < 25; i++)
+    pthread_join(pt[i], nullptr);
 
     return 0;
 }

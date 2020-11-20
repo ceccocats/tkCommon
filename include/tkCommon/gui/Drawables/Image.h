@@ -79,7 +79,7 @@ namespace tk{ namespace gui{
                             textures[i]->init(images[i]->width, images[i]->height, images[i]->channels);
                         }
                         //Copy data
-                        images[i]->lock();
+                        images[i]->lockRead();
                         textures[i]->setData(images[i]->data);
                         images[i]->unlockRead();
                     }

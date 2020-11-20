@@ -17,7 +17,6 @@ private:
     std::condition_variable cv; 
 
     tk::data::SensorData **data;
-    int         *nReader;
    
     int         last;
     int         locked;
@@ -35,15 +34,11 @@ private:
             while(true) {
                 // starting from last search for unlocked element
                 id = (id + (size-i)) % size;
-                if(data[id]->tryLock()) {
-                    nReader[id]++;
-                    data[id]->unlockRead();
+                if(data[id]->lockRead())
                     break;
-                }
                 i++;
             }
         gmtx.unlock();
-
         return dynamic_cast<const tk::data::SensorData*>(data[id]);
     }
 
@@ -82,12 +77,9 @@ public:
         if (!initted) {   
             size    = dim;
             data    = new tk::data::SensorData*[dim];
-            nReader = new int[size];
             for (int i = 0; i < size; i++) {
                 data[i] = new T();
                 data[i]->init();
-                data[i]->unlockRead();
-                nReader[i] = 0;
             }           
             initted = true;
         }
@@ -113,7 +105,7 @@ public:
             // search first free object        
             int freeID = (last + 1) % size;
             while(true) {
-                if(nReader[freeID] == 0 && data[freeID]->tryLock()) {
+                if(data[freeID]->lockWrite()) {
                     locked++;
                     break;
                 }
@@ -136,20 +128,19 @@ public:
     void 
     releaseAdd(const int id) {
         gmtx.lock();
-
-        // check if was really locked
-        if(!data[id]->tryLock()) {
+            // check if was really locked
+            //if(!data[id]->tryLock()) {
+            //    locked--;
+            //}
             locked--;
-        }
-        
-        // unlock anyway
-        data[id]->unlockWrite(); 
+            
+            // unlock anyway
+            data[id]->unlockWrite(); 
 
-        inserted++;
+            inserted++;
 
-        // notify new data available
-        cv.notify_all();
-
+            // notify new data available
+            cv.notify_all();
         gmtx.unlock();
     }
 
@@ -187,7 +178,7 @@ public:
     void 
     releaseGet(const int id) {
         gmtx.lock();
-            nReader[id]--;
+            data[id]->unlockRead();
         gmtx.unlock();
     }
 
@@ -203,7 +194,6 @@ public:
     void close() {
         gmtx.lock();
         if (initted) {
-            delete[] nReader;
             for (int i = 0; i < size; i++){
                 delete data[i];
             } 

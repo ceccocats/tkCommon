@@ -50,7 +50,7 @@ void read_cloud(tk::data::GpsData& gps, tk::data::CloudData& cloud) {
 
 		var.release();
 
-		cloud.lock();
+		cloud.lockWrite();
 
 		cloud.points.copyFrom(points.data(),points.rows(),points.cols());
 		cloud.features[tk::data::CloudData_gen::FEATURES_I].copyFrom(intensity.data(),intensity.rows(),intensity.cols());
@@ -58,7 +58,7 @@ void read_cloud(tk::data::GpsData& gps, tk::data::CloudData& cloud) {
 
 		cloud.unlockWrite();
 
-		gps.lock();
+		gps.lockWrite();
 		gps.lat += 0.000001;
 		gps.unlockWrite();
 
