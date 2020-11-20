@@ -4,37 +4,27 @@ const char* tkCommon_PATH = TKPROJ_PATH;
 
 namespace tk { namespace common {
 
-    Tfpose odom2tf(float x, float y, float yaw) {
-        Eigen::Quaternionf quat =
-                Eigen::AngleAxisf(0, Eigen::Vector3f::UnitX())*
-                Eigen::AngleAxisf(0, Eigen::Vector3f::UnitY())*
-                Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ());
-        Tfpose isometry = Eigen::Isometry3f::Identity();
-        isometry.linear() = quat.toRotationMatrix();
-        isometry.translation() = Eigen::Vector3f(x, y, 0) ;
+    Tfpose odom2tf(float x, float y, float z, float roll, float pitch, float yaw) {
+        Eigen::MatrixXf t(4,4);
+        float A = std::cos (yaw),  B = sin (yaw),  C  = std::cos (pitch), D  = sin (pitch),
+              E = std::cos (roll), F = sin (roll), DE = D*E,         DF = D*F;
+
+        t (0, 0) = A*C;  t (0, 1) = A*DF - B*E;  t (0, 2) = B*F + A*DE;  t (0, 3) = x;
+        t (1, 0) = B*C;  t (1, 1) = A*E + B*DF;  t (1, 2) = B*DE - A*F;  t (1, 3) = y;
+        t (2, 0) = -D;   t (2, 1) = C*F;         t (2, 2) = C*E;         t (2, 3) = z;
+        t (3, 0) = 0;    t (3, 1) = 0;           t (3, 2) = 0;           t (3, 3) = 1;
+        
+        Tfpose isometry;
+        isometry.matrix() = t;
         return isometry;
+    }
+
+    Tfpose odom2tf(float x, float y, float yaw) {
+        return odom2tf(x,y,0,0,0,yaw);
     }
 
     Tfpose odom2tf(float x, float y, float z, float yaw) {
-        Eigen::Quaternionf quat =
-                Eigen::AngleAxisf(0, Eigen::Vector3f::UnitX())*
-                Eigen::AngleAxisf(0, Eigen::Vector3f::UnitY())*
-                Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ());
-        Tfpose isometry = Eigen::Isometry3f::Identity();
-        isometry.linear() = quat.toRotationMatrix();
-        isometry.translation() = Eigen::Vector3f(x, y, z) ;
-        return isometry;
-    }
-
-    Tfpose odom2tf(float x, float y, float z, float roll, float pitch, float yaw) {
-        Eigen::Quaternionf quat =
-                Eigen::AngleAxisf(roll, Eigen::Vector3f::UnitX())*
-                Eigen::AngleAxisf(pitch, Eigen::Vector3f::UnitY())*
-                Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ());
-        Tfpose isometry = Eigen::Isometry3f::Identity();
-        isometry.linear() = quat.toRotationMatrix();
-        isometry.translation() = Eigen::Vector3f(x, y, z) ;
-        return isometry;
+        return odom2tf(x,y,z,0,0,yaw);
     }
 
     Tfpose odom2tf(float x, float y, float z, float qx, float qy, float qz, float qw) {
@@ -44,7 +34,6 @@ namespace tk { namespace common {
         isometry.translation() = Eigen::Vector3f(x, y, z) ;
         return isometry;
     }
-
 
     bool readOdom(std::ifstream &is, Tfpose &out, uint64_t &stamp) {
 
