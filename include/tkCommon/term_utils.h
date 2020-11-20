@@ -14,41 +14,37 @@ namespace tk { namespace term {
      *  Terminal ProgressBar
      * 
      *  Example usage:
-     *  tk::tprint::ProgressBar pbar(0, "example progress");
-     *  for(;pbar.eval(1000); pbar.i()++) {
+     *  for(tk::term::Pbar i(0, "Example progress"); i<100; i++) {
+     *      usleep(5000);
+     *  }
+     *  
+     *  even more minimal:
+     *  for(tk::term::Pbar i; i<100; i++) {
      *      usleep(5000);
      *  }
      */ 
-    class ProgressBar {
+    class Pbar { 
     private:
-        int _end = 0;
-        int _idx = 0;
-        std::string _name;
+            int counter;
+            int end;
+            std::string name;
 
     public:
-        ProgressBar(int start, std::string name = "") {
-            _idx = start;
-            _name = name;
+        Pbar(int start = 0, std::string name="Progress") {
+            counter = start;
+            end = start;
+            this->name = name;
         }
-        int size() {
-            return _end;
-        }
-        int &i() {
-            return _idx;
-        }
-        bool eval(int end) {
-            _end = end;
-            bool alive = _idx < end;
-
+        void print(bool alive) {
             struct winsize ws;
             ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
             
-            std::string left_str = _name + " |";
-            std::string right_str = "| " + std::to_string(_idx) + "/" + std::to_string(_end);
+            std::string left_str = name + " |";
+            std::string right_str = "| " + std::to_string(counter) + "/" + std::to_string(end);
 
             int dim = ws.ws_col - left_str.size() - right_str.size();
             std::cout<<left_str;
-            int endbar = (float(_idx) / _end)*dim;
+            int endbar = (float(counter) / end)*dim;
             for(int i=0; i<dim; i++) {
                 i<=endbar ? std::cout<<"#" : std::cout<<" ";
             }
@@ -58,10 +54,45 @@ namespace tk { namespace term {
                 std::cout<<"\r"<<std::flush;
             else
                 std::cout<<"\n";
+        }
+
+        operator int() const {
+            return counter;
+        }
+
+        Pbar& operator ++() {
+            counter += 1;
+            return *this;
+        }
+        Pbar operator ++(int) {
+            counter += 1;
+            return *this;
+        }
+        friend bool operator< (Pbar &c1, const int &end) {
+            c1.end = end;
+            bool alive = c1.counter < end;
+            c1.print(alive);
+            return alive;
+        }
+        friend bool operator<=(Pbar &c1, const int &end) {
+            c1.end = end;
+            bool alive = c1.counter <= end;
+            c1.print(alive);
+            return alive;
+        }
+        friend bool operator< (Pbar &c1, const long unsigned int &end) {
+            c1.end = end;
+            bool alive = c1.counter < end;
+            c1.print(alive);
+            return alive;
+        }
+        friend bool operator<=(Pbar &c1, const long unsigned int &end) {
+            c1.end = end;
+            bool alive = c1.counter <= end;
+            c1.print(alive);
             return alive;
         }
     };
-
 
 
     /**
