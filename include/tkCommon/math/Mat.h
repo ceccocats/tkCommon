@@ -31,7 +31,6 @@ class MatBase : public tk::math::MatDump {
         int     _cols;
         int     _size;
         bool    _gpu;
-        Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic> eigen;
         bool    _isCopy;
 
     public:
@@ -269,10 +268,9 @@ class MatBase : public tk::math::MatDump {
             std::cout<<std::endl;
         }
 
-        Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>&
+        Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>>
         matrix(){
-            eigen = Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>>(data_h, _rows, _cols);
-            return eigen;
+            return Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>>(data_h, _rows, _cols);
         }
         
 

@@ -62,6 +62,19 @@ namespace tk { namespace common {
             }
             return os;
         }
+        Map& operator=(const Map& s)
+        {
+            _map = s._map;
+            _mapKeys = s._mapKeys;
+            _keys = s._keys;
+            _vals.resize(_map.size());
+            // update pointers
+            for(int i=0; i<_map.size(); i++) {
+                unsigned hash_key = tk::common::key(_keys[i].c_str());
+                _vals[i] = &_map[hash_key];
+            }
+            return *this;
+        }
     private: 
         // unordered_map in theory has access time of o(1)
         // we esperienced the std::map has anyway better performance 

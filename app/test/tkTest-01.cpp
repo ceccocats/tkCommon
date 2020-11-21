@@ -71,4 +71,18 @@ TEST_CASE("Test mat class") {
             }
         }  
     }
+
+
+    SECTION("Eigen ops") {
+        mat.resize(3, 3);
+        mat.set({0, 1, 2, 3, 4, 5, 6, 7, 8});
+        Eigen::MatrixXf m = mat.matrix()*2;
+        mat.matrix() = mat.matrix()*2;
+
+        for (int i = 0; i < mat.rows(); i++) {
+            for (int j = 0; j < mat.cols(); j++) {
+                REQUIRE(mat(i, j) == m(i, j));
+            }
+        }  
+    }
 }
