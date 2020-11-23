@@ -65,7 +65,25 @@ namespace tk{ namespace data{
             unlockWrite();
         }
 
-
+        bool fromVar(tk::math::MatIO::var_t &var) {
+            if(var.empty())
+                return false;
+            bool ok = ImageData_gen::fromVar(var["info"]);
+            if(ok) {
+                init(width, height, channels);
+                std::vector<uint8_t> values;
+                var["data"].get(values);
+                memcpy(data, values.data(), values.size()*sizeof(uint8_t));
+            }
+            return ok;
+        }
+        bool toVar(std::string name, tk::math::MatIO::var_t &var) {
+            std::vector<tk::math::MatIO::var_t> structVars(2);
+            ImageData_gen::toVar("info", structVars[0]);
+            std::vector<uint8_t> values(data, data + height*width*channels);
+            structVars[1].set("data", values);
+            return var.setStruct(name, structVars);
+        }
 
     };
 }}
