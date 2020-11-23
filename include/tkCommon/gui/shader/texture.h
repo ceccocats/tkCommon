@@ -21,17 +21,17 @@ namespace tk { namespace gui { namespace shader {
 class texture : public tk::gui::shader::generic
 {
     public:
-        bool init(){
+        texture(){
             std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/texture.vert";
             std::string geometry    = "";
             std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/texture.frag";
             
             bool status = shader.init(vertex, fragment, geometry);
-            if(status == false) return false;
+            //if(status == false) return false;
 
             vertexPointer.push_back({3,5,0});
 		    vertexPointer.push_back({2,5,3});
-            return true;
+            //return true;
         }
 
         void draw(tk::gui::Texture<uint8_t>* text, tk::gui::Buffer<float>* buffer, int triangles){

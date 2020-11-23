@@ -21,44 +21,52 @@ class Lockable{
             modified    = false;
         }
 
-        bool lockWrite(){
-            globalMutex.lock();
-            if (nReader == 0 && mutex.try_lock()) {
-                nReader++;
-                globalMutex.unlock();
-                return true;
-            } else {
-                globalMutex.unlock();
-                return false;
-            }
+        void lockWrite(){
+
+            mutex.lock();
         }
 
         void unlockWrite(){
-            globalMutex.lock();
-                counter++;
-                nReader--;
-                modified = true;
-                mutex.unlock();
-            globalMutex.unlock();
+
+            counter++;
+            modified = true;
+            mutex.unlock();
+
         }
 
-        bool lockRead(){
+        void lockRead(){
             globalMutex.lock();
-            if (mutex.try_lock()) {
-                mutex.unlock();
-                nReader++;
-                
-                globalMutex.unlock();
-                return true;
-            } else {
-                globalMutex.unlock();
-                return false;
+            
+            if (nReader == 0){
+                mutex.lock();
             }
+            nReader++;
+            globalMutex.unlock();
+            
+        }
+
+        bool tryLockRead(){
+            globalMutex.lock();
+
+            bool l = true;
+            
+            if (nReader == 0){
+                l = mutex.try_lock();
+            }
+            if( l )
+                nReader++;
+            globalMutex.unlock();
+
+            return l;
         }
 
         void unlockRead(){
             globalMutex.lock();
-                nReader--;
+            
+            if (nReader == 1)
+                mutex.unlock();
+            nReader--;
+                
             globalMutex.unlock();
         }
 
@@ -71,17 +79,7 @@ class Lockable{
         }
 
         bool isChanged(){
-            globalMutex.lock();
-            if(mutex.try_lock() == true){
-                bool status = modified;
-                modified = false;
-                mutex.unlock();
-                globalMutex.unlock();
-                return status;
-            } else {
-                globalMutex.unlock();
-                return false;
-            }
+            return modified;
         }
 };
 
