@@ -34,7 +34,7 @@ private:
             while(true) {
                 // starting from last search for unlocked element
                 id = (id + (size-i)) % size;
-                if(data[id]->lockRead())
+                if(data[id]->tryLockRead())
                     break;
                 i++;
             }
@@ -105,7 +105,7 @@ public:
             // search first free object        
             int freeID = (last + 1) % size;
             while(true) {
-                if(data[freeID]->lockWrite()) {
+                if(data[freeID]->tryLock()) {
                     locked++;
                     break;
                 }
