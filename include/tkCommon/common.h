@@ -378,6 +378,10 @@ namespace tk { namespace common {
      */
     bool readOdomFile(std::string file_name, Tfpose &odom_out, uint64_t &odom_stamp);
 
+
+    Eigen::Isometry3f tfInterpolate(const Eigen::Isometry3f& t1,
+                                    const Eigen::Isometry3f& t2, const double ratio);
+
     /**
      * Extract 3d translation from TfPose
      * @param tf

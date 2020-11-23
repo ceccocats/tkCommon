@@ -91,6 +91,42 @@ namespace tk { namespace common {
         return state;
     }
 
+    template <typename T, int ROWS>
+    Eigen::Matrix<T, ROWS, 1> Interpolate_(const Eigen::Matrix<T, ROWS, 1>& v1,
+                                          const Eigen::Matrix<T, ROWS, 1>& v2, const double ratio) {
+        // Safety check sizes
+        tkASSERT(v1.size() == v2.size(), "Vectors v1 and v2 must be the same size")
+        
+        // Interpolate
+        // This is the numerically stable version, rather than  (p1 + (p2 - p1) * real_ratio)
+        return ((v1 * (1.0 - ratio)) + (v2 * ratio));
+    }
+
+    inline Eigen::Quaternionf Interpolate_(const Eigen::Quaternionf& q1,
+                                           const Eigen::Quaternionf& q2, const double ratio)
+    {
+        // Interpolate
+        return q1.slerp(ratio, q2);
+    }
+
+    Eigen::Isometry3f tfInterpolate(const Eigen::Isometry3f& t1,
+                                    const Eigen::Isometry3f& t2, const double ratio) {
+        // Safety check ratio
+        tkASSERT(ratio >= 0.0, "interpolation ratio not in 0-1 range: " + std::to_string(ratio));
+        tkASSERT(ratio <= 1.0, "interpolation ratio not in 0-1 range: " + std::to_string(ratio));
+        
+        // Interpolate
+        const Eigen::Vector3f v1 = t1.translation();
+        const Eigen::Quaternionf q1(t1.rotation());
+        const Eigen::Vector3f v2 = t2.translation();
+        const Eigen::Quaternionf q2(t2.rotation());
+        const Eigen::Vector3f vint = Interpolate_(v1, v2, ratio);
+        const Eigen::Quaternionf qint = Interpolate_(q1, q2, ratio);
+        const Eigen::Isometry3f tint = ((Eigen::Translation3f)vint) * qint;
+        return tint;
+    }
+
+
     Vector3<float> tf2pose(Tfpose tf) {
 
         Eigen::Vector3f p = tf.translation();
