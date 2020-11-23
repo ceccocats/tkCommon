@@ -1,5 +1,6 @@
 #pragma once
 #include <mutex>
+#include <tkCommon/rt/Profiler.h>
 
 namespace tk { namespace rt {
 
@@ -10,6 +11,7 @@ class Lockable{
         uint32_t    counter;
         uint32_t    nReader;
         bool        modified;
+        bool        writing;
 
     public:
         Lockable() {
@@ -19,11 +21,15 @@ class Lockable{
             counter     = 0;
             nReader     = 0;
             modified    = false;
+            writing     = false;
         }
 
         void lockWrite(){
-
+            tkPROF_tic(lock)
+            writing = true;
             mutex.lock();
+            writing = false;
+            tkPROF_toc(lock)
         }
 
         void unlockWrite(){
@@ -35,6 +41,9 @@ class Lockable{
         }
 
         void lockRead(){
+            while(writing){
+                usleep(1);
+            }
             globalMutex.lock();
             
             if (nReader == 0){
@@ -46,6 +55,8 @@ class Lockable{
         }
 
         bool tryLockRead(){
+            if(writing) return false;
+
             globalMutex.lock();
 
             bool l = true;
@@ -79,7 +90,14 @@ class Lockable{
         }
 
         bool isChanged(){
-            return modified;
+            bool l = false;
+            if(mutex.try_lock()){
+
+                l = modified;
+                modified = false;
+                mutex.unlock();
+            }
+            return l;
         }
 };
 
