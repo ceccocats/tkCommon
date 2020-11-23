@@ -43,6 +43,12 @@ namespace tk{ namespace data{
             return *this;
         }
 
+        ImageData& operator=(ImageData_gen& s){
+ 
+            ImageData_gen::operator=(s);
+            return *this;
+        }
+
         bool empty() {return channels == 0 || width == 0 || height == 0 || data == nullptr; }
 
         void release(){
