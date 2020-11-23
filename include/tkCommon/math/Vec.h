@@ -31,7 +31,6 @@ public:
 
     __host__ void 
     resize(int r, int c) {
-
         tkASSERT(r == 1, "You can't create a 2D vector");
         Mat<T>::resize(1,c);
     }
@@ -43,13 +42,13 @@ public:
 
     __host__ T&
     operator()(int n) {
-        tkASSERT(n < this->_size, "Out of memory")
+        //tkASSERT(n < this->_size, "Out of memory " + std::to_string(n) + " of " + std::to_string(this->_size));
         return this->data_h[n]; 
     }
 
     __host__ T&
     operator[](int n) {
-        tkASSERT(n < this->_size, "Out of memory")
+        //tkASSERT(n < this->_size, "Out of memory " + std::to_string(n) + " of " + std::to_string(this->_size));
         return this->data_h[n]; 
     }
 };
