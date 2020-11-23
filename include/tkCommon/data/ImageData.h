@@ -9,7 +9,7 @@ namespace tk{ namespace data{
 
         void init(){
 
-            lock();
+            lockWrite();
         	ImageData_gen::init();
             unlockWrite();
 
@@ -17,7 +17,7 @@ namespace tk{ namespace data{
         
         void init(int w, int h, int ch){
 
-            lock();
+            lockWrite();
         	ImageData_gen::init();
             width = w;
             height = h;
@@ -35,8 +35,8 @@ namespace tk{ namespace data{
                 init(s.width, s.height, s.channels);
             }
 
-            lock();
-            s.lock();
+            lockWrite();
+            s.lockRead();
             memcpy(data, s.data, width * height * channels);
             s.unlockRead();
             unlockWrite();
@@ -49,7 +49,7 @@ namespace tk{ namespace data{
             if(empty())
                 return;
 
-            lock();
+            lockWrite();
             uint8_t* tmp = data;
             data = nullptr;
             width = 0;
