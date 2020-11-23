@@ -74,14 +74,16 @@ namespace tk{ namespace gui{
                     if(images[i]->isChanged() || updates[i]){
                         //Need to init?
                         if(this->ready[i] == false){
+                            std::cout<<"ciao\n";
                             this->ready[i]  = true;
                             textures[i]     = new tk::gui::Texture<uint8_t>();
                             textures[i]->init(images[i]->width, images[i]->height, images[i]->channels);
                         }
                         //Copy data
-                        images[i]->lockRead();
+                        //images[i]->lockRead();
+                        std::cout<<"READ\n";
                         textures[i]->setData(images[i]->data);
-                        images[i]->unlockRead();
+                        //images[i]->unlockRead();
                     }
 
                     ImGui::Begin(name.c_str(), NULL, ImGuiWindowFlags_NoScrollbar);
