@@ -1,5 +1,5 @@
 
-#include <tkCommon/gui/Drawables/Drawable.h>
+#include <tkCommon/gui/drawables/Drawable.h>
 #include <tkCommon/gui/utils/Texture.h>
 
 #include <tkCommon/utils.h>
