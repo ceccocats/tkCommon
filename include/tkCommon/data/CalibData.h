@@ -1,5 +1,6 @@
 #pragma once
 #include "tkCommon/data/gen/CalibData_gen.h"
+#include "tkCommon/utils.h"
 
 namespace tk{ namespace data{
 
@@ -60,6 +61,28 @@ namespace tk{ namespace data{
                 r[i] = r_tmp[i];
 
             return true;
+        }
+
+        void world2cam(tk::common::Tfpose &tf, tk::math::Mat<float> &point, tk::math::Mat<float> &dst){
+
+            Eigen::MatrixXf t = tf.matrix() * point.matrix();
+            t.conservativeResize(3, point.cols());
+
+            Eigen::MatrixXf result = k.matrix() * t;
+
+            dst.resize(3, point.cols());
+
+            dst.matrix() = result;
+
+        }
+
+        void resize(float scale){
+
+            k(0,0) *= scale;
+            k(1,1) *= scale;
+            k(0,2) *= scale;
+            k(1,2) *= scale;
+
         }
 
     };
