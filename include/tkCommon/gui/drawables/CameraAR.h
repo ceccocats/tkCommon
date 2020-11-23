@@ -94,7 +94,7 @@ public:
     void draw(tk::gui::Viewer *viewer) {
 
         if(!img.empty()){
-            img.lock();
+            img.lockRead();
             im_texture->setData(img.data);
             img.unlockRead();
         }
