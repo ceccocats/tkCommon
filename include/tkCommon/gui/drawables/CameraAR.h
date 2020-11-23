@@ -109,7 +109,7 @@ public:
             glMultMatrixf(glm::value_ptr(camera.projection));
 
             // Apply ModelView
-            lock();
+            lockWrite();
             camera.modelView = glm::make_mat4((float*)view.matrix().data());
             unlockWrite();
             glm::mat4 mv = glm::make_mat4( (float*)tk::common::odom2tf(0,0,0,M_PI,0,0).matrix().data());
