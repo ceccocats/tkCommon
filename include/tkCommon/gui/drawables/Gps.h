@@ -13,7 +13,7 @@ namespace tk{ namespace gui{
 
             int nPos;
             int lastPos;
-            tk::math::VecStatic<tk::gui::shader::circle*,40> circles;
+            std::vector<tk::gui::shader::circle*> circles;
 
             tk::common::GeodeticConverter geoConv;
 
@@ -33,6 +33,7 @@ namespace tk{ namespace gui{
                 this->nPos = nPos;
                 this->lastPos = -1;
                 this->initted = false;
+                circles.resize(40);
             }
 
             Gps(tk::data::GpsData* gps, int nPos = 10, tk::gui::Color_t color = tk::gui::color::RED){
@@ -41,6 +42,7 @@ namespace tk{ namespace gui{
                 this->nPos = nPos;
                 this->lastPos = -1;
                 this->initted = true;
+                circles.resize(40);
             }
 
             ~Gps(){
