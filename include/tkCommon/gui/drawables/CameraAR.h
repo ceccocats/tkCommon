@@ -91,47 +91,52 @@ public:
     {
         save = save || ImGui::Button("Save Map!");
     }
+
     void draw(tk::gui::Viewer *viewer) {
 
-        if(!img.empty()){
-            img.lockRead();
-            im_texture->setData(img.data);
-            img.unlockRead();
-        }
-        
-        glPushMatrix();
-        {
-            texture->useForRendering();
-
-            glLoadIdentity();
-
-            // Apply projection
-            glMultMatrixf(glm::value_ptr(camera.projection));
-
-            // Apply ModelView
-            lockWrite();
-            camera.modelView = glm::make_mat4((float*)view.matrix().data());
-            unlockWrite();
-            glm::mat4 mv = glm::make_mat4( (float*)tk::common::odom2tf(0,0,0,M_PI,0,0).matrix().data());
-            glm::mat4 m_view = mv*camera.modelView;
-            glMultMatrixf(glm::value_ptr(m_view));
-
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            for (auto const& drawable : drawables){
-                if(drawable->enabled){
-                    glPushMatrix();
-                    glMultMatrixf(drawable->tf.matrix().data());
-                    drawable->draw(viewer);
-                    glPopMatrix();
-                }
+        if( img.isChanged() ){
+            if(!img.empty()){
+                img.lockRead();
+                im_texture->setData(img.data);
+                img.unlockRead();
             }
+            
+            glPushMatrix();
+            {
+                texture->useForRendering();
 
-            texture->unuseRendering();
+                glLoadIdentity();
 
+                // Apply projection
+                glMultMatrixf(glm::value_ptr(camera.projection));
+
+                // Apply ModelView
+                lockWrite();
+                camera.modelView = glm::make_mat4((float*)view.matrix().data());
+                unlockWrite();
+                glm::mat4 mv = glm::make_mat4( (float*)tk::common::odom2tf(0,0,0,M_PI,0,0).matrix().data());
+                glm::mat4 m_view = mv*camera.modelView;
+                glMultMatrixf(glm::value_ptr(m_view));
+
+                glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+                for (auto const& drawable : drawables){
+                    if(drawable->enabled){
+                        glPushMatrix();
+                        glMultMatrixf(drawable->tf.matrix().data());
+                        drawable->draw(viewer);
+                        glPopMatrix();
+                    }
+                }
+
+                texture->unuseRendering();
+
+            }
+            glPopMatrix();
         }
-        glPopMatrix();
+
+        
 
         ImGui::Begin(name.c_str(), NULL, ImGuiWindowFlags_NoScrollbar);
             
