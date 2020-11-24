@@ -25,11 +25,9 @@ class Lockable{
         }
 
         void lockWrite(){
-            tkPROF_tic(lock)
             writing = true;
             mutex.lock();
             writing = false;
-            tkPROF_toc(lock)
         }
 
         void unlockWrite(){
