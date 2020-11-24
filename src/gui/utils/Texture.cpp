@@ -50,8 +50,8 @@ void Texture<float>::init(int width, int height, int channels, bool anti_aliasin
     type =  GL_FLOAT;
 
     if(channels == 1){
-        format = GL_R;
-        this->generateTexture(GL_R16F);
+        format = GL_LUMINANCE;
+        this->generateTexture(GL_LUMINANCE8);
     }
 
     if(channels == 2){
