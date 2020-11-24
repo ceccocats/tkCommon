@@ -273,7 +273,11 @@ class MatBase : public tk::math::MatDump {
             return Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>>(data_h, _rows, _cols);
         }
         
-
+        void set(T scalar) {
+            for(int i=0; i<size(); i++) {
+                data_h[i] = scalar;
+            }
+        }
 };
 
 

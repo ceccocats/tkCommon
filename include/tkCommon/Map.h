@@ -27,7 +27,7 @@ namespace tk { namespace common {
                 _vals.push_back(&_map[hash_key]);
                 _mapKeys[hash_key] = key;
             } else {
-                tkFATAL(key + "key already inside map")
+                tkFATAL(key + " key already inside map")
             }
         }
         bool exists(unsigned key) {
