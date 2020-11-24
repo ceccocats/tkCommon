@@ -16,8 +16,8 @@ void Texture<uint8_t>::init(int width, int height, int channels, bool anti_alias
     type =  GL_UNSIGNED_BYTE;
 
     if(channels == 1){
-        format = GL_R;
-        this->generateTexture(GL_R8);
+        format = GL_LUMINANCE;
+        this->generateTexture(GL_LUMINANCE8);
     }
 
     if(channels == 2){
