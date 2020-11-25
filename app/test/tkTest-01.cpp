@@ -76,8 +76,14 @@ TEST_CASE("Test mat class") {
     SECTION("Eigen ops") {
         mat.resize(3, 3);
         mat.set({0, 1, 2, 3, 4, 5, 6, 7, 8});
-        Eigen::MatrixXf m = mat.matrix()*2;
+
+        Eigen::MatrixXf m = mat.matrix();
+
         mat.matrix() = mat.matrix()*2;
+        m = m*2;
+
+        //std::cout<<m<<"\n";
+        //mat.print();
 
         for (int i = 0; i < mat.rows(); i++) {
             for (int j = 0; j < mat.cols(); j++) {

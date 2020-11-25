@@ -27,7 +27,7 @@ class circle : public tk::gui::shader::generic
         int  multiCircles;
         linesMonocolor* linesShader;
         tk::gui::Buffer<float> linesGlBuf;
-        tk::math::Vec<linesMonocolor::line_color_t> linesBufData;
+        std::vector<linesMonocolor::line_color_t> linesBufData;
 
     public:
         int resolution;
@@ -50,7 +50,7 @@ class circle : public tk::gui::shader::generic
                 linesBufData[i].y = y + sin(angle) * radius;
                 linesBufData[i].z = z;
             }
-            linesGlBuf.setData((float*)linesBufData.data_h,resolution*3);
+            linesGlBuf.setData((float*)linesBufData.data(),resolution*3);
             multiCircles = 0;
         }
 
@@ -70,7 +70,7 @@ class circle : public tk::gui::shader::generic
                 linesBufData[resolution-1].y = y + sin(0) * radius;
                 linesBufData[resolution-1].z = z;
 
-                linesGlBuf.setData((float*)linesBufData.data_h,resolution*3,j*resolution*3);
+                linesGlBuf.setData((float*)linesBufData.data(),resolution*3,j*resolution*3);
             }
             multiCircles = points.cols();
         }
@@ -91,7 +91,7 @@ class circle : public tk::gui::shader::generic
                 linesBufData[resolution-1].y = y + sin(0) * radius;
                 linesBufData[resolution-1].z = z;
 
-                linesGlBuf.setData((float*)linesBufData.data_h,resolution*3,j*resolution*3);
+                linesGlBuf.setData((float*)linesBufData.data(),resolution*3,j*resolution*3);
             }
             multiCircles = n;
         }

@@ -49,6 +49,8 @@ namespace tk { namespace gui {
         
         static bool disabled;
 
+        Camera      camera;
+        
     private:
         
         Viewer();
@@ -91,7 +93,6 @@ namespace tk { namespace gui {
 
         bool    running = false;
 
-        Camera      camera;
 
         glm::vec3   lightPos;
 
