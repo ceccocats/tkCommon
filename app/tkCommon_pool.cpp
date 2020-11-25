@@ -40,7 +40,7 @@ void
             data->gps.lon = counter;
 
             //mtx.lock();
-            printf("write\tlat %f, lon %f\n", data->gps.lat, data->gps.lon);
+            printf("--------------------------------------------\nwrite\tlat %f, lon %f\n", data->gps.lat, data->gps.lon);
             //mtx.unlock();
 
             pool.releaseAdd(idx);
@@ -103,9 +103,9 @@ int main( int argc, char** argv){
     pthread_t pt[50];
     
 	pthread_create(&pt[0], nullptr, writer, nullptr);
-    for (int i = 1; i < 20; i++) 
+    for (int i = 1; i < 10; i++) 
         pthread_create(&pt[i], nullptr, reader, nullptr);
-    for (int i = 20; i < 25; i++)
+    for (int i = 10; i < 25; i++)
         pthread_create(&pt[i], nullptr, reader2, nullptr);
 
     for (int i = 0; i < 25; i++)

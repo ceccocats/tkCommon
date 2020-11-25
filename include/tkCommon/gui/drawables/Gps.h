@@ -10,6 +10,7 @@ namespace tk{ namespace gui{
 
         private:
             tk::data::GpsData* gps;
+            uint32_t counter = 0;
 
             int nPos;
             int lastPos;
@@ -60,7 +61,7 @@ namespace tk{ namespace gui{
 
             void draw(tk::gui::Viewer *viewer){
                 if(initted == true){
-                    if(gps->isChanged() || update){
+                    if(gps->isChanged(counter) || update){
                         update = false;
 
                         gps->lockRead();

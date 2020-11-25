@@ -8,6 +8,7 @@
 
 namespace tk { namespace rt {
 /**
+ * @brief Class to handle a pool of sensor data.
  * 
  */
 class DataPool {
@@ -21,9 +22,14 @@ private:
     int         last;
     int         locked;
     int         size;
-    int         inserted;
     bool        initted;
 
+    /**
+     * @brief Get the Last object
+     * 
+     * @param id    index of the sensor data returned, used to release
+     * @return const tk::data::SensorData* 
+     */
     const tk::data::SensorData* 
     getLast(int &id) {
         gmtx.lock();
@@ -43,6 +49,8 @@ private:
     }
 
 public:
+    int inserted;
+    
     /**
      * @brief Construct a new DataPool object
      * 
@@ -87,9 +95,9 @@ public:
     }
 
     /**
-     * @brief 
+     * @brief Method to request a pointer to sensor data in writing mode.
      * 
-     * @param id 
+     * @param id    index of the sensor data returned, used to release
      * @return tk::data::SensorData* 
      */
     tk::data::SensorData* 
@@ -121,18 +129,17 @@ public:
     }
 
     /**
-     * @brief 
+     * @brief Method to release a pointer to sensor data in writing mode.
      * 
-     * @param id 
+     * @param id   index of the data inside of the pool
      */
     void 
     releaseAdd(const int id) {
         gmtx.lock();
             // check if was really locked
-            //if(!data[id]->tryLock()) {
-            //    locked--;
-            //}
-            locked--;
+            if(!data[id]->tryLock()) {
+                locked--;
+            }
             
             // unlock anyway
             data[id]->unlockWrite(); 
@@ -145,10 +152,10 @@ public:
     }
 
     /**
-     * @brief 
+     * @brief Method to request a pointer to sensor data in reading mode.
      * 
-     * @param id 
-     * @param timeout 
+     * @param id        index of the sensor data returned, used to release
+     * @param timeout   optional timeout, if passed the get will return the newest data when available
      * @return const tk::data::SensorData* 
      */
     const tk::data::SensorData* 
@@ -171,7 +178,7 @@ public:
 
     
     /**
-     * @brief 
+     * @brief Method to release a pointer to sensor data in reading mode.
      * 
      * @param id 
      */
@@ -182,13 +189,20 @@ public:
         gmtx.unlock();
     }
 
+    /**
+     * @brief Method 
+     * 
+     * @param id 
+     * @return true     if the id passed is lower than the internal one
+     * @return false 
+     */
     bool
     newData(const int id) {
         return (inserted > id)?true:false;
     }
 
     /**
-     * @brief 
+     * @brief Method to deallocate memory.
      * 
      */
     void close() {

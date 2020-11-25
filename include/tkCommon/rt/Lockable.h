@@ -1,101 +1,95 @@
 #pragma once
 #include <mutex>
+#include <condition_variable>
 #include <tkCommon/rt/Profiler.h>
 
 namespace tk { namespace rt {
 
 class Lockable{
     private:
-        std::mutex  mutex;
-        std::mutex  globalMutex;
+        std::mutex  MTX;
+        std::mutex  gMTX;
+
+        std::condition_variable CV;
+        
         uint32_t    counter;
         uint32_t    nReader;
-        bool        modified;
         bool        writing;
-
+        
     public:
         Lockable() {
-            globalMutex.unlock();
-            mutex.unlock();
+            gMTX.unlock();
+            MTX.unlock();
 
             counter     = 0;
             nReader     = 0;
-            modified    = false;
             writing     = false;
         }
 
-        void lockWrite(){
+        void lockWrite() {
             writing = true;
-            mutex.lock();
-            writing = false;
+            MTX.lock();
         }
 
-        void unlockWrite(){
-
-            counter++;
-            modified = true;
-            mutex.unlock();
-
-        }
-
-        void lockRead(){
-            while(writing){
-                usleep(1);
-            }
-            globalMutex.lock();
-            
-            if (nReader == 0){
-                mutex.lock();
-            }
-            nReader++;
-            globalMutex.unlock();
-            
-        }
-
-        bool tryLockRead(){
-            if(writing) return false;
-
-            globalMutex.lock();
-
-            bool l = true;
-            
-            if (nReader == 0){
-                l = mutex.try_lock();
-            }
-            if( l )
-                nReader++;
-            globalMutex.unlock();
-
-            return l;
-        }
-
-        void unlockRead(){
-            globalMutex.lock();
-            
-            if (nReader == 1)
-                mutex.unlock();
-            nReader--;
-                
-            globalMutex.unlock();
+        void unlockWrite() {
+            gMTX.lock();
+                if (writing) {
+                    counter++;
+                    writing     = false;
+                }
+                MTX.unlock();
+                CV.notify_all();
+            gMTX.unlock();
         }
 
         bool tryLock() {
-            return mutex.try_lock();
+            return MTX.try_lock();
         }
 
-        uint32_t getModCount(){
-            return counter;
+        void lockRead() {
+            std::unique_lock<std::mutex> lck(gMTX);
+                while (writing) CV.wait(lck);
+                
+                if (nReader == 0)
+                    MTX.lock();
+                nReader++;
+            gMTX.unlock();
         }
 
-        bool isChanged(){
-            bool l = false;
-            if(mutex.try_lock()){
+        void unlockRead() {
+            gMTX.lock();
+                if (nReader == 1)
+                    MTX.unlock();
+                    
+                if (nReader > 0)
+                    nReader--; 
+            gMTX.unlock();
+        }
 
-                l = modified;
-                modified = false;
-                mutex.unlock();
-            }
-            return l;
+
+        bool tryLockRead() {
+            gMTX.lock();
+                bool r = false;
+                if (nReader > 0)
+                    r = true;
+                else 
+                    r = MTX.try_lock();
+                
+                if (r == true)
+                    nReader++;
+            gMTX.unlock();
+            return r;
+        }
+
+        bool isChanged(uint32_t &counter) {
+            gMTX.lock();
+                bool r = false;
+                if (this->counter > counter) {
+                    r       = true;
+                    counter = this->counter;
+                }
+            gMTX.unlock();
+            return r;
         }
 };
 

@@ -11,6 +11,7 @@ namespace tk{ namespace gui{
 
         public:
             tk::data::CloudData*    cloud;
+            uint32_t counter = 0;
 
         private:
             int points;
@@ -267,8 +268,9 @@ namespace tk{ namespace gui{
                     cloud->unlockRead();
                 }
 
-                if(cloud->isChanged() || update){
+                if(cloud->isChanged(counter) || update){
                     update = false;
+
                     cloud->lockRead();
                     points = cloud->points.cols();
                     glbuffer.setData(cloud->points.data_h,cloud->points.size());

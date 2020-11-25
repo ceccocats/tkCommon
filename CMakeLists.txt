@@ -97,7 +97,6 @@ add_library(tkGUI SHARED
     src/gui/imgui/imgui_impl_glfw.cpp
     src/gui/imgui/imgui_impl_opengl3.cpp
     src/gui/imgui/imgui_impl_opengl3.cpp
-    src/gui/drawables/Wrapper.cpp
 )
 target_link_libraries(tkGUI ${GUI_LIBS} ${CUDA_LIBRARIES})
 

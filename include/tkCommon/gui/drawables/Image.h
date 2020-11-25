@@ -12,6 +12,8 @@ namespace tk{ namespace gui{
             std::vector<tk::data::ImageData*>       images;
             std::vector<bool>   updates;
             std::vector<bool>   ready;
+            std::vector<uint32_t> counter;
+
 
             std::string name;
 
@@ -21,10 +23,12 @@ namespace tk{ namespace gui{
                 this->images.resize(n);
                 this->updates.resize(n);
                 this->ready.resize(n);
+                this->counter.resize(n);
                 for(int i = 0; i < n; i++){
                     this->updates[i] = false;
                     this->ready[i]   = false;
-                }
+                    this->counter[i] = 0; 
+                }   
                 this->name = name;
             }
 
@@ -36,11 +40,13 @@ namespace tk{ namespace gui{
                 this->images.resize(n);
                 this->updates.resize(n);
                 this->ready.resize(n);
+                this->counter.resize(n);
 
                 for(int i = 0; i < n; i++){
                     this->images[i]  = va_arg(arguments, tk::data::ImageData*);
                     this->updates[i] = false;
                     this->ready[i]   = true;
+                    this->counter[i] = 0;
                 }
                 va_end(arguments);
                 this->name = name;
@@ -71,7 +77,7 @@ namespace tk{ namespace gui{
 
                 //Check data
                 for(int i = 0; i< images.size(); i++){
-                    if(images[i]->isChanged() || updates[i]){
+                    if(images[i]->isChanged(counter[i]) || updates[i]){
                         //Need to init?
                         if(this->ready[i] == false){
                             this->ready[i]  = true;

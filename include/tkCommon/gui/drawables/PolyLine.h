@@ -17,6 +17,7 @@ namespace tk{ namespace gui{
             tk::gui::line* line;
             tk::gui::Buffer<float> glData;
 
+            uint32_t counter = 0;
             float lineSize = 1.0f;
 
             std::string name;
@@ -46,9 +47,9 @@ namespace tk{ namespace gui{
             }
 
             void draw(tk::gui::Viewer *viewer){
-                if(line->isChanged() || update){
+                if(line->isChanged(counter) || update){
                     update = false;
-
+                    
                     line->lockRead();
                     glData.setData((float*)line->points.data(),line->points.size()*3);
                     line->unlockRead();               

@@ -8,6 +8,7 @@ namespace tk{ namespace gui{
         private:
             tk::common::Prisms prisms;
             tk::common::Prisms* ref;
+            uint32_t counter = 0;
         public:
 
             tk::gui::Color_t color;
@@ -37,7 +38,7 @@ namespace tk{ namespace gui{
             }
 
             void draw(tk::gui::Viewer *viewer){
-                if(ref->isChanged() || update){
+                if(ref->isChanged(counter) || update){
                     update      = false;
 
                     ref->lockRead();
