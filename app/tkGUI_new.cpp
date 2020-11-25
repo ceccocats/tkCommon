@@ -30,6 +30,7 @@ void read_cloud(tk::data::GpsData& gps, tk::data::CloudData& cloud) {
 	gps.lat = 42.182945;
 	gps.lon = 12.477200;
 	gps.heigth = 0.0f;
+	gps.sats   = 20;
 	gps.header.name = "GPS";
 
 	cloud.header.name   = "LiDAR cloud";

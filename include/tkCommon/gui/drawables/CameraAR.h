@@ -33,6 +33,8 @@ public:
 
     bool save = false;
 
+    uint32_t counter;
+
     CameraAR(tk::data::CalibData &calib, int channels = 4, std::string name = "AR"){
 
         this->calib = calib;
@@ -71,6 +73,8 @@ public:
 
         //camera.projection = glm::perspective<float>(-60, (float)-w/h, z_near, z_far);
         img.init();
+
+        counter = 0;
     }
 
     void updateImage(tk::data::ImageData &im){
@@ -93,7 +97,7 @@ public:
 
     void draw(tk::gui::Viewer *viewer) {
 
-        if( img.isChanged() ){
+        if( img.isChanged(counter) ){
             if(!img.empty()){
                 img.lockRead();
                 im_texture->setData(img.data);

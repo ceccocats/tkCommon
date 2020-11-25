@@ -3,7 +3,6 @@
 #include <tkCommon/gui/drawables/Image.h>
 #include <tkCommon/gui/drawables/Grid.h>
 #include <tkCommon/gui/drawables/Cloud4f.h>
-#include <tkCommon/gui/drawables/Wrapper.h>
 #include <tkCommon/gui/drawables/Plot.h>
 #include <tkCommon/gui/drawables/Drawable.h>
 #include <tkCommon/gui/drawables/DrawBuffer.h>
