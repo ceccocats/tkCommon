@@ -131,7 +131,9 @@ genData(className, VARS, DEPS)
 
 className = "CalibData_gen"
 DEPS = ["#include \"tkCommon/math/Mat.h\"\n"]
-VARS = [ {"name":"k",   "type":"tk::math::Mat<float>", "init":"k.resize(3,3)"},
+VARS = [ {"name":"w",   "type":"int", "default":"0"},
+         {"name":"h",   "type":"int", "default":"0"},
+         {"name":"k",   "type":"tk::math::Mat<float>", "init":"k.resize(3,3)"},
          {"name":"d",   "type":"tk::math::Mat<float>", "init":"d.resize(1,5)"},
          {"name":"r",   "type":"tk::math::Mat<float>", "init":"r.resize(3,3)"} ]
 genData(className, VARS, DEPS)

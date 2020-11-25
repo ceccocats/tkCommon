@@ -44,11 +44,16 @@ namespace tk{ namespace data{
 
             init();
 
+            w = conf["width"]? conf["width"].as<int>() : w;
+            h = conf["height"]? conf["height"].as<int>() : h;
+
             //std::vector<float> k_tmp = getYAMLconf<std::vector<float>>(conf, "K", std::vector<float>(9,0));
             std::vector<float> k_tmp = conf["K"]? conf["K"].as<std::vector<float>>(): std::vector<float>(9,0);
-            tkASSERT(k_tmp.size() == 9)
-            for(int i = 0; i < 9; i++)
-                k[i] = k_tmp[i];
+            tkASSERT(k_tmp.size() == 9);
+            for(int i = 0; i < 3; i++) for(int j = 0; j < 3; j++)
+                    k.data_h[i*3+j] = k_tmp[i*3 + j];
+                    //k(i,j) = k_tmp[i*3 + j];
+
 
             std::vector<float> d_tmp = conf["D"]? conf["D"].as<std::vector<float>>(): std::vector<float>(5,0);
             tkASSERT(d_tmp.size() >= 5)
@@ -57,8 +62,9 @@ namespace tk{ namespace data{
 
             std::vector<float> r_tmp = conf["R"]? conf["R"].as<std::vector<float>>(): std::vector<float>(9,0);
             tkASSERT(r_tmp.size() == 9)
-            for(int i = 0; i < 9; i++)
-                r[i] = r_tmp[i];
+            for(int i = 0; i < 3; i++) for(int j = 0; j < 3; j++)
+                    r.data_h[i*3+j] = r_tmp[i*3 + j];
+                    //r(i,j) = r_tmp[i*3 + j];
 
             return true;
         }
@@ -76,12 +82,13 @@ namespace tk{ namespace data{
 
         }
 
-        void resize(float scale){
-
-            k(0,0) *= scale;
-            k(1,1) *= scale;
-            k(0,2) *= scale;
-            k(1,2) *= scale;
+        void rescale(float scale){
+            w *= scale;
+            h *= scale;
+            k.data_h[0*3+0] *= scale;
+            k.data_h[1*3+1] *= scale;
+            k.data_h[0*3+2] *= scale;
+            k.data_h[1*3+2] *= scale;
 
         }
 
