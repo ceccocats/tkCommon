@@ -70,16 +70,39 @@ namespace tk{ namespace data{
         }
 
         void world2cam(tk::common::Tfpose &tf, tk::math::Mat<float> &point, tk::math::Mat<float> &dst){
+            Eigen::Matrix3f fix;
 
-            Eigen::MatrixXf t = tf.matrix() * point.matrix();
+            fix << 0, -1,  0,
+                   0,  0, -1,
+                   1,  0,  0;
+            //tk::common::Tfpose lol; lol.linear() = fix;
+            //std::cout<<tk::common::tf2rot(lol)<<"\n";
+
+            Eigen::MatrixXf t = (tf.inverse().matrix()) * point.matrix();
             t.conservativeResize(3, point.cols());
 
-            Eigen::MatrixXf result = k.matrix() * t;
+            t = fix * t;
 
-            dst.resize(3, point.cols());
+            Eigen::MatrixXf result = k.matrix().transpose() * t;
+            dst.copyFrom(result.data(), result.rows(), result.cols());
+        }
 
-            dst.matrix() = result;
+        void world2pix(tk::common::Tfpose &tf, tk::math::Mat<float> &point, tk::math::Mat<float> &dst){
+            
 
+            world2cam(tf, point, dst);
+            for(int i=0; i<dst.cols(); i++) {
+                if(dst(2,i) > 0){
+                    dst(0,i) = dst(0,i) / dst(2,i);
+                    dst(1,i) = dst(1,i) / dst(2,i);
+                    dst(2,i) = 1.0;
+                } else{
+                    dst(0,i) = 0.0;
+                    dst(1,i) = 0.0;
+                    dst(2,i) = 0.0;
+                }
+                
+            }
         }
 
         void rescale(float scale){

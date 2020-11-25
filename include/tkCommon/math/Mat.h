@@ -24,7 +24,7 @@ template<class T>
 class MatBase : public tk::math::MatDump {
 
     protected:
-        const float MAXSIZE_MARGIN = 1.5f;
+        const float MAXSIZE_MARGIN = 1.0f;
         int     _maxSize;
         int     _maxSizeGPU;
         int     _rows;
@@ -253,6 +253,8 @@ class MatBase : public tk::math::MatDump {
         friend std::ostream& 
         operator<<(std::ostream& os, const MatBase& s) {
             os<<"Mat ("<<s.rows()<<"x"<<s.cols()<<")";
+            if(s._isCopy)
+                os<<" copy";
             return os;
         }
 
