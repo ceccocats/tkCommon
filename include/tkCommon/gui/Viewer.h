@@ -13,6 +13,7 @@
 #include "tkCommon/gui/imgui/imgui.h"
 #include "tkCommon/gui/imgui/imgui_impl_glfw.h"
 #include "tkCommon/gui/imgui/imgui_impl_opengl3.h"
+#include "tkCommon/gui/implot/implot.h"
 #include "tkCommon/rt/Thread.h"
 
 #define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
