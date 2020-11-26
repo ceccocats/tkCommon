@@ -107,9 +107,10 @@ namespace tk { namespace data {
         }
 
         bool toVar(std::string name, tk::math::MatIO::var_t &var) {
-            std::vector<tk::math::MatIO::var_t> structVars(2);
+            std::vector<tk::math::MatIO::var_t> structVars(3);
             structVars[0].set("stamp", stamp);
             structVars[1].set("tf", tf.matrix());
+            structVars[2].set("name", this->name);
             return var.setStruct(name, structVars);
         }
         bool fromVar(tk::math::MatIO::var_t &var) {
@@ -117,6 +118,7 @@ namespace tk { namespace data {
                 return false;
             var["stamp"].get(stamp);
             var["tf"].get(tf.matrix());
+            var["name"].get(this->name);
             return true;
         }
     };
