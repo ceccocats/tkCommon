@@ -81,25 +81,6 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawa
 #-------------------------------------------------------------------------------
 # Build Libraries
 #-------------------------------------------------------------------------------
-add_library(tkGUI SHARED
-    src/gui/Viewer.cpp
-    src/gui/utils/PlotManager.cpp
-    src/gui/utils/Buffer.cpp
-    src/gui/utils/Shader.cpp
-    src/gui/utils/Texture.cpp
-    src/gui/utils/Camera.cpp
-    src/gui/utils/stb_image.cpp
-    src/gui/utils/CommonViewer.cpp
-    src/gui/imgui/imgui_demo.cpp
-    src/gui/imgui/imgui_draw.cpp
-    src/gui/imgui/imgui_widgets.cpp
-    src/gui/imgui/imgui.cpp
-    src/gui/imgui/imgui_impl_glfw.cpp
-    src/gui/imgui/imgui_impl_opengl3.cpp
-    src/gui/imgui/imgui_impl_opengl3.cpp
-)
-target_link_libraries(tkGUI ${GUI_LIBS} ${CUDA_LIBRARIES})
-
 add_library(tkCommon SHARED
     src/common.cpp
     src/log.cpp
@@ -109,6 +90,20 @@ add_library(tkCommon SHARED
     include/tkCommon/data/gen/CloudData_gen.cpp   
 )
 target_link_libraries(tkCommon yaml-cpp matio dl)
+
+file(GLOB gui_utils "src/gui/utils/*.cpp")
+file(GLOB imgui "src/gui/imgui/*.cpp")
+file(GLOB implot "src/gui/implot/*.cpp")
+file(GLOB drawables "src/gui/drawables/*.cpp")
+
+add_library(tkGUI SHARED
+    src/gui/Viewer.cpp
+    ${drawables}
+    ${gui_utils}  
+    ${imgui}
+    ${implot}
+)
+target_link_libraries(tkGUI ${CUDA_LIBRARIES} ${GUI_LIBS} tkCommon)
 
 add_library(tkCommunication SHARED
     src/communication/ethernet/UDPSocket.cpp

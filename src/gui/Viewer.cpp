@@ -426,7 +426,7 @@ Viewer::runloop() {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        camera.mouseOnGUI = ImGui::IsMouseHoveringAnyWindow();
+        camera.mouseOnGUI = ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow);
 
         // just for debug -- pp is mouse pose
         glm::vec3 pp = camera.unprojectPlane({camera.mousePos.x,camera.mousePos.y});

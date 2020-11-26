@@ -20,6 +20,7 @@ make -j8
 |------------|--------|---------|
 |[can-dbcparser](https://github.com/downtimes/can-dbcparser) |Michael Auracher | MIT|
 |[imgui](https://github.com/ocornut/imgui)| Omar Cornut | MIT|
+|[implot](https://github.com/epezent/implot)| Evan Pezent | MIT|
 |[stb_image](https://github.com/nothings/stb)|Michael Keck| MIT|
 |[OBJ-Loader](https://github.com/Bly7/OBJ-Loader)|Robert Smith| MIT|
 |[Argh!](https://github.com/adishavit/argh)| Adi Shavit| Argh! |
