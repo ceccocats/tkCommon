@@ -41,7 +41,7 @@ tk::gui::Gps::draw(tk::gui::Viewer *viewer){
             update = false;
 
             gps->lockRead();
-            if(!geoConv.isInitialised() && gps->sats > 10) {
+            if(!geoConv.isInitialised() && gps->sats > 10 && gps->lat!=0 && gps->lon!=0 && gps->heigth!=0) {
                 geoConv.initialiseReference(gps->lat,gps->lon,gps->heigth);
             }
             name = gps->header.name;
@@ -67,7 +67,7 @@ void
 tk::gui::Gps::imGuiSettings(){
     ImGui::ColorEdit4("Color", color.color);
     ImGui::SliderFloat("Size",&lineSize,1.0f,20.0f,"%.1f");
-    ImGui::SliderInt("Last poses",&nPos,1,40);
+    ImGui::SliderInt("Last poses gps",&nPos,1,40);
 }
 
 void 
