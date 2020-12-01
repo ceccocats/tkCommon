@@ -7,59 +7,74 @@ namespace tk { namespace data{
 
 class box{
     public:
-        float x, y, z; //Position
-        float w, h, d; //Size
-        float r, p, y; //roll, pitch, yaw
+        tk::common::Vector3<float> pose; //Position: X,Y,Z
+        tk::common::Vector3<float> size; //Size:     W,H,D
+        tk::common::Vector3<float> rot;  //Rotation: roll, pitch, yaw
+        float &x = pose.x;
+        float &y = pose.y;
+        float &z = pose.z;
+        float &w = size.x;
+        float &h = size.y;
+        float &d = size.z;
 
         box(){
-            x = y = z = w = h = d = r = p = y = 0;
+            pose = tk::common::Vector3<float>(0,0,0);
+            size = tk::common::Vector3<float>(0,0,0);
+            rot  = tk::common::Vector3<float>(0,0,0);
         }
 
         ~box(){
         }
 
         box(const box& b){
-            this->x = b.x;
-            this->y = b.y;
-            this->z = b.z;
-            this->w = b.w;
-            this->h = b.h;
-            this->d = b.d;
+            this->pose = b.pose;
+            this->size = b.size;
+            this->rot = b.rot;
         }
 
-        box(float x, float y, float w, float h, float r, float p){
-            this->x = x;
-            this->y = y;
-            this->w = w;
-            this->h = h;
-            this->r = r;
-            this->p = p;
+        box(float x, float y, float w, float h){
+            pose = tk::common::Vector3<float>(x,y,0);
+            size = tk::common::Vector3<float>(w,h,0);
+            rot  = tk::common::Vector3<float>(0,0,0);
         }
  
-        box(float x, float y, float z, float w, float h, float d, float r, float p, float y){
-            this->x = x;
-            this->y = y;
-            this->z = z;
-            this->w = w;
-            this->h = h;
-            this->d = d;
-            this->r = r;
-            this->p = p;
-            this->y = y;
+        box(float x, float y, float z, float w, float h, float d, float roll, float pitch, float yaw){
+            pose = tk::common::Vector3<float>(x,y,z);
+            size = tk::common::Vector3<float>(w,h,d);
+            rot  = tk::common::Vector3<float>(roll,pitch,yaw);
         }
 
         box& 
         operator=(const box& b){
-            this->x = b.x;
-            this->y = b.y;
-            this->z = b.z;
-            this->w = b.w;
-            this->h = b.h;
-            this->d = b.d;
-            this->r = b.r;
-            this->p = b.p;
-            this->y = b.y;
+            this->pose = b.pose;
+            this->size = b.size;
+            this->rot = b.rot;
         }
+};
+
+class object {
+    public:
+
+        enum Class : uint8_t{
+            PEDESTRIAN  ,
+            CAR         ,
+            TRUCK       ,
+            BUS         ,
+            MOTOBIKE    ,
+            CYCLE       ,
+            RIDER       ,
+            LIGHT		,
+            ROADSIGN	,
+            TRAIN   	,
+            NOT_CLS     
+        };
+
+
+    public:
+        box   cam;
+        box   world;
+        bool  confidence;
+        Class cl;
 };
 
 }}
