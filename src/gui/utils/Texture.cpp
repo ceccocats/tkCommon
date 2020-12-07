@@ -9,7 +9,7 @@ void Texture<uint8_t>::init(int width, int height, int channels, bool anti_alias
     this->height        =  height;
     this->anti_aliasing = anti_aliasing;
 
-    if(channels > 4 && channels < 1){
+    if(channels > 4 || channels < 1){
         tkERR("You must set 1, 2, 3 or 4 channel. Abort\n");
     }
 
@@ -43,7 +43,7 @@ void Texture<float>::init(int width, int height, int channels, bool anti_aliasin
     this->height        =  height;
     this->anti_aliasing = anti_aliasing;
 
-    if(channels > 4 && channels < 1){
+    if(channels > 4 || channels < 1){
         tkERR("You must set 1, 2, 3 or 4 channel. Abort\n");
     }
 
