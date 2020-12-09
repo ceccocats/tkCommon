@@ -60,19 +60,23 @@ tk::gui::Image::updateRef(int n, tk::data::ImageData* image){
 void 
 tk::gui::Image::draw(tk::gui::Viewer *viewer){
 
-    //Check data
     for(int i = 0; i< images.size(); i++){
-        if(images[i]->isChanged(counter[i]) || updates[i]){
-            //Need to init?
-            if(this->ready[i] == false){
-                this->ready[i]  = true;
-                textures[i]     = new tk::gui::Texture<uint8_t>();
-                textures[i]->init(images[i]->width, images[i]->height, images[i]->channels);
+
+        //init
+        if(!ready[i] && updates[i]){
+            this->ready[i]  = true;
+            textures[i]     = new tk::gui::Texture<uint8_t>();
+            textures[i]->init(images[i]->width, images[i]->height, images[i]->channels);
+        }
+
+        if(ready[i]){
+            if(images[i]->isChanged(counter[i]) || updates[i]){
+                //Copy data
+                images[i]->lockRead();
+                textures[i]->setData(images[i]->data);
+                images[i]->unlockRead();
+                this->updates[i]  = false;
             }
-            //Copy data
-            images[i]->lockRead();
-            textures[i]->setData(images[i]->data);
-            images[i]->unlockRead();
         }
 
         ImGui::Begin(name.c_str(), NULL, ImGuiWindowFlags_NoScrollbar);
@@ -87,6 +91,7 @@ tk::gui::Image::draw(tk::gui::Viewer *viewer){
             ImGui::Separator();
         }
         ImGui::End();
+
     }
 }
 
