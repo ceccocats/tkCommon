@@ -113,8 +113,28 @@ tk::gui::Cloud4f::updateData(){
     }
 }
 
-tk::gui::Cloud4f::Cloud4f(tk::data::CloudData* cloud){
+tk::gui::Cloud4f::Cloud4f(std::string name){
     //CloudParams
+    this->name         = name;
+    this->points       =  0;
+    this->color        =  tk::gui::color::WHITE;
+    this->color.a()    =  0.5;
+    this->update       =  true;
+    this->resetMinMax  =  true;
+    this->updateMinMax =  false;
+
+    //DefaultSelected
+    this->cloudMod          = 0;
+    this->selectedColorMap  = cloudMod0.second;
+    this->selected[0]       = feature0.second;
+    this->selected[1]       = featuresChannel0.second;
+    this->selected[2]       = featuresChannel0.second;
+    this->selected[3]       = featuresChannel0.second;
+}
+
+tk::gui::Cloud4f::Cloud4f(tk::data::CloudData* cloud, std::string name){
+    //CloudParams
+    this->name         = name;
     this->points       =  0;
     this->cloud        =  cloud; 
     this->color        =  tk::gui::color::WHITE;
@@ -164,6 +184,9 @@ tk::gui::Cloud4f::onInit(tk::gui::Viewer *viewer){
 
 void 
 tk::gui::Cloud4f::draw(tk::gui::Viewer *viewer){
+    if(cloud == nullptr){
+        return;
+    }
 
     if(updateMinMax == true){
         updateMinMax = false;
@@ -213,6 +236,10 @@ tk::gui::Cloud4f::draw(tk::gui::Viewer *viewer){
 
 void 
 tk::gui::Cloud4f::imGuiSettings(){
+    if(cloud == nullptr){
+        return;
+    }
+
     ImGui::SliderFloat("Size",&pointSize,1.0f,20.0f,"%.1f");
     ImGui::SliderFloat("Alpha",&color.a(),0,1.0f,"%.2f");
     if(ImGui::Combo("Draw mode", &cloudMod, cloudMods.data(), cloudMods.size())){
@@ -262,6 +289,10 @@ tk::gui::Cloud4f::imGuiSettings(){
 
 void 
 tk::gui::Cloud4f::imGuiInfos(){
+    if(cloud == nullptr){
+        return;
+    }
+
     std::stringstream print;
     print<<(*cloud);
     ImGui::Text("%s",print.str().c_str());
@@ -284,5 +315,5 @@ tk::gui::Cloud4f::onClose(){
 
 std::string 
 tk::gui::Cloud4f::toString(){
-    return cloud->header.name;
+    return name;
 }

@@ -5,7 +5,7 @@ tk::communication::PacketParser::firstFrame(pcap_t* pcapFile, timeStamp_t& stamp
                 
     int status = pcap_next_ex(pcapFile, &header, &pkt_data);
     if(status < 0) {
-        tkERR("PCAP error: " + std::to_string(status));
+        tkERR("PCAP error: " + std::to_string(status) + "\n");
         return -1;
     }
 
