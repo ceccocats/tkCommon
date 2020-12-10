@@ -69,7 +69,7 @@ tk::gui::Imu::draw(tk::gui::Viewer *viewer){
 
 void 
 tk::gui::Imu::imGuiSettings(){
-    if(ImGui::SliderInt("Last poses",&nPos,1,maxDataDim)){
+    if(ImGui::SliderInt("Last poses imu",&nPos,1,maxDataDim)){
         time.setDim(nPos);
         accX.setDim(nPos);
         accY.setDim(nPos);

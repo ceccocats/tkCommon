@@ -39,7 +39,7 @@ tk::gui::GpsImu::imGuiSettings(){
 void 
 tk::gui::GpsImu::imGuiInfos(){
     gps->imGuiInfos();
-    imu->imGuiInfos();  
+    //imu->imGuiInfos();  
 }
 
 void 
