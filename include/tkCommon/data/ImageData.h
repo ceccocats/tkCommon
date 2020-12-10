@@ -69,8 +69,10 @@ namespace tk{ namespace data{
             if(var.empty())
                 return false;
             bool ok = ImageData_gen::fromVar(var["info"]);
+            tk::data::HeaderData tmp = header; // header will be overwrited by init
             if(ok) {
                 init(width, height, channels);
+                header = tmp;
                 std::vector<uint8_t> values;
                 var["data"].get(values);
                 memcpy(data, values.data(), values.size()*sizeof(uint8_t));
