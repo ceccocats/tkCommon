@@ -1,56 +1,55 @@
 #include "tkCommon/communication/ethernet/TCPSocket.h"
 
 bool 
-tk::communication::TCPSocket::initClient(const int port, const std::string ip){
+tk::communication::TCPSocket::initClient(const int port, const std::string ip, bool readTimeout){
 
-    tkFATAL("Need to testing")
+    //ret client
+    this->sock_client = 1;
 
     //Set socket struct
     memset(&this->sock_addr, 0, sizeof(this->sock_addr));
     this->sock_addr.sin_family          = AF_INET; // IPv4
     this->sock_addr.sin_port            = htons(port);
 
-    if(this->sock_client){
-        this->sock_addr.sin_addr.s_addr    = htonl(INADDR_ANY);
-    }else{
-        this->sock_addr.sin_addr.s_addr     = inet_addr(ip.c_str());
-    }
+    this->sock_addr.sin_addr.s_addr     = inet_addr(ip.c_str());
 
     // open socket
-    this->sock_fd = socket(AF_INET, SOCK_STREAM, AF_INET);
+    this->sock_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (this->sock_fd < 0){
         tkERR("error while opening socket.\n");
         perror("TCP error");
         return false;
     }
 
-    // bind socket
-    int r = bind(this->sock_fd, (const struct sockaddr *)&this->sock_addr,  sizeof(this->sock_addr));
-    if (r < 0) {
-        tkERR("error while binding the socket.\n");
-        perror("UDP error");
-        return false;
+    //Set 1 sec of timeout
+    if(readTimeout == true){
+        struct timeval timeout;
+        timeout.tv_sec = 1;
+        timeout.tv_usec = 0;
+        setsockopt(this->sock_fd, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(timeout));
     }
     
     // listen socket
-    r = connect(this->sock_fd, (const struct sockaddr *)&this->sock_addr,  sizeof(this->sock_addr));
+    int r = connect(this->sock_fd, (const struct sockaddr *)&this->sock_addr,  sizeof(this->sock_addr));
         if (r < 0) {
         tkERR("error while connecting to the socket.\n");
         perror("TCP error");
         return false;
     }
 
-    if(this->sock_client != 1){
-        tkMSG(std::string{"client TCP connected to server "}+ip+"\n")
-    }
+    tkMSG(std::string{"Connected to "}+ip+" on port "+std::to_string(port)+"\n")
 
     return true;
 }
 
 bool 
 tk::communication::TCPSocket::initServer(const int port){
+    
+    std::cout<<"i'm sorry\n";
+    return false;
+    //TODO: check and implemet
 
-    this->sock_client = 1;
+    /*this->sock_client = 1;
     bool ret = initClient(port,"");
     if(!ret){
         return false;
@@ -59,40 +58,45 @@ tk::communication::TCPSocket::initServer(const int port){
     struct sockaddr client;
     memset(&client, 0, sizeof(client));
 
-    tkWRN("Server attending connection..\n")
+    clsWrn("Server attending connection..\n")
 
     this->sock_client = ::accept(this->sock_fd, (struct sockaddr *)&client, (socklen_t*)sizeof(client));
     if(this->sock_client < 0){
-        tkERR("error while connecting to the socket.\n");
+        clsErr("error while connecting to the socket.\n");
         perror("TCP error");
         return false;
     }
 
-    tkWRN(std::string{"Server accept connection from "}+client.sa_data+"\n")
-    return true;    
+    clsWrn(std::string{"Server accept connection from "}+client.sa_data+"\n")
+    return true;    */
 }
 
 int 
 tk::communication::TCPSocket::receive(uint8_t* buffer, int length){
 
-    if(this->sock_client == -1)
-        return ::read(this->sock_fd, buffer, length); 
-    else
-        return ::read(this->sock_client, buffer, length);     
+    if(this->sock_client == 1)
+        return ::read(this->sock_fd, buffer, length);
+    
+    return 0;
+
 }
 
 bool 
 tk::communication::TCPSocket::send(uint8_t* buffer, int length){
 
-    if(this->sock_client == -1)
-        return ::send(this->sock_fd, buffer, length, 0) > 0; 
-    else
-        return ::send(this->sock_client, buffer, length, 0) > 0; 
+    if(this->sock_client == 1)
+        return ::send(this->sock_fd, buffer, length, 0) > 0;
+
+    return false;
+
 }
 
 bool 
 tk::communication::TCPSocket::close(){
 
-    ::close(this->sock_client);
-    return ::close(this->sock_fd) > 0;
+    if(this->sock_client == 1)
+        return ::close(this->sock_fd) > 0;      //server
+    
+    return false;
+
 }

@@ -12,6 +12,7 @@ public:
     typedef std::string featureType_t;
     static const featureType_t FEATURES_NONE;
     static const featureType_t FEATURES_I;
+    static const featureType_t FEATURES_NOISE;
     static const featureType_t FEATURES_CHANNEL;
     static const featureType_t FEATURES_R;
     static const featureType_t FEATURES_G;

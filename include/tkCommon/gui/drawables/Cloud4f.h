@@ -10,7 +10,7 @@ namespace tk{ namespace gui{
 	class Cloud4f : public Drawable {
 
         public:
-            tk::data::CloudData*    cloud;
+            tk::data::CloudData*    cloud = nullptr;
             uint32_t counter = 0;
 
         private:
@@ -37,6 +37,8 @@ namespace tk{ namespace gui{
             tk::gui::shader::pointcloudRGBA* pointcloudrgba;
 
             bool resetMinMax;
+
+            std::string name;
             
             void updateData();
         public:
@@ -94,7 +96,8 @@ namespace tk{ namespace gui{
              * @param cloud pointcloud ref
              * @param color color
              */
-            Cloud4f(tk::data::CloudData* cloud);
+            Cloud4f(std::string name = "cloud4f");
+            Cloud4f(tk::data::CloudData* cloud, std::string name = "cloud4f");
             ~Cloud4f();
 
             void updateRef(tk::data::CloudData* cloud);
