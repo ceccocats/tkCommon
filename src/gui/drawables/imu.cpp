@@ -64,8 +64,7 @@ tk::gui::Imu::imGuiInfos() {
     static ImPlotAxisFlags rt_axis = ImPlotAxisFlags_NoTickLabels;
     ImPlot::SetNextPlotLimitsX(t - accHistory, t, ImGuiCond_Always);
     ImPlot::SetNextPlotLimitsY(-10.0f, 10.0f);
-    
-    if (ImPlot::BeginPlot("##Scrolling", NULL, NULL, ImVec2(-1,150), 0, rt_axis, rt_axis)) {
+    if (ImPlot::BeginPlot("##Scrolling", NULL, NULL, ImVec2(-1,150), 0, rt_axis | ImPlotAxisFlags_Time, rt_axis)) {
         //ImPlot::FitNextPlotAxes(false, true, false, false);
         ImPlot::PlotLine("accX", &accX.Data[0].x, &accX.Data[0].y, accX.Data.size(), accX.Offset, 2*sizeof(float));
         ImPlot::PlotLine("accY", &accY.Data[0].x, &accY.Data[0].y, accY.Data.size(), accY.Offset, 2*sizeof(float));
