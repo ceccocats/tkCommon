@@ -69,7 +69,7 @@ namespace tk { namespace data {
         tk::common::Tfpose  tf     = tk::common::Tfpose::Identity(); /**< TF in respect to back axel, @see tk::common::Tfpose. */
         sensorName          sensor;
         
-        timeStamp_t         stamp     = 0; /**< Time stamp, expressed in millisecond. */
+        timeStamp_t         stamp     = 0; /**< Time stamp, expressed in microseconds. */
         int                 sensorID  = 0; /**< ID of the sensor. */
         int                 messageID = 0; /**< Incremental message counter. */
 

@@ -130,6 +130,7 @@ Viewer::init() {
     //ImGUI
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsClassic();
@@ -463,6 +464,7 @@ Viewer::runloop() {
         rate.wait();
     }
 
+    ImPlot::DestroyContext();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();  
     ImGui::DestroyContext();

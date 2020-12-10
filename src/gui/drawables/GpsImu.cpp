@@ -33,13 +33,15 @@ tk::gui::GpsImu::draw(tk::gui::Viewer *viewer){
 void 
 tk::gui::GpsImu::imGuiSettings(){
     gps->imGuiSettings();
+    ImGui::Separator();
     imu->imGuiSettings();  
 }
 
 void 
 tk::gui::GpsImu::imGuiInfos(){
     gps->imGuiInfos();
-    //imu->imGuiInfos();  
+    ImGui::Separator();
+    imu->imGuiInfos();  
 }
 
 void 

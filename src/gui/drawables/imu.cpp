@@ -1,30 +1,14 @@
 #include "tkCommon/gui/drawables/Imu.h"
 
-tk::gui::Imu::Imu(int nPos){ 
-    this->nPos = nPos;
+tk::gui::Imu::Imu(){ 
+    this->accHistory = 10.0f;
     this->initted = false;
-    time.setDim(maxDataDim);
-    accX.setDim(maxDataDim);
-    accY.setDim(maxDataDim);
-    accZ.setDim(maxDataDim);
-    for(int i = 0; i < maxDataDim; i++){
-        time.array[i] = accX.array[i] = 0;
-        accY.array[i] = accZ.array[i] = 0;
-    }
 }
 
-tk::gui::Imu::Imu(tk::data::ImuData* imu, int nPos){
+tk::gui::Imu::Imu(tk::data::ImuData* imu){
     this->imu = imu;  
-    this->nPos = nPos;
+    this->accHistory = 10.0f;    
     this->initted = true;
-    time.setDim(maxDataDim);
-    accX.setDim(maxDataDim);
-    accY.setDim(maxDataDim);
-    accZ.setDim(maxDataDim);
-    for(int i = 0; i < maxDataDim; i++){
-        time.array[i] = accX.array[i] = 0;
-        accY.array[i] = accZ.array[i] = 0;
-    }
 }
 
 tk::gui::Imu::~Imu(){
@@ -53,14 +37,16 @@ tk::gui::Imu::draw(tk::gui::Viewer *viewer){
             print<<(*imu);
 
             if(prec == 0){
-                prec = imu->header.stamp-1;
+                prec = imu->header.stamp;
             }
-            time.add(imu->header.stamp - prec);
-            prec = imu->header.stamp;
 
-            accX.add(imu->acc.x());
-            accY.add(imu->acc.y());
-            accZ.add(imu->acc.z());
+            t += float(imu->header.stamp - prec) * 1e-6;
+            
+            accX.AddPoint(t, imu->acc.x());
+            accY.AddPoint(t, imu->acc.y());
+            accZ.AddPoint(t, imu->acc.z());
+            
+            prec = imu->header.stamp;
 
             imu->unlockRead();
         }
@@ -69,22 +55,23 @@ tk::gui::Imu::draw(tk::gui::Viewer *viewer){
 
 void 
 tk::gui::Imu::imGuiSettings(){
-    if(ImGui::SliderInt("Last poses imu",&nPos,1,maxDataDim)){
-        time.setDim(nPos);
-        accX.setDim(nPos);
-        accY.setDim(nPos);
-        accZ.setDim(nPos);
-    }
+    ImGui::SliderFloat("Acc history",&accHistory,1,30,"%.1f s");
 }
 
 void 
-tk::gui::Imu::imGuiInfos(){
-    ImPlot::BeginPlot("##Rolling", NULL, NULL, ImVec2(-1,150), 0, 
-        ImPlotAxisFlags_NoTickLabels, ImPlotAxisFlags_NoTickLabels | ImPlotAxisFlags_LockMin);
-    ImPlot::PlotLine("Acc x", (const float*)&time.array, (const float*)&accX.array, nPos, -3, 3);
-    ImPlot::PlotLine("Acc y", (const float*)&time.array, (const float*)&accY.array, nPos, -3, 3);
-    ImPlot::PlotLine("Acc z", (const float*)&time.array, (const float*)&accZ.array, nPos, -3, 3);
-    ImPlot::EndPlot();
+tk::gui::Imu::imGuiInfos() {    
+
+    static ImPlotAxisFlags rt_axis = ImPlotAxisFlags_NoTickLabels;
+    ImPlot::SetNextPlotLimitsX(t - accHistory, t, ImGuiCond_Always);
+    ImPlot::SetNextPlotLimitsY(-10.0f, 10.0f);
+    
+    if (ImPlot::BeginPlot("##Scrolling", NULL, NULL, ImVec2(-1,150), 0, rt_axis, rt_axis)) {
+        //ImPlot::FitNextPlotAxes(false, true, false, false);
+        ImPlot::PlotLine("accX", &accX.Data[0].x, &accX.Data[0].y, accX.Data.size(), accX.Offset, 2*sizeof(float));
+        ImPlot::PlotLine("accY", &accY.Data[0].x, &accY.Data[0].y, accY.Data.size(), accY.Offset, 2*sizeof(float));
+        ImPlot::PlotLine("accZ", &accZ.Data[0].x, &accZ.Data[0].y, accZ.Data.size(), accZ.Offset, 2*sizeof(float));
+        ImPlot::EndPlot();
+    }
     ImGui::Text("%s",print.str().c_str());
 }
 
