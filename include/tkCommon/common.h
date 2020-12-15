@@ -119,45 +119,46 @@ namespace tk { namespace common {
      * Rect [ x y w h ]
      * @tparam T
      */
-    template <class T> 
-    class Rect {
-        public:
-            T x, y, w, h;
-
-            /**
-             * init all to zero
-             */
-            Rect() {
-                x = y = w = h = 0;
-            }
-
-            /**
-             * init with values
-             * @param x
-             * @param y
-             * @param z
-             * @param i
-             */
-            Rect(T x, T y, T w, T h) {
-                this->x = x;
-                this->y = y;
-                this->w = w;
-                this->h = h;
-            }
-
-            ~Rect() {}
-
-            /**
-             * override ostream to a nice print
-             * @param os
-             * @param v
-             * @return
-             */
-            friend std::ostream& operator<<(std::ostream& os, const Rect& v) {
-                os << "Rect(" << v.x <<", "<< v.y <<", "<< v.w <<", "<< v.h <<")";
-                return os;
-            }  
-    };
+    
+    //template <class T> 
+    //class Rect {
+    //    public:
+    //        T x, y, w, h;
+//
+    //        /**
+    //         * init all to zero
+    //         */
+    //        Rect() {
+    //            x = y = w = h = 0;
+    //        }
+//
+    //        /**
+    //         * init with values
+    //         * @param x
+    //         * @param y
+    //         * @param z
+    //         * @param i
+    //         */
+    //        Rect(T x, T y, T w, T h) {
+    //            this->x = x;
+    //            this->y = y;
+    //            this->w = w;
+    //            this->h = h;
+    //        }
+//
+    //        ~Rect() {}
+//
+    //        /**
+    //         * override ostream to a nice print
+    //         * @param os
+    //         * @param v
+    //         * @return
+    //         */
+    //        friend std::ostream& operator<<(std::ostream& os, const Rect& v) {
+    //            os << "Rect(" << v.x <<", "<< v.y <<", "<< v.w <<", "<< v.h <<")";
+    //            return os;
+    //        }  
+    //};
 
     /**
      * Vector of 4 elements [ x y z i ]

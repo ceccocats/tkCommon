@@ -9,6 +9,7 @@ class Lockable{
     private:
         std::mutex  MTX;
         std::mutex  gMTX;
+        std::mutex  cvMTX;
 
         std::condition_variable CV;
         
@@ -47,13 +48,14 @@ class Lockable{
         }
 
         void lockRead() {
-            std::unique_lock<std::mutex> lck(gMTX);
+            std::unique_lock<std::mutex> lck(cvMTX);
                 while (writing) CV.wait(lck);
-                
+                gMTX.lock();
                 if (nReader == 0)
                     MTX.lock();
                 nReader++;
-            gMTX.unlock();
+                gMTX.unlock();
+            cvMTX.unlock();
         }
 
         void unlockRead() {
