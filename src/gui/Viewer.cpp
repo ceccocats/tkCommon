@@ -130,11 +130,14 @@ Viewer::init() {
     //ImGUI
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsClassic();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
+
+    ImPlot::GetStyle().AntiAliasedLines = true;
 
     // OpenGL confs
     glEnable(GL_DEPTH_TEST);
@@ -463,6 +466,7 @@ Viewer::runloop() {
         rate.wait();
     }
 
+    ImPlot::DestroyContext();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();  
     ImGui::DestroyContext();

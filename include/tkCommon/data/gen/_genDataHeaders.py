@@ -93,6 +93,7 @@ DEPS = ["#include \"tkCommon/math/Vec.h\"\n"]
 VARS = [ {"name": "featureType_t", "type": "typedef std::string"},
          {"name": "FEATURES_NONE"        , "type": "static const featureType_t", "default": "\"f_none\""},
          {"name": "FEATURES_I"           , "type": "static const featureType_t", "default": "\"f_intensity\""},
+         {"name": "FEATURES_NOISE"       , "type": "static const featureType_t", "default": "\"f_noise\""},
          {"name": "FEATURES_CHANNEL"     , "type": "static const featureType_t", "default": "\"f_channel\""},
          {"name": "FEATURES_R"           , "type": "static const featureType_t", "default": "\"f_r\""},
          {"name": "FEATURES_G"           , "type": "static const featureType_t", "default": "\"f_g\""},

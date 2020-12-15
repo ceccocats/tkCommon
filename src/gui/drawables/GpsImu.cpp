@@ -32,14 +32,30 @@ tk::gui::GpsImu::draw(tk::gui::Viewer *viewer){
 
 void 
 tk::gui::GpsImu::imGuiSettings(){
+    ImGui::BeginGroup();
+    ImGui::BeginChild("GPS", ImVec2{-1, ImGui::GetContentRegionAvail().y/2}, true);
+    ImGui::TextDisabled("GPS");
     gps->imGuiSettings();
-    imu->imGuiSettings();  
+    ImGui::EndChild();
+    ImGui::BeginChild("IMU", ImVec2{-1, ImGui::GetContentRegionAvail().y}, true);
+    ImGui::TextDisabled("IMU");
+    imu->imGuiSettings();
+    ImGui::EndChild();
+    ImGui::EndGroup();       
 }
 
 void 
 tk::gui::GpsImu::imGuiInfos(){
+    ImGui::BeginGroup();
+    ImGui::BeginChild("GPS", ImVec2{-1, ImGui::GetContentRegionAvail().y/2}, true);
+    ImGui::TextDisabled("GPS");
     gps->imGuiInfos();
-    //imu->imGuiInfos();  
+    ImGui::EndChild();
+    ImGui::BeginChild("IMU", ImVec2{-1, ImGui::GetContentRegionAvail().y}, true);
+    ImGui::TextDisabled("IMU");
+    imu->imGuiInfos();
+    ImGui::EndChild();
+    ImGui::EndGroup();     
 }
 
 void 
