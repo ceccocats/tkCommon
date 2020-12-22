@@ -78,6 +78,10 @@ void read_cloud(tk::data::GpsData& gps, tk::data::CloudData& cloud) {
 	mat.close();
 }
 
+void key_listener(int key, int action, int source) {
+	std::cout<<"KEY: "<<key<<" action: "<<action<<" source: "<<source<<"\n";
+}
+
 int main(){
 
 	/*tk::data::CloudData cloud;
@@ -98,6 +102,7 @@ int main(){
 	tk::data::GpsData	gps;
 
 	viewer->start();
+	viewer->addKeyCallback(key_listener);
 
 	plt = new tk::gui::Plot("provaPlot", 1000, tk::gui::Plot::type_t::LINE, 1);
 	viewer->add(new tk::gui::Grid());
