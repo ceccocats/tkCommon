@@ -8,6 +8,7 @@
 #include "tkCommon/gui/drawables/PolyLine.h"
 #include "tkCommon/gui/drawables/Image.h"
 #include "tkCommon/gui/drawables/DrawBuffer.h"
+#include "tkCommon/gui/drawables/Text.h"
 
 #include "tkCommon/data/CloudData.h"
 #include "tkCommon/data/GpsData.h"
@@ -105,6 +106,12 @@ int main(){
 	viewer->add(new tk::gui::Cloud4f(&cloud));
 	viewer->add(new tk::gui::Gps(&gps));
 	viewer->add(plt);
+
+
+	tk::gui::Text *text = new tk::gui::Text("Hello");
+	text->tf = tk::common::odom2tf(5, 5, 2, 0.3, 0.2, 0.5);
+	viewer->add(text);
+
 
 	read_cloud(gps,cloud);
 	//std::thread read_cloud_th(read_cloud);
