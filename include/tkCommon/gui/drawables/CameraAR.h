@@ -27,7 +27,7 @@ public:
 
     int w,h,c;
 
-    float z_near = 1.0, z_far = 10000.0;
+    float z_near = 0.1, z_far = 10000.0;
 
     tk::gui::Camera camera;
 

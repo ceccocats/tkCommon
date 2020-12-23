@@ -112,7 +112,8 @@ tk::gui::CameraAR::draw(tk::gui::Viewer *viewer) {
     glPopMatrix();
 
     ImGui::Begin(name.c_str(), NULL, ImGuiWindowFlags_NoScrollbar);
-        
+    ImGui::SetWindowSize(name.c_str(), ImVec2(viewer->getWidth(), viewer->getHeight()));
+    ImGui::SetWindowPos(name.c_str(), ImVec2(0,0));
     float imgX = ImGui::GetWindowSize().x-20;
     //int imgY = ImGui::GetWindowSize().y-35;
     //float imgX = textures[i]->width;
