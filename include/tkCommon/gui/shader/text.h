@@ -41,6 +41,7 @@ class text : public tk::gui::shader::generic
         glm::mat4 projection;
 
         glm::vec4 textColor;
+        float maxH = 0;
 
     public:
         bool init(std::string font = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"){
@@ -83,6 +84,9 @@ class text : public tk::gui::shader::generic
                     glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
                     static_cast<unsigned int>(face->glyph->advance.x)
                 };
+                if(character.Size.y > maxH) {
+                    maxH = character.Size.y;
+                }
                 Characters.insert(std::pair<char, Character>(c, character));
             }
             glBindTexture(GL_TEXTURE_2D, 0);
@@ -107,13 +111,12 @@ class text : public tk::gui::shader::generic
             return shader.init(vertex, fragment);
         }
 
-        void draw(std::string text, float x, float y, float scale = 1.3f, tk::gui::Color_t color = tk::gui::color::WHITE){
+        void draw(std::string text, float targetH = 0.5, tk::gui::Color_t color = tk::gui::color::WHITE){
+            float scale = targetH / maxH;
             
             std::memcpy(glm::value_ptr(textColor), color.color, sizeof(textColor));
-            
-            //TODO: Removing in future
-            projection = glm::ortho(0.0f, (float)glutGet(GLUT_SCREEN_WIDTH), 0.0f, (float)glutGet(GLUT_SCREEN_HEIGHT));
-            
+            glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(projection)); 
+
             shader.use();
             shader.setVec4("textColor", textColor);
             shader.setMat4("projection", projection);
@@ -121,6 +124,7 @@ class text : public tk::gui::shader::generic
             glActiveTexture(GL_TEXTURE0);
             glBindVertexArray(VAO);
 
+            float x=0, y=0;
             // iterate through all characters
             std::string::const_iterator c;
             for (c = text.begin(); c != text.end(); c++){

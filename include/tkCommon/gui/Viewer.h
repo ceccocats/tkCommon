@@ -51,7 +51,22 @@ namespace tk { namespace gui {
         static bool disabled;
 
         Camera      camera;
-        
+
+
+        #define GLFW_SOURCE_KEYBORAD 0
+        #define GLFW_SOURCE_MOUSE 1
+        /**
+         * Add a mouse key callback
+         * void fun(key, action, source)
+         * key: id of key
+         * action: GLFW_PRESS, GLFW_RELEASE, GLFW_REPEAT
+         * source: GLFW_SOURCE_KEYBORAD, GLFW_SOURCE_MOUSE
+         */        
+        void addKeyCallback(void (*fun)(int,int,int));
+    
+        // user access callbacks
+        std::vector<void (*)(int,int,int)> user_key_callbacks;
+    
     private:
         
         Viewer();

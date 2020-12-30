@@ -39,7 +39,7 @@ class grid : public tk::gui::shader::generic
 
             shader.setMat4("modelview", modelview);
             shader.setInt("n", n);
-            shader.setFloat("dim", dim);
+            shader.setFloat("dim", dim/2);
 
             shader.setInt("dir", 0);
             glDrawArrays(GL_LINES, 0, n*2 +2);

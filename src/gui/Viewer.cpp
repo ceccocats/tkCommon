@@ -502,6 +502,10 @@ Viewer::mouse_button_callback(GLFWwindow* window, int button, int action, int mo
         Viewer::instance->camera.mouseDown(button, xpos, ypos);
     if (action == GLFW_RELEASE)
         Viewer::instance->camera.mouseUp(button, xpos, ypos);
+
+    for(int i=0; i<Viewer::instance->user_key_callbacks.size(); i++) {
+        Viewer::instance->user_key_callbacks[i](button, action, GLFW_SOURCE_MOUSE);
+    }
 }
 
 void 
@@ -514,6 +518,15 @@ Viewer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int m
     if(key == GLFW_KEY_R){
         Viewer::instance->camera.init();
     }
+
+    for(int i=0; i<Viewer::instance->user_key_callbacks.size(); i++) {
+        Viewer::instance->user_key_callbacks[i](key, action, GLFW_SOURCE_KEYBORAD);
+    }
+}
+
+void 
+Viewer::addKeyCallback(void (*fun)(int,int,int)) {
+    Viewer::instance->user_key_callbacks.push_back(fun);
 }
 
 }}
