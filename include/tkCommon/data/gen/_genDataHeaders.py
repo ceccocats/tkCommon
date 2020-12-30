@@ -111,6 +111,7 @@ VARS = [ {"name": "featureType_t", "type": "typedef std::string"},
          {"name": "FEATURES_RCS"         , "type": "static const featureType_t", "default": "\"f_rcs\""},
          {"name": "FEATURES_PROBABILITY" , "type": "static const featureType_t", "default": "\"f_probability\""},
          {"name": "FEATURES_NEAR_SCAN"   , "type": "static const featureType_t", "default": "\"f_near_scan\""},
+         {"name": "TIMESTAMP"            , "type": "static const featureType_t", "default": "\"f_timestamp\""},
          {"name":"points",   "type":"tk::math::Mat<float>"},
          {"name":"ranges",   "type":"tk::math::Mat<float>"},
          {"name":"features", "type":"tk::common::Map<tk::math::Vec<float>>"}]
