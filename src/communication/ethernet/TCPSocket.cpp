@@ -37,7 +37,7 @@ tk::communication::TCPSocket::initClient(const int port, const std::string ip, b
         return false;
     }
 
-    tkMSG(std::string{"Connected to "}+ip+" on port "+std::to_string(port)+"\n")
+    //tkMSG(std::string{"Connected to "}+ip+" on port "+std::to_string(port)+"\n")
 
     return true;
 }

@@ -1,0 +1,8 @@
+#!/bin/bash
+if [ $# != 1 ] ; then
+	printf "You need to pass the file that you want to set capabilites\n"
+	exit
+fi
+
+sudo groupadd pcap
+sudo usermod -a -G pcap $USER
