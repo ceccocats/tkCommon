@@ -6,7 +6,7 @@
 
 namespace tk { namespace data {
 
-    class sensorName{
+    class sensorType{
 
     public:
         enum Value : uint8_t{
@@ -18,44 +18,48 @@ namespace tk { namespace data {
         RADAR       = 5,
         LINES       = 6,
         PERCEPTION  = 7,
+        IMU         = 8,
+        GPSIMU      = 9
         };
 
         /**
          * @brief   method for convert id to lane string name
          */
         std::string toString(){
-            if(value == sensorName::NOT_SPEC)   return std::string{"not specified"};
-            if(value == sensorName::LIDAR)      return std::string{"lidar"};
-            if(value == sensorName::VEHICLE)    return std::string{"vehicle"};
-            if(value == sensorName::GPS)        return std::string{"gps"};
-            if(value == sensorName::CAMDATA)    return std::string{"camera"};
-            if(value == sensorName::RADAR)      return std::string{"radar"};
-            if(value == sensorName::PERCEPTION) return std::string{"perception"};
+            if(value == sensorType::NOT_SPEC)   return std::string{"not specified"};
+            if(value == sensorType::LIDAR)      return std::string{"lidar"};
+            if(value == sensorType::VEHICLE)    return std::string{"vehicle"};
+            if(value == sensorType::GPS)        return std::string{"gps"};
+            if(value == sensorType::CAMDATA)    return std::string{"camera"};
+            if(value == sensorType::RADAR)      return std::string{"radar"};
+            if(value == sensorType::PERCEPTION) return std::string{"perception"};
+            if(value == sensorType::IMU)        return std::string{"imu"};
+            if(value == sensorType::GPSIMU)     return std::string{"gps&imu"};
             return std::string{"type error"};
         }
 
-        bool operator!=(sensorName::Value v) noexcept {
+        bool operator!=(sensorType::Value v) noexcept {
             return v != value;
         }
 
-        bool operator==(sensorName::Value v) noexcept {
+        bool operator==(sensorType::Value v) noexcept {
             return v == value;
         }
 
-        bool operator!=(sensorName &s) noexcept {
+        bool operator!=(sensorType &s) noexcept {
             return s.value != value;
         }
 
-        bool operator==(sensorName &s) noexcept {
+        bool operator==(sensorType &s) noexcept {
             return s.value == value;
         }
 
-        void operator=(sensorName::Value v) noexcept {
+        void operator=(sensorType::Value v) noexcept {
             value = v;
         }
 
     private:
-        sensorName::Value value = sensorName::Value::NOT_SPEC;
+        sensorType::Value value = sensorType::Value::NOT_SPEC;
     };
 
 
@@ -67,7 +71,7 @@ namespace tk { namespace data {
     public:
         std::string         name   = "";                             /**< Name of the sensor. */
         tk::common::Tfpose  tf     = tk::common::Tfpose::Identity(); /**< TF in respect to back axel, @see tk::common::Tfpose. */
-        sensorName          sensor;
+        sensorType          type;
         
         timeStamp_t         stamp     = 0; /**< Time stamp, expressed in microseconds. */
         int                 sensorID  = 0; /**< ID of the sensor. */
@@ -78,7 +82,7 @@ namespace tk { namespace data {
             this->tf            = tk::common::Tfpose::Identity();
             this->sensorID      = 0;
             this->messageID     = 0;
-            this->sensor        = sensorName::NOT_SPEC;
+            this->type          = sensorType::NOT_SPEC;
         }
 
         /**
@@ -91,6 +95,7 @@ namespace tk { namespace data {
             this->stamp         = s.stamp;
             this->sensorID      = s.sensorID;
             this->messageID     = s.messageID;
+            this->type          = s.type;
 
             // safe string update
             if(this->name != s.name) {

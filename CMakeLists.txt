@@ -128,6 +128,15 @@ add_library(tkJoystick SHARED
 )
 target_link_libraries(tkJoystick udev)
 
+add_library(tkSensor SHARED
+    src/sensor/Sensor.cpp
+    src/sensor/SensorManager.cpp
+    src/sensor/LogManager.cpp    
+)
+target_link_libraries(tkSensor
+    tkCommon tkGUI tkCommunication tkMath ${GUI_LIBS} ${CUDA_LIBRARIES}    
+)
+
 #-------------------------------------------------------------------------------
 # GIT version autoupdate
 #-------------------------------------------------------------------------------

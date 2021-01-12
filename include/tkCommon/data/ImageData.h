@@ -23,7 +23,7 @@ namespace tk{ namespace data{
             height = h;
             channels = ch;
             data = new uint8_t[width*height*channels];
-            header.name = sensorName::CAMDATA;
+            header.name = sensorType::CAMDATA;
             unlockWrite();
 
         }

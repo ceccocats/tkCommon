@@ -39,6 +39,7 @@ set(tkCommon_LIBRARIES
     tkGUI
     tkMath
     tkCommunication
+    tkSensor
     ${FREETYPE_LIBRARIES}
     matio
     tkJoystick
