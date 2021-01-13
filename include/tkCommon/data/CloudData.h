@@ -23,6 +23,7 @@ namespace tk { namespace data {
 
         void resize(int n) {
             points.resize(4, n);
+            ranges.resize(3, n);
             const auto &fts = features.vals();
             for(int i=0; i<fts.size(); i++) {
                 fts[i]->resize(n);
@@ -37,7 +38,9 @@ namespace tk { namespace data {
         bool checkConsistency() {
             int n = size();
             if(n>0 && points.rows() != 4) return false;
+            if(n>0 && ranges.rows() != 3) return false;
             if(n != points.cols()) return false;
+            if(n != ranges.cols()) return false;
             for(int i=0; i<features.keys().size(); i++) {
                 if(features[features.keys()[i]].size() != n)
                     return false;

@@ -2,7 +2,7 @@
 
 namespace tk { namespace sensors {
     bool 
-    SensorsManager::init(YAML::Node conf, const std::string &logPath, SensorSpawner *spawner, const std::string &list, tk::gui::Viewer* viewer) 
+    SensorsManager::init(YAML::Node conf, const std::string &logPath, const std::string &list, tk::gui::Viewer* viewer) 
     {    
         // LOG
         if (logPath != "") {
@@ -15,7 +15,7 @@ namespace tk { namespace sensors {
         }
         
         // SPAWN SENSOR
-        if (spawner != nullptr && !spawner->spawn(list, &sensors)) {
+        if (!spawn(conf, list)) {
             tkERR("Cannot spawn sensors.\n");
             return false;
         }

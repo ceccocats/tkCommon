@@ -6,7 +6,6 @@
 #include "tkCommon/rt/Task.h"
 
 #include "tkCommon/sensor/Sensor.h"
-#include "tkCommon/sensor/SensorSpawner.h"
 #include "tkCommon/sensor/LogManager.h"
 
 namespace tk { namespace sensors {
@@ -51,8 +50,7 @@ namespace tk { namespace sensors {
          * @return false 
          */
         bool init(YAML::Node conf, const std::string &logPath = "", 
-                  SensorSpawner *spawner = nullptr,  const std::string &list="", 
-                  tk::gui::Viewer* viewer = nullptr);
+                  const std::string &list="", tk::gui::Viewer* viewer = nullptr);
 
         /**
          * @brief 
@@ -108,6 +106,17 @@ namespace tk { namespace sensors {
          * @param time ref logTick time
          */
         void waitSync(timeStamp_t time);
+
+    protected:
+        /**
+         * @brief 
+         * 
+         * @param conf 
+         * @param list 
+         * @return true 
+         * @return false 
+         */
+        virtual bool spawn(YAML::Node conf, const std::string &list="") = 0;
 
     private:
         /**
