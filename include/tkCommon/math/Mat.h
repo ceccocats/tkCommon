@@ -82,7 +82,7 @@ class MatBase : public tk::math::MatDump {
 
         __host__ 
         MatBase(const tk::math::MatBase<T>& m){
-            std::cout<<"COPY CONSTRUCTIOR\n";
+            // THIS IS CALLED WHEN Mat is passed to a function as a copy
             this->_isCopy  = true;
             this->_size    = m.size();
             this->_cols    = m.cols();
