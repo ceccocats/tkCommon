@@ -15,6 +15,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 #-------------------------------------------------------------------------------
 find_package(CUDA 9.0 QUIET)
 include_directories(${CUDA_INCLUDE_DIRS})
+set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --expt-relaxed-constexpr")
 if(CUDA_FOUND)
     add_definitions(-DTKCUDA_ENABLED)
 endif()
@@ -22,8 +23,19 @@ endif()
 #-------------------------------------------------------------------------------
 # External Libraries
 #-------------------------------------------------------------------------------
-find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
+include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
+SET(EIGEN_SRC_PATH   "eigen_src")
+SET(EIGEN_BUILD_PATH "eigen_build")
+ExternalProject_Add(eigen_src
+  URL https://gitlab.com/libeigen/eigen/-/archive/master/eigen-master.tar.gz
+  UPDATE_COMMAND ""
+  SOURCE_DIR ${EIGEN_SRC_PATH}
+  BINARY_DIR ${EIGEN_BUILD_PATH}
+  CONFIGURE_COMMAND cd ../${EIGEN_BUILD_PATH} && cmake ../${EIGEN_SRC_PATH} -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/eigen -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/eigen
+  BUILD_COMMAND     cd ../${EIGEN_BUILD_PATH} && make ${MAKE_J}
+  INSTALL_COMMAND   cd ../${EIGEN_BUILD_PATH} && make install ${MAKE_J}
+)
+include_directories(${CMAKE_BINARY_DIR}/eigen/include/eigen3)
 
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
@@ -172,6 +184,11 @@ foreach(app ${tkpackage_APPS})
     add_executable(${app} "app/${app}.cpp")
     target_link_libraries(${app} tkCommon tkGUI tkCommunication tkMath tkJoystick ${GUI_LIBS} ${CUDA_LIBRARIES})
 endforeach()
+
+if(CUDA_FOUND)
+    cuda_add_executable(tkCommon_eigen_cuda app/tkCommon_eigen_cuda.cu)
+    target_link_libraries(tkCommon_eigen_cuda tkCommon tkGUI tkCommunication tkMath tkJoystick ${GUI_LIBS} ${CUDA_LIBRARIES})
+endif()
 
 #-------------------------------------------------------------------------------
 # Build tests

@@ -506,6 +506,7 @@ public:
         if(var.empty())
             return false;
         Mat_VarWrite(matfp, var.getRawData(), MAT_COMPRESSION_NONE);
+        return true;
     }
 
     template<typename T>
@@ -538,9 +539,11 @@ class MatDump {
 
     virtual bool   toVar(std::string name, MatIO::var_t &var) {
         tkFATAL("Not implemented");
+        return false;
     }
     virtual bool fromVar(MatIO::var_t &var) {
         tkFATAL("Not implemented");
+        return false;
     }
 
     bool loadMat(std::string file, std::string name = "data") {
