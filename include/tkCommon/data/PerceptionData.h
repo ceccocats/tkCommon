@@ -75,6 +75,7 @@ class object {
         box   world;
         bool  confidence;
         Class cl;
+        int sensorID = 0;
 };
 
 }}

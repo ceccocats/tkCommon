@@ -7,6 +7,18 @@ namespace tk{ namespace data{
     class ImageData : public ImageData_gen{
         public:
 
+        ImageData(){
+            data.useGPU();
+        }
+
+        ImageData(const ImageData& s){
+            ImageData();
+            width = s.width;
+            height = s.height;
+            channels = s.channels;
+            data = s.data;
+        }
+
         void init(){
 
             lockWrite();
@@ -22,7 +34,7 @@ namespace tk{ namespace data{
             width = w;
             height = h;
             channels = ch;
-            data = new uint8_t[width*height*channels];
+            data.resize(width*height*channels);
             header.name = sensorType::CAMDATA;
             unlockWrite();
 
@@ -34,12 +46,9 @@ namespace tk{ namespace data{
                 release();
                 init(s.width, s.height, s.channels);
             }
-
-            lockWrite();
             s.lockRead();
-            memcpy(data, s.data, width * height * channels);
+            memcpy(data.data_h, s.data.data_h, width * height * channels);
             s.unlockRead();
-            unlockWrite();
             return *this;
         }
 
@@ -49,19 +58,17 @@ namespace tk{ namespace data{
             return *this;
         }
 
-        bool empty() {return channels == 0 || width == 0 || height == 0 || data == nullptr; }
+        bool empty() {return channels == 0 || width == 0 || height == 0 || data.size() == 0; }
 
         void release(){
             if(empty())
                 return;
 
             lockWrite();
-            uint8_t* tmp = data;
-            data = nullptr;
+            data.resize(0);
             width = 0;
             height = 0;
             channels = 0;
-            delete [] tmp;
             unlockWrite();
         }
 
@@ -73,17 +80,14 @@ namespace tk{ namespace data{
             if(ok) {
                 init(width, height, channels);
                 header = tmp;
-                std::vector<uint8_t> values;
-                var["data"].get(values);
-                memcpy(data, values.data(), values.size()*sizeof(uint8_t));
+                data.fromVar(var["data"]);
             }
             return ok;
         }
         bool toVar(std::string name, tk::math::MatIO::var_t &var) {
             std::vector<tk::math::MatIO::var_t> structVars(2);
             ImageData_gen::toVar("info", structVars[0]);
-            std::vector<uint8_t> values(data, data + height*width*channels);
-            structVars[1].set("data", values);
+            data.toVar("data", structVars[1]);
             return var.setStruct(name, structVars);
         }
 

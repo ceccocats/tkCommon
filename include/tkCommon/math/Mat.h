@@ -32,6 +32,8 @@ class MatBase : public tk::math::MatDump {
         int     _size;
         bool    _gpu;
         bool    _isCopy;
+        int     _device;
+        bool    _integrated;
 
     public:
         T*      data_d;
@@ -48,6 +50,10 @@ class MatBase : public tk::math::MatDump {
             _size = 0;
             _gpu  = false;
             _isCopy = false;
+            cudaDeviceProp  props;
+            tkCUDA(cudaGetDevice(&_device));
+            tkCUDA(cudaGetDeviceProperties(&props,_device));
+            _integrated = props.integrated != 0;
         }
 
         __host__
@@ -58,7 +64,10 @@ class MatBase : public tk::math::MatDump {
                     data_h = nullptr;
                 } 
                 if(data_d != nullptr && _gpu == true){
-                    tkCUDA( cudaFree(data_d) );
+                    if(!_integrated)
+                        tkCUDA( cudaFree(data_d) );
+                    else
+                        tkCUDA( cudaFreeHost(data_d) );
                     data_d = nullptr;
                 } 
             }
@@ -83,6 +92,8 @@ class MatBase : public tk::math::MatDump {
             if(m.hasGPU()){
                 this->_maxSizeGPU = m.maxSize();
                 this->data_d      = m.data_d;
+                this->_device     = m._device;
+                this->_integrated = m._integrated;
                 this->_gpu = true;
             }else{
                 this->_gpu = false;
@@ -158,9 +169,17 @@ class MatBase : public tk::math::MatDump {
             if(_gpu == true){
                 if(_maxSizeGPU < r * c) {
                     _maxSizeGPU = (r * c) * MAXSIZE_MARGIN;
+                    
                     if(data_d != nullptr)
-                        tkCUDA( cudaFree(data_d) );
-                    tkCUDA( cudaMalloc(&data_d, _maxSizeGPU * sizeof(T)) );
+                        if(!_integrated)
+                            tkCUDA( cudaFree(data_d) );
+                        else
+                            tkCUDA( cudaFreeHost(data_d) );
+
+                    if(!_integrated)
+                        tkCUDA( cudaMalloc(&data_d, _maxSizeGPU * sizeof(T)) );
+                    else
+                        tkCUDA( cudaMallocHost(&data_d, _maxSizeGPU * sizeof(T)) );
                 }        
                 tkASSERT(_maxSizeGPU == _maxSize);
             }

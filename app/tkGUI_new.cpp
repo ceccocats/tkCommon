@@ -12,6 +12,7 @@
 
 #include "tkCommon/data/CloudData.h"
 #include "tkCommon/data/GpsData.h"
+#include "tkCommon/data/VectorData.h"
 
 #include <thread>
 

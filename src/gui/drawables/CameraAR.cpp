@@ -69,7 +69,7 @@ tk::gui::CameraAR::draw(tk::gui::Viewer *viewer) {
     if( img.isChanged(counter) ){
         if(!img.empty()){
             img.lockRead();
-            im_texture->setData(img.data);
+            im_texture->setData(img.data.data_h);
             img.unlockRead();
         }        
     }    

@@ -109,7 +109,7 @@ void Camera::mouseWheel(float dx, float dy) {
         return;
     
     float tmpZoom = zoom - dy * 10.0f;
-    if (tmpZoom > 0.0f) {
+    if (tmpZoom >= 0.0f) {
         zoom = tmpZoom;
         updateEye();
         updateMatrices();
