@@ -93,7 +93,7 @@ tk::gui::Image::draw(tk::gui::Viewer *viewer){
             //int imgY = ImGui::GetWindowSize().y-35;
             //float imgX = textures[i]->width;
             float imgY = imgX / ((float)textures[i]->width / textures[i]->height);
-            ImGui::Text("%s",images[i]->header.name.c_str());
+            //ImGui::Text("%s",images[i]->header.name.c_str());
             ImGui::Image((void*)(intptr_t)textures[i]->id(), ImVec2(imgX, imgY));
             ImGui::Separator();
         }
