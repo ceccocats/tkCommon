@@ -1,6 +1,6 @@
 #pragma once
 #include "tkCommon/communication/CanInterface.h"
-#include "tkCommon/data/VehicleData.h"
+#include "tkCommon/data/OdomData.h"
 
 namespace tk { namespace communication {
 
@@ -22,6 +22,7 @@ namespace tk { namespace communication {
         static const canid_t ODOM_RESET_ID         = ( 0x11a | CAN_EFF_FLAG );
         static const canid_t ODOM0_ID              = ( 0x121 | CAN_EFF_FLAG );
         static const canid_t ODOM1_ID              = ( 0x122 | CAN_EFF_FLAG );
+        static const canid_t ON_OFF_ID             = ( 0x210 | CAN_EFF_FLAG );
 
         // can iface
         tk::communication::CanInterface *soc = nullptr;
@@ -34,7 +35,7 @@ namespace tk { namespace communication {
         uint8_t accECU = 6;
 
     public:
-        //tk::data::VehicleData::odom_t odom; /**< current vehicle odometry */
+        tk::data::OdomData odom; /**< current vehicle odometry */
         int steerPos = 0;                   /**< current steer value      */
         int brakePos = 0;                   /**< current brake value      */
         int accPos = 0;                     /**< current accel value      */
@@ -80,7 +81,9 @@ namespace tk { namespace communication {
         void setAccPos(uint16_t pos);
         /**
          *  Send a brake position command to the motor
-         *  0 is no brake, 100 is full brake
+         *  0 is no brake, 20000 is full brake
+         *  4000 step for 6 mm
+         *  max 20000 step for 30 mm  
          */
         void setBrakePos(uint16_t pos);
         /**
@@ -91,6 +94,11 @@ namespace tk { namespace communication {
          *  Set Odometry stream enabled or not
          */
         void sendOdomEnable(bool status);
+
+        /**
+         *  Simulate pression off engine start
+         */
+        void sendEngineStart();
 
     private:
         // request info from the system
