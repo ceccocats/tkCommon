@@ -1,7 +1,8 @@
 #include "tkCommon/communication/car/CarControl.h"
+#include "tkCommon/rt/Task.h"
 
 using namespace tk::communication;
-/*
+
 bool CarControl::init(tk::communication::CanInterface *soc) {
     this->soc = soc;
     run = true;
@@ -24,12 +25,13 @@ void *CarControl::readCaller(void *args) {
 }
 
 void CarControl::writeLoop() {
-    LoopRate rate(20000);
+    tk::rt::Task t;
+    t.init(20000);
     while(run) {
         requestSteerPos();
         requestAccPos();
         requestBrakePos();
-        rate.wait();
+        t.wait();
     }
 }
 void CarControl::readLoop() {
@@ -69,7 +71,7 @@ void CarControl::readLoop() {
                 alfa =  __bswap_16(alfa);               
                 odom.x = float(x)/2e4;
                 odom.yaw = float(alfa)*1.54;
-                odom.t = data.stamp;
+                odom.header.stamp = data.header.stamp;
             }
             if(data.id() == ODOM1_ID) {
                 id = data.frame.data[1];
@@ -78,9 +80,12 @@ void CarControl::readLoop() {
                 y =  __bswap_32(y);
                 vel =  __bswap_16(vel);               
                 odom.y = float(y)/2e4;
-                odom.t = data.stamp;
+                odom.speed = vel;
+                odom.header.stamp = data.header.stamp;
             }
         }
+
+
     }
 }
 
@@ -140,6 +145,8 @@ void CarControl::setAccPos(uint16_t pos) {
     return;
 }
 void CarControl::setBrakePos(uint16_t pos) {
+    pos = __bswap_16(pos);
+
     tk::data::CanData_t data;
     data.frame.can_dlc = 3;
     data.frame.can_id = SET_BRAKE_ID;
@@ -171,6 +178,13 @@ void CarControl::sendOdomEnable(bool status) {
     soc->write(&data);
 }
 
+void CarControl::sendEngineStart() {
+    tk::data::CanData_t data;
+    data.frame.can_dlc = 1;
+    data.frame.can_id = ON_OFF_ID;
+    data.frame.data[0] = steerECU;
+    soc->write(&data);
+}
 
 void CarControl::requestSteerPos() {
     tk::data::CanData_t data;
@@ -192,7 +206,7 @@ void CarControl::requestBrakePos() {
     tk::data::CanData_t data;
     data.frame.can_dlc = 1;
     data.frame.can_id = GET_BRAKE_ID;
-    data.frame.data[0] = accECU;
+    data.frame.data[0] = steerECU;
     soc->write(&data);
 }
 
@@ -201,4 +215,4 @@ void CarControl::requestMotorId() {
     data.frame.can_dlc = 0;
     data.frame.can_id = GET_HW_ID;
     soc->write(&data);
-}*/
+}
