@@ -41,7 +41,7 @@ struct MatSimple {
         owned = true;
     }
 
-    __device__ T&  
+    __host__ __device__ T&  
     at(int r, int c) { 
         return data[r+c*rows];
     }
