@@ -15,7 +15,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 #-------------------------------------------------------------------------------
 find_package(CUDA 9.0 QUIET)
 include_directories(${CUDA_INCLUDE_DIRS})
-set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} --expt-relaxed-constexpr")
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} --expt-relaxed-constexpr)
 if(CUDA_FOUND)
     add_definitions(-DTKCUDA_ENABLED)
 endif()
