@@ -152,6 +152,9 @@ class Sensor {
          */
         template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
         bool grab(const T* &data, int &idx, uint64_t timeout = 0) {
+            if (poolEmpty)
+                return false;
+            
             if (timeout != 0) {     // locking
                 data = dynamic_cast<const T*>(pool.get(idx, timeout));
             } else {                // non locking
@@ -245,6 +248,7 @@ class Sensor {
 
         tk::rt::DataPool pool;       /**< Data pool */
         int              poolSize;   /**< Size of data pool */
+        bool             poolEmpty;
         
         std::vector<tk::common::Tfpose>     tf;         /**< Sensor tf */
         LogManager                          *log    = nullptr;
@@ -310,6 +314,7 @@ class Sensor {
 
                 pool.releaseAdd(idx);
             }
+            poolEmpty = true;
 
             return true;
         }
