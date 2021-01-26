@@ -39,7 +39,7 @@ TEST_CASE("Test mat class") {
 
     SECTION("Operator =") {
         mat.resize(2, 2);
-        mat << 40.0f, 10.0f, 25.0f, 33.0f;
+        mat.writableMatrix() << 40.0f, 10.0f, 25.0f, 33.0f;
         tk::math::Mat<float> mat2;
         mat2 = mat;
 
@@ -53,7 +53,7 @@ TEST_CASE("Test mat class") {
 
     SECTION("serialize") {
         mat.resize(2, 3);
-        mat << 0, 1, 2, 3, 4, 5;
+        mat.writableMatrix() << 0, 1, 2, 3, 4, 5;
 
         tk::math::MatIO file;
         file.create("test.mat");
@@ -75,11 +75,11 @@ TEST_CASE("Test mat class") {
 
     SECTION("Eigen ops") {
         mat.resize(3, 3);
-        mat << 0, 1, 2, 3, 4, 5, 6, 7, 8;
+        mat.writableMatrix() << 0, 1, 2, 3, 4, 5, 6, 7, 8;
 
         Eigen::MatrixXf m = mat.matrix();
 
-        mat.matrix() = mat.matrix()*2;
+        mat = mat.matrix()*2;
         m = m*2;
 
         //std::cout<<m<<"\n";

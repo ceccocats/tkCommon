@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <matio.h>
 #include "tkCommon/common.h"
+#include "tkCommon/math/MatSimple.h"
 
 /** @if mat_devman
  * @brief Matlab MAT File information
@@ -255,6 +256,15 @@ public:
             return true;
         }
         template<typename T>
+        bool get(MatSimple<T,false> &mat) {
+            matio_type<T> mat_type;
+            if(!check(var, mat_type.tid, 2))
+                return false;
+            mat.resize(var->dims[0], var->dims[1]);
+            memcpy(mat.data, var->data, mat.size*var->data_size);
+            return true;
+        }
+        template<typename T>
         bool get(std::vector<T> &vec) {
             matio_type<T> mat_type;
             if(!check(var, mat_type.tid, 2))
@@ -297,6 +307,14 @@ public:
             release();
             size_t dim[2] = { (size_t) mat.rows(), (size_t) mat.cols() }; 
             var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, mat.data(), 0);
+            return true;
+        }
+        template<typename T>
+        bool set(std::string name, MatSimple<T,false> &mat) {
+            matio_type<T> mat_type;
+            release();
+            size_t dim[2] = { (size_t) mat.rows, (size_t) mat.cols }; 
+            var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, mat.data, 0);
             return true;
         }
         template<typename T>

@@ -24,7 +24,7 @@ public:
 
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Vec<T,N>& s) {
+    friend std::ostream& operator<<(std::ostream& os, Vec<T,N>& s) {
         os<<"vec( "<<s.rows()<<" )";
         return os;
     }
@@ -51,6 +51,8 @@ public:
     ~Vec2() {
     }
 
+    T& x() { return this->cpu.data[0]; }
+    T& y() { return this->cpu.data[1]; }
 };
 
 template<class T>
@@ -69,6 +71,9 @@ public:
     ~Vec3() {
     }
 
+    T& x() { return this->cpu.data[0]; }
+    T& y() { return this->cpu.data[1]; }
+    T& z() { return this->cpu.data[2]; }
 };
 
 template<class T>
@@ -87,6 +92,11 @@ public:
 
     ~Vec4() {
     }
+
+    T& x() { return this->cpu.data[0]; }
+    T& y() { return this->cpu.data[1]; }
+    T& z() { return this->cpu.data[2]; }
+    T& w() { return this->cpu.data[3]; }
 };
 
 
