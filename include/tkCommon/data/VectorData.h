@@ -1,3 +1,5 @@
+#pragma once
+
 #include <tkCommon/data/SensorData.h>
 #include <vector>
 

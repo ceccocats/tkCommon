@@ -2,6 +2,7 @@
 
 #include "tkCommon/gui/Viewer.h"
 #include "tkCommon/gui/drawables/Drawables.h"
+#include "tkCommon/data/VectorData.h"
 
 #include "tkCommon/rt/Task.h"
 
