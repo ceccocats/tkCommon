@@ -80,7 +80,7 @@ namespace tk { namespace data {
                     tkERR("Error\n");
                     return;
             }
-            const tk::math::Vec<float> *intensity = &features[tk::data::CloudData::FEATURES_I];
+            tk::math::Vec<float> *intensity = &features[tk::data::CloudData::FEATURES_I];
 
             // Get low and high value
             /*double lo = 99999.0f; 
@@ -111,14 +111,14 @@ namespace tk { namespace data {
                 indices[i] = i;
             }
             auto cmp = [&](const size_t a, const size_t b) {
-                return intensity->data_h[a] < intensity->data_h[b];
+                return intensity->data()[a] < intensity->data()[b];
             };
             std::nth_element(indices.begin(), indices.begin() + kth_extreme,
                                 indices.end(), cmp);
-            const double lo = intensity->data_h[*(indices.begin() + kth_extreme)];
+            const double lo = intensity->data()[*(indices.begin() + kth_extreme)];
             std::nth_element(indices.begin() + kth_extreme,
                                 indices.end() - kth_extreme, indices.end(), cmp);
-            const double hi = intensity->data_h[*(indices.end() - kth_extreme)];
+            const double hi = intensity->data()[*(indices.end() - kth_extreme)];
             if (lo_state < 0) {
                 lo_state = lo;
                 hi_state = hi;
@@ -130,11 +130,11 @@ namespace tk { namespace data {
             for(int i = 0; i < intensity->size(); i++){
 
                 double value;
-                value = (intensity->data_h[i] - lo) / (hi - lo);
+                value = (intensity->data()[i] - lo) / (hi - lo);
                 value = sqrt(value);
                 if(value > 1.0f) value = 1.0f;
                 if(value < 0.0f) value = 0.0f;
-                intensity->data_h[i] = value;
+                intensity->operator[](i) = float(value);
             }
         }
     };

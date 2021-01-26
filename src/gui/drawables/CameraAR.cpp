@@ -11,10 +11,10 @@ tk::gui::CameraAR::CameraAR(tk::data::CalibData &calib, int channels, std::strin
     camera.init();
     view = tk::common::Tfpose::Identity();
 
-    float fx = calib.k.data_h[0*3+0];
-    float fy = calib.k.data_h[1*3+1];
-    float cx = calib.k.data_h[0*3+2];
-    float cy = calib.h - calib.k.data_h[1*3+2];
+    float fx = calib.k[0*3+0];
+    float fy = calib.k[1*3+1];
+    float cx = calib.k[0*3+2];
+    float cy = calib.h - calib.k[1*3+2];
     
 
     camera.projection[0][0] = 2.0 * fx / w;
@@ -69,7 +69,7 @@ tk::gui::CameraAR::draw(tk::gui::Viewer *viewer) {
     if( img.isChanged(counter) ){
         if(!img.empty()){
             img.lockRead();
-            im_texture->setData(img.data.data_h);
+            im_texture->setData(img.data.data());
             img.unlockRead();
         }        
     }    

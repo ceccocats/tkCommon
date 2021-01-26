@@ -13,10 +13,10 @@
 
 namespace tk { namespace math {
 
-template<class T>
-class Vec : public tk::math::Mat<T>{
+template<class T, int N = -1>
+class Vec : public tk::math::Mat<T,N,1>{
 public:
-    Vec() : Mat<T>(){
+    Vec() : Mat<T,N,1>(){
 
     }
 
@@ -24,78 +24,23 @@ public:
 
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Vec<T>& s) {
-        os<<"vec( "<<s.cols()<<" )";
+    friend std::ostream& operator<<(std::ostream& os, const Vec<T,N>& s) {
+        os<<"vec( "<<s.rows()<<" )";
         return os;
-    }
-
-    __host__ void 
-    resize(int r, int c) {
-        tkASSERT(r == 1, "You can't create a 2D vector");
-        Mat<T>::resize(1,c);
     }
 
     __host__ void 
     resize(int n) {
-        Mat<T>::resize(1,n);
+        Mat<T,N,1>::resize(n,1);
     }
 
-    __host__ T&
-    operator()(int n) {
-        //tkASSERT(n < this->_size, "Out of memory " + std::to_string(n) + " of " + std::to_string(this->_size));
-        return this->data_h[n]; 
-    }
-
-    __host__ T&
-    operator[](int n) {
-        //tkASSERT(n < this->_size, "Out of memory " + std::to_string(n) + " of " + std::to_string(this->_size));
-        return this->data_h[n]; 
-    }
-};
-
-template<class T, int N>
-class VecStatic : public tk::math::MatStatic<T,1,N>{
-public:
-    VecStatic() : MatStatic<T,1,N>(){
-        for(int i = 0; i < N; i++){
-            this->data_h[i] = 0;
-        }
-    }
-    ~VecStatic() {}
-    
-    friend std::ostream& operator<<(std::ostream& os, const VecStatic<T,N>& s) {
-        if(N > 4){
-            os<<"vec("<<N<<")";
-        }else{
-            os<<"vec"<<N<<"(";
-            for(int i = 0; i < N; i++){
-                os<<s.data_h[i];
-                if(i<N-1)
-                    os<<", ";
-            }
-            os<<")";
-        }
-        return os;
-    }
-
-     __host__ T&
-    operator()(int n) {
-        tkASSERT(n < this->_size, "Out of memory, "+std::to_string(n)+" > "+std::to_string(this->_size)+"\n")
-        return this->data_h[n]; 
-    }
-
-    __host__ T&
-    operator[](int n) {
-        tkASSERT(n < this->_size, "Out of memory, "+std::to_string(n)+" > "+std::to_string(this->_size)+"\n")
-        return this->data_h[n]; 
-    }
 };
 
 template<class T>
-class Vec2 : public VecStatic<T,2> {
+class Vec2 : public Vec<T,2> {
 public:
 
-    Vec2() : VecStatic<T,2>(){
+    Vec2() : Vec<T,2>(){
     }
 
     Vec2(T x, T y) {
@@ -106,15 +51,13 @@ public:
     ~Vec2() {
     }
 
-    T& x(){return this->data_h[0];}
-    T& y(){return this->data_h[1];}
 };
 
 template<class T>
-class Vec3 : public VecStatic<T,3> {
+class Vec3 : public Vec<T,3> {
 public:
 
-    Vec3() : VecStatic<T,3>(){
+    Vec3() : Vec<T,3>(){
     }
 
     Vec3(T x, T y, T z) {
@@ -126,16 +69,13 @@ public:
     ~Vec3() {
     }
 
-    T& x(){return this->data_h[0];}
-    T& y(){return this->data_h[1];}
-    T& z(){return this->data_h[2];}
 };
 
 template<class T>
-class Vec4 : public VecStatic<T,4> {
+class Vec4 : public Vec<T,4> {
 public:
 
-    Vec4() : VecStatic<T,4>(){
+    Vec4() : Vec<T,4>(){
     }
 
     Vec4(T x, T y, T z, T w) {
@@ -147,11 +87,6 @@ public:
 
     ~Vec4() {
     }
-
-    T& x(){return this->data_h[0];}
-    T& y(){return this->data_h[1];}
-    T& z(){return this->data_h[2];}
-    T& w(){return this->data_h[3];}
 };
 
 

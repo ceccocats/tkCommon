@@ -24,7 +24,7 @@ tk::gui::Cloud4f::updateData(){
             if(selected[ch] != featuresChannel0.second){
                 tk::math::Vec<float> *f = &cloud->features[featuresChannels[selected[ch]]];
                 tkASSERT(f->size() == points,"Cloud corrupted\n");
-                glbuffer.setData(f->data_h, f->size(), offset);
+                glbuffer.setData(f->data(), f->size(), offset);
                 offset += f->size();
                 if(autoMinMax == true){
                     float min =  999;
@@ -90,7 +90,7 @@ tk::gui::Cloud4f::updateData(){
             axisShader = -1;
             tk::math::Vec<float> *f = &cloud->features[features[selected[0]]];
             tkASSERT(f->size() == points,"Cloud corrupted\n");
-            glbuffer.setData(f->data_h, f->size(), cloud->points.size());
+            glbuffer.setData(f->data(), f->size(), cloud->points.size());
             if(autoMinMax == true){
                 float min =  999;
                 float max = -999;
@@ -194,7 +194,7 @@ tk::gui::Cloud4f::draw(tk::gui::Viewer *viewer){
         cloud->lockRead();
         if(points != cloud->points.cols()){
             points = cloud->points.cols();
-            glbuffer.setData(cloud->points.data_h,cloud->points.size());
+            glbuffer.setData(cloud->points.data(),cloud->points.size());
             updateData();
         }else{
             updateData();
@@ -207,7 +207,7 @@ tk::gui::Cloud4f::draw(tk::gui::Viewer *viewer){
 
         cloud->lockRead();
         points = cloud->points.cols();
-        glbuffer.setData(cloud->points.data_h,cloud->points.size());
+        glbuffer.setData(cloud->points.data(),cloud->points.size());
         updateData();
         cloud->unlockRead();
     }

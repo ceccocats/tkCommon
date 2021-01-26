@@ -47,7 +47,7 @@ namespace tk{ namespace data{
                 init(s.width, s.height, s.channels);
             }
             s.lockRead();
-            memcpy(data.data_h, s.data.data_h, width * height * channels);
+            memcpy(data.data(), s.data.data(), width * height * channels);
             s.unlockRead();
             return *this;
         }
