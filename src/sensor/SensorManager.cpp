@@ -175,7 +175,10 @@ namespace tk { namespace sensors {
                         const tk::data::VectorData<tk::data::ImageData>* d;
                         if (self->sensors[drw->name]->grab(d,drw->id)) {
                             auto a = (tk::data::VectorData<tk::data::ImageData>*)d;
-                            ref->updateRef(a->size(), a->data.data());
+                            for(int i = 0; i<a->size(); i++){
+                                if(a->data[i].channels != 0)
+                                    ref->updateRef(i, &a->data[i]);
+                            }
                             drw->locked = true;
                         }
                     }
