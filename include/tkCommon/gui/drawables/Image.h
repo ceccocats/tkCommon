@@ -1,6 +1,8 @@
 #pragma once
 #include "tkCommon/gui/drawables/Drawable.h"
 #include "tkCommon/data/ImageData.h"
+#include "tkCommon/data/VectorData.h"
+
 #include <cstdarg>
 
 namespace tk{ namespace gui{
@@ -23,7 +25,8 @@ namespace tk{ namespace gui{
             ~Image();
 
             void onInit(tk::gui::Viewer *viewer);
-            void updateRef(int n, tk::data::ImageData* image);
+            void updateRef(int index, tk::data::ImageData* img);
+            void updateRef(tk::data::VectorData<tk::data::ImageData> *vecImg);
             void draw(tk::gui::Viewer *viewer);
             void imGuiInfos();
             void onClose();

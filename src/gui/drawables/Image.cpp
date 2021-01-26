@@ -51,10 +51,17 @@ tk::gui::Image::onInit(tk::gui::Viewer *viewer){
 }
 
 void 
-tk::gui::Image::updateRef(int n, tk::data::ImageData* image){
-    tkASSERT(n <= images.size());
-    this->images[n] = image;
-    this->updates[n] = true;
+tk::gui::Image::updateRef(int index, tk::data::ImageData* img){
+    tkASSERT(index <= images.size());
+    
+    this->images[index]     = img;
+    this->updates[index]    = true;
+}
+
+void 
+tk::gui::Image::updateRef(tk::data::VectorData<tk::data::ImageData>* vecImg) {
+    for (int i = 0; i < vecImg->size(); i++)
+        updateRef(i, &vecImg->data[i]);
 }
 
 void 

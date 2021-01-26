@@ -89,6 +89,9 @@ Sensor::readFrame() {
             info.synched = true;
     }
 
+    if (poolEmpty && retval)
+        poolEmpty = false;
+
     info.dataArrived++;
 
     // fill data header
