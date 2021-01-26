@@ -52,7 +52,7 @@ tk::gui::Image::onInit(tk::gui::Viewer *viewer){
 
 void 
 tk::gui::Image::updateRef(int n, tk::data::ImageData* image){
-    tkASSERT(n < images.size());
+    tkASSERT(n <= images.size());
     this->images[n] = image;
     this->updates[n] = true;
 }

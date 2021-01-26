@@ -29,6 +29,8 @@ namespace tk { namespace sensors {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Cloud4f(it->second->info.name)});
                 } else if (it->second->info.type == tk::data::sensorType::GPSIMU) {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::GpsImu()});
+                } else if (it->second->info.type == tk::data::sensorType::CAMDATA) {
+                    drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Image(it->second->info.nSensors, it->second->info.name)});
                 }
             }
 
@@ -159,6 +161,21 @@ namespace tk { namespace sensors {
                         if (self->sensors[drw->name]->grab<tk::data::CloudData>(d,drw->id)) {
                             tk::data::CloudData* a = (tk::data::CloudData*)d;
                             ref->updateRef(a);
+                            drw->locked = true;
+                        }
+                    }
+                } else if(drw->type == tk::data::sensorType::CAMDATA) {
+                    auto ref = (tk::gui::Image*)drw->drawable;
+                    if (drw->locked) {
+                        if (ref->update == false) {
+                            self->sensors[drw->name]->release(drw->id);
+                            drw->locked = false;
+                        }
+                    } else {
+                        const tk::data::VectorData<tk::data::ImageData>* d;
+                        if (self->sensors[drw->name]->grab(d,drw->id)) {
+                            auto a = (tk::data::VectorData<tk::data::ImageData>*)d;
+                            ref->updateRef(a->size(), a->data.data());
                             drw->locked = true;
                         }
                     }

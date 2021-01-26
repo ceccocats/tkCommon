@@ -92,6 +92,7 @@ class sensorInfo{
         uint16_t        dataReaded;     /**< number of data readed from the sensor*/
         timeStamp_t     startingTime;   /**< sensor starting time*/
         float           readFps;        /**< sensor data fps */
+        int             nSensors = 1;
 
         bool            synched = false; /**< tell if the sensor is synched with the log */
 
