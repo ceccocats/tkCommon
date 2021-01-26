@@ -175,6 +175,9 @@ namespace tk { namespace sensors {
                         const tk::data::VectorData<tk::data::ImageData>* d;
                         if (self->sensors[drw->name]->grab(d,drw->id)) {
                             auto a = (tk::data::VectorData<tk::data::ImageData>*)d;
+                            for(auto &t : a->data){
+                                if(t.isGPU) t.data.synchCPU();
+                            }
                             ref->updateRef(a);
                             drw->locked = true;
                         }

@@ -7,6 +7,8 @@ namespace tk{ namespace data{
     class ImageData : public ImageData_gen{
         public:
 
+        bool isGPU = false;
+
         ImageData(){
             data.useGPU();
         }
