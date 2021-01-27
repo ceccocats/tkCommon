@@ -3,7 +3,8 @@
 namespace tk { namespace sensors {
 
 void 
-Sensor::start() {
+Sensor::start() 
+{
     // start loop thread
     pthread_attr_init(&attr);
     pthread_create(&t0, &attr, &Sensor::loop_helper, this);
@@ -11,35 +12,27 @@ Sensor::start() {
 }
 
 void* 
-Sensor::loop_helper(void *context) {
+Sensor::loop_helper(void *context) 
+{
     return ((tk::sensors::Sensor*)context)->loop(nullptr);
 }
 
 void* 
-Sensor::loop(void *vargp) {
-
-    while (senStatus != sensorStatus::STOPPING && senStatus != sensorStatus::ERROR) {
+Sensor::loop(void *vargp) 
+{
+    while (senStatus != SensorStatus::STOPPING && senStatus != SensorStatus::ERROR) {
         if (!readFrame()) {
-            tkERR("Error while reading\n");
-            sleep(1);
+            tkWRN("Error while reading. Trying again in 2 seconds...\n");
+            sleep(2);
             continue;
         }
-        if(viewer != nullptr) {
-            // TODO do something 
-        }
     }
-
     pthread_exit(nullptr);
 }
 
-void 
-Sensor::setViewer(tk::gui::Viewer *viewer) {
-    this->viewer = viewer;
-    // TODO add a drawable to viewer
-}
-
 tk::common::Tfpose 
-Sensor::getTf(int id) {
+Sensor::getTf(int id) 
+{
     if(id >= tf.size())
         return tk::common::Tfpose::Identity();
     else
@@ -47,41 +40,45 @@ Sensor::getTf(int id) {
 }
 
 std::vector<tk::common::Tfpose> 
-Sensor::getTfs() {
+Sensor::getTfs() 
+{
     return tf;
 }
 
 bool 
-tk::sensors::Sensor::close() {
-	if (senStatus == sensorStatus::OFFLINE)
-		log->stop();
-
-    if (senStatus == sensorStatus::RECORDING) {
-
+tk::sensors::Sensor::close() 
+{
+    // stop recording
+    if (senStatus == SensorStatus::RECORDING)
         stopRecord();
-    }
 
-    senStatus = sensorStatus::STOPPING;
-
+    // stop online reading thread
+    senStatus = SensorStatus::STOPPING;
     if(readLoopStarted)
         pthread_join(t0, nullptr);
-
+    
+    // stop log
+	if (senStatus == SensorStatus::OFFLINE)
+		log->stop();
+    
+    // clear pool
     pool.close();
 
     return true;
 }
 
 bool 
-Sensor::readFrame() {
+Sensor::readFrame() 
+{
     // get data from pool
     bool    retval;
     int     idx;
     tk::data::SensorData* data = pool.add(idx);
 
-    // check sensor status
-    if (senStatus != sensorStatus::OFFLINE) {
+    // read data
+    if (senStatus != SensorStatus::OFFLINE) {
         retval = readOnline(data);
-    }else {         
+    } else {         
         retval = readLog(data);
         if(retval)
             log->wait(data->header.stamp, info.synched);
@@ -89,10 +86,12 @@ Sensor::readFrame() {
             info.synched = true;
     }
 
+
     if (poolEmpty && retval)
         poolEmpty = false;
 
-    info.dataArrived++;
+    if (retval)   
+        info.dataArrived++;
 
     // fill data header
     if(data->header.name != info.name)
@@ -102,26 +101,19 @@ Sensor::readFrame() {
 
     // release pool
     pool.releaseAdd(idx);
-
-    if(first_read) {
-        first_read          = false;
-        info.startingTime   = getTimeStamp();
-    } else {
-
-        timeStamp_t t   = getTimeStamp() - info.startingTime;
-        info.readFps    = (float)info.dataArrived / (t/1000000.0);
-    }
     
     return retval;
 }
 
-tk::sensors::sensorStatus 
-Sensor::status(){
+tk::sensors::SensorStatus 
+Sensor::status()
+{
     return this->senStatus;
 }
 
 void
-Sensor::release(const int idx) {
+Sensor::release(const int idx) 
+{
     pool.releaseGet(idx);
 }
 }}

@@ -20,95 +20,82 @@
 #include "tkCommon/gui/Viewer.h"
 
 
-namespace tk{ namespace sensors{
+namespace tk{ namespace sensors {
 
 /** @brief   Sensor status class */
-class sensorStatus{
+class SensorStatus {
     public:
         enum Value : uint8_t{
         ONLINE                  = 0,
         OFFLINE                 = 1,
         RECORDING               = 2,
-        RECORDING_AND_READING   = 3,
-        STOPPING                = 4,
-        ERROR                   = 5
+        STOPPING                = 3,
+        ERROR                   = 4
         };
 
         /**
          * @brief   method for convert id to semaphore status string name
          */
-        std::string toString(){
-            if(value == sensorStatus::ONLINE)                   return std::string{"online"};
-            if(value == sensorStatus::OFFLINE)                  return std::string{"offline"};
-            if(value == sensorStatus::RECORDING)                return std::string{"recording"};
-            if(value == sensorStatus::RECORDING_AND_READING)    return std::string{"recording and reading"};
-            if(value == sensorStatus::STOPPING)                 return std::string{"stopping"};
-            if(value == sensorStatus::ERROR)                    return std::string{"error"};
+        std::string toString()
+        {
+            if(value == SensorStatus::ONLINE)                   return std::string{"online"};
+            if(value == SensorStatus::OFFLINE)                  return std::string{"offline"};
+            if(value == SensorStatus::RECORDING)                return std::string{"recording"};
+            if(value == SensorStatus::STOPPING)                 return std::string{"stopping"};
+            if(value == SensorStatus::ERROR)                    return std::string{"error"};
             return std::string{"type error"};
         }
 
-        /**
-         * @brief 
-         * 
-         * @param v 
-         * @return true 
-         * @return false 
-         */
-        bool operator!=(sensorStatus::Value v) noexcept {
+
+        bool operator!=(SensorStatus::Value v) noexcept 
+        {
             return v != value;
         }
 
-        /**
-         * @brief 
-         * 
-         * @param v 
-         * @return true 
-         * @return false 
-         */
-        bool operator==(sensorStatus::Value v) noexcept {
+        bool operator==(SensorStatus::Value v) noexcept 
+        {
             return v == value;
         }
 
-        /**
-         * @brief 
-         * 
-         * @param v 
-         */
-        void operator=(sensorStatus::Value v) noexcept {
+        void operator=(SensorStatus::Value v) noexcept 
+        {
             value = v;
         }
     
     private:
-        sensorStatus::Value value;
+        SensorStatus::Value value;
 };
 
-class sensorInfo{
+class SensorInfo{
     public:
-        std::string     name;           /**< sensor name */
+        std::string     name;       /**< sensor name */
+        float           version;    /**< programm version*/
+        int             nSensors;
+        int             dataArrived;
+        bool            synched;    /**< tell if the sensor is synched with the log */
         tk::data::sensorType type;
 
-        float           version;        /**< programm version*/
-        uint16_t        dataArrived;    /**< number of data arrived form the sensor*/
-        uint16_t        dataReaded;     /**< number of data readed from the sensor*/
-        timeStamp_t     startingTime;   /**< sensor starting time*/
-        float           readFps;        /**< sensor data fps */
-        int             nSensors = 1;
-
-        bool            synched = false; /**< tell if the sensor is synched with the log */
+        SensorInfo() 
+        {
+            name            = "?????";
+            version         = 1.0f;
+            nSensors        = 1;
+            dataArrived     = 0;
+            synched         = false;
+            type            = tk::data::sensorType::NOT_SPEC;
+        }
 
         /**
          * @brief 
          * 
          * @param i 
          */
-        void operator=(sensorInfo i) noexcept {
-            this->name          = i.name;
-            this->version       = i.version;
-            this->dataArrived   = i.dataArrived;
-            this->dataReaded    = i.dataReaded;
-            this->startingTime  = i.startingTime;
-            this->readFps       = i.readFps;
-            this->type          = i.type;
+        void operator=(SensorInfo i) noexcept {
+            this->name              = i.name;
+            this->version           = i.version;
+            this->nSensors          = i.nSensors;
+            this->dataArrived       = i.dataArrived;
+            this->type              = i.type;
         }
 };
 
@@ -121,7 +108,7 @@ class sensorInfo{
 class Sensor {
     public:
 
-        sensorInfo info; /**< */
+        SensorInfo info; /**< */
 
 
         /**
@@ -151,17 +138,18 @@ class Sensor {
          * @return false    data is not aviable
          */
         template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
-        bool grab(const T* &data, int &idx, uint64_t timeout = 0) {
+        bool grab(const T* &data, int &idx, uint64_t timeout = 0) 
+        {    
             if (poolEmpty)
                 return false;
             
             if (timeout != 0) {     // locking
                 data = dynamic_cast<const T*>(pool.get(idx, timeout));
             } else {                // non locking
-                if (pool.newData(info.dataReaded)) {    // new data available
-                    info.dataReaded = pool.inserted;
+                if (pool.newData(lastDataCounter)) {   // new data available
+                    lastDataCounter = (uint32_t) pool.inserted;
                     data = dynamic_cast<const T*>(pool.get(idx)); 
-                } else {                                // no new data available
+                } else {                                    // no new data available
                     data = nullptr;
                 }
             }
@@ -213,14 +201,7 @@ class Sensor {
          *
          * @return sensor   status
          */  
-        sensorStatus status();
-
-        /**
-         * @brief Method for set the sensor viewer
-         * 
-         * @param viewer viewer
-         */
-        void setViewer(tk::gui::Viewer *viewer);
+        SensorStatus status();
 
         /**
          * @brief Get the Tf object
@@ -244,18 +225,16 @@ class Sensor {
         pthread_t       t0;
         pthread_attr_t  attr;
         
-        sensorStatus    senStatus;  /** Sensor status */
+        SensorStatus    senStatus;  /** Sensor status */
+
+        LogManager      *log = nullptr;
 
         tk::rt::DataPool pool;       /**< Data pool */
         int              poolSize;   /**< Size of data pool */
-        bool             poolEmpty;
+        bool             poolEmpty;        
+
+        std::vector<tk::common::Tfpose> tf;         /**< Sensor tf */
         
-        std::vector<tk::common::Tfpose>     tf;         /**< Sensor tf */
-        LogManager                          *log    = nullptr;
-        bool                                first_read; /**< do first read, for fps calc */
-
-        tk::gui::Viewer                     *viewer = nullptr; /**< viewer */
-
         /**
          * @brief Method that init the sensor
          * 
@@ -265,10 +244,10 @@ class Sensor {
         template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>> 
         bool initSensor(const YAML::Node conf, const std::string &name, LogManager *log = nullptr) {
             // get class name
-            info.name           = name;
-            info.version        = 0.1;
-            info.dataArrived    = info.dataReaded = 0;
-            first_read          = true;
+            this->info.name             = name;
+            this->info.dataArrived      = 0;
+            this->log                   = log;
+            this->lastDataCounter       = 0;
 
             // check if paths passed are correct
             if (!conf) {
@@ -278,43 +257,38 @@ class Sensor {
 
             // read tf from configuration file
             if (conf["tf"].IsDefined()) {
-                tf = tk::common::YAMLreadTf(conf["tf"]);
+                this->tf = tk::common::YAMLreadTf(conf["tf"]);
             } else {
-                tf.resize(1);
-                tf[0] = Eigen::Isometry3f::Identity();
+                this->tf.resize(1);
+                this->tf[0] = Eigen::Isometry3f::Identity();
             }
 
-            //1.3 Get configuration params
-            poolSize                = tk::common::YAMLgetConf<int>(conf, "pool_size", 2);
-            bool readWhileRecord    = tk::common::YAMLgetConf<bool>(conf, "read_while_record", false);
-            this->log               = log;
+            // get configuration params
+            this->poolSize = tk::common::YAMLgetConf<int>(conf, "pool_size", 2);
 
-            //1.4 Set sensor status
-            if(log == nullptr){
-                if(readWhileRecord){
-                    senStatus = sensorStatus::RECORDING_AND_READING;
-                } else {
-                    senStatus = sensorStatus::ONLINE;
-                }
-            } else {
-                senStatus = sensorStatus::OFFLINE;
+            // set sensor status
+            if(this->log == nullptr)
+                this->senStatus = SensorStatus::ONLINE;
+            else 
+                this->senStatus = SensorStatus::OFFLINE;
+
+            // init pool
+            if(this->poolSize < 1) {
+                tkWRN("You tried to set poolSize to a negative value, resetted to 1.")
+                this->poolSize = 1;
             }
-
-            // init pool data
-            if(poolSize < 1)
-                poolSize = 1;
-            
-            pool.init<T>(poolSize);
+            this->poolEmpty = true;
+            this->pool.init<T>(this->poolSize);
             int idx;
-            for (int i = 0; i < poolSize; i++) {
-                T* data = dynamic_cast<T*>(pool.add(idx));
+            for (int i = 0; i < this->poolSize; i++) {
+                auto data = dynamic_cast<T*>(this->pool.add(idx));
                 
                 data->header.name = name;
                 data->header.tf = getTf();
 
-                pool.releaseAdd(idx);
+                this->pool.releaseAdd(idx);
             }
-            poolEmpty = true;
+            
 
             return true;
         }
@@ -338,13 +312,6 @@ class Sensor {
         virtual bool readLog(tk::data::SensorData* data) = 0;
 
         /**
-         * @brief Useful method for make some stuff before get data
-         * 
-         * @param data 
-         */
-        virtual void prepareData (tk::data::SensorData* data) = 0;
-
-        /**
          * @brief Method that read the sensor data 
          *
          * @return true     Successful read
@@ -355,6 +322,9 @@ class Sensor {
         
     
     private:
+        std::mutex  readMtx;
+        uint32_t    lastDataCounter;
+
         /**
          * @brief Method for launch start thread
          * 
