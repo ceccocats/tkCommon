@@ -13,6 +13,7 @@ class GpsImuData_gen : public SensorData
 public:
     tk::data::GpsData gps;
     tk::data::ImuData imu;
+    tk::math::Vec3<double> vel;
     
     void init() override
     {
@@ -25,6 +26,7 @@ public:
         SensorData::operator=(s);
         gps = s.gps;
         imu = s.imu;
+        vel = s.vel;
         return *this;
     }
     friend std::ostream& operator<<(std::ostream& os, GpsImuData_gen& s)
@@ -34,14 +36,16 @@ public:
         os<<"	header.stamp: "<<s.header.stamp<<std::endl;
         os<<"	gps: "<<s.gps<<std::endl;
         os<<"	imu: "<<s.imu<<std::endl;
+        os<<"	vel: "<<s.vel<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)
     {
-        std::vector<tk::math::MatIO::var_t> structVars(3);
+        std::vector<tk::math::MatIO::var_t> structVars(4);
         structVars[0].set("header", header);
         structVars[1].set("gps", gps);
         structVars[2].set("imu", imu);
+        structVars[3].set("vel", vel);
         return var.setStruct(name, structVars);
     }
     bool fromVar(tk::math::MatIO::var_t &var)
@@ -50,6 +54,7 @@ public:
         var["header"].get(header);
         var["gps"].get(gps);
         var["imu"].get(imu);
+        var["vel"].get(vel);
         return true;
     }
 };

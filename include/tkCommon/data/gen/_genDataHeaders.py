@@ -87,6 +87,7 @@ DEPS = ["#include \"tkCommon/data/ImuData.h\"\n",
         "#include \"tkCommon/data/GpsData.h\"\n"]
 VARS = [ {"name":"gps", "type":"tk::data::GpsData", "init": "gps.init();"}, 
          {"name":"imu", "type":"tk::data::ImuData", "init": "imu.init();"},
+         {"name":"vel", "type":"tk::math::Vec3<double>"},
         ]
 genData(className, VARS, DEPS)
 
