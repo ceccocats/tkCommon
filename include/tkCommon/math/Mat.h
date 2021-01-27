@@ -22,7 +22,7 @@ static bool Mat_integrated_memory = false;
  * @brief   Matrix in cuda. Matrix in COLS order.
  * @tparam  T matrix class type
  */
-template<class T, int R = -1, int C = -1>
+template<class T>
 class Mat : public tk::math::MatDump {
 
 protected:
@@ -51,7 +51,7 @@ public:
         init();
     }
 
-    Mat(float *data_h, float *data_d, int r, int c) {
+    Mat(T *data_h, T *data_d, int r, int c) {
         init();
         if(data_h != nullptr)
             cpu = MatSimple<T, false>(data_h, r, c);
@@ -61,15 +61,15 @@ public:
         }
     }
 
-    template<typename OtherDerived>
-    Mat(const Eigen::MatrixBase<OtherDerived>& other) : Eigen::Matrix<T, R, C>(other) { 
-        init();
-    }
+    //template<typename OtherDerived>
+    //Mat(const Eigen::MatrixBase<OtherDerived>& other) : Eigen::Matrix<T,-1,-1>(other) { 
+    //    init();
+    //}
 
     template<typename OtherDerived>
-    Mat& operator=(const Eigen::MatrixBase <OtherDerived>& other) {
+    Mat<T>& operator=(const Eigen::MatrixBase <OtherDerived>& other) {
         cpu.resize(other.rows(), other.cols());
-        Eigen::Map<Eigen::Matrix<T, R, C>> m(cpu.data, cpu.rows, cpu.cols);
+        Eigen::Map<Eigen::Matrix<T,-1,-1>> m(cpu.data, cpu.rows, cpu.cols);
         m = other;
         return *this;
     }
@@ -133,7 +133,6 @@ public:
 
     __host__ void 
     resize(int r, int c) {
-        tkASSERT(R == -1 && C == -1, "You cant resize a static Mat");
         cpu.resize(r,c);
         if(_use_gpu == true){
             gpu.resize(r, c);
@@ -151,8 +150,8 @@ public:
         return cpu.data[n]; 
     }
 
-    __host__ Mat<T,R,C>& 
-    operator=(const Mat<T,R,C>& s) {
+    __host__ Mat<T>& 
+    operator=(const Mat<T>& s) {
         cpu = s.cpu;
         if(_use_gpu) {
             this->synchGPU();
@@ -161,17 +160,17 @@ public:
     }
 
     __host__
-    const Eigen::Map<Eigen::Matrix<T, R, C>> matrix() {
-        return Eigen::Map<Eigen::Matrix<T, R, C>>(cpu.data, cpu.rows, cpu.cols);
+    const Eigen::Map<Eigen::Matrix<T,-1,-1>> matrix() {
+        return Eigen::Map<Eigen::Matrix<T,-1,-1>>(cpu.data, cpu.rows, cpu.cols);
     }
     
     __host__
-    Eigen::Map<Eigen::Matrix<T, R, C>> writableMatrix() {
-        return Eigen::Map<Eigen::Matrix<T, R, C>>(cpu.data, cpu.rows, cpu.cols);
+    Eigen::Map<Eigen::Matrix<T,-1,-1>> writableMatrix() {
+        return Eigen::Map<Eigen::Matrix<T,-1,-1>>(cpu.data, cpu.rows, cpu.cols);
     }
 
     friend std::ostream& 
-    operator<<(std::ostream& os, Mat<T,R,C>& s) {
+    operator<<(std::ostream& os, Mat<T>& s) {
         os<<"Mat ("<<s.rows()<<"x"<<s.cols()<<")";
         return os;
     }
@@ -208,17 +207,37 @@ public:
 
 };
 
+template<class T, int R, int C>
+class MatStatic : public Mat<T> {
+    
+private:
+    T static_data[R*C];
 
-typedef Mat<double,2,2> Mat2d;
-typedef Mat<double,3,3> Mat3d;
-typedef Mat<double,4,4> Mat4d;
+public:
+    MatStatic() : Mat<T>(static_data, nullptr, R, C) {
+    }
 
-typedef Mat<int,2,2> Mat2i;
-typedef Mat<int,3,3> Mat3i;
-typedef Mat<int,4,4> Mat4i;
+    template<typename OtherDerived>
+    Mat<T>& operator=(const Eigen::MatrixBase <OtherDerived>& other) {
+        tkASSERT(R == other.rows() && C == other.cols());
+        Eigen::Map<Eigen::Matrix<T,-1,-1>> m(this->cpu.data, this->cpu.rows, this->cpu.cols);
+        m = other;
+        return *this;
+    }
 
-typedef Mat<float,2,2> Mat2f; 
-typedef Mat<float,3,3> Mat3f; 
-typedef Mat<float,4,4> Mat4f; 
+};
+
+
+typedef MatStatic<double,2,2> Mat2d;
+typedef MatStatic<double,3,3> Mat3d;
+typedef MatStatic<double,4,4> Mat4d;
+
+typedef MatStatic<int,2,2> Mat2i;
+typedef MatStatic<int,3,3> Mat3i;
+typedef MatStatic<int,4,4> Mat4i;
+
+typedef MatStatic<float,2,2> Mat2f; 
+typedef MatStatic<float,3,3> Mat3f; 
+typedef MatStatic<float,4,4> Mat4f; 
 
 }}

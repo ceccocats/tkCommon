@@ -13,10 +13,10 @@
 
 namespace tk { namespace math {
 
-template<class T, int N = -1>
-class Vec : public tk::math::Mat<T,N,1>{
+template<class T>
+class Vec : public tk::math::Mat<T>{
 public:
-    Vec() : Mat<T,N,1>(){
+    Vec() : Mat<T>(){
 
     }
 
@@ -24,23 +24,30 @@ public:
 
     }
 
-    friend std::ostream& operator<<(std::ostream& os, Vec<T,N>& s) {
+    friend std::ostream& operator<<(std::ostream& os, Vec<T>& s) {
         os<<"vec( "<<s.rows()<<" )";
         return os;
     }
 
     __host__ void 
     resize(int n) {
-        Mat<T,N,1>::resize(n,1);
+        Mat<T>::resize(n,1);
     }
+
+    __host__ void 
+    resize(int r, int c) {
+        tkASSERT(c == 1, "this is a vector!");
+        Mat<T>::resize(r,c);
+    }
+
 
 };
 
 template<class T>
-class Vec2 : public Vec<T,2> {
+class Vec2 : public MatStatic<T,2,1> {
 public:
 
-    Vec2() : Vec<T,2>(){
+    Vec2() : MatStatic<T,2,1>(){
     }
 
     Vec2(T x, T y) {
@@ -56,10 +63,10 @@ public:
 };
 
 template<class T>
-class Vec3 : public Vec<T,3> {
+class Vec3 : public MatStatic<T,3,1> {
 public:
 
-    Vec3() : Vec<T,3>(){
+    Vec3() : MatStatic<T,3,1>(){
     }
 
     Vec3(T x, T y, T z) {
@@ -77,10 +84,10 @@ public:
 };
 
 template<class T>
-class Vec4 : public Vec<T,4> {
+class Vec4 : public MatStatic<T,4,1> {
 public:
 
-    Vec4() : Vec<T,4>(){
+    Vec4() : MatStatic<T,4,1>(){
     }
 
     Vec4(T x, T y, T z, T w) {

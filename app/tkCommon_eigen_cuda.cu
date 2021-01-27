@@ -28,6 +28,15 @@ int main( int argc, char** argv){
     m = m.matrix() * m.matrix().transpose();
     m.print();
 
+    std::cout<<"Static mats\n";
+    tk::math::Mat4f mat4, mat4_2;
+    mat4 = Eigen::MatrixXf::Identity(4,4)*2;
+    mat4_2 = Eigen::MatrixXf::Identity(4,4)*4;
+    mat4.print();
+    mat4_2.print();
+    mat4 = mat4.matrix() * mat4_2.matrix();
+    mat4.print();
+
 
     // owned matrix
     std::cout<<"OWNED\n";
