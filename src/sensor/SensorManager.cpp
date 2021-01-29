@@ -64,6 +64,8 @@ namespace tk { namespace sensors {
     {
         for (std::map<std::string,tk::sensors::Sensor*>::iterator it = sensors.begin(); it!=sensors.end(); ++it)
             it->second->startRecord(folderPath);
+        
+        viewer->add(new tk::gui::RecordInfo(folderPath));
     }
 
     void 

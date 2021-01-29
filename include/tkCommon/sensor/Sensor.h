@@ -17,7 +17,6 @@
 #include "tkCommon/rt/Pool.h"
 #include "tkCommon/data/SensorData.h"
 #include "tkCommon/sensor/LogManager.h"
-#include "tkCommon/gui/Viewer.h"
 
 
 namespace tk{ namespace sensors {
