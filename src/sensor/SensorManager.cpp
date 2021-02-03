@@ -32,7 +32,7 @@ namespace tk { namespace sensors {
                 } else if (it->second->info.type == tk::data::sensorType::CAMDATA) {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Image(it->second->info.nSensors, it->second->info.name)});
                 } else if (it->second->info.type == tk::data::sensorType::GPS) {
-                    drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Gps()});
+                    drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Gps(it->second->info.name)});
                 }
             }
 
@@ -191,7 +191,7 @@ namespace tk { namespace sensors {
                             drw->locked = false;
                         }
                     } else {
-                        const tk::data::VectorData<tk::data::ImageData>* d;
+                        const tk::data::GpsData* d;
                         if (self->sensors[drw->name]->grab(d,drw->id)) {
                             auto a = (tk::data::GpsData*) d;
                             ref->updateRef(a);

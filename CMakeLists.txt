@@ -115,7 +115,7 @@ add_library(tkCommunication SHARED
     src/communication/serial/SerialPort.cpp
     src/communication/car/CarControl.cpp
 )
-target_link_libraries(tkCommunication pcap)
+target_link_libraries(tkCommunication pcap /usr/local/lib/libserial.so)
 
 add_library(tkMath SHARED 
     src/math/CSpline.cpp 

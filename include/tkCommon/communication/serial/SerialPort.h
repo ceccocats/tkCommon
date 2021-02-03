@@ -1,57 +1,64 @@
 #pragma once
-#include "tkCommon/utils.h"
+
+#include <libserial/SerialPort.h>
+#include "tkCommon/time.h"
+#include "tkCommon/log.h"
 
 
-namespace tk{ namespace sensors{
+namespace tk{ namespace communication{
 
-    /**
-     * Class for interfacing the Serial port
-     * 
-     * @author Francesco Gatti
-     * 
-     * @version 1.0
-     * 
-     */
     class SerialPort {
-
     private:
-        std::string port;
-        int soc = -1;
+        LibSerial::SerialPort serialPort;
 
     public:
         SerialPort() {};
         ~SerialPort() {};
 
         /**
-         * Initialize object on the desidered CAN interface
+         * @brief 
          * 
-         * @param port string of the interface to open 
-         * @return false if fail
+         * @param port 
+         * @return true 
+         * @return false 
          */
-        bool init(std::string port = "/dev/ttyACM0");
+        bool init(const std::string& port = "/dev/ttyACM0");
 
-        
         /**
-         * Read message on socket
-         *
-         * @param msg string msg to be filled
-         * @return false if fail
+         * @brief 
+         * 
+         * @param msg 
+         * @param terminator 
+         * @param timeout 
+         * @return true 
+         * @return false 
          */
-        bool readSoc(std::string &msg);
+        bool readLine(std::string &msg, char terminator = '\n', timeStamp_t timeout = 250);
+
+        /**
+         * @brief 
+         * 
+         * @param msg 
+         * @param size 
+         * @param timeout 
+         * @return true 
+         * @return false 
+         */
+        bool read(std::string& msg, int size = 1024, timeStamp_t timeout = 250);
         
         /**
          * Close the socket
          *
          * @return false if fail
          */    
-        bool closeSoc();
+        bool close();
 
         /**
          * Status of the socket
          *
          * @return true if open and active
          */  
-        bool status() { return soc >= 0; }
+        bool status() { return serialPort.IsOpen(); }
     };
     
 }}
