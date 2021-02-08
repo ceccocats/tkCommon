@@ -7,7 +7,10 @@ genData(className, VARS, DEPS)
 
 className = "OdomData_gen"
 DEPS = [ "#include \"tkCommon/math/Mat.h\"" ]
-VARS = [ {"name":"tf",      "type":"tk::math::Mat4f"} ]
+VARS = [ {"name":"x",      "type":"float"},
+         {"name":"y",      "type":"float"},
+         {"name":"yaw",    "type":"float"},
+         {"name":"speed",  "type":"float"} ]
 genData(className, VARS, DEPS)
 
 className = "VehicleData_gen"
@@ -84,6 +87,7 @@ DEPS = ["#include \"tkCommon/data/ImuData.h\"\n",
         "#include \"tkCommon/data/GpsData.h\"\n"]
 VARS = [ {"name":"gps", "type":"tk::data::GpsData", "init": "gps.init();"}, 
          {"name":"imu", "type":"tk::data::ImuData", "init": "imu.init();"},
+         {"name":"vel", "type":"tk::math::Vec3<double>"},
         ]
 genData(className, VARS, DEPS)
 

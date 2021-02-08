@@ -14,3 +14,4 @@
 #include <tkCommon/gui/drawables/Drawable.h>
 #include <tkCommon/gui/drawables/GpsImu.h>
 #include <tkCommon/gui/drawables/Grid.h>
+#include <tkCommon/gui/drawables/RecordInfo.h>
