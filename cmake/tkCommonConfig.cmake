@@ -8,6 +8,7 @@ if(CUDA_FOUND)
     add_definitions(-DTKCUDA_ENABLED)
 endif()
 
+find_package(Eigen3 3.3.9 REQUIRED)
 #find_package(yaml-cpp REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
@@ -24,9 +25,8 @@ set(tkCommon_INCLUDE_DIRS
     ${EIGEN3_INCLUDE_DIR}
     ${FREETYPE_INCLUDE_DIRS}
     ${ROS_INCLUDE_DIRS}
-    ${CMAKE_BINARY_DIR}/eigen/include/eigen3
+    ${EIGEN3_INCLUDE_DIR}
 )
-message(${CMAKE_BINARY_DIR}/eigen/include/eigen3)
 
 set(tkCommon_LIBRARIES 
     ${CUDA_LIBRARIES}

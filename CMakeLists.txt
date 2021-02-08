@@ -23,19 +23,9 @@ endif()
 #-------------------------------------------------------------------------------
 # External Libraries
 #-------------------------------------------------------------------------------
-include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
-SET(EIGEN_SRC_PATH   "eigen_src")
-SET(EIGEN_BUILD_PATH "eigen_build")
-ExternalProject_Add(eigen_src
-  URL https://gitlab.com/libeigen/eigen/-/archive/master/eigen-master.tar.gz
-  UPDATE_COMMAND ""
-  SOURCE_DIR ${EIGEN_SRC_PATH}
-  BINARY_DIR ${EIGEN_BUILD_PATH}
-  CONFIGURE_COMMAND cd ../${EIGEN_BUILD_PATH} && cmake ../${EIGEN_SRC_PATH} -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/eigen -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/eigen
-  BUILD_COMMAND     cd ../${EIGEN_BUILD_PATH} && make ${MAKE_J}
-  INSTALL_COMMAND   cd ../${EIGEN_BUILD_PATH} && make install ${MAKE_J}
-)
-include_directories(${CMAKE_BINARY_DIR}/eigen/include/eigen3)
+find_package(Eigen3 3.3.9 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+message("-- Eigen: " ${EIGEN3_INCLUDE_DIR})
 
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
