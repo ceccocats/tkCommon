@@ -221,13 +221,6 @@ class Sensor {
         bool             poolEmpty; /**< true if no data has been added to the pool yet */        
 
         std::vector<tk::common::Tfpose> tf; /**< Sensor TF */
-        
-        /**
-         * @brief 
-         * 
-         * @return true     Successful read
-         * @return false    Unsuccessful read
-         */
 
         /**
          * @brief   Method that init the sensor
