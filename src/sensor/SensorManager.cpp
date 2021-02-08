@@ -6,9 +6,9 @@ namespace tk { namespace sensors {
     {    
         // LOG
         if (logPath != "") {
-            logpath     = logPath;
-            logManager  = new tk::sensors::LogManager();
-            if (!logManager->init(logpath)) {
+            this->logPath       = logPath;
+            this->logManager    = new tk::sensors::LogManager();
+            if (!logManager->init(this->logPath)) {
                 tkERR("Error init logManger.\n");
                 return false;
             }
@@ -21,9 +21,8 @@ namespace tk { namespace sensors {
         }
 
         // GUI
-        this->viewer = viewer;
-        if (viewer!= nullptr) {
-            
+        if (viewer != nullptr) {
+            this->viewer = viewer;
             for (std::map<std::string,tk::sensors::Sensor*>::iterator it = sensors.begin(); it!=sensors.end(); ++it) {
                 if (it->second->info.type == tk::data::sensorType::LIDAR) {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Cloud4f(it->second->info.name)});
@@ -35,11 +34,6 @@ namespace tk { namespace sensors {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Gps(it->second->info.name)});
                 }
             }
-
-            if (!viewerThread.init(dataViewer,this)) {
-                tkERR("Cannot start dataViewer thread\n");
-                return false;
-            }
         }
 
         return true;
@@ -50,6 +44,9 @@ namespace tk { namespace sensors {
     {
         for (std::map<std::string,tk::sensors::Sensor*>::iterator it = sensors.begin(); it!=sensors.end(); ++it)
             it->second->start();
+
+        if (this->viewer != nullptr)
+            viewerThread.init(dataViewer,this);
     }
 
     bool 
@@ -57,8 +54,9 @@ namespace tk { namespace sensors {
     {
         for (std::map<std::string,tk::sensors::Sensor*>::iterator it = sensors.begin(); it!=sensors.end(); ++it)
             it->second->close();
-
-        viewerThread.join();
+        
+        if (this->viewer != nullptr)
+            viewerThread.join();
     }
 
     void 
