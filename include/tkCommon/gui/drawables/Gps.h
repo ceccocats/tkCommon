@@ -28,8 +28,8 @@ namespace tk{ namespace gui{
         public:
             tk::gui::Color_t        color;
 
-            Gps(int nPos = 10, tk::gui::Color_t color = tk::gui::color::RED);
-            Gps(tk::data::GpsData* gps, int nPos = 10, tk::gui::Color_t color = tk::gui::color::RED);
+            Gps(const std::string& name = "gps" ,int nPos = 10, tk::gui::Color_t color = tk::gui::color::RED);
+            Gps(tk::data::GpsData* gps, const std::string& name = "gps", int nPos = 10, tk::gui::Color_t color = tk::gui::color::RED);
             ~Gps();
 
             void updateRef(tk::data::GpsData* gps);

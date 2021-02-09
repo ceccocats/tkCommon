@@ -17,7 +17,7 @@ namespace tk { namespace sensors {
         bool  stopped    = false;
 
         /**
-         * @brief Init the log manager, rememnber to set the configs before or right after init, if you need it
+         * @brief Init the log manager, remember to set the configs before or right after init, if you need it
          * @param folderPath Log path
          */
         bool init(const std::string folderPath);
@@ -34,16 +34,20 @@ namespace tk { namespace sensors {
         timeStamp_t getTick();
 
         /**
-         * @brief autoticker thread
+         * @brief auto-ticker thread
          */
         static void *logTicker(void *args);
+
         /**
          * @brief This is called by the sensor read, it waits to synch with other sensors 
-         * @param time Data timestamps to be synched with logTick
+         * @param time Data timestamps to be synced with logTick
          * @param synched update the sensor synch status
          */
         timeStamp_t wait(timeStamp_t time, bool &synched);
 
+        /**
+         * @brief Method to stop the replay.
+         */
         void stop();
 
     private:
