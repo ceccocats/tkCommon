@@ -37,6 +37,13 @@ int main( int argc, char** argv){
     mat4 = mat4.matrix() * mat4_2.matrix();
     mat4.print();
 
+    // wrt matrix
+    tk::math::Mat3d cov;
+    cov.writableMatrix() << 10, 0, 0,
+                            0, 4, 0,
+                            0, 0, 5;
+    cov.print();
+
 
     // owned matrix
     std::cout<<"OWNED\n";

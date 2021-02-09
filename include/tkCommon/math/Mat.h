@@ -45,7 +45,7 @@ protected:
 
 public:
     MatSimple<T, false> cpu;
-    MatSimple<T, true> gpu;
+    MatSimple<T, true>  gpu;
 
     Mat(void) {
         init();
