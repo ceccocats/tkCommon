@@ -6,9 +6,9 @@ namespace tk { namespace sensors {
     {    
         // LOG
         if (logPath != "") {
-            logpath     = logPath;
-            logManager  = new tk::sensors::LogManager();
-            if (!logManager->init(logpath)) {
+            this->logPath       = logPath;
+            this->logManager    = new tk::sensors::LogManager();
+            if (!logManager->init(this->logPath)) {
                 tkERR("Error init logManger.\n");
                 return false;
             }
@@ -21,9 +21,8 @@ namespace tk { namespace sensors {
         }
 
         // GUI
-        this->viewer = viewer;
-        if (viewer!= nullptr) {
-            
+        if (viewer != nullptr) {
+            this->viewer = viewer;
             for (std::map<std::string,tk::sensors::Sensor*>::iterator it = sensors.begin(); it!=sensors.end(); ++it) {
                 if (it->second->info.type == tk::data::sensorType::LIDAR) {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Cloud4f(it->second->info.name)});
@@ -31,12 +30,9 @@ namespace tk { namespace sensors {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::GpsImu()});
                 } else if (it->second->info.type == tk::data::sensorType::CAMDATA) {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Image(it->second->info.nSensors, it->second->info.name)});
+                } else if (it->second->info.type == tk::data::sensorType::GPS) {
+                    drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Gps(it->second->info.name)});
                 }
-            }
-
-            if (!viewerThread.init(dataViewer,this)) {
-                tkERR("Cannot start dataViewer thread\n");
-                return false;
             }
         }
 
@@ -48,6 +44,9 @@ namespace tk { namespace sensors {
     {
         for (std::map<std::string,tk::sensors::Sensor*>::iterator it = sensors.begin(); it!=sensors.end(); ++it)
             it->second->start();
+
+        if (this->viewer != nullptr)
+            viewerThread.init(dataViewer,this);
     }
 
     bool 
@@ -55,8 +54,9 @@ namespace tk { namespace sensors {
     {
         for (std::map<std::string,tk::sensors::Sensor*>::iterator it = sensors.begin(); it!=sensors.end(); ++it)
             it->second->close();
-
-        viewerThread.join();
+        
+        if (this->viewer != nullptr)
+            viewerThread.join();
     }
 
     void 
@@ -64,6 +64,8 @@ namespace tk { namespace sensors {
     {
         for (std::map<std::string,tk::sensors::Sensor*>::iterator it = sensors.begin(); it!=sensors.end(); ++it)
             it->second->startRecord(folderPath);
+        
+        viewer->add(new tk::gui::RecordInfo(folderPath));
     }
 
     void 
@@ -175,6 +177,21 @@ namespace tk { namespace sensors {
                         const tk::data::VectorData<tk::data::ImageData>* d;
                         if (self->sensors[drw->name]->grab(d,drw->id)) {
                             auto a = (tk::data::VectorData<tk::data::ImageData>*)d;
+                            ref->updateRef(a);
+                            drw->locked = true;
+                        }
+                    }
+                } else if(drw->type == tk::data::sensorType::GPS) {
+                    auto ref = (tk::gui::Gps*)drw->drawable;
+                    if (drw->locked) {
+                        if (ref->update == false) {
+                            self->sensors[drw->name]->release(drw->id);
+                            drw->locked = false;
+                        }
+                    } else {
+                        const tk::data::GpsData* d;
+                        if (self->sensors[drw->name]->grab(d,drw->id)) {
+                            auto a = (tk::data::GpsData*) d;
                             ref->updateRef(a);
                             drw->locked = true;
                         }

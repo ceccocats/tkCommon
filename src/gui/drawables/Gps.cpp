@@ -1,19 +1,21 @@
 #include "tkCommon/gui/drawables/Gps.h"
 
-tk::gui::Gps::Gps(int nPos, tk::gui::Color_t color){
-    this->color = color;  
-    this->nPos = nPos;
-    this->lastPos = -1;
-    this->initted = false;
+tk::gui::Gps::Gps(const std::string& name, int nPos, tk::gui::Color_t color){
+    this->color     = color;  
+    this->nPos      = nPos;
+    this->lastPos   = -1;
+    this->initted   = false;
+    this->name      = name;
     circles.resize(40);
 }
 
-tk::gui::Gps::Gps(tk::data::GpsData* gps, int nPos, tk::gui::Color_t color){
-    this->gps = gps;
-    this->color = color;  
-    this->nPos = nPos;
-    this->lastPos = -1;
-    this->initted = true;
+tk::gui::Gps::Gps(tk::data::GpsData* gps, const std::string& name, int nPos, tk::gui::Color_t color){
+    this->gps       = gps;
+    this->color     = color;  
+    this->nPos      = nPos;
+    this->lastPos   = -1;
+    this->initted   = true;
+    this->name      = name;
     circles.resize(40);
 }
 
@@ -41,10 +43,10 @@ tk::gui::Gps::draw(tk::gui::Viewer *viewer){
             update = false;
 
             gps->lockRead();
-            if(!geoConv.isInitialised() && gps->sats > 10 && gps->lat!=0 && gps->lon!=0 && gps->heigth!=0) {
+            if(!geoConv.isInitialised() && gps->sats > 3 && gps->lat!=0 && gps->lon!=0 && gps->heigth!=0) {
                 geoConv.initialiseReference(gps->lat,gps->lon,gps->heigth);
             }
-            name = gps->header.name;
+            
             print.str("");
             print<<(*gps);
             double x, y, z;
