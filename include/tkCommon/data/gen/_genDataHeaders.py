@@ -150,3 +150,10 @@ VARS = [ {"name":"steerAngle", "type":"double", "default":"0"},
          {"name":"accel",      "type":"double", "default":"0"},
          {"name":"speed",      "type":"double", "default":"0"} ]
 genData(className, VARS, DEPS)
+
+className = "DepthData_gen"
+DEPS = ["#include \"tkCommon/math/Vec.h\"\n"]
+VARS = [ {"name":"data", "type":"tk::math::Vec<uint16_t>"},
+         {"name":"width", "type":"uint32_t", "default": "0"},
+         {"name":"height", "type":"uint32_t", "default": "0"} ]
+genData(className, VARS, DEPS)
