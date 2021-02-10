@@ -22,7 +22,7 @@ namespace tk{ namespace communication{
          * @return true 
          * @return false 
          */
-        bool init(const std::string& port = "/dev/ttyACM0");
+        bool init(const std::string& port = "/dev/ttyACM0", int baud = 9600);
 
         /**
          * @brief 
@@ -45,7 +45,18 @@ namespace tk{ namespace communication{
          * @return false 
          */
         bool read(std::string& msg, int size = 1024, timeStamp_t timeout = 250);
+
+        bool readByte(uint8_t& byte, timeStamp_t timeout = 250);
         
+        /**
+         * @brief 
+         * 
+         * @param msg 
+         * @return true 
+         * @return false 
+         */
+        bool write(std::string &msg);
+
         /**
          * Close the socket
          *
@@ -58,7 +69,9 @@ namespace tk{ namespace communication{
          *
          * @return true if open and active
          */  
-        bool status() { return serialPort.IsOpen(); }
+        bool isOpen() { return serialPort.IsOpen(); }
+
+        bool isDataAvailable() { return serialPort.IsDataAvailable(); }
     };
     
 }}
