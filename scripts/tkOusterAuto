@@ -1,40 +1,29 @@
 #!/bin/bash
 
+# IP
 ##################
-ipOutster="192.168.1.203"
-ipDest="192.168.1.100"
-dev="eth1"
+ip="192.168.1.203"
 ##################
 
-##################
+# CONFIG
 ## 512x10, 1024x10, 2048x10, 512x20, 1024x20
+##################
 config=2048x10
 ##################
-
-sudo route add $ipOutster dev $dev
 
 echo -e "\e[43mConnecting to LiDAR at $ip and setting $config configuration...\e[0m"
 
 #set destination ip (this pc)
-echo "set_config_param udp_ip $ipDest" | nc $ipOutster 7501 -q 1
+echo "set_config_param udp_ip $(hostname -I | cut -f 1 -d " ")" | nc $ip 7501 -q 1
 
 if [ $? != "0" ]; then
-	echo -e"\e[41mError setting ip dest $ipDest\e[0m"
+	echo -e"\e[41mError setting ip dest $(hostname -I | cut -f 1 -d " ")\e[0m"
 else
-	echo -e "\e[42mSet ip dest $ipDest (this pc)\e[0m"
-fi
-
-#set udp_port
-echo "set_config_param udp_port_lidar 7502" | nc $ipOutster 7501 -q 1
-
-if [ $? != "0" ]; then
-	echo -e"\e[41mError\e[0m"
-else
-	echo -e "\e[42mSet udp_port\e[0m"
+	echo -e "\e[42mSet ip dest $(hostname -I | cut -f 1 -d " ") (this pc)\e[0m"
 fi
 
 #set lidar mode
-echo "set_config_param lidar_mode $config" | nc $ipOutster 7501 -q 1
+echo "set_config_param lidar_mode $config" | nc $ip 7501 -q 1
 if [ $? != "0" ]; then
 	echo -e "\e[41mError setting lidar mode $config\e[0m"
 else
@@ -42,7 +31,7 @@ else
 fi
 
 #Save configs
-echo "write_config_txt" | nc $ipOutster 7501 -q 1
+echo "write_config_txt" | nc $ip 7501 -q 1
 if [ $? != "0" ]; then
 	echo -e "\e[41mError saving configuration\e[0m"
 else
@@ -50,7 +39,7 @@ else
 fi
 
 #start sensor
-echo "reinitialize" | nc $ipOutster 7501 -q 1
+echo "reinitialize" | nc $ip 7501 -q 1
 if [ $? != "0" ]; then
 	echo -e "\e[41mError starting sensor\e[0m"
 else
