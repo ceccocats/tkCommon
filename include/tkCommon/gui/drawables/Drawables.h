@@ -11,6 +11,7 @@
 #include <tkCommon/gui/drawables/Axis.h>
 #include <tkCommon/gui/drawables/Text.h>
 #include <tkCommon/gui/drawables/Cloud4f.h>
+#include <tkCommon/gui/drawables/Radar.h>
 #include <tkCommon/gui/drawables/Drawable.h>
 #include <tkCommon/gui/drawables/GpsImu.h>
 #include <tkCommon/gui/drawables/Grid.h>

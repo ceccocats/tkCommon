@@ -130,9 +130,9 @@ VARS = [ {"name":"data", "type":"tk::math::Vec<uint8_t>"},
 genData(className, VARS, DEPS)
 
 className = "RadarData_gen"
-DEPS = ["#include \"tkCommon/data/gen/CloudData_gen.h\"\n"]
-VARS = [ {"name":"near", "type":"tk::data::CloudData_gen", "init": "near.init()"},
-         {"name":"far",  "type":"tk::data::CloudData_gen", "init": "far.init()"} ]
+DEPS = ["#include \"tkCommon/data/CloudData.h\"\n"]
+VARS = [ {"name":"near", "type":"tk::data::CloudData", "init": "near.init()"},
+         {"name":"far",  "type":"tk::data::CloudData", "init": "far.init()"} ]
 genData(className, VARS, DEPS)
 
 className = "CalibData_gen"
