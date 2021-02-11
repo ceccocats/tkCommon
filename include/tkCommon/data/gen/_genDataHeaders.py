@@ -131,9 +131,9 @@ VARS = [ {"name":"data", "type":"tk::math::Vec<uint8_t>"},
 genData(className, VARS, DEPS)
 
 className = "RadarData_gen"
-DEPS = ["#include \"tkCommon/data/gen/CloudData_gen.h\"\n"]
-VARS = [ {"name":"near", "type":"tk::data::CloudData_gen", "init": "near.init()"},
-         {"name":"far",  "type":"tk::data::CloudData_gen", "init": "far.init()"} ]
+DEPS = ["#include \"tkCommon/data/CloudData.h\"\n"]
+VARS = [ {"name":"near", "type":"tk::data::CloudData", "init": "near.init()"},
+         {"name":"far",  "type":"tk::data::CloudData", "init": "far.init()"} ]
 genData(className, VARS, DEPS)
 
 className = "CalibData_gen"
@@ -150,4 +150,11 @@ DEPS = ["#include \"tkCommon/math/Mat.h\"\n"]
 VARS = [ {"name":"steerAngle", "type":"double", "default":"0"},
          {"name":"accel",      "type":"double", "default":"0"},
          {"name":"speed",      "type":"double", "default":"0"} ]
+genData(className, VARS, DEPS)
+
+className = "DepthData_gen"
+DEPS = ["#include \"tkCommon/math/Vec.h\"\n"]
+VARS = [ {"name":"data", "type":"tk::math::Vec<uint16_t>"},
+         {"name":"width", "type":"uint32_t", "default": "0"},
+         {"name":"height", "type":"uint32_t", "default": "0"} ]
 genData(className, VARS, DEPS)

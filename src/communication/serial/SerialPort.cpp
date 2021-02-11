@@ -2,7 +2,7 @@
 
 namespace tk { namespace communication {
     bool 
-    SerialPort::init(const std::string& port)
+    SerialPort::init(const std::string& port, int baud)
     {
         // open port
         serialPort.Open(port);
@@ -10,7 +10,22 @@ namespace tk { namespace communication {
             return false;
 
         // set baud
-        serialPort.SetBaudRate(LibSerial::BaudRate::BAUD_115200);
+        switch (baud)
+        {
+        case 9600:
+            serialPort.SetBaudRate(LibSerial::BaudRate::BAUD_9600);
+            break;
+        case 115200:
+            serialPort.SetBaudRate(LibSerial::BaudRate::BAUD_115200);
+            break;
+        case 921600:
+            serialPort.SetBaudRate(LibSerial::BaudRate::BAUD_921600);
+            break;
+        default:
+            return false;
+            break;
+        }
+        
 
         // Set the number of data bits.
         serialPort.SetCharacterSize(LibSerial::CharacterSize::CHAR_SIZE_8) ;
@@ -25,10 +40,10 @@ namespace tk { namespace communication {
         serialPort.SetStopBits(LibSerial::StopBits::STOP_BITS_1) ;
 
         // Wait for data to be available at the serial port.
-        while(!serialPort.IsDataAvailable()) 
-        {
-            usleep(1000) ;
-        }
+        //while(!serialPort.IsDataAvailable()) 
+        //{
+        //    usleep(1000) ;
+        //}
 
         return true;
     }
@@ -50,7 +65,6 @@ namespace tk { namespace communication {
             tkWRN("Timeout.\n");
             return false;
         }
-
         return true;
     }
 
@@ -63,6 +77,26 @@ namespace tk { namespace communication {
             tkWRN("Timeout.\n");
             return false;
         }
+        return true;
+    }
+
+    bool 
+    SerialPort::readByte(uint8_t& byte, timeStamp_t timeout)
+    {
+        try {
+            serialPort.ReadByte(byte, timeout);
+        } catch (const LibSerial::ReadTimeout&) {
+            tkWRN("Timeout.\n");
+            return false;
+        }
+        return true;
+    }
+
+    bool
+    SerialPort::write(std::string &msg)
+    {
+        serialPort.Write(msg);
+        serialPort.DrainWriteBuffer();
 
         return true;
     }

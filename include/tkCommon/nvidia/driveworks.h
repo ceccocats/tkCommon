@@ -3,7 +3,7 @@
 #if DW_VERSION_MAJOR >= 2
     #include <dw/core/Context.h>
     #include <dw/core/VersionCurrent.h>
-    #include <dw/core/NvMedia.h>
+//    #include <dw/core/NvMedia.h>
     #include <dw/sensors/Sensors.h>
 
     #define float16_t dwF16
