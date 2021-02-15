@@ -1,6 +1,6 @@
 #include "tkCommon/gui/drawables/Can.h"
 
-tk::gui::Can::Can(tk::data::CanData_t* data, std::string name);{
+tk::gui::Can::Can(tk::data::CanData_t* data, std::string name){
     this->data = data;
     this->name = name;
 }
