@@ -34,6 +34,10 @@ namespace tk { namespace sensors {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Gps(it->second->info.name)});
                 } else if (it->second->info.type == tk::data::sensorType::RADAR) {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Radar(it->second->info.name)});
+                } else if (it->second->info.type == tk::data::sensorType::STEREO) {
+                    drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Image(2, it->second->info.name)});
+                } else if (it->second->info.type == tk::data::sensorType::IMU) {
+                    drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Imu()});
                 }
             }
         }
@@ -213,7 +217,40 @@ namespace tk { namespace sensors {
                             drw->locked = true;
                         }
                     }
-                }
+                } else if(drw->type == tk::data::sensorType::STEREO) {
+                    auto ref = (tk::gui::Image*)drw->drawable;
+                    if (drw->locked) {
+                        if (ref->update == false) {
+                            self->sensors[drw->name]->release(drw->id);
+                            drw->locked = false;
+                        }
+                    } else {
+                        const tk::data::StereoData* d;
+                        if (self->sensors[drw->name]->grab(d,drw->id)) {
+                            auto a = (tk::data::StereoData*)d;
+                            ref->updateRef(0,&a->data);
+                            if(!a->color.empty()){
+                                ref->updateRef(1, &a->color);
+                            }
+                            drw->locked = true;
+                        }
+                    }
+                } else if (drw->type == tk::data::sensorType::IMU) {
+                    auto ref = (tk::gui::Imu*)drw->drawable;
+                    if (drw->locked){
+                        if (ref->update == false){
+                            self->sensors[drw->name]->release(drw->id);
+                            drw->locked = false;
+                        }
+                    } else {
+                        const tk::data::ImuData* d;
+                        if (self->sensors[drw->name]->grab<tk::data::ImuData>(d,drw->id)) {
+                            tk::data::ImuData* a = (tk::data::ImuData*)d;
+                            ref->updateRef(a);
+                            drw->locked = true;
+                        }
+                    }
+                } 
             }
             t.wait();
         }
