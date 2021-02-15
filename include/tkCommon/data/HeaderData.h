@@ -20,7 +20,8 @@ namespace tk { namespace data {
         PERCEPTION  = 7,
         IMU         = 8,
         GPSIMU      = 9,
-        STEREO      = 10
+        STEREO      = 10,
+        CAN         = 11
         };
 
         /**

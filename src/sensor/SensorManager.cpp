@@ -38,6 +38,8 @@ namespace tk { namespace sensors {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Image(2, it->second->info.name)});
                 } else if (it->second->info.type == tk::data::sensorType::IMU) {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Imu()});
+                } else if (it->second->info.type == tk::data::sensorType::CAN) {
+                    drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Can()});
                 }
             }
         }
@@ -246,6 +248,21 @@ namespace tk { namespace sensors {
                         const tk::data::ImuData* d;
                         if (self->sensors[drw->name]->grab<tk::data::ImuData>(d,drw->id)) {
                             tk::data::ImuData* a = (tk::data::ImuData*)d;
+                            ref->updateRef(a);
+                            drw->locked = true;
+                        }
+                    }
+                } else if (drw->type == tk::data::sensorType::CAN) {
+                    auto ref = (tk::gui::Can*)drw->drawable;
+                    if (drw->locked){
+                        if (ref->update == false){
+                            self->sensors[drw->name]->release(drw->id);
+                            drw->locked = false;
+                        }
+                    } else {
+                        const tk::data::CanData_t* d;
+                        if (self->sensors[drw->name]->grab<tk::data::CanData_t>(d,drw->id)) {
+                            tk::data::CanData_t* a = (tk::data::CanData_t*)d;
                             ref->updateRef(a);
                             drw->locked = true;
                         }
