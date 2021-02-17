@@ -37,9 +37,11 @@ namespace tk { namespace communication {
 
         addr.can_ifindex = ifr.ifr_ifindex;
 
-        //if(fcntl(soc, F_SETFL, O_NONBLOCK) < 0) {
-        //    return false;
-        //}
+        //Timeout
+        struct timeval tv;
+        tv.tv_sec = 1;
+        tv.tv_usec = 0;
+        setsockopt(soc, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv));
 
         if (bind(soc, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
             tkERR("Error binding socket: " + port + "\n");
@@ -176,6 +178,8 @@ namespace tk { namespace communication {
                 struct timeval tv;
                 ioctl(soc, SIOCGSTAMP, &tv);
                 data->header.stamp = tv2TimeStamp(tv);
+            }else{
+                tkWRN("Timeout\n")
             }
             return ok;
         }
