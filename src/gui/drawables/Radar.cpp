@@ -84,10 +84,7 @@ namespace tk { namespace gui {
     void 
     Radar::onClose()
     {
-        far_drw->onClose();
-        near_drw->onClose();
-        delete far_drw;
-        delete near_drw;
+        
     }
     
     std::string 
