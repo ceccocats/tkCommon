@@ -98,9 +98,6 @@ namespace tk { namespace gui {
 
         int     width = 800;
         int     height = 800;
-        float   aspectRatio = 1;
-        float   xLim = 1.0;
-        float   yLim = 1.0;
         double  dt = 1.0/60;
         bool    useImGUI;
 
@@ -131,7 +128,7 @@ namespace tk { namespace gui {
         static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
         static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
         static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
-
+        static void window_size_callback(GLFWwindow* window, int width, int height);
     };
 
 }}

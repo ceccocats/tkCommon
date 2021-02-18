@@ -108,17 +108,15 @@ Viewer::init() {
     img.pixels = tk::gui::common::loadImage(std::string(tkCommon_PATH) + "data/tkLogo.png", &img.width, &img.height, &channels);
     glfwSetWindowIcon(window,1,&img); 
     free(img.pixels);
-    glCheckError(); 
-
 
     //Callbacks
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetCursorPosCallback(window, cursor_position_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetKeyCallback(window, keyCallback);
+    glfwSetWindowSizeCallback(window, window_size_callback);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
-    glCheckError();
 
 
     // Initialize OpenGL loader
@@ -150,6 +148,7 @@ Viewer::init() {
 
     // init cameras
     camera.init();
+    camera.setViewPort(0, 0, width, height);
 
     //Graphics
     for(int i = 0; i < nFPS; i++){
@@ -167,8 +166,6 @@ Viewer::init() {
                 std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))) + " -- " +
                 std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))) + "\n"
             );
-
-    glCheckError();
 
     //tkLogo
     int height, width;
@@ -291,15 +288,11 @@ Viewer::drawInfos(){
         text = "FPS";
         ImGui::PlotLines(usage.c_str(),(const float*)vizFPS,IM_ARRAYSIZE(vizFPS),nFPS,text.c_str(),0,120.0);
 
-
         ImGui::Text("Window size: %d x %d", width, height);
-        ImGui::Text("window ratio: %f", aspectRatio);
 
-        
     }else{
         drawables[imguiSelected]->imGuiInfos();
     }
-    glCheckError();
 }
 
 void 
@@ -309,7 +302,6 @@ Viewer::drawSettings(){
     }else{
         drawables[imguiSelected]->imGuiSettings();
     }
-    glCheckError();
 }
 
 void
@@ -318,7 +310,6 @@ Viewer::beforeDraw(){
         if(drawable.second->enabled)
             drawable.second->beforeDraw(Viewer::instance);
     }
-    glCheckError();
 }
 
 void 
@@ -329,7 +320,6 @@ Viewer::draw() {
             drawable.second->draw(Viewer::instance);
         }
     }
-    glCheckError();
 }
 
 void 
@@ -342,7 +332,6 @@ Viewer::initDrawables() {
         }
         newDrawables.clear();
     }
-    glCheckError();
 }
 
 void 
@@ -384,17 +373,10 @@ Viewer::runloop() {
 
     while (running) {
 
-        // manage window resize
-        glfwGetFramebufferSize(window, &width, &height);
-        aspectRatio = (float)width / (float)height;
-        xLim = aspectRatio;
-        yLim = 1.0;
-
         initDrawables();
         beforeDraw();
+
         follow();
-        
-        camera.setViewPort(0, 0, width, height);
         glViewport(camera.viewport[0], camera.viewport[1], camera.viewport[2], camera.viewport[3]);
 
         glClearColor(background.r(), background.g(), background.b(), background.a());
@@ -484,6 +466,12 @@ Viewer::keyCallback(GLFWwindow* window, int key, int scancode, int action, int m
         Viewer::instance->user_key_callbacks[i](key, action, GLFW_SOURCE_KEYBORAD);
     }
 }
+
+void 
+Viewer::window_size_callback(GLFWwindow* window, int width, int height){ 
+    Viewer::instance->camera.setViewPort(0, 0, width, height);
+}
+
 
 void 
 Viewer::addKeyCallback(void (*fun)(int,int,int)) {
