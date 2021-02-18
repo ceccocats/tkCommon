@@ -316,7 +316,7 @@ void
 Viewer::draw() {
     for (auto const& drawable : drawables){
         if(drawable.second->enabled){
-            drawable.second->drawview = modelview * glm::make_mat4x4(drawable.second->tf.matrix().data());
+            drawable.second->drwModelView = modelview * glm::make_mat4x4(drawable.second->tf.matrix().data());
             drawable.second->draw(Viewer::instance);
         }
     }

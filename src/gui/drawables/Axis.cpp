@@ -16,7 +16,7 @@ tk::gui::Axis::onInit(tk::gui::Viewer *viewer){
 void 
 tk::gui::Axis::draw(tk::gui::Viewer *viewer){
     tk::gui::shader::axis* shaderAxis = (tk::gui::shader::axis*) shader;
-    shaderAxis->draw(drawview,viewer->getWidth(),viewer->getHeight());
+    shaderAxis->draw(drwModelView,viewer->getWidth(),viewer->getHeight());
 }
 
 void 

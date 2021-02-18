@@ -105,17 +105,17 @@ tk::gui::Plot::draw(tk::gui::Viewer *viewer){
     }
     
     if(this->type == type_t::LINE){
-        shaderLine->draw(drawview,&glData,nPoints,drawSize,color,GL_LINE_STRIP);
+        shaderLine->draw(drwModelView,&glData,nPoints,drawSize,color,GL_LINE_STRIP);
         return;
     }
 
     if(this->type == type_t::CIRCLES){
-        shaderCircle->draw(drawview,color,drawSize);
+        shaderCircle->draw(drwModelView,color,drawSize);
         return;
     }
 
     if(this->type == type_t::AXIS){
-        shaderAxis->draw(drawview,&glData,nPoints,drawSize);
+        shaderAxis->draw(drwModelView,&glData,nPoints,drawSize);
         return;
     }
 }

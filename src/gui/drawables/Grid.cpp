@@ -28,7 +28,7 @@ tk::gui::Grid::imGuiInfos(){
 void 
 tk::gui::Grid::draw(tk::gui::Viewer *viewer){
     tk::gui::shader::grid* shaderGrid = (tk::gui::shader::grid*) shader;
-    shaderGrid->draw(drawview,dim,n);
+    shaderGrid->draw(drwModelView,dim,n);
 }
 
 void 

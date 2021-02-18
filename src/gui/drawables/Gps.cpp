@@ -60,7 +60,7 @@ tk::gui::Gps::draw(tk::gui::Viewer *viewer){
         }
 
         for(int i = 0; i < nPos; i++){
-            circles[i]->draw(drawview,color,lineSize);
+            circles[i]->draw(drwModelView,color,lineSize);
         }   	
     }
 }

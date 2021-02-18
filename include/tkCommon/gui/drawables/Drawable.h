@@ -17,7 +17,7 @@ namespace tk{ namespace gui{
 
 		bool update = false;
 
-		glm::mat4 drawview;
+		glm::mat4 drwModelView;
 
 		tk::common::Tfpose tf = tk::common::Tfpose::Identity();
 
@@ -27,7 +27,7 @@ namespace tk{ namespace gui{
 		/** method used for update data in opegl from cpu and other things*/
 		virtual void beforeDraw(tk::gui::Viewer *viewer) {}
 
-		/** draw 3D method */
+		/**  method */
 		virtual void draw(tk::gui::Viewer *viewer) {}
 
 		/** draw in imgui settings window */
