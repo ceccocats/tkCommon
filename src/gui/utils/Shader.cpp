@@ -85,61 +85,109 @@ tk::gui::Shader::close() {
 }
 
 void 
-tk::gui::Shader::setBool(const std::string &name, bool value){         
-    glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value); 
+tk::gui::Shader::setBool(const std::string &name, bool value){ 
+    if(map.find(name) == map.end()){
+        map[name] = glGetUniformLocation(ID, name.c_str());
+    }else{
+        glUniform1i(map[name],(int)value);
+    }         
 }
 
 void 
 tk::gui::Shader::setInt(const std::string &name, int value){ 
-    glUniform1i(glGetUniformLocation(ID, name.c_str()), value); 
+    if(map.find(name) == map.end()){
+        map[name] = glGetUniformLocation(ID, name.c_str());
+    }else{
+        glUniform1i(map[name],value);
+    }    
 }
 
 void 
 tk::gui::Shader::setFloat(const std::string &name, float value){ 
-    glUniform1f(glGetUniformLocation(ID, name.c_str()), value); 
+    if(map.find(name) == map.end()){
+        map[name] = glGetUniformLocation(ID, name.c_str());
+    }else{
+        glUniform1f(map[name], value);
+    }   
 }
 
 void 
 tk::gui::Shader::setVec2(const std::string &name, const glm::vec2 &value){ 
-    glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]); 
+    if(map.find(name) == map.end()){
+        map[name] = glGetUniformLocation(ID, name.c_str());
+    }else{
+        glUniform2fv(map[name], 1, &value[0]);
+    }   
 }
 void 
 tk::gui::Shader::setVec2(const std::string &name, float x, float y){ 
-    glUniform2f(glGetUniformLocation(ID, name.c_str()), x, y); 
+    if(map.find(name) == map.end()){
+        map[name] = glGetUniformLocation(ID, name.c_str());
+    }else{
+        glUniform2f(map[name], x, y);
+    }   
 }
 
 void 
 tk::gui::Shader::setVec3(const std::string &name, const glm::vec3 &value){ 
-    glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]); 
+    if(map.find(name) == map.end()){
+        map[name] = glGetUniformLocation(ID, name.c_str());
+    }else{
+        glUniform3fv(map[name], 1, &value[0]); 
+    }   
 }
 
 void 
 tk::gui::Shader::setVec3(const std::string &name, float x, float y, float z){ 
-    glUniform3f(glGetUniformLocation(ID, name.c_str()), x, y, z); 
+    if(map.find(name) == map.end()){
+        map[name] = glGetUniformLocation(ID, name.c_str());
+    }else{
+        glUniform3f(map[name], x, y, z); 
+    }   
 }
 
 void 
 tk::gui::Shader::setVec4(const std::string &name, const glm::vec4 &value){ 
-    glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]); 
+    if(map.find(name) == map.end()){
+        map[name] = glGetUniformLocation(ID, name.c_str());
+    }else{
+        glUniform4fv(map[name], 1, &value[0]);  
+    }   
 }
 void 
 tk::gui::Shader::setVec4(const std::string &name, float x, float y, float z, float w){ 
-    glUniform4f(glGetUniformLocation(ID, name.c_str()), x, y, z, w); 
+    if(map.find(name) == map.end()){
+        map[name] = glGetUniformLocation(ID, name.c_str());
+    }else{
+        glUniform4f(map[name], x, y, z, w);
+    }   
 }
 
 void 
 tk::gui::Shader::setMat2(const std::string &name, const glm::mat2 &mat){
-    glUniformMatrix2fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+    if(map.find(name) == map.end()){
+        map[name] = glGetUniformLocation(ID, name.c_str());
+    }else{
+        glUniformMatrix2fv(map[name], 1, GL_FALSE, &mat[0][0]);
+    }   
 }
 
 void 
 tk::gui::Shader::setMat3(const std::string &name, const glm::mat3 &mat){
-    glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+    if(map.find(name) == map.end()){
+        map[name] = glGetUniformLocation(ID, name.c_str());
+    }else{
+        glUniformMatrix3fv(map[name], 1, GL_FALSE, &mat[0][0]);
+    }   
 }
 
 void 
 tk::gui::Shader::setMat4(const std::string &name, const glm::mat4 &mat){
-    glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+    if(map.find(name) == map.end()){
+        map[name] = glGetUniformLocation(ID, name.c_str());
+    }else{
+        glUniformMatrix4fv(map[name], 1, GL_FALSE, &mat[0][0]);
+    }   
 }
 
 void 

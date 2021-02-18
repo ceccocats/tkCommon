@@ -37,9 +37,8 @@ class pointcloud3f  : public tk::gui::shader::generic
             return true;
         }
 
-        void draw(tk::gui::Buffer<float>* buffer, int n, tk::gui::Color_t color = tk::gui::color::WHITE){
+        void draw(glm::mat4& modelview, tk::gui::Buffer<float>* buffer, int n, tk::gui::Color_t color = tk::gui::color::WHITE){
 
-		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
             buffer->setVertexAttribs(vertexPointer);
 
             std::memcpy(glm::value_ptr(pointColor), color.color, sizeof(pointColor));

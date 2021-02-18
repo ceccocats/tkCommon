@@ -34,9 +34,7 @@ class axisPlot : public tk::gui::shader::generic
             
         }
 
-        void draw(tk::gui::Buffer<float>* buffer, int n, float size = 1.0f){
-
-            glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
+        void draw(glm::mat4& modelview,tk::gui::Buffer<float>* buffer, int n, float size = 1.0f){
 
             vertexPointer[0] = {3,3,0};
             vertexPointer[1] = {3,3,n*3};

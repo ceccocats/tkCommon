@@ -15,6 +15,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 #-------------------------------------------------------------------------------
 find_package(CUDA 9.0 QUIET)
 include_directories(${CUDA_INCLUDE_DIRS})
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} --expt-relaxed-constexpr)
 if(CUDA_FOUND)
     add_definitions(-DTKCUDA_ENABLED)
 endif()
@@ -22,8 +23,9 @@ endif()
 #-------------------------------------------------------------------------------
 # External Libraries
 #-------------------------------------------------------------------------------
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 3.3.9 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
+message("-- Eigen: " ${EIGEN3_INCLUDE_DIR})
 
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
@@ -73,10 +75,10 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/shade
 #-------------------------------------------------------------------------------
 # Generate Drawables include
 #-----------------------------------------------------------------------------
-add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawables/Drawables.h
+add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawables/*
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawables
     COMMAND python3 _drawables.py)
-    add_custom_target(tkdrawablesgen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawables/Drawables.h)
+    add_custom_target(tkdrawablesgen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawables/*)
 
 #-------------------------------------------------------------------------------
 # Build Libraries
@@ -172,6 +174,11 @@ foreach(app ${tkpackage_APPS})
     add_executable(${app} "app/${app}.cpp")
     target_link_libraries(${app} tkCommon tkGUI tkCommunication tkMath tkJoystick ${GUI_LIBS} ${CUDA_LIBRARIES})
 endforeach()
+
+if(CUDA_FOUND)
+    cuda_add_executable(tkCommon_eigen_cuda app/tkCommon_eigen_cuda.cu)
+    target_link_libraries(tkCommon_eigen_cuda tkCommon tkGUI tkCommunication tkMath tkJoystick ${GUI_LIBS} ${CUDA_LIBRARIES})
+endif()
 
 #-------------------------------------------------------------------------------
 # Build tests

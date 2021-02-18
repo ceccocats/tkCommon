@@ -34,9 +34,7 @@ class texture : public tk::gui::shader::generic
             //return true;
         }
 
-        void draw(tk::gui::Texture<uint8_t>* text, tk::gui::Buffer<float>* buffer, int triangles){
-
-            glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview));
+        void draw(glm::mat4& modelview, tk::gui::Texture<uint8_t>* text, tk::gui::Buffer<float>* buffer, int triangles){
 
             buffer->setVertexAttribs(vertexPointer);
 

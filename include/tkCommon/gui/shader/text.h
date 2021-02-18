@@ -111,15 +111,14 @@ class text : public tk::gui::shader::generic
             return shader.init(vertex, fragment);
         }
 
-        void draw(std::string text, float targetH = 0.5, tk::gui::Color_t color = tk::gui::color::WHITE){
+        void draw(glm::mat4& modelview, std::string text, float targetH = 0.5, tk::gui::Color_t color = tk::gui::color::WHITE){
             float scale = targetH / maxH;
             
             std::memcpy(glm::value_ptr(textColor), color.color, sizeof(textColor));
-            glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(projection)); 
 
             shader.use();
             shader.setVec4("textColor", textColor);
-            shader.setMat4("projection", projection);
+            shader.setMat4("projection", modelview);
 
             glActiveTexture(GL_TEXTURE0);
             glBindVertexArray(VAO);

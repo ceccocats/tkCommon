@@ -27,7 +27,7 @@ void
 tk::gui::Text::draw(tk::gui::Viewer *viewer){
     tk::gui::shader::text* shaderText = (tk::gui::shader::text*) shader;
     text_mutex.lock();
-    shaderText->draw(text_str, text_height, text_color);
+    shaderText->draw(drawview,text_str, text_height, text_color);
     text_mutex.unlock();
 }
 

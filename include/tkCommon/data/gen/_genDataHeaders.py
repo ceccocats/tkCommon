@@ -115,6 +115,7 @@ VARS = [ {"name": "featureType_t", "type": "typedef std::string"},
          {"name": "FEATURES_RCS"         , "type": "static const featureType_t", "default": "\"f_rcs\""},
          {"name": "FEATURES_PROBABILITY" , "type": "static const featureType_t", "default": "\"f_probability\""},
          {"name": "FEATURES_NEAR_SCAN"   , "type": "static const featureType_t", "default": "\"f_near_scan\""},
+         {"name": "FEATURES_GROUND"      , "type": "static const featureType_t", "default": "\"f_ground\""},
          {"name": "TIMESTAMP"            , "type": "static const featureType_t", "default": "\"f_timestamp\""},
          {"name":"points",   "type":"tk::math::Mat<float>"},
          {"name":"ranges",   "type":"tk::math::Mat<float>"},
@@ -149,4 +150,11 @@ DEPS = ["#include \"tkCommon/math/Mat.h\"\n"]
 VARS = [ {"name":"steerAngle", "type":"double", "default":"0"},
          {"name":"accel",      "type":"double", "default":"0"},
          {"name":"speed",      "type":"double", "default":"0"} ]
+genData(className, VARS, DEPS)
+
+className = "DepthData_gen"
+DEPS = ["#include \"tkCommon/math/Vec.h\"\n"]
+VARS = [ {"name":"data", "type":"tk::math::Vec<uint16_t>"},
+         {"name":"width", "type":"uint32_t", "default": "0"},
+         {"name":"height", "type":"uint32_t", "default": "0"} ]
 genData(className, VARS, DEPS)

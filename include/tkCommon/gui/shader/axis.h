@@ -33,9 +33,8 @@ class axis : public tk::gui::shader::generic
             
         }
 
-        void draw(float width, float height){
-            glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
-
+        void draw(glm::mat4& modelview, float width, float height){
+            
             shader.use();
             shader.setMat4("modelview", modelview);
             shader.setInt("width",width);

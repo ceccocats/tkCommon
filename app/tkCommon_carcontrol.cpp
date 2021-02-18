@@ -7,55 +7,48 @@
 #include "tkCommon/communication/car/CarControl.h"
 #include "tkCommon/rt/Task.h"
 
-/*class MyViewer : public tk::gui::Viewer {
+//viewer
+#include "tkCommon/gui/Viewer.h"
+#include "tkCommon/gui/drawables/Drawable.h"
+
+tk::gui::Viewer* 	viewer = tk::gui::Viewer::getInstance();
+
+class Control : public tk::gui::Drawable{
     public:
-    MyViewer() {}
-    ~MyViewer() {}
+        Control() {}
+        ~Control() {}
 
-    void init() {
-        tk::gui::Viewer::init();
-    }
+        void draw(tk::gui::Viewer *viewer){
+            ImGui::Begin("Car control", NULL, ImGuiWindowFlags_NoScrollbar);
+            ImGui::Text("Steer: %f",steer);
+            ImGui::Text("Throttle: %f",throttle);
+            ImGui::Text("\n");
+            ImGui::Text("steerReq: %f",steerReq);
+            ImGui::Text("accReq: %f",accReq);
+            ImGui::Text("brakeReq: %f",brakeReq);
+            ImGui::Text("\n");
+            ImGui::Text("enableSteer: %d (start/back)",curSteer);
+            ImGui::Text("enableAcc: %d",curAcc);
+            ImGui::Text("enableBrake: %d",curBrake);
+            ImGui::Text("\n");
+            ImGui::Text("A: steer zero");
+            ImGui::Text("B: motor reset");
+            ImGui::Text("X: off");
+            ImGui::Text("Y: start");
+            ImGui::End();
+        }
 
-    void draw() {
-        //tk::gui::Viewer::draw();
-        tkViewport2D(width, height);
+        float steer = 0;
+        float throttle = 0;
 
-        drawBar("steer", steer, 0.2);
-        drawBar("throttle", throttle, -0.2);
+        int curSteer = 0;
+        int curAcc = 0;
+        int curBrake = 0;
 
-        std::string str = std::string("Back:  disable Acc\n")   +
-                                      "Start: enable Acc\n"     + 
-                                      "A:     set steer zero\n" +
-                                      "B:     reset steer\n"    +
-                                      "X:     disable steer\n";
-        tkDrawText(str, {-xLim+0.05f, yLim-0.1f, 0.01f}, {0.0f,0.0f,0.0f}, {0.05f, 0.05f, 0.05f});
-
-
-        std::string str2 = std::string("Steer Req:   ") + std::to_string(steerReq) + "\n" +
-                           std::string("Steer Resp:  ") + std::to_string(curSteer) + "\n" +
-                           std::string("Acc Req:   ") + std::to_string(accReq) + "\n" +
-                           std::string("Acc Resp:  ") + std::to_string(curAcc) + "\n" +
-                           std::string("Brk Req:   ") + std::to_string(brakeReq) + "\n" +
-                           std::string("Brk Resp:  ") + std::to_string(curBrake) + "\n";
-        tkDrawText(str2, {-xLim+0.05f, -0.4, 0.01f}, {0.0f,0.0f,0.0f}, {0.05f, 0.05f, 0.05f});
-    }
-
-    void drawBar(std::string name, float val, float y, float w = 0.8, float h = 0.1) {
-        char buf[256];
-        tkSetColor(tk::gui::color::WHITE);
-        sprintf(buf, "%s: %+4.3f", name.c_str(), val);
-        tkDrawText(buf, {-w,y+h,0}, {0,0,0}, {h,h,h});
-        tkDrawRectangle({0,y,0}, {w*2, h, 0}, false);
-        tkSetColor(tk::gui::color::RED);
-        tkDrawRectangle({val*w, y, 0}, {h,h,h}, true);
-    } 
-
-    float steer = 0, throttle = 0;
-
-    int steerReq = 0, curSteer = 0;
-    int accReq = 0, brakeReq = 0, curAcc = 0, curBrake = 0;
-};*/
-
+        float steerReq = 0;        
+        float accReq     = 0;
+        float brakeReq = 0;
+};
 
 bool gRun = true;
 void signal_handler(int signal){
@@ -67,27 +60,17 @@ void signal_handler(int signal){
 int main( int argc, char** argv){
     std::signal(SIGINT, signal_handler);
     std::signal(SIGTERM, signal_handler);
-    
-    // useful
-    std::cout<<"Please set can before\n";
-    std::cout<<"sudo ip link set can0 down\n";
-    std::cout<<"sudo ip link set can0 type can bitrate 125000\n";
-    std::cout<<"sudo ip link set can0 up\n\n";
 
-    tk::common::CmdParser cmd(argv, "Can utils");
+    tk::common::CmdParser cmd(argv, "Car Control");
     std::string soc_file = cmd.addArg("interface", "can0", "can interface to read");
-    std::string dbc_file = cmd.addArg("dbc", "", "DBC can to parse");
     float smoothSteer    = cmd.addFloatOpt("-lerp_steer", 0.02, "steer lerp value");
     float smoothThrottle = cmd.addFloatOpt("-lerp_throttle", 0.10, "throttle lerp value");
     cmd.parse();
 
-    //MyViewer viewer;
-    //viewer.setWindowName("Car control");
-    //viewer.initOnThread(false);
-    //viewer.plotManger->addCirclePlot("odom", tk::gui::color::RED, 1000000, 0.5);
-    //viewer.plotManger->set2d("odom",true);
+    Control* c = new Control();
+    viewer->add(c);
+    viewer->start();
     
-
 	Joystick joy;
     tkASSERT(joy.init());
 
@@ -116,14 +99,14 @@ int main( int argc, char** argv){
         throttle = /*-triggerL + triggerR;*/ tk::math::lerp(throttle, -triggerL + triggerR, smoothThrottle);
 
         // update viewer
-        //viewer.steer = steer;
-        //viewer.throttle = throttle;
-        std::cout<<"Steer: "<<steer<<"\tThrottle: "<<throttle<<std::endl;
+        c->steer = steer;
+        c->throttle = throttle;
+        //std::cout<<"Steer: "<<steer<<"\tThrottle: "<<throttle<<std::endl;
 
-        std::cout<<"STATUS: "<<carCtrl.steerPos<<" "<<carCtrl.accPos<<" "<<carCtrl.brakePos<<"\n";
-        //viewer.curSteer = carCtrl.steerPos;
-        //viewer.curAcc = carCtrl.accPos;
-        //viewer.curBrake = carCtrl.brakePos;
+        //std::cout<<"STATUS: "<<carCtrl.steerPos<<" "<<carCtrl.accPos<<" "<<carCtrl.brakePos<<"\n";
+        c->curSteer = carCtrl.steerPos;
+        c->curAcc = carCtrl.accPos;
+        c->curBrake = carCtrl.brakePos;
         
         //tk::data::VehicleData::odom_t o = carCtrl.odom;
         //viewer.plotManger->addPoint("odom", tk::common::odom2tf(o.x, o.y, 0));
@@ -178,10 +161,10 @@ int main( int argc, char** argv){
                 brakeReq = throttle < 0 ? -throttle*6000 : 0;
             }
 
-            std::cout<<"Req: "<<steerReq<<" "<<accReq<<" "<<brakeReq<<"\n";
-            //viewer.steerReq = steerReq;
-            //viewer.accReq = accReq;
-            //viewer.brakeReq = brakeReq;
+            //std::cout<<"Req: "<<steerReq<<" "<<accReq<<" "<<brakeReq<<"\n";
+            c->steerReq = steerReq;
+            c->accReq = accReq;
+            c->brakeReq = brakeReq;
 
             carCtrl.setAccPos(accReq); 
             carCtrl.setBrakePos(brakeReq);
@@ -192,5 +175,6 @@ int main( int argc, char** argv){
     //viewer.joinThread();
     carCtrl.close();
     canSoc.close();
+    viewer->join();
     return 0;
 }

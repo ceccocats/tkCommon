@@ -38,14 +38,17 @@ class Buffer
         bool intted     = false;
 
         GLenum          type;
+        GLenum          memType;
 
     public:
 
         /**
          * Init method
          * 
+         * @param bool static draw
+         * 
          */
-        void init();
+        void init(bool staticDraw = false);
 
 
         /**
@@ -140,7 +143,7 @@ void Buffer<T>::setIndexVector(unsigned int* data, int lenght){
         glBindVertexArray(VAO);
         glGenBuffers(1, &EBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, lenght * sizeof(unsigned int), data, GL_DYNAMIC_DRAW); 
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, lenght * sizeof(unsigned int), data, memType); 
         glBindVertexArray(0);  
         return;    
     }
@@ -155,7 +158,7 @@ void Buffer<T>::setIndexVector(unsigned int* data, int lenght){
         glDeleteBuffers(1, &EBO);
         glGenBuffers(1, &EBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeEBO  * sizeof(unsigned int), data, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeEBO  * sizeof(unsigned int), data, memType);
 
     }else{
 
@@ -202,7 +205,7 @@ void Buffer<T>::setData(T* data, int lenght, int offset){
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, _size * realOffset * sizeof(T), NULL, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, _size * realOffset * sizeof(T), NULL, memType);
         glBufferSubData(GL_ARRAY_BUFFER, offset * sizeof(T), lenght * sizeof(T), data);
         glBindVertexArray(0);
 
@@ -222,7 +225,7 @@ void Buffer<T>::setData(T* data, int lenght, int offset){
             glDeleteBuffers(1, &VBO);
             glGenBuffers(1, &VBO);
             glBindBuffer(GL_ARRAY_BUFFER, VBO);
-            glBufferData(GL_ARRAY_BUFFER, _size  * sizeof(T), data, GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, _size  * sizeof(T), data, memType);
 
         }else{
 
@@ -230,7 +233,7 @@ void Buffer<T>::setData(T* data, int lenght, int offset){
             unsigned int VBOtemp;
             glGenBuffers(1, &VBOtemp);
             glBindBuffer(GL_ARRAY_BUFFER, VBOtemp);
-            glBufferData(GL_ARRAY_BUFFER, offset  * sizeof(T), NULL, GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, offset  * sizeof(T), NULL, memType);
 
             //copy data
             glBindBuffer(GL_COPY_READ_BUFFER, VBO);
@@ -241,7 +244,7 @@ void Buffer<T>::setData(T* data, int lenght, int offset){
             glDeleteBuffers(1, &VBO);
             glGenBuffers(1, &VBO);
             glBindBuffer(GL_ARRAY_BUFFER, VBO);
-            glBufferData(GL_ARRAY_BUFFER, _size  * sizeof(T), NULL, GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, _size  * sizeof(T), NULL, memType);
 
             //recopy data
             glBindBuffer(GL_COPY_READ_BUFFER, VBOtemp);

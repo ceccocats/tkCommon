@@ -44,7 +44,7 @@ tk::gui::Image::onInit(tk::gui::Viewer *viewer){
         if(this->ready[i] == true){
             textures[i] = new tk::gui::Texture<uint8_t>();
             textures[i]->init(images[i]->width, images[i]->height, images[i]->channels);
-            textures[i]->setData(images[i]->data.data_h);
+            textures[i]->setData(images[i]->data.data());
         }
 
     }
@@ -80,7 +80,7 @@ tk::gui::Image::draw(tk::gui::Viewer *viewer){
             if(images[i]->isChanged(counter[i]) || updates[i]){
                 //Copy data
                 images[i]->lockRead();
-                textures[i]->setData(images[i]->data.data_h);
+                textures[i]->setData(images[i]->data.data());
                 images[i]->unlockRead();
                 this->updates[i]  = false;
             }

@@ -50,7 +50,7 @@ namespace tk { namespace gui {
         
         static bool disabled;
 
-        Camera      camera;
+        Camera camera;
 
 
         #define GLFW_SOURCE_KEYBORAD 0
@@ -82,7 +82,6 @@ namespace tk { namespace gui {
         void  drawSettings();
         void  imguiDraw();
         void  draw();
-        void  draw2D();
         
         void  follow();
         void  close();
@@ -111,6 +110,8 @@ namespace tk { namespace gui {
 
 
         glm::vec3   lightPos;
+
+        glm::mat4   modelview;
 
         GLFWwindow *window;
         const char *glsl_version = "#version 130";

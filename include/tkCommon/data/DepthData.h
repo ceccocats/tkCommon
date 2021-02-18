@@ -1,64 +1,62 @@
 #pragma once
 
-#include "tkCommon/data/gen/ImageData_gen.h"
+#include "tkCommon/data/gen/DepthData_gen.h"
 
 namespace tk{ namespace data{
 
-    class ImageData : public ImageData_gen{
+    class DepthData : public DepthData_gen{
         public:
 
-        ImageData(){
+        DepthData(){
             data.useGPU();
         }
 
-        ImageData(const ImageData& s){
-            ImageData();
+        DepthData(const DepthData& s){
+            DepthData();
             width = s.width;
             height = s.height;
-            channels = s.channels;
             data = s.data;
         }
 
         void init(){
 
             lockWrite();
-        	ImageData_gen::init();
+        	DepthData_gen::init();
             unlockWrite();
 
         }
         
-        void init(int w, int h, int ch){
+        void init(int w, int h){
 
             lockWrite();
-        	ImageData_gen::init();
+        	DepthData_gen::init();
             width = w;
             height = h;
-            channels = ch;
-            data.resize(width*height*channels);
+            data.resize(width*height);
             header.name = sensorType::CAMDATA;
             unlockWrite();
 
         }
 
-        ImageData& operator=(ImageData& s){
+        DepthData& operator=(DepthData& s){
  
-            if(s.width != width || s.height != height || s.channels != channels){
+            if(s.width != width || s.height != height ){
                 release();
-                init(s.width, s.height, s.channels);
+                init(s.width, s.height);
             }
             s.lockRead();
-            memcpy(data.data(), s.data.data(), width * height * channels);
+            memcpy(data.cpu.data, s.data.cpu.data, width * height * sizeof(uint16_t));
             s.unlockRead();
             return *this;
         }
 
-        ImageData& operator=(ImageData_gen& s){
+        DepthData& operator=(DepthData_gen& s){
  
-            ImageData_gen::operator=(s);
+            DepthData_gen::operator=(s);
             return *this;
         }
 
-        bool empty() {return channels == 0 || width == 0 || height == 0 || data.size() == 0; }
+        bool empty() {return width == 0 || height == 0 || data.size() == 0; }
 
         void release(){
             if(empty())
@@ -68,17 +66,16 @@ namespace tk{ namespace data{
             data.resize(0);
             width = 0;
             height = 0;
-            channels = 0;
             unlockWrite();
         }
 
         bool fromVar(tk::math::MatIO::var_t &var) {
             if(var.empty())
                 return false;
-            bool ok = ImageData_gen::fromVar(var["info"]);
+            bool ok = DepthData_gen::fromVar(var["info"]);
             tk::data::HeaderData tmp = header; // header will be overwrited by init
             if(ok) {
-                init(width, height, channels);
+                init(width, height);
                 header = tmp;
                 data.fromVar(var["data"]);
             }
@@ -86,7 +83,7 @@ namespace tk{ namespace data{
         }
         bool toVar(std::string name, tk::math::MatIO::var_t &var) {
             std::vector<tk::math::MatIO::var_t> structVars(2);
-            ImageData_gen::toVar("info", structVars[0]);
+            DepthData_gen::toVar("info", structVars[0]);
             data.toVar("data", structVars[1]);
             return var.setStruct(name, structVars);
         }

@@ -24,7 +24,7 @@ tk::gui::Cloud4f::updateData(){
             if(selected[ch] != featuresChannel0.second){
                 tk::math::Vec<float> *f = &cloud->features[featuresChannels[selected[ch]]];
                 tkASSERT(f->size() == points,"Cloud corrupted\n");
-                glbuffer.setData(f->data_h, f->size(), offset);
+                glbuffer.setData(f->data(), f->size(), offset);
                 offset += f->size();
                 if(autoMinMax == true){
                     float min =  999;
@@ -90,7 +90,7 @@ tk::gui::Cloud4f::updateData(){
             axisShader = -1;
             tk::math::Vec<float> *f = &cloud->features[features[selected[0]]];
             tkASSERT(f->size() == points,"Cloud corrupted\n");
-            glbuffer.setData(f->data_h, f->size(), cloud->points.size());
+            glbuffer.setData(f->data(), f->size(), cloud->points.size());
             if(autoMinMax == true){
                 float min =  999;
                 float max = -999;
@@ -194,7 +194,7 @@ tk::gui::Cloud4f::draw(tk::gui::Viewer *viewer){
         cloud->lockRead();
         if(points != cloud->points.cols()){
             points = cloud->points.cols();
-            glbuffer.setData(cloud->points.data_h,cloud->points.size());
+            glbuffer.setData(cloud->points.data(),cloud->points.size());
             updateData();
         }else{
             updateData();
@@ -207,7 +207,7 @@ tk::gui::Cloud4f::draw(tk::gui::Viewer *viewer){
 
         cloud->lockRead();
         points = cloud->points.cols();
-        glbuffer.setData(cloud->points.data_h,cloud->points.size());
+        glbuffer.setData(cloud->points.data(),cloud->points.size());
         updateData();
         cloud->unlockRead();
     }
@@ -216,10 +216,10 @@ tk::gui::Cloud4f::draw(tk::gui::Viewer *viewer){
     glPushMatrix();
     glMultMatrixf(this->cloud->header.tf.matrix().data());
     if(cloudMod == cloudMod0.second){
-        monocolorCloud->draw(&glbuffer, points, color);
+        monocolorCloud->draw(drawview,&glbuffer, points, color);
     }
     if(cloudMod == cloudMod1.second){
-        pointcloudrgba->draw(&glbuffer,points,
+        pointcloudrgba->draw(drawview,&glbuffer,points,
             selected[1]>0,minMax[0][1],minMax[1][1],
             selected[2]>0,minMax[0][2],minMax[1][2],
             selected[3]>0,minMax[0][3],minMax[1][3],
@@ -227,7 +227,7 @@ tk::gui::Cloud4f::draw(tk::gui::Viewer *viewer){
     }
     if(cloudMod == cloudMod2.second){
         tk::gui::shader::pointcloudColorMaps* shaderCloud = (tk::gui::shader::pointcloudColorMaps*) shader;
-        shaderCloud->draw(shaderCloud->colormaps[selectedColorMap], &glbuffer, 
+        shaderCloud->draw(drawview,shaderCloud->colormaps[selectedColorMap], &glbuffer, 
             points, minMax[0][0], minMax[1][0], axisShader, color.a());
     }
     glPopMatrix();

@@ -9,357 +9,224 @@
 #include <sstream>
 #include <initializer_list>
 #include "tkCommon/cuda.h"
+#include "tkCommon/math/MatSimple.h"
 #include "tkCommon/math/MatIO.h"
 
-//#define STATIC  0
-//#define DYNAMIC 1
-
 namespace tk { namespace math {
+
+// GPU INFO
+static int  Mat_device = -1;
+static bool Mat_integrated_memory = false;
 
 /**
  * @brief   Matrix in cuda. Matrix in COLS order.
  * @tparam  T matrix class type
  */
 template<class T>
-class MatBase : public tk::math::MatDump {
+class Mat : public tk::math::MatDump {
 
-    protected:
-        const float MAXSIZE_MARGIN = 1.0f;
-        int     _maxSize;
-        int     _maxSizeGPU;
-        int     _rows;
-        int     _cols;
-        int     _size;
-        bool    _gpu;
-        bool    _isCopy;
-        int     _device;
-        bool    _integrated;
+protected:
+    bool    _use_gpu;
 
-    public:
-        T*      data_d;
-        T*      data_h;
+    void init() {
+        _use_gpu = false;
 
-        __host__
-        MatBase(){
-            data_d = nullptr;
-            data_h = nullptr;
-            _maxSize = 0;
-            _maxSizeGPU = 0;
-            _rows = 0;
-            _cols = 0;
-            _size = 0;
-            _gpu  = false;
-            _isCopy = false;
+#ifdef TKCUDA_ENABLED
+        // get GPU type
+        if(Mat_device == -1) {
             cudaDeviceProp  props;
-            tkCUDA(cudaGetDevice(&_device));
-            tkCUDA(cudaGetDeviceProperties(&props,_device));
-            _integrated = props.integrated != 0;
+            tkCUDA(cudaGetDevice(&Mat_device));
+            tkCUDA(cudaGetDeviceProperties(&props,Mat_device));
+            Mat_integrated_memory = props.integrated != 0;
         }
-
-        __host__
-        ~MatBase(){
-            if(_isCopy == false){
-                if(data_h != nullptr){
-                    delete [] data_h;
-                    data_h = nullptr;
-                } 
-                if(data_d != nullptr && _gpu == true){
-                    if(!_integrated)
-                        tkCUDA( cudaFree(data_d) );
-                    else
-                        tkCUDA( cudaFreeHost(data_d) );
-                    data_d = nullptr;
-                } 
-            }
-        }
-
-        __host__ 
-        MatBase(int r, int c) : MatBase<T>(){
-            if(r > 0 && c > 0){
-                resize(r,c);
-            }
-        }
-
-        __host__ 
-        MatBase(const tk::math::MatBase<T>& m){
-            this->_isCopy  = true;
-            this->_size    = m.size();
-            this->_cols    = m.cols();
-            this->_rows    = m.rows();
-            this->_maxSize = m.maxSize();
-            this->data_h   = m.data_h;
-
-            if(m.hasGPU()){
-                this->_maxSizeGPU = m.maxSize();
-                this->data_d      = m.data_d;
-                this->_device     = m._device;
-                this->_integrated = m._integrated;
-                this->_gpu = true;
-            }else{
-                this->_gpu = false;
-            }
-        }
-
-        __host__ void
-        useGPU(){
-            _gpu = true;
-            resize(_rows,_cols);
-        }
-
-        __host__ bool
-        hasGPU() const {
-            return _gpu;
-        }
-
-        __host__ void 
-        copyFrom(T*data, int r, int c) {
-            resize(r, c);
-            memcpy(data_h, data, _size*sizeof(T));
-            if(_gpu == true){
-                synchGPU();
-            }
-        }
-
-        __host__ void 
-        copyTo(T*data) {
-            memcpy(data, data_h, _size*sizeof(T)); 
-        }
-
-        __host__ void 
-        cloneGPU(const MatBase<T> &m) {
-
-            tkASSERT(m.hasGPU() == true, "Could not clone from GPU")
-
-            resize(m.rows(), m.cols());
-            useGPU();
-            tkCUDA( cudaMemcpy(data_d, m.data_d, m.size() * sizeof(T), cudaMemcpyDeviceToDevice) ); 
-        }
-
-        __host__ void 
-        cloneCPU(const MatBase<T> &m) {
-
-            resize(m.rows(), m.cols());
-            memcpy(data_h, m.data_h, m.size() * sizeof(T)); 
-        }
-        
-        __host__ void 
-        synchGPU(){ 
-
-            useGPU();
-            tkCUDA( cudaMemcpy(data_d, data_h, _size * sizeof(T), cudaMemcpyHostToDevice) ); 
-        }
-
-        __host__ void 
-        synchCPU(){ 
-
-            tkASSERT(_gpu == true, "You set mat only on CPU\n");
-            tkCUDA( cudaMemcpy(data_h, data_d, _size * sizeof(T), cudaMemcpyDeviceToHost) ); 
-        }
-        
-        __host__ void 
-        resize(int r, int c) {
-
-            if(_maxSize < r * c){
-                _maxSize = (r * c) * MAXSIZE_MARGIN;
-                if(data_h != nullptr)
-                    delete [] data_h;
-                data_h = new T[_maxSize];
-            }
-
-            if(_gpu == true){
-                if(_maxSizeGPU < r * c) {
-                    _maxSizeGPU = (r * c) * MAXSIZE_MARGIN;
-                    
-                    if(data_d != nullptr)
-                        if(!_integrated)
-                            tkCUDA( cudaFree(data_d) );
-                        else
-                            tkCUDA( cudaFreeHost(data_d) );
-
-                    if(!_integrated)
-                        tkCUDA( cudaMalloc(&data_d, _maxSizeGPU * sizeof(T)) );
-                    else
-                        tkCUDA( cudaMallocHost(&data_d, _maxSizeGPU * sizeof(T)) );
-                }        
-                tkASSERT(_maxSizeGPU == _maxSize);
-            }
-
-            _rows = r;
-            _cols = c;
-            _size = r * c;
-        }
-
-
-        __host__ __device__ int 
-        rows() const { 
-            return _rows; 
-        }
-
-        __host__ __device__ int 
-        cols() const { 
-            return _cols; 
-        }
-        
-        __host__ __device__ int 
-        size() const { 
-            return _size; 
-        }
-
-        __host__ int 
-        maxSize() const { 
-            return _maxSize; 
-        }
-        
-        __host__ T&
-        operator()(int r, int c) {
-            //tkASSERT(r < this->_rows && r >= 0, "Out of memory, rows "+std::to_string(r)+" > "+std::to_string(this->_rows)+"\n")
-            //tkASSERT(c < this->_cols && c >= 0, "Out of memory, cols "+std::to_string(c)+" > "+std::to_string(this->_cols)+"\n")
-            return data_h[r+c*_rows]; 
-        }
-
-        __host__ T&
-        operator[](int i) {
-            //tkASSERT(r < this->_rows && r >= 0, "Out of memory, rows "+std::to_string(r)+" > "+std::to_string(this->_rows)+"\n")
-            //tkASSERT(c < this->_cols && c >= 0, "Out of memory, cols "+std::to_string(c)+" > "+std::to_string(this->_cols)+"\n")
-            return data_h[i]; 
-        }
-        
-        __device__ T&  
-        atGPU(int r, int c) { 
-            //tkASSERT(_gpu == true, "You set mat only on CPU\n");
-            //tkASSERT(r < this->_rows && r >= 0, "Out of memory, rows "+std::to_string(r)+" > "+std::to_string(this->_rows)+"\n")
-            //tkASSERT(c < this->_cols && c >= 0, "Out of memory, cols "+std::to_string(c)+" > "+std::to_string(this->_cols)+"\n")    
-            return data_d[r+c*_rows];
-        }
-
-        __host__ void 
-        set(std::initializer_list<T> a_args) {
-            if(a_args.size() != size()) {
-                std::cout<<"ERROR: you must set all data\n";
-                std::cout<<"try insert: "<<a_args.size()<<" in size: "<<size()<<"\n";
-                exit(1);
-            }
-            int i=0;
-            for(auto a : a_args) {
-                (*this)(i/_cols, i%_cols) = a;
-                i++;
-            }
-
-            if(_gpu == true){
-                synchGPU();
-            }
-        }
-
-        __host__ void
-        fill(T value) {
-            for (int i = 0; i < _size; i++) {
-                data_h[i] = value;
-            }
-
-            if(_gpu == true){
-                synchGPU();
-            }
-        }
-
-        __host__ MatBase<T>& 
-        operator=(const MatBase<T>& s) {
-            cloneCPU(s);
-            if(s.hasGPU() == true)
-                cloneGPU(s);
-            return *this;
-        }
-
-        friend std::ostream& 
-        operator<<(std::ostream& os, const MatBase& s) {
-            os<<"Mat ("<<s.rows()<<"x"<<s.cols()<<")";
-            if(s._isCopy)
-                os<<" copy";
-            return os;
-        }
-
-        void 
-        print() {
-            std::cout<<"Mat ("<<rows()<<"x"<<cols()<<")\n";
-            for(int i = 0; i < rows(); ++i) {
-                std::cout << std::endl;
-                for(int j = 0; j < cols(); ++j) {
-                    std::cout << std::right << std::setw(20) << data_h[i+j*rows()];
-                }
-            }
-            std::cout<<std::endl;
-        }
-
-        Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>>
-        matrix(){
-            return Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>>(data_h, _rows, _cols);
-        }
-        
-        void set(T scalar) {
-            for(int i=0; i<size(); i++) {
-                data_h[i] = scalar;
-            }
-        }
-};
-
-
-// spicialization for Mat<something>
-template<typename T, typename Enable = void>
-class Mat : public MatBase<T> { 
-public:
-};
-// spicialization for Mat<float> and other arithme
-template<typename T>
-class Mat<T, typename std::enable_if<std::is_arithmetic<T>::value>::type> : public MatBase<T> { 
-public:
-    bool toVar(std::string name, MatIO::var_t &var) {
-        Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> mat;
-        mat.resize(this->rows(), this->cols());
-        memcpy(mat.data(), this->data_h, sizeof(T)*this->rows()*this->cols());
-        return var.set(name, mat);
-    }
-    bool fromVar(MatIO::var_t &var) {
-        Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> mat;
-        if(!var.get(mat))
-            return false;
-        this->resize(mat.rows(), mat.cols());
-        memcpy(this->data_h, mat.data(), sizeof(T)*this->rows()*this->cols());
-        return true;
-    }
-};
-
-template<class T, int R, int C>
-class MatStatic : public tk::math::Mat<T> {
-private:
-        T staticdata_h[R*C];
-
-public:
-    MatStatic() : Mat<T>() {
-        
-        this->data_h = staticdata_h;
-        this->_maxSize = R*C;
-        this->_rows    = R;
-        this->_cols    = C;
-        this->_size    = R*C;
+        gpu.integrated_memory = Mat_integrated_memory;
+#endif
     }
 
-    ~MatStatic() {
-        this->data_h = nullptr;
+public:
+    MatSimple<T, false> cpu;
+    MatSimple<T, true>  gpu;
+
+    Mat(void) {
+        init();
+    }
+
+    Mat(T *data_h, T *data_d, int r, int c) {
+        init();
+        if(data_h != nullptr)
+            cpu = MatSimple<T, false>(data_h, r, c);
+        if(data_d != nullptr) {
+            _use_gpu = true;
+            gpu = MatSimple<T, true>(data_d, r, c);
+        }
+    }
+
+    //template<typename OtherDerived>
+    //Mat(const Eigen::MatrixBase<OtherDerived>& other) : Eigen::Matrix<T,-1,-1>(other) { 
+    //    init();
+    //}
+
+    template<typename OtherDerived>
+    Mat<T>& operator=(const Eigen::MatrixBase <OtherDerived>& other) {
+        cpu.resize(other.rows(), other.cols());
+        Eigen::Map<Eigen::Matrix<T,-1,-1>> m(cpu.data, cpu.rows, cpu.cols);
+        m = other;
+        return *this;
+    }
+
+    __host__
+    ~Mat() {
+        cpu.release();
+        gpu.release();
+    }
+
+
+    __host__ void
+    useGPU(){
+        _use_gpu = true;
+        resize(rows(),cols());
+    }
+
+    __host__ bool
+    hasGPU() const {
+        return _use_gpu;
     }
 
     __host__ void 
-    resize(int r, int c) {
-        tkASSERT(r==R && c==C, "unable to resize a static Mat");
+    copyFrom(T*data, int r, int c) {
+        resize(r, c);
+        memcpy(cpu.data, data, size()*sizeof(T));
+        if(_use_gpu == true){
+            synchGPU();
+        }
     }
 
-    __host__ 
-    MatStatic<T,R,C>& operator=(const Mat<T>& s) {
-        this->cloneCPU(s);
-        if(s.hasGPU() == true)
-            this->cloneGPU(s);
+    __host__ void 
+    copyTo(T*data) {
+        memcpy(data, cpu.data, size()*sizeof(T)); 
+    }
+    
+    __host__ void 
+    synchGPU(){ 
+        useGPU();
+        tkCUDA( cudaMemcpy(gpu.data, cpu.data, size() * sizeof(T), cudaMemcpyHostToDevice) ); 
+    }
+
+    __host__ void 
+    synchCPU(){ 
+        tkASSERT(_use_gpu == true, "You set mat only on CPU\n");
+        resize(gpu.rows, gpu.cols);
+        tkCUDA( cudaMemcpy(cpu.data, gpu.data, size() * sizeof(T), cudaMemcpyDeviceToHost) ); 
+    }
+    
+    __host__ int
+    rows() { return cpu.rows; }
+
+    __host__ int
+    cols() { return cpu.cols; }
+
+    __host__ int
+    size() { return cpu.size; }
+
+    __host__ T*
+    data() { return cpu.data; }
+
+    __host__ void 
+    resize(int r, int c) {
+        cpu.resize(r,c);
+        if(_use_gpu == true){
+            gpu.resize(r, c);
+        }
+    }
+
+
+    __host__ T&
+    operator()(int i, int j) {
+        return cpu.data[i+j*cpu.rows]; 
+    }
+
+    __host__ T&
+    operator[](int n) {
+        return cpu.data[n]; 
+    }
+
+    __host__ Mat<T>& 
+    operator=(const Mat<T>& s) {
+        cpu = s.cpu;
+        if(_use_gpu) {
+            this->synchGPU();
+        }
+        return *this;
+    }
+
+    __host__
+    const Eigen::Map<Eigen::Matrix<T,-1,-1>> matrix() {
+        return Eigen::Map<Eigen::Matrix<T,-1,-1>>(cpu.data, cpu.rows, cpu.cols);
+    }
+    
+    __host__
+    Eigen::Map<Eigen::Matrix<T,-1,-1>> writableMatrix() {
+        return Eigen::Map<Eigen::Matrix<T,-1,-1>>(cpu.data, cpu.rows, cpu.cols);
+    }
+
+    friend std::ostream& 
+    operator<<(std::ostream& os, Mat<T>& s) {
+        os<<"Mat ("<<s.rows()<<"x"<<s.cols()<<")";
+        return os;
+    }
+
+    __host__ void 
+    print(std::ostream &os = std::cout) {
+        int r = rows();
+        int c = cols();
+        os<<"Mat ("<<r<<"x"<<c<<")\n";
+        for(int i = 0; i < r; ++i) {
+            os << std::endl;
+            for(int j = 0; j < c; ++j) {
+                os << std::right << std::setw(20) << cpu.data[i+j*r];
+            }
+        }
+        os<<std::endl;
+    }
+
+    __host__
+    void fill(float val) {
+        for(int i=0; i<cpu.size; i++)
+            cpu.data[i] = val;
+    }
+
+
+    bool   toVar(std::string name, MatIO::var_t &var) {
+        return var.set(name, cpu);
+    }
+    bool fromVar(MatIO::var_t &var) {
+        if(var.empty())
+            return false;
+        return var.get(cpu);
+    }
+
+};
+
+template<class T, int R, int C>
+class MatStatic : public Mat<T> {
+    
+private:
+    T static_data[R*C];
+
+public:
+    MatStatic() : Mat<T>(static_data, nullptr, R, C) {
+    }
+
+    template<typename OtherDerived>
+    Mat<T>& operator=(const Eigen::MatrixBase <OtherDerived>& other) {
+        tkASSERT(R == other.rows() && C == other.cols());
+        Eigen::Map<Eigen::Matrix<T,-1,-1>> m(this->cpu.data, this->cpu.rows, this->cpu.cols);
+        m = other;
         return *this;
     }
 
 };
+
 
 typedef MatStatic<double,2,2> Mat2d;
 typedef MatStatic<double,3,3> Mat3d;
