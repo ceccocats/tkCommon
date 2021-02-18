@@ -20,7 +20,7 @@ tk::gui::Mesh::onInit(tk::gui::Viewer *viewer){
     objColors.resize(objMesh.meshes.size());
     for(int i = 0; i < objMesh.meshes.size(); i++){
 
-        obj[i].init();
+        obj[i].init(true);
 
         float* data; int n;
         data = objMesh.meshes[i].vertexBufferPositionNormal(&n);

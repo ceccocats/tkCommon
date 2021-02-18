@@ -117,7 +117,7 @@ void* th_imu(void* ptrimu){
 }
 
 void key_listener(int key, int action, int source) {
-	std::cout<<"KEY: "<<key<<" action: "<<action<<" source: "<<source<<"\n";
+	//std::cout<<"KEY: "<<key<<" action: "<<action<<" source: "<<source<<"\n";
 }
 
 int main(int argc, char* argv[]){
