@@ -34,7 +34,7 @@ tk::gui::PolyLine::draw(tk::gui::Viewer *viewer){
     }
 
     auto shaderLine = (tk::gui::shader::linesMonocolor*)shader;
-    shaderLine->draw(&glData,glData.size()/3,lineSize,color,GL_LINE_STRIP);	
+    shaderLine->draw(drawview,&glData,glData.size()/3,lineSize,color,GL_LINE_STRIP);	
 }
 
 void 

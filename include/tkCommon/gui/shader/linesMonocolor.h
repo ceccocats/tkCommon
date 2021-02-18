@@ -50,10 +50,8 @@ class linesMonocolor : public tk::gui::shader::generic
             vertexPointer.resize(1);
         }
 
-        void draw(tk::gui::Buffer<float>* buffer, int n, int size = 1.0f, 
+        void draw(glm::mat4& modelview, tk::gui::Buffer<float>* buffer, int n, int size = 1.0f, 
                 tk::gui::Color_t color = tk::gui::color::WHITE, GLenum linemode = GL_LINE_STRIP, int offset = 0){
-
-		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview));
 
             vertexPointer[0] = {3,3,offset};
             buffer->setVertexAttribs(vertexPointer);

@@ -56,9 +56,8 @@ class mesh : public tk::gui::shader::generic
 
         }
 
-        void draw(tk::gui::Buffer<float>* buffer, int n, glm::vec3 lightPos, tk::gui::Color_t color = tk::gui::color::WHITE, float ambientStrength = 0.6, bool useLight = true){
+        void draw(glm::mat4& modelview, tk::gui::Buffer<float>* buffer, int n, glm::vec3 lightPos, tk::gui::Color_t color = tk::gui::color::WHITE, float ambientStrength = 0.6, bool useLight = true){
 
-		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
             buffer->setVertexAttribs(vertexPointer);
 
             std::memcpy(glm::value_ptr(meshColor), color.color, sizeof(meshColor));

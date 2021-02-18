@@ -36,9 +36,7 @@ class pointcloudRGBA  : public tk::gui::shader::generic
 
         }
 
-        void draw(tk::gui::Buffer<float>* buffer, int n, bool red, float r_min, float r_max, bool green, float g_min, float g_max, bool blue, float b_min, float b_max, float alpha = 1.0f){
-
-		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview));
+        void draw(glm::mat4& modelview, tk::gui::Buffer<float>* buffer, int n, bool red, float r_min, float r_max, bool green, float g_min, float g_max, bool blue, float b_min, float b_max, float alpha = 1.0f){
 
             if(red == true){
                 vertexPointer[1] = {1,1,n*4};

@@ -42,9 +42,8 @@ class cubes3D : public tk::gui::shader::generic
             return true;
         }
 
-        void draw(tk::gui::Buffer<float>* buffer, int n, glm::vec3& lightPos){
+        void draw(glm::mat4& modelview, tk::gui::Buffer<float>* buffer, int n, glm::vec3& lightPos){
 
-		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
             buffer->setVertexAttribs(vertexPointer);
 
             shader.use();

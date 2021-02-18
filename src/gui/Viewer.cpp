@@ -315,7 +315,7 @@ Viewer::drawSettings(){
 void
 Viewer::beforeDraw(){
     for (auto const& drawable : drawables){
-        if(drawable.second->enabled) //TODO: removing?!?
+        if(drawable.second->enabled)
             drawable.second->beforeDraw(Viewer::instance);
     }
     glCheckError();
@@ -325,24 +325,9 @@ void
 Viewer::draw() {
     for (auto const& drawable : drawables){
         if(drawable.second->enabled){
-            glPushMatrix();
-			glMultMatrixf(drawable.second->tf.matrix().data());
+            drawable.second->drawview = modelview * glm::make_mat4x4(drawable.second->tf.matrix().data());
             drawable.second->draw(Viewer::instance);
-            glPopMatrix();
         }
-    }
-    glCheckError();
-}
-
-void 
-Viewer::draw2D() {
-
-
-    
-
-    for (auto const& drawable : drawables){
-        if(drawable.second->enabled)
-            drawable.second->draw2D(Viewer::instance);
     }
     glCheckError();
 }
@@ -412,48 +397,24 @@ Viewer::runloop() {
         camera.setViewPort(0, 0, width, height);
         glViewport(camera.viewport[0], camera.viewport[1], camera.viewport[2], camera.viewport[3]);
 
-        glMatrixMode( GL_PROJECTION );
-        glLoadIdentity();
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity() ;
-
         glClearColor(background.r(), background.g(), background.b(), background.a());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glPushMatrix();
-
         // apply camera matrix
-        glMultMatrixf(glm::value_ptr(camera.projection));
-        glMultMatrixf(glm::value_ptr(camera.modelView));
+        modelview = camera.projection * camera.modelView;
         
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         camera.mouseOnGUI = ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow);
 
-        // just for debug -- pp is mouse pose
-        glm::vec3 pp = camera.unprojectPlane({camera.mousePos.x,camera.mousePos.y});
-
         //tkRendering
         if(useImGUI == true)
             imguiDraw();
         draw();
 
-        //Setting 2D view
-        glViewport(0, 0, width, height);
-        glOrtho(0, width, 0, height, -1, 1);
-        glLoadIdentity();
-        glMatrixMode( GL_PROJECTION );
-        glLoadIdentity();
-        glOrtho(-aspectRatio, aspectRatio, -1, 1, 1, -1);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        draw2D();
-
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        glPopMatrix();
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

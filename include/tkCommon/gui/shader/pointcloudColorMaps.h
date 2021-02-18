@@ -62,9 +62,7 @@ class pointcloudColorMaps  : public tk::gui::shader::generic
 
         }
 
-        void draw(std::string name, tk::gui::Buffer<float>* buffer, int nPoints, float minValue, float maxValue, int axis = -1, float alpha = 1.0){
-
-		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview));
+        void draw(glm::mat4& modelview, std::string name, tk::gui::Buffer<float>* buffer, int nPoints, float minValue, float maxValue, int axis = -1, float alpha = 1.0){
 
             tkASSERT(axis == -1 || axis == 0 || axis == 1 || axis == 2);
 

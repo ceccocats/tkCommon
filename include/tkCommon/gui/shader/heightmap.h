@@ -76,9 +76,7 @@ class heightmap : public tk::gui::shader::generic
             return shader.init(vertex, fragment, geometry);
         }
 
-        void draw(tk::math::Mat<float>& cords, tk::math::Mat<float>& colors, int rows, int cols){
-
-            glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
+        void draw(glm::mat4& modelview, tk::math::Mat<float>& cords, tk::math::Mat<float>& colors, int rows, int cols){
 
             int n = rows * cols * 3;
 

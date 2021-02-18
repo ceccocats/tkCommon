@@ -17,6 +17,8 @@ namespace tk{ namespace gui{
 
 		bool update = false;
 
+		glm::mat4 drawview;
+
 		tk::common::Tfpose tf = tk::common::Tfpose::Identity();
 
 		/** init method */
@@ -27,9 +29,6 @@ namespace tk{ namespace gui{
 
 		/** draw 3D method */
 		virtual void draw(tk::gui::Viewer *viewer) {}
-		
-		/** draw 2D method */
-		virtual void draw2D(tk::gui::Viewer *viewer) {}
 
 		/** draw in imgui settings window */
 		virtual void imGuiSettings() {};

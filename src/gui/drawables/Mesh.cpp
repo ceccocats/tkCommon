@@ -39,7 +39,7 @@ tk::gui::Mesh::draw(tk::gui::Viewer *viewer){
     tk::gui::shader::mesh* shaderMesh= (tk::gui::shader::mesh*) shader;
 
     for(int i = 0; i < obj.size(); i++){
-        shaderMesh->draw(&obj[i], obj[i].size(), viewer->getLightPos(), objColors[i],ambientStrength,useLight);
+        shaderMesh->draw(drawview,&obj[i], obj[i].size(), viewer->getLightPos(), objColors[i],ambientStrength,useLight);
     }		
 }
 

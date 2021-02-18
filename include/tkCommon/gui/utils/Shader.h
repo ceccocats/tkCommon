@@ -21,6 +21,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <map>
+
 #include "tkCommon/exceptions.h"
 
 namespace tk { namespace gui {
@@ -74,6 +76,7 @@ class Shader
     private:
 
         unsigned int ID;
+        std::map<std::string,int> map; 
 
         /**
          *  private method for check compile error

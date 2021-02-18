@@ -96,14 +96,14 @@ class circle : public tk::gui::shader::generic
             multiCircles = n;
         }
 
-        void draw(tk::gui::Color_t color = tk::gui::color::WHITE, float size = 1.0f){
+        void draw(glm::mat4& modelview, tk::gui::Color_t color = tk::gui::color::WHITE, float size = 1.0f){
             if(isFilled == false)
                 return;
             if(multiCircles == 0){
-		        linesShader->draw(&linesGlBuf, resolution, size, color, GL_LINE_LOOP);
+		        linesShader->draw(modelview, &linesGlBuf, resolution, size, color, GL_LINE_LOOP);
             }else{
                 for(int i = 0; i < multiCircles; i++)
-                    linesShader->draw(&linesGlBuf, resolution, size, color, GL_LINE_LOOP, (i*(resolution*3)));
+                    linesShader->draw(modelview, &linesGlBuf, resolution, size, color, GL_LINE_LOOP, (i*(resolution*3)));
             }
         }
 

@@ -31,9 +31,7 @@ class grid : public tk::gui::shader::generic
 
         }
 
-        void draw(float dim = 1.0f, int n = 50){
-
-            glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview)); 
+        void draw(glm::mat4& modelview, float dim = 1.0f, int n = 50){
 
             shader.use();
 

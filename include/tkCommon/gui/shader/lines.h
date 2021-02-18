@@ -47,9 +47,7 @@ class lines : public tk::gui::shader::generic
             vertexPointer[1] = {4,7,3};
         }
 
-        void draw(tk::gui::Buffer<float>* buffer, int n, float size = 1.0f, GLenum linemode = GL_LINE_STRIP){
-
-		    glGetFloatv(GL_MODELVIEW_MATRIX, glm::value_ptr(modelview));
+        void draw(glm::mat4& modelview, tk::gui::Buffer<float>* buffer, int n, float size = 1.0f, GLenum linemode = GL_LINE_STRIP){
 
             buffer->setVertexAttribs(vertexPointer);
 
