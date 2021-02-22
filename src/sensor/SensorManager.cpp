@@ -14,6 +14,13 @@ namespace tk { namespace sensors {
             }
         }
         
+        // SYNCH BOX
+        if (conf["synch"].IsDefined()) {
+            Clock::get().init(conf["synch"]);
+        } else {
+            tkWRN("No synch parameter defined, skipping synch.\n");
+        }
+
         // SPAWN SENSOR
         if (!spawn(conf, list)) {
             tkERR("Cannot spawn sensors.\n");
@@ -52,6 +59,9 @@ namespace tk { namespace sensors {
     {
         for (std::map<std::string,tk::sensors::Sensor*>::iterator it = sensors.begin(); it!=sensors.end(); ++it)
             it->second->start();
+        
+        if (Clock::get().synchronized())
+            Clock::get().start();
 
         if (this->viewer != nullptr)
             viewerThread.init(dataViewer,this);
@@ -62,6 +72,9 @@ namespace tk { namespace sensors {
     {
         for (std::map<std::string,tk::sensors::Sensor*>::iterator it = sensors.begin(); it!=sensors.end(); ++it)
             it->second->close();
+        
+        if (Clock::get().synchronized())
+            Clock::get().stop();
         
         if (this->viewer != nullptr)
             viewerThread.join();

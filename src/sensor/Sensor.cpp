@@ -1,6 +1,55 @@
 #include "tkCommon/sensor/Sensor.h"
 
 namespace tk { namespace sensors {
+Clock::Clock()
+{
+    initted = false;
+}
+
+Clock::~Clock()
+{
+
+}
+        
+void 
+Clock::init(const YAML::Node conf)
+{   
+    if (!initted) {
+        std::string port    = tk::common::YAMLgetConf<std::string>(conf, "port", "/dev/ttyUSB0");
+        int         baud    = tk::common::YAMLgetConf<int>(conf, "baud", 9600);
+        
+        // open serial port
+        if (!serial.init(port, baud)) {
+            tkWRN("Cannot open communication with SynchBox.\n");
+            initted = false;
+        } else {
+            initted = true;
+        }
+    }
+}
+
+void 
+Clock::start()
+{
+
+}
+
+void 
+Clock::stop()
+{
+
+}
+
+timeStamp_t 
+Clock::getSychTimeStamp(int frameCounter, int triggerLine)
+{
+    tkASSERT(initted == true);
+    tkASSERT(triggerLine >= 0 && triggerLine < freq.size(), "Out of bounds.");
+
+    return (timeStamp_t) t0 + (frameCounter * 1.0f/freq[triggerLine]); 
+}
+
+
 
 void 
 Sensor::start() 

@@ -7,9 +7,42 @@
 #include "tkCommon/rt/Pool.h"
 #include "tkCommon/data/SensorData.h"
 #include "tkCommon/sensor/LogManager.h"
+#include "tkCommon/communication/serial/SerialPort.h"
 
 
 namespace tk{ namespace sensors {
+
+class Clock {
+    public:
+        ~Clock();
+        Clock(Clock const&) = delete;
+        void operator=(Clock const&) = delete;
+        
+        void init(const YAML::Node conf);
+        void start();
+        void stop();
+
+        bool synchronized() {
+            return serial.isOpen() && initted;
+        }
+
+        static Clock& get()
+        {
+            static Clock instance;
+            return instance;
+        }
+
+        timeStamp_t getSychTimeStamp(int frameCounter, int triggerLine);
+        //timeStamp_t getTimeStamp(int frameCounter, int hz);
+
+    private:
+        timeStamp_t         t0;
+        bool                initted;
+        std::vector<int>    freq;
+        tk::communication::SerialPort serial;
+
+        Clock();
+};
 
 /**
  * @brief   SensorStatus class, is used to handle the status of a sensor. 
@@ -63,6 +96,7 @@ class SensorInfo{
         float           version;        /**< program version */
         int             nSensors;       /**< number of sensors handled */
         int             dataArrived;    /**< incremental counter */
+        int             triggerLine;
         bool            synched;        /**< tell if the sensor is synced with the log */
         tk::data::sensorType type;      /**< type of the sensor, used for visualization */
 
@@ -254,7 +288,8 @@ class Sensor {
             }
 
             // get configuration params
-            this->poolSize = tk::common::YAMLgetConf<int>(conf, "pool_size", 2);
+            this->poolSize          = tk::common::YAMLgetConf<int>(conf, "pool_size", 2);
+            this->info.triggerLine  = tk::common::YAMLgetConf<int>(conf, "trigger_line", -1);
 
             // set sensor status
             if(this->log == nullptr)
@@ -278,7 +313,6 @@ class Sensor {
 
                 this->pool.releaseAdd(idx);
             }
-            
 
             return true;
         }

@@ -5,9 +5,14 @@ namespace tk { namespace communication {
     SerialPort::init(const std::string& port, int baud)
     {
         // open port
-        serialPort.Open(port);
-        if(!serialPort.IsOpen())
+        try {
+            serialPort.Open(port);
+        } catch (LibSerial::OpenFailed e) {
+            tkERR("Bad file descriptor.\n");
             return false;
+        }
+        //if(!serialPort.IsOpen())
+        //    return false;
 
         // set baud
         switch (baud)
