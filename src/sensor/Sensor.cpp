@@ -15,7 +15,7 @@ void
 Clock::init(const YAML::Node conf)
 {   
     port    = tk::common::YAMLgetConf<std::string>(conf, "port", "/dev/ttyUSB0");
-    baud    = tk::common::YAMLgetConf<int>(conf, "baud", 9600);
+    baud    = tk::common::YAMLgetConf<int>(conf, "baud", 115200);
     lines   = tk::common::YAMLgetConf<std::vector<int>>(conf, "lines", std::vector<int>(0));
 }
 
@@ -28,12 +28,56 @@ Clock::start(timeStamp_t start)
         if (!serial.init(port, baud)) {
             tkWRN("Cannot open communication with SynchBox.\n");
             synched = false;
+            return;
         } else {
             synched = true;
         }
 
-        // send conf to lagala device
-        // TODO:
+        //Send data
+        std::string msg = "\\gse\n";
+        serial.write(msg);
+        std::string ts_0;
+        while(ts_0.find("$GPRMC") == std::string::npos){
+            std::cout<<ts_0<<std::endl;
+            if(!serial.readLine(ts_0,'\n',5000))
+                tkERR("Error reciving timestamp\n");
+        }
+        std::cout<<ts_0<<std::endl;
+        int pos = 0;
+        std::vector<std::string> seglist;
+        while((pos = ts_0.find(',')) != std::string::npos){
+            seglist.push_back(ts_0.substr(0, pos));
+            ts_0.erase(0, pos+1);
+        }
+        msg = "\\gsd\n";
+        serial.write(msg);
+        serial.close();
+
+        int hh = atoi(seglist[1].substr(0,2).c_str());
+        int mm = atoi(seglist[1].substr(2,2).c_str());
+        int ss = atoi(seglist[1].substr(4,2).c_str());
+        int ms = atoi(seglist[1].substr(6,3).c_str());
+
+        int day   = atoi(seglist[9].substr(0,2).c_str());
+        int month = atoi(seglist[9].substr(2,2).c_str());
+        int year  = atoi(seglist[9].substr(4,2).c_str())+2000;
+
+        struct tm time = { 0 };
+        time.tm_year = (int) year - 1900;
+        time.tm_mon  = (int) month;
+        time.tm_mday = (int) day;
+        time.tm_hour = (int) hh + 1;
+        time.tm_min  = (int) mm;
+        time.tm_sec  = (int) ms;
+
+        time_t t = mktime(&time) + 619315200;  /// Added 1024 weeks
+
+        struct tm *tim = localtime(&t);
+
+        timeStamp_t stamp = (t * 1e3);
+
+        std::cout<<tim->tm_year + 1900<<"   "<<tim->tm_mon<<"   "<<tim->tm_mday<<"   "<<tim->tm_hour<<"   "<<tim->tm_min<<"   "<<stamp<<"\n";
+        //t0 = std::stoi(ts_0.c_str());
     } else {
         t0      = start;
         synched = true;

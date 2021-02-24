@@ -60,8 +60,7 @@ namespace tk { namespace sensors {
         for (std::map<std::string,tk::sensors::Sensor*>::iterator it = sensors.begin(); it!=sensors.end(); ++it)
             it->second->start();
         
-        if (Clock::get().synchronized())
-            Clock::get().start();
+        Clock::get().start();
 
         if (this->viewer != nullptr)
             viewerThread.init(dataViewer,this);
