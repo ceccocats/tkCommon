@@ -41,10 +41,14 @@ Clock::stop()
 }
 
 timeStamp_t 
-Clock::getSychTimeStamp(int frameCounter, int triggerLine)
+Clock::getTimeStamp(int frameCounter, int triggerLine)
 {
+    if (frameCounter == -1 || triggerLine == -1)
+        return ::getTimeStamp();
+    
     tkASSERT(initted == true);
-    tkASSERT(triggerLine >= 0 && triggerLine < freq.size(), "Out of bounds.");
+    tkASSERT(frameCounter >= 0, "Negative Frame counter.\n");
+    tkASSERT(triggerLine >= 0 && triggerLine < freq.size(), "Out of bounds.\n");
 
     return (timeStamp_t) t0 + (frameCounter * 1.0f/freq[triggerLine]); 
 }

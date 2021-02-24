@@ -32,9 +32,7 @@ class Clock {
             return instance;
         }
 
-        timeStamp_t getSychTimeStamp(int frameCounter, int triggerLine);
-        //timeStamp_t getTimeStamp(int frameCounter, int hz);
-
+        timeStamp_t getTimeStamp(int frameCounter = -1, int triggerLine = -1);
     private:
         timeStamp_t         t0;
         bool                initted;
