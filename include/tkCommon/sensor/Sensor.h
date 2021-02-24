@@ -34,6 +34,7 @@ class Clock {
 
         timeStamp_t getTimeStamp(int frameCounter = -1, int triggerLine = -1);
     private:
+        int                 timezone;
         timeStamp_t         t0;
         bool                synched;
         std::string         port;

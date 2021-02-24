@@ -14,9 +14,10 @@ Clock::~Clock()
 void 
 Clock::init(const YAML::Node conf)
 {   
-    port    = tk::common::YAMLgetConf<std::string>(conf, "port", "/dev/ttyUSB0");
-    baud    = tk::common::YAMLgetConf<int>(conf, "baud", 115200);
-    lines   = tk::common::YAMLgetConf<std::vector<int>>(conf, "lines", std::vector<int>(0));
+    port     = tk::common::YAMLgetConf<std::string>(conf, "port", "/dev/ttyUSB0");
+    baud     = tk::common::YAMLgetConf<int>(conf, "baud", 115200);
+    lines    = tk::common::YAMLgetConf<std::vector<int>>(conf, "lines", std::vector<int>(0));
+    timezone = tk::common::YAMLgetConf<int>(conf, "timezone", 0);
 }
 
 void 
@@ -42,14 +43,13 @@ Clock::start(timeStamp_t start)
             if(!serial.readLine(ts_0,'\n',5000))
                 tkERR("Error reciving timestamp\n");
         }
-        std::cout<<ts_0<<std::endl;
         int pos = 0;
         std::vector<std::string> seglist;
         while((pos = ts_0.find(',')) != std::string::npos){
             seglist.push_back(ts_0.substr(0, pos));
             ts_0.erase(0, pos+1);
         }
-        msg = "\\gsd\n";
+        //msg = "\\gsd\n";
         serial.write(msg);
         serial.close();
 
@@ -64,19 +64,21 @@ Clock::start(timeStamp_t start)
 
         struct tm time = { 0 };
         time.tm_year = (int) year - 1900;
-        time.tm_mon  = (int) month;
+        time.tm_mon  = (int) month -1;
         time.tm_mday = (int) day;
-        time.tm_hour = (int) hh + 1;
+        time.tm_hour = (int) hh;
         time.tm_min  = (int) mm;
-        time.tm_sec  = (int) ms;
+        time.tm_sec  = (int) ss;
 
-        time_t t = mktime(&time) + 619315200;  /// Added 1024 weeks
+        time_t t = mktime(&time) + 619315200 + timezone*60*60;  /// Added 1024 weeks
 
-        struct tm *tim = localtime(&t);
+        t0 = t * 1e6 + ms * 1e3;
 
-        timeStamp_t stamp = (t * 1e3);
+        tkDBG("First trigger stamp: "<<t0<<"\n")
 
-        std::cout<<tim->tm_year + 1900<<"   "<<tim->tm_mon<<"   "<<tim->tm_mday<<"   "<<tim->tm_hour<<"   "<<tim->tm_min<<"   "<<stamp<<"\n";
+        //struct tm *tim = localtime(&t);
+        //timeStamp_t stamp = (t * 1e6);
+        //std::cout<<stamp<<"\n"<<pc_t<<"\n";
         //t0 = std::stoi(ts_0.c_str());
     } else {
         t0      = start;
