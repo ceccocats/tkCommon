@@ -12,8 +12,8 @@ config=2048x10
 timestamp_mode=TIME_FROM_SYNC_PULSE_IN
 ##################
 ## ACTIVE_HIGH, ACTIVE_LOW
-sync_pulse_in_polarity=ACTIVE_LOW
-nmea_in_polarity=ACTIVE_HIGH
+sync_pulse_in_polarity=ACTIVE_HIGH
+nmea_in_polarity=ACTIVE_LOW
 ##################
 ## BAUD_9600, BAUD_115200
 nmea_baud_rate=BAUD_9600
