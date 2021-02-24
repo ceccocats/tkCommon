@@ -109,6 +109,7 @@ class SensorInfo{
             dataArrived     = 0;
             synched         = false;
             type            = tk::data::sensorType::NOT_SPEC;
+            triggerLine     = -1;
         }
 
         void operator=(SensorInfo i) noexcept {
@@ -118,6 +119,7 @@ class SensorInfo{
             this->dataArrived       = i.dataArrived;
             this->synched           = i.synched;
             this->type              = i.type;
+            this->triggerLine       = i.triggerLine;
         }
 };
 
