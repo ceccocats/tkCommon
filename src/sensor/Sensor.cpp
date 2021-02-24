@@ -1,6 +1,18 @@
 #include "tkCommon/sensor/Sensor.h"
 
 namespace tk { namespace sensors {
+
+void serial_thread(tk::communication::SerialPort *serial, bool *mRun){
+
+    *mRun = true;
+    while(*mRun){
+        std::string msg;
+        serial->readLine(msg);
+        //std::cout<<msg<<"\n";
+    }
+
+}
+
 Clock::Clock()
 {
     synched = false;
@@ -40,7 +52,7 @@ Clock::start(timeStamp_t start)
         std::string ts_0;
         while(ts_0.find("$GPRMC") == std::string::npos){
             std::cout<<ts_0<<std::endl;
-            if(!serial.readLine(ts_0,'\n',5000))
+            if(!serial.readLine(ts_0,'\n',1000))
                 tkERR("Error reciving timestamp\n");
         }
         int pos = 0;
@@ -49,9 +61,8 @@ Clock::start(timeStamp_t start)
             seglist.push_back(ts_0.substr(0, pos));
             ts_0.erase(0, pos+1);
         }
-        //msg = "\\gsd\n";
-        serial.write(msg);
-        serial.close();
+
+        th = new std::thread(serial_thread, &serial, &mRun);
 
         int hh = atoi(seglist[1].substr(0,2).c_str());
         int mm = atoi(seglist[1].substr(2,2).c_str());
@@ -89,7 +100,13 @@ Clock::start(timeStamp_t start)
 void 
 Clock::stop()
 {
-
+    tkWRN("Closing serial port\n")
+    std::string msg = "\\gsd\n";
+    serial.write(msg);
+    mRun = false;
+    th->join();
+    delete th;
+    serial.close();
 }
 
 timeStamp_t 

@@ -39,7 +39,9 @@ class Clock {
         bool                synched;
         std::string         port;
         int                 baud;
+        bool                mRun;
         std::vector<int>    lines;
+        std::thread *th;
         tk::communication::SerialPort serial;
 
         Clock();
