@@ -32,9 +32,7 @@ class Clock {
             return instance;
         }
 
-        timeStamp_t getSychTimeStamp(int frameCounter, int triggerLine);
-        //timeStamp_t getTimeStamp(int frameCounter, int hz);
-
+        timeStamp_t getTimeStamp(int frameCounter = -1, int triggerLine = -1);
     private:
         timeStamp_t         t0;
         bool                initted;
@@ -111,6 +109,7 @@ class SensorInfo{
             dataArrived     = 0;
             synched         = false;
             type            = tk::data::sensorType::NOT_SPEC;
+            triggerLine     = -1;
         }
 
         void operator=(SensorInfo i) noexcept {
@@ -120,6 +119,7 @@ class SensorInfo{
             this->dataArrived       = i.dataArrived;
             this->synched           = i.synched;
             this->type              = i.type;
+            this->triggerLine       = i.triggerLine;
         }
 };
 
