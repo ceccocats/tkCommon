@@ -3,7 +3,7 @@
 namespace tk { namespace sensors {
 Clock::Clock()
 {
-    initted = false;
+    synched = false;
 }
 
 Clock::~Clock()
@@ -14,24 +14,30 @@ Clock::~Clock()
 void 
 Clock::init(const YAML::Node conf)
 {   
-    if (!initted) {
-        std::string port    = tk::common::YAMLgetConf<std::string>(conf, "port", "/dev/ttyUSB0");
-        int         baud    = tk::common::YAMLgetConf<int>(conf, "baud", 9600);
-        
-        // open serial port
-        if (!serial.init(port, baud)) {
-            tkWRN("Cannot open communication with SynchBox.\n");
-            initted = false;
-        } else {
-            initted = true;
-        }
-    }
+    port    = tk::common::YAMLgetConf<std::string>(conf, "port", "/dev/ttyUSB0");
+    baud    = tk::common::YAMLgetConf<int>(conf, "baud", 9600);
+    lines   = tk::common::YAMLgetConf<std::vector<int>>(conf, "lines", std::vector<int>(0));
 }
 
 void 
-Clock::start()
+Clock::start(timeStamp_t start)
 {
+    // SynchBox
+    if (start == 0) {
+        // open serial port
+        if (!serial.init(port, baud)) {
+            tkWRN("Cannot open communication with SynchBox.\n");
+            synched = false;
+        } else {
+            synched = true;
+        }
 
+        // send conf to lagala device
+        // TODO:
+    } else {
+        t0      = start;
+        synched = true;
+    }
 }
 
 void 
@@ -46,13 +52,11 @@ Clock::getTimeStamp(int frameCounter, int triggerLine)
     if (frameCounter == -1 || triggerLine == -1)
         return ::getTimeStamp();
     
-    tkASSERT(initted == true);
-    tkASSERT(frameCounter >= 0, "Negative Frame counter.\n");
-    tkASSERT(triggerLine >= 0 && triggerLine < freq.size(), "Out of bounds.\n");
+    tkASSERT(synched == true);
+    tkASSERT(triggerLine < lines.size(), "Out of bounds.\n");
 
-    return (timeStamp_t) t0 + (frameCounter * 1.0f/freq[triggerLine]); 
+    return (timeStamp_t) t0 + (frameCounter * 1.0f/lines[triggerLine]); 
 }
-
 
 
 void 

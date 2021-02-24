@@ -19,11 +19,11 @@ class Clock {
         void operator=(Clock const&) = delete;
         
         void init(const YAML::Node conf);
-        void start();
+        void start(timeStamp_t start = 0);
         void stop();
 
         bool synchronized() {
-            return serial.isOpen() && initted;
+            return synched || serial.isOpen();
         }
 
         static Clock& get()
@@ -35,8 +35,10 @@ class Clock {
         timeStamp_t getTimeStamp(int frameCounter = -1, int triggerLine = -1);
     private:
         timeStamp_t         t0;
-        bool                initted;
-        std::vector<int>    freq;
+        bool                synched;
+        std::string         port;
+        int                 baud;
+        std::vector<int>    lines;
         tk::communication::SerialPort serial;
 
         Clock();
