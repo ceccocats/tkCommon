@@ -117,8 +117,13 @@ Clock::getTimeStamp(int frameCounter, int triggerLine)
     
     tkASSERT(synched == true);
     tkASSERT(triggerLine < lines.size(), "Out of bounds.\n");
+    timeStamp_t offset = frameCounter * 1.0f/lines[triggerLine] * 1e6;
 
-    return (timeStamp_t) t0 + (frameCounter * 1.0f/lines[triggerLine]); 
+    timeStamp_t t_time = t0+offset;
+
+    //std::cout<<t_time<<"    "<<offset<<"\n";
+
+    return t_time; 
 }
 
 
