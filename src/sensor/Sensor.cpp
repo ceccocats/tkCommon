@@ -85,7 +85,7 @@ Clock::start(timeStamp_t start)
 
         t0 = t * 1e6 + ms * 1e3;
 
-        tkDBG("First trigger stamp: "<<t0<<"\n")
+        tkERR("First trigger stamp: "<<t0<<"\n")
 
         //struct tm *tim = localtime(&t);
         //timeStamp_t stamp = (t * 1e6);
