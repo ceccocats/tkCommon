@@ -100,13 +100,15 @@ Clock::start(timeStamp_t start)
 void 
 Clock::stop()
 {
-    tkWRN("Closing serial port\n")
-    std::string msg = "\\gsd\n";
-    serial.write(msg);
-    mRun = false;
-    th->join();
-    delete th;
-    serial.close();
+    tkWRN("Closing Clock\n")
+    if (serial.isOpen()) {
+        std::string msg = "\\gsd\n";
+        serial.write(msg);
+        mRun = false;
+        th->join();
+        delete th;
+        serial.close();
+    }
 }
 
 timeStamp_t 
