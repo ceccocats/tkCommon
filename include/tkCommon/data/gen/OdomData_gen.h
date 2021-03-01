@@ -31,6 +31,7 @@ public:
         os<<"OdomData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;
         os<<"	header.stamp: "<<s.header.stamp<<std::endl;
+        os<<"	header.fps:   "<<s.header.fps<<std::endl;
         os<<"	x: "<<s.x<<std::endl;
         os<<"	y: "<<s.y<<std::endl;
         os<<"	yaw: "<<s.yaw<<std::endl;

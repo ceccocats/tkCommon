@@ -30,6 +30,7 @@ public:
         os<<"RadarData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;
         os<<"	header.stamp: "<<s.header.stamp<<std::endl;
+        os<<"	header.fps:   "<<s.header.fps<<std::endl;
         os<<"	near: "<<s.near<<std::endl;
         os<<"	far: "<<s.far<<std::endl;
         return os;

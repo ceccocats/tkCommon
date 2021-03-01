@@ -139,6 +139,7 @@ def genData(className, VARS, DEPS = []):
 				cpp("os<<\"$ClassName$\"<<std::endl;")
 				cpp("os<<\"\theader.name:  \"<<s.header.name<<std::endl;")
 				cpp("os<<\"\theader.stamp: \"<<s.header.stamp<<std::endl;")
+				cpp("os<<\"\theader.fps:   \"<<s.header.fps<<std::endl;")
 				#cpp("SensorData::operator<<(s);")
 				for var in VARS:
 					if isVarConst(var["type"]) or isVarSTD(var["type"]):

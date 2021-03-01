@@ -122,6 +122,7 @@ public:
         os<<"VehicleData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;
         os<<"	header.stamp: "<<s.header.stamp<<std::endl;
+        os<<"	header.fps:   "<<s.header.fps<<std::endl;
         os<<"	CAR_WHEELBASE: "<<s.CAR_WHEELBASE<<std::endl;
         os<<"	CAR_DIM: "<<s.CAR_DIM<<std::endl;
         os<<"	CAR_BACK2AXLE: "<<s.CAR_BACK2AXLE<<std::endl;

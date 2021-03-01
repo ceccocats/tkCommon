@@ -35,6 +35,7 @@ public:
         os<<"ImageData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;
         os<<"	header.stamp: "<<s.header.stamp<<std::endl;
+        os<<"	header.fps:   "<<s.header.fps<<std::endl;
         os<<"	data: "<<s.data<<std::endl;
         os<<"	width: "<<s.width<<std::endl;
         os<<"	height: "<<s.height<<std::endl;
