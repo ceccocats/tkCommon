@@ -79,12 +79,15 @@ namespace tk { namespace data {
         int                 sensorID  = 0; /**< ID of the sensor. */
         int                 messageID = 0; /**< Incremental message counter. */
 
+        float               fps = 0;
+
         void init() {
             this->stamp         = 0;
             this->tf            = tk::common::Tfpose::Identity();
             this->sensorID      = 0;
             this->messageID     = 0;
             this->type          = sensorType::NOT_SPEC;
+            this->fps           = 0;
         }
 
         /**
@@ -98,6 +101,7 @@ namespace tk { namespace data {
             this->sensorID      = s.sensorID;
             this->messageID     = s.messageID;
             this->type          = s.type;
+            this->fps           = s.fps;
 
             // safe string update
             if(this->name != s.name) {

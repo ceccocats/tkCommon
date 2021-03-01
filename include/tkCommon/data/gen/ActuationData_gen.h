@@ -33,6 +33,7 @@ public:
         os<<"ActuationData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;
         os<<"	header.stamp: "<<s.header.stamp<<std::endl;
+        os<<"	header.fps:   "<<s.header.fps<<std::endl;
         os<<"	steerAngle: "<<s.steerAngle<<std::endl;
         os<<"	accel: "<<s.accel<<std::endl;
         os<<"	speed: "<<s.speed<<std::endl;

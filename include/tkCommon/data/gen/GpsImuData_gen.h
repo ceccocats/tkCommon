@@ -34,6 +34,7 @@ public:
         os<<"GpsImuData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;
         os<<"	header.stamp: "<<s.header.stamp<<std::endl;
+        os<<"	header.fps:   "<<s.header.fps<<std::endl;
         os<<"	gps: "<<s.gps<<std::endl;
         os<<"	imu: "<<s.imu<<std::endl;
         os<<"	vel: "<<s.vel<<std::endl;

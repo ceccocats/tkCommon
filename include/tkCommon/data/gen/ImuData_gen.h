@@ -43,6 +43,7 @@ public:
         os<<"ImuData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;
         os<<"	header.stamp: "<<s.header.stamp<<std::endl;
+        os<<"	header.fps:   "<<s.header.fps<<std::endl;
         os<<"	acc: "<<s.acc<<std::endl;
         os<<"	angleVel: "<<s.angleVel<<std::endl;
         os<<"	angle: "<<s.angle<<std::endl;
