@@ -194,14 +194,10 @@ tk::sensors::Sensor::close()
     return true;
 }
 
-bool 
-Sensor::readFrame() 
+bool
+Sensor::read(tk::data::SensorData* data)
 {
-    // get data from pool
     bool    retval;
-    int     idx;
-    tk::data::SensorData* data = pool.add(idx);
-
     // read data
     if (senStatus != SensorStatus::OFFLINE) {
         retval = readOnline(data);
@@ -213,10 +209,6 @@ Sensor::readFrame()
             info.synched = true;
     }
 
-
-    if (poolEmpty && retval)
-        poolEmpty = false;
-
     if (retval)   
         info.dataArrived++;
 
@@ -225,6 +217,23 @@ Sensor::readFrame()
         data->header.name = info.name;
     data->header.tf         = getTf();
     data->header.messageID  = info.dataArrived;
+    
+    return retval;
+}
+
+bool 
+Sensor::readFrame() 
+{
+    // get data from pool
+    bool    retval;
+    int     idx;
+    tk::data::SensorData* data = pool.add(idx);
+
+    // read
+    retval  = read(data);
+
+    if (poolEmpty && retval)
+        poolEmpty = false;
 
     // release pool
     pool.releaseAdd(idx);

@@ -11,6 +11,7 @@ namespace tk { namespace data {
 class GpsImuData_gen : public SensorData
 {
 public:
+    static const DataType type;
     tk::data::GpsData gps;
     tk::data::ImuData imu;
     tk::math::Vec3<double> vel;

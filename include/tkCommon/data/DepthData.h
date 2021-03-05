@@ -33,7 +33,7 @@ namespace tk{ namespace data{
             width = w;
             height = h;
             data.resize(width*height);
-            header.name = sensorType::CAMDATA;
+            header.name = "depth";
             unlockWrite();
 
         }

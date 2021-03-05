@@ -101,7 +101,7 @@ class SensorInfo{
         int             dataArrived;    /**< incremental counter */
         int             triggerLine;
         bool            synched;        /**< tell if the sensor is synced with the log */
-        tk::data::sensorType type;      /**< type of the sensor, used for visualization */
+        tk::data::DataType type;      /**< type of the sensor, used for visualization */
 
         /**
          * @brief Construct a new SensorInfo object
@@ -113,7 +113,7 @@ class SensorInfo{
             nSensors        = 1;
             dataArrived     = 0;
             synched         = false;
-            type            = tk::data::sensorType::NOT_SPEC;
+            type            = tk::data::DataType::NOT_SPEC;
             triggerLine     = -1;
         }
 
@@ -167,6 +167,8 @@ class Sensor {
         {    
             if (poolEmpty)
                 return false;
+
+            T::type;
             
             if (timeout != 0) {     // locking
                 data = dynamic_cast<const T*>(pool.get(idx, timeout));
@@ -187,6 +189,8 @@ class Sensor {
          * @param idx   index of the data returned from the pool, given by the grab() method.
          */
         void release(const int idx);
+
+        bool read(tk::data::SensorData* data);
 
         /**
          * @brief   Method that write sensor data.
@@ -257,7 +261,11 @@ class Sensor {
 
         tk::rt::DataPool pool;      /**< data pool */
         int              poolSize;  /**< size of data pool */
-        bool             poolEmpty; /**< true if no data has been added to the pool yet */        
+        bool             poolEmpty; /**< true if no data has been added to the pool yet */    
+        
+        //std::map<tk::data::DataType, tk::rt::DataPool>  pool;      /**< data pool */
+        //std::map<tk::data::DataType, int>               poolSize;  /**< size of data pool */
+        //std::map<tk::data::DataType, bool>              poolEmpty; /**< true if no data has been added to the pool yet */    
 
         std::vector<tk::common::Tfpose> tf; /**< Sensor TF */
 
@@ -277,6 +285,11 @@ class Sensor {
             this->info.dataArrived      = 0;
             this->log                   = log;
             this->lastDataCounter       = 0;
+
+            tk::data::DataType dtype = (tk::data::DataType) tk::common::YAMLgetConf<uint8_t>(conf, "dtype", 0);
+            std::cout<<"dtype "<<(int)dtype<<"\n";
+
+            return false;
 
             // check if paths passed are correct
             if (!conf) {
@@ -302,6 +315,7 @@ class Sensor {
             else 
                 this->senStatus = SensorStatus::OFFLINE;
 
+            /*
             // init pool
             if(this->poolSize < 1) {
                 tkWRN("You tried to set poolSize to a negative value, resetted to 1.")
@@ -318,7 +332,7 @@ class Sensor {
 
                 this->pool.releaseAdd(idx);
             }
-
+            */
             return true;
         }
         

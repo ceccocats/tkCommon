@@ -9,6 +9,7 @@ namespace tk { namespace data {
 class RadarData_gen : public SensorData
 {
 public:
+    static const DataType type;
     tk::data::CloudData near;
     tk::data::CloudData far;
     

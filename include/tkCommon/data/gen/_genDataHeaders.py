@@ -2,21 +2,24 @@ from _codeGen import genData
 
 className = "CanData_gen"
 DEPS = [ "#include <linux/can.h>", "#include <linux/can/raw.h>" ]
-VARS = [ {"name":"frame", "type":"struct can_frame"} ]
+VARS = [ {"name": "type", "type": "static const DataType", "default": "DataType::CAN"},       
+         {"name":"frame", "type":"struct can_frame"} ]
 genData(className, VARS, DEPS)
 
 className = "OdomData_gen"
-DEPS = [ "#include \"tkCommon/math/Mat.h\"" ]
-VARS = [ {"name":"x",      "type":"float"},
-         {"name":"y",      "type":"float"},
-         {"name":"yaw",    "type":"float"},
-         {"name":"speed",  "type":"float"} ]
+DEPS = [ "#include \"tkCommon/math/Vec.h\"" ]
+VARS = [ {"name": "type", "type": "static const DataType", "default": "DataType::ODOM"},  
+         {"name":"pose",        "type":"tk::math::Vec3<double>"},
+         {"name":"angle",       "type":"tk::math::Vec3<double>"},
+         {"name":"speed",       "type":"double" , "default": "0"}
+        ]
 genData(className, VARS, DEPS)
 
 className = "VehicleData_gen"
 DEPS = [ "#include \"tkCommon/math/Vec.h\"",
          "#include \"tkCommon/data/gen/OdomData_gen.h\"" ]
-VARS = [ {"name":"CAR_WHEELBASE",       "type":"double"                , "default": "0"},
+VARS = [ {"name": "type", "type": "static const DataType", "default": "DataType::VEHICLE"},
+         {"name":"CAR_WHEELBASE",       "type":"double"                , "default": "0"},
          {"name":"CAR_DIM",             "type":"tk::math::Vec3<double>"},
          {"name":"CAR_BACK2AXLE",       "type":"double"                , "default": "0"},
          {"name":"CAR_MASS",            "type":"double"                , "default": "0"}, 
@@ -55,7 +58,8 @@ genData(className, VARS, DEPS)
 className = "ImuData_gen"
 DEPS = [ "#include \"tkCommon/math/Vec.h\"",
          "#include \"tkCommon/math/Mat.h\"" ]
-VARS = [ {"name":"acc",         "type":"tk::math::Vec3<double>"},
+VARS = [ {"name": "type", "type": "static const DataType", "default": "DataType::IMU"},
+         {"name":"acc",         "type":"tk::math::Vec3<double>"},
          {"name":"angleVel",    "type":"tk::math::Vec3<double>"}, 
          {"name":"angle",       "type":"tk::math::Vec3<double>"}, 
          {"name":"mag",         "type":"tk::math::Vec3<double>"},
@@ -69,7 +73,8 @@ genData(className, VARS, DEPS)
 
 className = "GpsData_gen"
 DEPS = ["#include \"tkCommon/math/Mat.h\"" ]
-VARS = [ {"name":"utcStamp","type":"timeStamp_t","default":"0"},
+VARS = [ {"name": "type", "type": "static const DataType", "default": "DataType::GPS"},
+         {"name":"utcStamp","type":"timeStamp_t","default":"0"},
          {"name":"lat",     "type":"double",  "default":"0"}, 
          {"name":"lon",     "type":"double",  "default":"0"}, 
          {"name":"heigth",  "type":"double",  "default":"0"},
@@ -85,7 +90,8 @@ genData(className, VARS, DEPS)
 className = "GpsImuData_gen"
 DEPS = ["#include \"tkCommon/data/ImuData.h\"\n", 
         "#include \"tkCommon/data/GpsData.h\"\n"]
-VARS = [ {"name":"gps", "type":"tk::data::GpsData", "init": "gps.init();"}, 
+VARS = [ {"name": "type", "type": "static const DataType", "default": "DataType::GPSIMU"},
+         {"name":"gps", "type":"tk::data::GpsData", "init": "gps.init();"}, 
          {"name":"imu", "type":"tk::data::ImuData", "init": "imu.init();"},
          {"name":"vel", "type":"tk::math::Vec3<double>"},
         ]
@@ -94,29 +100,30 @@ genData(className, VARS, DEPS)
 className = "CloudData_gen"
 DEPS = ["#include \"tkCommon/math/Mat.h\"\n"]
 DEPS = ["#include \"tkCommon/math/Vec.h\"\n"]
-VARS = [ {"name": "featureType_t", "type": "typedef std::string"},
-         {"name": "FEATURES_NONE"        , "type": "static const featureType_t", "default": "\"f_none\""},
-         {"name": "FEATURES_I"           , "type": "static const featureType_t", "default": "\"f_intensity\""},
-         {"name": "FEATURES_NOISE"       , "type": "static const featureType_t", "default": "\"f_noise\""},
-         {"name": "FEATURES_CHANNEL"     , "type": "static const featureType_t", "default": "\"f_channel\""},
-         {"name": "FEATURES_R"           , "type": "static const featureType_t", "default": "\"f_r\""},
-         {"name": "FEATURES_G"           , "type": "static const featureType_t", "default": "\"f_g\""},
-         {"name": "FEATURES_B"           , "type": "static const featureType_t", "default": "\"f_b\""},
-         {"name": "FEATURES_NX"          , "type": "static const featureType_t", "default": "\"f_nx\""},
-         {"name": "FEATURES_NY"          , "type": "static const featureType_t", "default": "\"f_ny\""},
-         {"name": "FEATURES_NZ"          , "type": "static const featureType_t", "default": "\"f_nz\""},
-         {"name": "FEATURES_CLASS"       , "type": "static const featureType_t", "default": "\"f_class\""},
-         {"name": "FEATURES_DIST"        , "type": "static const featureType_t", "default": "\"f_dist\""},
-         {"name": "FEATURES_VELOCITY"    , "type": "static const featureType_t", "default": "\"f_velocity\""},
-         {"name": "FEATURES_FALSE_DET"   , "type": "static const featureType_t", "default": "\"f_false_det\""},
-         {"name": "FEATURES_RANGE_VAR"   , "type": "static const featureType_t", "default": "\"f_range_var\""},
-         {"name": "FEATURES_VELOCITY_VAR", "type": "static const featureType_t", "default": "\"f_velocity_var\""},
-         {"name": "FEATURES_ANGLE_VAR"   , "type": "static const featureType_t", "default": "\"f_angle_var\""},
-         {"name": "FEATURES_RCS"         , "type": "static const featureType_t", "default": "\"f_rcs\""},
-         {"name": "FEATURES_PROBABILITY" , "type": "static const featureType_t", "default": "\"f_probability\""},
-         {"name": "FEATURES_NEAR_SCAN"   , "type": "static const featureType_t", "default": "\"f_near_scan\""},
-         {"name": "FEATURES_GROUND"      , "type": "static const featureType_t", "default": "\"f_ground\""},
-         {"name": "TIMESTAMP"            , "type": "static const featureType_t", "default": "\"f_timestamp\""},
+VARS = [ {"name": "type", "type": "static const DataType", "default": "DataType::CLOUD"},
+         {"name": "featureType_t", "type": "typedef std::string"},
+         {"name": "FEATURES_NONE"        , "type": "static const CloudData_gen::featureType_t", "default": "\"f_none\""},
+         {"name": "FEATURES_I"           , "type": "static const CloudData_gen::featureType_t", "default": "\"f_intensity\""},
+         {"name": "FEATURES_NOISE"       , "type": "static const CloudData_gen::featureType_t", "default": "\"f_noise\""},
+         {"name": "FEATURES_CHANNEL"     , "type": "static const CloudData_gen::featureType_t", "default": "\"f_channel\""},
+         {"name": "FEATURES_R"           , "type": "static const CloudData_gen::featureType_t", "default": "\"f_r\""},
+         {"name": "FEATURES_G"           , "type": "static const CloudData_gen::featureType_t", "default": "\"f_g\""},
+         {"name": "FEATURES_B"           , "type": "static const CloudData_gen::featureType_t", "default": "\"f_b\""},
+         {"name": "FEATURES_NX"          , "type": "static const CloudData_gen::featureType_t", "default": "\"f_nx\""},
+         {"name": "FEATURES_NY"          , "type": "static const CloudData_gen::featureType_t", "default": "\"f_ny\""},
+         {"name": "FEATURES_NZ"          , "type": "static const CloudData_gen::featureType_t", "default": "\"f_nz\""},
+         {"name": "FEATURES_CLASS"       , "type": "static const CloudData_gen::featureType_t", "default": "\"f_class\""},
+         {"name": "FEATURES_DIST"        , "type": "static const CloudData_gen::featureType_t", "default": "\"f_dist\""},
+         {"name": "FEATURES_VELOCITY"    , "type": "static const CloudData_gen::featureType_t", "default": "\"f_velocity\""},
+         {"name": "FEATURES_FALSE_DET"   , "type": "static const CloudData_gen::featureType_t", "default": "\"f_false_det\""},
+         {"name": "FEATURES_RANGE_VAR"   , "type": "static const CloudData_gen::featureType_t", "default": "\"f_range_var\""},
+         {"name": "FEATURES_VELOCITY_VAR", "type": "static const CloudData_gen::featureType_t", "default": "\"f_velocity_var\""},
+         {"name": "FEATURES_ANGLE_VAR"   , "type": "static const CloudData_gen::featureType_t", "default": "\"f_angle_var\""},
+         {"name": "FEATURES_RCS"         , "type": "static const CloudData_gen::featureType_t", "default": "\"f_rcs\""},
+         {"name": "FEATURES_PROBABILITY" , "type": "static const CloudData_gen::featureType_t", "default": "\"f_probability\""},
+         {"name": "FEATURES_NEAR_SCAN"   , "type": "static const CloudData_gen::featureType_t", "default": "\"f_near_scan\""},
+         {"name": "FEATURES_GROUND"      , "type": "static const CloudData_gen::featureType_t", "default": "\"f_ground\""},
+         {"name": "TIMESTAMP"            , "type": "static const CloudData_gen::featureType_t", "default": "\"f_timestamp\""},
          {"name":"points",   "type":"tk::math::Mat<float>"},
          {"name":"ranges",   "type":"tk::math::Mat<float>"},
          {"name":"features", "type":"tk::common::Map<tk::math::Vec<float>>"}]
@@ -124,7 +131,8 @@ genData(className, VARS, DEPS)
 
 className = "ImageData_gen"
 DEPS = ["#include \"tkCommon/math/Vec.h\"\n"]
-VARS = [ {"name":"data", "type":"tk::math::Vec<uint8_t>"},
+VARS = [ {"name": "type", "type": "static const DataType", "default": "DataType::IMAGE"},
+         {"name":"data", "type":"tk::math::Vec<uint8_t>"},
          {"name":"width", "type":"uint32_t", "default": "0"},
          {"name":"height", "type":"uint32_t", "default": "0"},
          {"name":"channels", "type":"uint32_t", "default": "0"}]
@@ -132,13 +140,15 @@ genData(className, VARS, DEPS)
 
 className = "RadarData_gen"
 DEPS = ["#include \"tkCommon/data/CloudData.h\"\n"]
-VARS = [ {"name":"near", "type":"tk::data::CloudData", "init": "near.init()"},
+VARS = [ {"name": "type", "type": "static const DataType", "default": "DataType::RADAR"},
+         {"name":"near", "type":"tk::data::CloudData", "init": "near.init()"},
          {"name":"far",  "type":"tk::data::CloudData", "init": "far.init()"} ]
 genData(className, VARS, DEPS)
 
 className = "CalibData_gen"
 DEPS = ["#include \"tkCommon/math/Mat.h\"\n"]
-VARS = [ {"name":"w",   "type":"int", "default":"0"},
+VARS = [ {"name": "type", "type": "static const DataType", "default": "DataType::NOT_SPEC"},
+         {"name":"w",   "type":"int", "default":"0"},
          {"name":"h",   "type":"int", "default":"0"},
          {"name":"k",   "type":"tk::math::Mat<float>", "init":"k.resize(3,3)"},
          {"name":"d",   "type":"tk::math::Mat<float>", "init":"d.resize(1,5)"},
@@ -147,7 +157,8 @@ genData(className, VARS, DEPS)
 
 className = "ActuationData_gen"
 DEPS = ["#include \"tkCommon/math/Mat.h\"\n"]
-VARS = [ {"name":"steerAngle", "type":"double", "default":"0"},
+VARS = [ {"name": "type", "type": "static const DataType", "default": "DataType::ACTUATION"},
+         {"name":"steerAngle", "type":"double", "default":"0"},
          {"name":"accel",      "type":"double", "default":"0"},
          {"name":"speed",      "type":"double", "default":"0"} ]
 genData(className, VARS, DEPS)
@@ -158,3 +169,13 @@ VARS = [ {"name":"data", "type":"tk::math::Vec<uint16_t>"},
          {"name":"width", "type":"uint32_t", "default": "0"},
          {"name":"height", "type":"uint32_t", "default": "0"} ]
 genData(className, VARS, DEPS)
+
+#className = "GpsImuData_gen"
+#DEPS = ["#include \"tkCommon/data/ImuData.h\"\n", 
+#        "#include \"tkCommon/data/GpsData.h\"\n"]
+#VARS = [ {"name": "type", "type": "static const DataType", "default": "DataType::GPSIMU"},
+#         {"name":"gps", "type":"tk::data::GpsData", "init": "gps.init();"}, 
+#         {"name":"imu", "type":"tk::data::ImuData", "init": "imu.init();"},
+#         {"name":"vel", "type":"tk::math::Vec3<double>"},
+#        ]
+#genData(className, VARS, DEPS)

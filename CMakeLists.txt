@@ -107,6 +107,12 @@ add_library(tkGUI SHARED
 )
 target_link_libraries(tkGUI ${CUDA_LIBRARIES} ${GUI_LIBS} tkCommon)
 
+add_library(tkMath SHARED 
+    src/math/CSpline.cpp 
+    src/math/CSpline2D.cpp 
+    src/math/CSpline3D.cpp
+)
+
 add_library(tkCommunication SHARED
     src/communication/ethernet/UDPSocket.cpp
     src/communication/ethernet/TCPSocket.cpp
@@ -117,12 +123,7 @@ add_library(tkCommunication SHARED
     src/communication/serial/SerialPort.cpp
     src/communication/car/CarControl.cpp
 )
-target_link_libraries(tkCommunication pcap serial)
-
-add_library(tkMath SHARED 
-    src/math/CSpline.cpp 
-    src/math/CSpline2D.cpp 
-    src/math/CSpline3D.cpp)
+target_link_libraries(tkCommunication tkCommon pcap serial)
 
 add_library(tkJoystick SHARED 
     src/joystick/Joystick.cpp
@@ -172,7 +173,7 @@ foreach(cpp ${tkpackage_APPScpp})
 endforeach()
 foreach(app ${tkpackage_APPS})
     add_executable(${app} "app/${app}.cpp")
-    target_link_libraries(${app} tkCommon tkGUI tkCommunication tkMath tkJoystick ${GUI_LIBS} ${CUDA_LIBRARIES})
+    target_link_libraries(${app} tkCommon tkGUI tkCommunication tkMath tkJoystick tkSensor ${GUI_LIBS} ${CUDA_LIBRARIES})
 endforeach()
 
 if(CUDA_FOUND)

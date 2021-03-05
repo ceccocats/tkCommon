@@ -9,6 +9,7 @@ namespace tk { namespace data {
 class VehicleData_gen : public SensorData
 {
 public:
+    static const DataType type;
     double CAR_WHEELBASE;
     tk::math::Vec3<double> CAR_DIM;
     double CAR_BACK2AXLE;

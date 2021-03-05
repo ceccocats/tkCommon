@@ -31,21 +31,21 @@ namespace tk { namespace sensors {
         if (viewer != nullptr) {
             this->viewer = viewer;
             for (std::map<std::string,tk::sensors::Sensor*>::iterator it = sensors.begin(); it!=sensors.end(); ++it) {
-                if (it->second->info.type == tk::data::sensorType::LIDAR) {
+                if (it->second->info.type == tk::data::DataType::CLOUD) {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Cloud4f(it->second->info.name)});
-                } else if (it->second->info.type == tk::data::sensorType::GPSIMU) {
+                } else if (it->second->info.type == tk::data::DataType::GPSIMU) {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::GpsImu()});
-                } else if (it->second->info.type == tk::data::sensorType::CAMDATA) {
+                } else if (it->second->info.type == tk::data::DataType::IMAGE) {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Image(it->second->info.nSensors, it->second->info.name)});
-                } else if (it->second->info.type == tk::data::sensorType::GPS) {
+                } else if (it->second->info.type == tk::data::DataType::GPS) {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Gps(it->second->info.name)});
-                } else if (it->second->info.type == tk::data::sensorType::RADAR) {
+                } else if (it->second->info.type == tk::data::DataType::RADAR) {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Radar(it->second->info.name)});
-                } else if (it->second->info.type == tk::data::sensorType::STEREO) {
+                } else if (it->second->info.type == tk::data::DataType::STEREO) {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Image(2, it->second->info.name)});
-                } else if (it->second->info.type == tk::data::sensorType::IMU) {
+                } else if (it->second->info.type == tk::data::DataType::IMU) {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Imu()});
-                } else if (it->second->info.type == tk::data::sensorType::CAN) {
+                } else if (it->second->info.type == tk::data::DataType::CAN) {
                     drawables.push_back({0, false, it->second->info.name, it->second->info.type, new tk::gui::Can()});
                 }
             }
@@ -161,7 +161,7 @@ namespace tk { namespace sensors {
         while (self->viewer->isRunning()){
             for (int i = 0; i < self->drawables.size(); i++){
                 auto drw = &(self->drawables[i]);
-                if (drw->type == tk::data::sensorType::GPSIMU) {
+                if (drw->type == tk::data::DataType::GPSIMU) {
                     auto ref = (tk::gui::GpsImu*)drw->drawable;
                     if (drw->locked){
                         if (ref->update == false){
@@ -176,7 +176,7 @@ namespace tk { namespace sensors {
                             drw->locked = true;
                         }
                     }
-                } else if(drw->type == tk::data::sensorType::LIDAR) {
+                } else if(drw->type == tk::data::DataType::CLOUD) {
                     auto ref = (tk::gui::Cloud4f*)drw->drawable;
                     if (drw->locked) {
                         if (ref->update == false) {
@@ -191,7 +191,7 @@ namespace tk { namespace sensors {
                             drw->locked = true;
                         }
                     }
-                } else if(drw->type == tk::data::sensorType::CAMDATA) {
+                } else if(drw->type == tk::data::DataType::IMAGE) {
                     auto ref = (tk::gui::Image*)drw->drawable;
                     if (drw->locked) {
                         if (ref->update == false) {
@@ -206,7 +206,7 @@ namespace tk { namespace sensors {
                             drw->locked = true;
                         }
                     }
-                } else if(drw->type == tk::data::sensorType::GPS) {
+                } else if(drw->type == tk::data::DataType::GPS) {
                     auto ref = (tk::gui::Gps*)drw->drawable;
                     if (drw->locked) {
                         if (ref->update == false) {
@@ -221,7 +221,7 @@ namespace tk { namespace sensors {
                             drw->locked = true;
                         }
                     }
-                } else if(drw->type == tk::data::sensorType::RADAR) {
+                } else if(drw->type == tk::data::DataType::RADAR) {
                     auto ref = (tk::gui::Radar*)drw->drawable;
                     if (drw->locked) {
                         if (ref->update == false) {
@@ -236,7 +236,7 @@ namespace tk { namespace sensors {
                             drw->locked = true;
                         }
                     }
-                } else if(drw->type == tk::data::sensorType::STEREO) {
+                } else if(drw->type == tk::data::DataType::STEREO) {
                     auto ref = (tk::gui::Image*)drw->drawable;
                     if (drw->locked) {
                         if (ref->update == false) {
@@ -254,7 +254,7 @@ namespace tk { namespace sensors {
                             drw->locked = true;
                         }
                     }
-                } else if (drw->type == tk::data::sensorType::IMU) {
+                } else if (drw->type == tk::data::DataType::IMU) {
                     auto ref = (tk::gui::Imu*)drw->drawable;
                     if (drw->locked){
                         if (ref->update == false){
@@ -269,7 +269,7 @@ namespace tk { namespace sensors {
                             drw->locked = true;
                         }
                     }
-                } else if (drw->type == tk::data::sensorType::CAN) {
+                } else if (drw->type == tk::data::DataType::CAN) {
                     auto ref = (tk::gui::Can*)drw->drawable;
                     if (drw->locked){
                         if (ref->update == false){

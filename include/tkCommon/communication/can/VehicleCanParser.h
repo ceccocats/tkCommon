@@ -53,9 +53,9 @@ namespace tk { namespace communication {
         }
 
         //write data
-        veh->odom.x = veh->x;
-        veh->odom.y = veh->y;
-        veh->odom.yaw = -veh->carDirection +M_PI/2;
+        veh->odom.pose.x() = veh->x;
+        veh->odom.pose.y() = veh->y;
+        veh->odom.angle.z() = -veh->carDirection +M_PI/2;
         //veh->odom.tf.copyFrom(tk::common::odom2tf(veh->x, veh->y, -veh->carDirection +M_PI/2).matrix().data(), 4,4);
         //veh->odom.header.stamp = t;
     }

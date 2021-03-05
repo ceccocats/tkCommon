@@ -194,8 +194,8 @@ def genData(className, VARS, DEPS = []):
 			for var in VARS:
 				if(isVarStatic(var["type"]) and "default" in var):
 					tp = (var["type"][len("static"):]).split(" ")
-					tp.insert(-1, " "+className +"::")
-					tp = "".join(tp)
+					#tp.insert(-1, " "+className +"::")
+					tp = " ".join(tp)
 					with cpp.subs(type=tp, var=var["name"], default=var["default"]):
 						cpp("$type$ $ClassName$::$var$ = $default$;")
 			cpp("")

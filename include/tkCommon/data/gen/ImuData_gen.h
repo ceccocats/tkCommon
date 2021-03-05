@@ -9,6 +9,7 @@ namespace tk { namespace data {
 class ImuData_gen : public SensorData
 {
 public:
+    static const DataType type;
     tk::math::Vec3<double> acc;
     tk::math::Vec3<double> angleVel;
     tk::math::Vec3<double> angle;

@@ -69,8 +69,8 @@ void CarControl::readLoop() {
                 memcpy(&alfa, &data.frame.data[1+4], 2);
                 x =  __bswap_32(x);
                 alfa =  __bswap_16(alfa);               
-                odom.x = float(x)/2e4;
-                odom.yaw = float(alfa)*1.54;
+                odom.pose.x() = float(x)/2e4;
+                odom.angle.z() = float(alfa)*1.54;
                 odom.header.stamp = data.header.stamp;
             }
             if(data.id() == ODOM1_ID) {
@@ -79,7 +79,7 @@ void CarControl::readLoop() {
                 memcpy(&vel, &data.frame.data[1+4], 2);
                 y =  __bswap_32(y);
                 vel =  __bswap_16(vel);               
-                odom.y = float(y)/2e4;
+                odom.pose.y() = float(y)/2e4;
                 odom.speed = vel;
                 odom.header.stamp = data.header.stamp;
             }

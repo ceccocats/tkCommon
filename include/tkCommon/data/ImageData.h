@@ -35,7 +35,7 @@ namespace tk{ namespace data{
             height = h;
             channels = ch;
             data.resize(width*height*channels);
-            header.name = sensorType::CAMDATA;
+            header.name = "image";
             unlockWrite();
 
         }

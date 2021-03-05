@@ -9,6 +9,7 @@ namespace tk { namespace data {
 class CalibData_gen : public SensorData
 {
 public:
+    static const DataType type;
     int w;
     int h;
     tk::math::Mat<float> k;

@@ -1,6 +1,12 @@
 #pragma once
 #include "tkCommon/data/gen/CloudData_gen.h"
 
+#ifdef ROS_ENABLED
+#include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/LaserScan.h>
+#include <sensor_msgs/point_cloud_conversion.h>
+#endif
+
 namespace tk { namespace data {
 
     class CloudData : public CloudData_gen{
@@ -137,5 +143,117 @@ namespace tk { namespace data {
                 intensity->operator[](i) = float(value);
             }
         }
+
+#ifdef ROS_ENABLED
+        void toRos(sensor_msgs::LaserScan &msg) {
+            this->header.toRos(msg.header);
+            
+            /*
+            float max_range, min_range, max_angle, min_angle, angle_increment;
+
+            msg.ranges.resize(size());
+            msg.intensities.resize(size());
+            for (int i = 0; i < size(); i++) {
+                msg.ranges[i] = this->ranges(0, 1);
+            }
+            */
+            tkWRN("Not implemented.\n");
+        }
+
+        void toRos(sensor_msgs::PointCloud2 &msg) {
+            this->header.toRos(msg.header);
+
+            sensor_msgs::PointCloud tmp;
+            tk::math::Vec<float>*   intensity = nullptr;
+            if (this->features.exists(FEATURES_I))
+                tk::math::Vec<float>* intensity = &features[FEATURES_I];
+
+            // fill points
+            tmp.points.resize(size());
+            if (intensity != nullptr) {
+                tmp.channels.resize(1);
+                tmp.channels[0].name = "intensity";
+            }
+            for(int i = 0 ; i < size(); i++) {
+                tmp.points[i].x = this->points(0, i); 
+                tmp.points[i].y = this->points(1, i); 
+                tmp.points[i].z = this->points(2, i); 
+
+                if (intensity != nullptr)
+                    tmp.channels[0].values[i] = (*intensity)[i];
+            }
+
+            // convert
+            sensor_msgs::convertPointCloudToPointCloud2(tmp, msg);
+        }
+
+        void fromRos(sensor_msgs::LaserScan &msg) {
+            this->header.fromRos(msg.header);
+            this->header.type   = DataType::CLOUD; 
+            
+            tk::math::Vec<float>* intensity = nullptr;
+            if (this->features.exists(FEATURES_I))
+                tk::math::Vec<float>* intensity = &features[FEATURES_I];
+
+            // fill points
+            resize(msg.ranges.size());
+            for(int i = 0 ; i < msg.ranges.size(); i++) {
+                float r = msg.ranges[i];
+                if (msg.ranges[i] < msg.range_min || msg.ranges[i] > msg.range_max)
+                    r = 0;
+
+                float angle = msg.angle_min + msg.angle_increment * float(i);
+
+                this->points(0, i) = r * cos(angle);
+                this->points(1, i) = r * sin(angle);
+                this->points(2, i) = 0;
+                this->points(3, i) = 1;
+
+                this->ranges(0, i) = r;
+                this->ranges(1, i) = angle;
+                this->ranges(2, i) = 0.0f;
+
+                if (intensity != nullptr && msg.intensities.size() > i)
+                    (*intensity)[i] = msg.intensities[i];
+            }
+        }
+
+        void fromRos(sensor_msgs::PointCloud2 &msg) {
+            this->header.fromRos(msg.header);
+            this->header.type   = DataType::CLOUD; 
+
+            // convert
+            sensor_msgs::PointCloud     tmp;
+            sensor_msgs::convertPointCloud2ToPointCloud(msg, tmp);
+
+            // check if intensity is present
+            tk::math::Vec<float>* intensity = nullptr;
+            int i_channel = -1;
+            if (this->features.exists(FEATURES_I)) {
+                tk::math::Vec<float>* intensity = &features[FEATURES_I]; 
+                for (int i = 0; i < tmp.channels.size(); i++) {
+                    if (tmp.channels[i].name == "intensity") {
+                        i_channel = i;
+                    }
+                }
+            }
+
+            // fill points
+            resize(tmp.points.size());
+            for(int i = 0 ; i < tmp.points.size(); i++) {
+                this->points(0, i) = tmp.points[i].x;
+                this->points(1, i) = tmp.points[i].y;
+                this->points(2, i) = tmp.points[i].z;
+                this->points(3, i) = 1.0f;
+
+                this->ranges(0, i) = std::sqrt(std::pow(tmp.points[i].x, 2) + std::pow(tmp.points[i].y, 2) + std::pow(tmp.points[i].z, 2));
+                this->ranges(1, i) = std::acos(tmp.points[i].x / std::sqrt(std::pow(tmp.points[i].x, 2) + std::pow(tmp.points[i].y, 2))) * (tmp.points[i].y < 0 ? -1 : 1);
+                this->ranges(2, i) = std::acos(tmp.points[i].z / this->ranges(0, i));
+
+                if (intensity != nullptr && i_channel != -1)
+                    (*intensity)[i] = tmp.channels[i_channel].values[i];
+            }
+        }
+#endif
     };
 }}

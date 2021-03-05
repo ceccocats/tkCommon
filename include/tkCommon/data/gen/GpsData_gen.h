@@ -8,6 +8,7 @@ namespace tk { namespace data {
 class GpsData_gen : public SensorData
 {
 public:
+    static const DataType type;
     timeStamp_t utcStamp;
     double lat;
     double lon;

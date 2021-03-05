@@ -9,6 +9,7 @@ namespace tk { namespace data {
 class CanData_gen : public SensorData
 {
 public:
+    static const DataType type;
     struct can_frame frame;
     
     void init() override

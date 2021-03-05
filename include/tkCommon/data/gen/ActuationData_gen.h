@@ -9,6 +9,7 @@ namespace tk { namespace data {
 class ActuationData_gen : public SensorData
 {
 public:
+    static const DataType type;
     double steerAngle;
     double accel;
     double speed;
