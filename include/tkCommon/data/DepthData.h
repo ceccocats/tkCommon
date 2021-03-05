@@ -38,6 +38,7 @@ namespace tk{ namespace data{
 
         }
 
+/*
         DepthData& operator=(DepthData& s){
  
             if(s.width != width || s.height != height ){
@@ -55,7 +56,7 @@ namespace tk{ namespace data{
             DepthData_gen::operator=(s);
             return *this;
         }
-
+*/
         bool empty() {return width == 0 || height == 0 || data.size() == 0; }
 
         void release(){

@@ -58,11 +58,11 @@ set(GUI_LIBS
 # Generate Data Headers
 #-------------------------------------------------------------------------------
 add_custom_command(OUTPUT 
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/GpsData_gen.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/*
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/_genDataHeaders.py
     COMMAND python3 _genDataHeaders.py)
-add_custom_target(tkdataheaders_gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/GpsData_gen.h)
+add_custom_target(tkdataheaders_gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/*)
 
 #-------------------------------------------------------------------------------
 # Generate shaders colorsmaps
@@ -83,19 +83,22 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawa
 #-------------------------------------------------------------------------------
 # Build Libraries
 #-------------------------------------------------------------------------------
+file(GLOB data_gen  "include/tkCommon/data/gen/*.cpp")
+file(GLOB data      "include/tkCommon/data/*.cpp")
 add_library(tkCommon SHARED
     src/common.cpp
     src/log.cpp
     src/version.cpp
     src/CmdParser.cpp 
     src/rt/Profiler.cpp
-    include/tkCommon/data/gen/CloudData_gen.cpp   
+    ${data_gen}
+    ${data} 
 )
 target_link_libraries(tkCommon yaml-cpp matio dl)
 
 file(GLOB gui_utils "src/gui/utils/*.cpp")
-file(GLOB imgui "src/gui/imgui/*.cpp")
-file(GLOB implot "src/gui/implot/*.cpp")
+file(GLOB imgui     "src/gui/imgui/*.cpp")
+file(GLOB implot    "src/gui/implot/*.cpp")
 file(GLOB drawables "src/gui/drawables/*.cpp")
 
 add_library(tkGUI SHARED

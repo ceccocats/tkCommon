@@ -3,7 +3,7 @@
 #include <tkCommon/data/SensorData.h>
 #include <vector>
 
-namespace tk{namespace data{
+namespace tk{ namespace data {
     
     
     /**
@@ -12,10 +12,9 @@ namespace tk{namespace data{
      */
     template <class T>
     //typename std::enable_if<std::is_base_of<SensorData, T*>::value, void>::type
-    class VectorData : public SensorData {
-        
-        public:
-
+    class VectorData : public SensorData {    
+    public:
+        static const DataType type;
         std::vector<T> data;
 
         /**

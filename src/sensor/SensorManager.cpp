@@ -165,7 +165,7 @@ namespace tk { namespace sensors {
                     auto ref = (tk::gui::GpsImu*)drw->drawable;
                     if (drw->locked){
                         if (ref->update == false){
-                            self->sensors[drw->name]->release(drw->id);
+                            self->sensors[drw->name]->release<tk::data::GpsImuData>(drw->id);
                             drw->locked = false;
                         }
                     } else {
@@ -180,7 +180,7 @@ namespace tk { namespace sensors {
                     auto ref = (tk::gui::Cloud4f*)drw->drawable;
                     if (drw->locked) {
                         if (ref->update == false) {
-                            self->sensors[drw->name]->release(drw->id);
+                            self->sensors[drw->name]->release<tk::data::CloudData>(drw->id);
                             drw->locked = false;
                         }
                     } else {
@@ -191,7 +191,7 @@ namespace tk { namespace sensors {
                             drw->locked = true;
                         }
                     }
-                } else if(drw->type == tk::data::DataType::IMAGE) {
+                } /*else if(drw->type == tk::data::DataType::IMAGE) {
                     auto ref = (tk::gui::Image*)drw->drawable;
                     if (drw->locked) {
                         if (ref->update == false) {
@@ -206,16 +206,16 @@ namespace tk { namespace sensors {
                             drw->locked = true;
                         }
                     }
-                } else if(drw->type == tk::data::DataType::GPS) {
+                } */else if(drw->type == tk::data::DataType::GPS) {
                     auto ref = (tk::gui::Gps*)drw->drawable;
                     if (drw->locked) {
                         if (ref->update == false) {
-                            self->sensors[drw->name]->release(drw->id);
+                            self->sensors[drw->name]->release<tk::data::GpsData>(drw->id);
                             drw->locked = false;
                         }
                     } else {
                         const tk::data::GpsData* d;
-                        if (self->sensors[drw->name]->grab(d,drw->id)) {
+                        if (self->sensors[drw->name]->grab<tk::data::GpsData>(d,drw->id)) {
                             auto a = (tk::data::GpsData*) d;
                             ref->updateRef(a);
                             drw->locked = true;
@@ -225,12 +225,12 @@ namespace tk { namespace sensors {
                     auto ref = (tk::gui::Radar*)drw->drawable;
                     if (drw->locked) {
                         if (ref->update == false) {
-                            self->sensors[drw->name]->release(drw->id);
+                            self->sensors[drw->name]->release<tk::data::RadarData>(drw->id);
                             drw->locked = false;
                         }
                     } else {
                         const tk::data::RadarData* d;
-                        if (self->sensors[drw->name]->grab(d,drw->id)) {
+                        if (self->sensors[drw->name]->grab<tk::data::RadarData>(d,drw->id)) {
                             auto a = (tk::data::RadarData*) d;
                             ref->updateRef(a);
                             drw->locked = true;
@@ -240,12 +240,12 @@ namespace tk { namespace sensors {
                     auto ref = (tk::gui::Image*)drw->drawable;
                     if (drw->locked) {
                         if (ref->update == false) {
-                            self->sensors[drw->name]->release(drw->id);
+                            self->sensors[drw->name]->release<tk::data::StereoData>(drw->id);
                             drw->locked = false;
                         }
                     } else {
                         const tk::data::StereoData* d;
-                        if (self->sensors[drw->name]->grab(d,drw->id)) {
+                        if (self->sensors[drw->name]->grab<tk::data::StereoData>(d,drw->id)) {
                             auto a = (tk::data::StereoData*)d;
                             ref->updateRef(0,&a->data);
                             if(!a->color.empty()){
@@ -258,7 +258,7 @@ namespace tk { namespace sensors {
                     auto ref = (tk::gui::Imu*)drw->drawable;
                     if (drw->locked){
                         if (ref->update == false){
-                            self->sensors[drw->name]->release(drw->id);
+                            self->sensors[drw->name]->release<tk::data::ImuData>(drw->id);
                             drw->locked = false;
                         }
                     } else {
@@ -273,7 +273,7 @@ namespace tk { namespace sensors {
                     auto ref = (tk::gui::Can*)drw->drawable;
                     if (drw->locked){
                         if (ref->update == false){
-                            self->sensors[drw->name]->release(drw->id);
+                            self->sensors[drw->name]->release<tk::data::CanData_t>(drw->id);
                             drw->locked = false;
                         }
                     } else {

@@ -128,6 +128,12 @@ class SensorInfo{
         }
 };
 
+struct SensorPool_t {
+    tk::rt::DataPool    pool;
+    int                 size, lastDataCounter;
+    bool                empty;
+};
+
 
 /**
  * @brief Sensor class interface
@@ -137,69 +143,29 @@ class Sensor {
         SensorInfo info;    /**< sensor info */
 
         /**
-         * @brief   Init sensor class, must be implemented by child.
+         * @brief   Method that init the sensor
          * 
-         * @param conf      configuration file
-         * @param name      unique string representing sensor name
-         * @param log       pointer to LogManager instance
-         * @return true     Successful init
-         * @return false    Unsuccessful init
+         * @param conf  configuration file
+         * @param name  name of the sensor
+         * @param log   pointer to LogManager instance
+         * @return true     successful init
+         * @return false    unsuccessful init
          */
-        virtual bool init(const YAML::Node conf, const std::string &name, LogManager *log = nullptr) = 0;
+        virtual bool init(const YAML::Node conf, const std::string &name, LogManager *log = nullptr) final;
 
         /**
          * @brief   Start internal thread that read the sensor and fills the internal pool
          */
-        void start();
+        virtual void start() final;
 
         /**
-         * @brief   Extract last or newest element from the pool, based on timeout parameter value
-         *          passed. Must be called after start() method.
+         * @brief 
          * 
-         * @param data      returned data
-         * @param idx       index of the data returned from the pool, used in release() method.
-         * @param timeout   grab timeout
-         * @return true     data is available
-         * @return false    data is not available
+         * @param data 
+         * @return true 
+         * @return false 
          */
-        template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
-        bool grab(const T* &data, int &idx, uint64_t timeout = 0) 
-        {    
-            if (poolEmpty)
-                return false;
-
-            T::type;
-            
-            if (timeout != 0) {     // locking
-                data = dynamic_cast<const T*>(pool.get(idx, timeout));
-            } else {                // non locking
-                if (pool.newData(lastDataCounter)) {   // new data available
-                    lastDataCounter = (uint32_t) pool.inserted;
-                    data = dynamic_cast<const T*>(pool.get(idx)); 
-                } else {                                    // no new data available
-                    data = nullptr;
-                }
-            }
-            return (data != nullptr)?true:false;
-        }
-
-        /**
-         * @brief   Release grabbed element from the pool, must be called after a grab().
-         * 
-         * @param idx   index of the data returned from the pool, given by the grab() method.
-         */
-        void release(const int idx);
-
-        bool read(tk::data::SensorData* data);
-
-        /**
-         * @brief   Method that write sensor data.
-         * 
-         * @param  data     pointer to generic sensorData that you need to write
-         * @return true     successful writing
-         * @return false    unsuccessful writing
-         */
-        virtual bool write(tk::data::SensorData* data) = 0;
+        virtual bool read(tk::data::SensorData* data) final;
 
         /**
          * @brief   Method that close the class.
@@ -207,7 +173,7 @@ class Sensor {
          * @return true     successful closing
          * @return false    unsuccessful closing
          */
-        virtual bool close();
+        virtual bool close() final;
 
         /**
          * @brief   Method that start the recording of sensor data.
@@ -257,84 +223,30 @@ class Sensor {
         
         SensorStatus    senStatus;  /** Sensor status */
 
-        LogManager      *log = nullptr;
-
-        tk::rt::DataPool pool;      /**< data pool */
-        int              poolSize;  /**< size of data pool */
-        bool             poolEmpty; /**< true if no data has been added to the pool yet */    
+        LogManager      *log = nullptr; 
         
-        //std::map<tk::data::DataType, tk::rt::DataPool>  pool;      /**< data pool */
-        //std::map<tk::data::DataType, int>               poolSize;  /**< size of data pool */
-        //std::map<tk::data::DataType, bool>              poolEmpty; /**< true if no data has been added to the pool yet */    
+        std::map<tk::data::DataType, SensorPool_t> pool;      /**< data pool */   
 
         std::vector<tk::common::Tfpose> tf; /**< Sensor TF */
 
         /**
-         * @brief   Method that init the sensor
+         * @brief   Init sensor class, must be implemented by child.
          * 
-         * @param conf  configuration file
-         * @param name  name of the sensor
-         * @param log   pointer to LogManager instance
-         * @return true     successful init
-         * @return false    unsuccessful init
+         * @param conf      configuration file
+         * @param name      unique string representing sensor name
+         * @param log       pointer to LogManager instance
+         * @return true     Successful init
+         * @return false    Unsuccessful init
          */
-        template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>> 
-        bool initSensor(const YAML::Node conf, const std::string &name, LogManager *log = nullptr) {
-            // get class name
-            this->info.name             = name;
-            this->info.dataArrived      = 0;
-            this->log                   = log;
-            this->lastDataCounter       = 0;
+        virtual bool initChild(const YAML::Node conf, const std::string &name, LogManager *log = nullptr) = 0;
 
-            tk::data::DataType dtype = (tk::data::DataType) tk::common::YAMLgetConf<uint8_t>(conf, "dtype", 0);
-            std::cout<<"dtype "<<(int)dtype<<"\n";
-
-            return false;
-
-            // check if paths passed are correct
-            if (!conf) {
-                tkERR("No sensor configuration in yaml\n");
-                return false;
-            }
-
-            // read tf from configuration file
-            if (conf["tf"].IsDefined()) {
-                this->tf = tk::common::YAMLreadTf(conf["tf"]);
-            } else {
-                this->tf.resize(1);
-                this->tf[0] = Eigen::Isometry3f::Identity();
-            }
-
-            // get configuration params
-            this->poolSize          = tk::common::YAMLgetConf<int>(conf, "pool_size", 2);
-            this->info.triggerLine  = tk::common::YAMLgetConf<int>(conf, "trigger_line", -1);
-
-            // set sensor status
-            if(this->log == nullptr)
-                this->senStatus = SensorStatus::ONLINE;
-            else 
-                this->senStatus = SensorStatus::OFFLINE;
-
-            /*
-            // init pool
-            if(this->poolSize < 1) {
-                tkWRN("You tried to set poolSize to a negative value, resetted to 1.")
-                this->poolSize = 1;
-            }
-            this->poolEmpty = true;
-            this->pool.init<T>(this->poolSize);
-            int idx;
-            for (int i = 0; i < this->poolSize; i++) {
-                auto data = dynamic_cast<T*>(this->pool.add(idx));
-                
-                data->header.name = name;
-                data->header.tf = getTf();
-
-                this->pool.releaseAdd(idx);
-            }
-            */
-            return true;
-        }
+        /**
+         * @brief 
+         * 
+         * @return true 
+         * @return false 
+         */
+        virtual bool closeChild() = 0;
         
         /**
          * @brief   Method that read sensor data from online stream
@@ -379,6 +291,74 @@ class Sensor {
          * @param   vargp   class reference
          * @return  void*   null
          */
-        void* loop(void *vargp);                
+        void* loop(void *vargp);
+
+    public:
+        /**
+         * @brief   Extract last or newest element from the pool, based on timeout parameter value
+         *          passed. Must be called after start() method.
+         * 
+         * @param data      returned data
+         * @param idx       index of the data returned from the pool, used in release() method.
+         * @param timeout   grab timeout
+         * @return true     data is available
+         * @return false    data is not available
+         */
+        template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
+        bool grab(const T* &data, int &idx, uint64_t timeout = 0) 
+        {    
+            // check if the passed template is the same as the pointer
+            if (T::type != data->header.type) {
+                tkERR("Type mismatch between template and passed pointer.\n");
+                return false;
+            }
+            
+            // check if template type is present inside pool
+            std::map<tk::data::DataType, SensorPool_t>::iterator it = pool.find(T::type); 
+            if (it == pool.end()) {
+                tkERR("No pool present with this template type.\n");
+                return false;
+            }
+
+            // check if pool is empty
+            if (it->second.empty) {
+                tkWRN("Pool empty.\n");
+                return false;
+            }
+            
+            // grab
+            if (timeout != 0) {     // locking
+                data = dynamic_cast<const T*>(it->second.pool.get(idx, timeout));
+            } else {                // non locking
+                if (it->second.pool.newData(lastDataCounter)) {   // new data available
+                    it->second.lastDataCounter = (uint32_t) it->second.pool.inserted;
+                    data = dynamic_cast<const T*>(it->second.pool.get(idx)); 
+                } else {                                    // no new data available
+                    data = nullptr;
+                }
+            }
+            return (data != nullptr)?true:false;
+        }
+
+        /**
+         * @brief   Release grabbed element from the pool, must be called after a grab().
+         * 
+         * @tparam T  
+         * @param idx   index of the data returned from the pool, given by the grab() method.
+         */
+        template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
+        bool release(const int idx)
+        {
+            // check if template type is present inside pool
+            std::map<tk::data::DataType, SensorPool_t>::iterator it = pool.find(T::type); 
+            if (it == pool.end()) {
+                tkERR("No pool present with this template type.\n");
+                return false;
+            }
+
+            // release element
+            it->second.pool.releaseGet(idx);
+            return true;
+        }                
 };
 }}

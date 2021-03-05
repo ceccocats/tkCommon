@@ -11,14 +11,6 @@ namespace tk { namespace sensors {
         {
 
         }
-        bool init(const YAML::Node conf, const std::string &name, LogManager *log = nullptr)
-        {
-            return true;
-        }
-        bool write(tk::data::SensorData* data)
-        {
-            return false;
-        }
         bool startRecord(const std::string &fileName)
         {
             return true;
@@ -27,12 +19,15 @@ namespace tk { namespace sensors {
         {
             return true;
         }
-
-        bool close()
+    private:
+        bool initChild(const YAML::Node conf, const std::string &name, LogManager *log = nullptr)
         {
             return true;
         }
-    private:
+        bool closeChild()
+        {
+            return true;
+        }
         bool readOnline(tk::data::SensorData* data)
         {
             return true;

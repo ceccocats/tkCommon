@@ -25,7 +25,8 @@ namespace tk { namespace data {
         CAN         = 11,
         VECTOR      = 12,
         ACTUATION   = 13,
-        DEPTH       = 14
+        DEPTH       = 14,
+        ODOM        = 15
     };
 
     /**

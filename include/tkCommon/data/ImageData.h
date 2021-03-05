@@ -40,7 +40,8 @@ namespace tk{ namespace data{
 
         }
 
-        ImageData& operator=(ImageData& s){
+/*
+        ImageData& operator=(const ImageData& s){
  
             if(s.width != width || s.height != height || s.channels != channels){
                 release();
@@ -52,12 +53,12 @@ namespace tk{ namespace data{
             return *this;
         }
 
-        ImageData& operator=(ImageData_gen& s){
+        ImageData& operator=(const ImageData_gen& s){
  
             ImageData_gen::operator=(s);
             return *this;
         }
-
+*/
         bool empty() {return channels == 0 || width == 0 || height == 0 || data.size() == 0; }
 
         void release(){

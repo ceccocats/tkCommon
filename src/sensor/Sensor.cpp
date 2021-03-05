@@ -129,6 +129,64 @@ Clock::getTimeStamp(int frameCounter, int triggerLine)
 }
 
 
+bool 
+Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log) {
+    // get class name
+    this->info.name             = name;
+    this->info.dataArrived      = 0;
+    this->log                   = log;
+
+    // check if paths passed are correct
+    if (!conf) {
+        tkERR("No sensor configuration in yaml\n");
+        return false;
+    }
+
+    // read tf from configuration file
+    if (conf["tf"].IsDefined()) {
+        this->tf = tk::common::YAMLreadTf(conf["tf"]);
+    } else {
+        this->tf.resize(1);
+        this->tf[0] = Eigen::Isometry3f::Identity();
+    }
+
+    // get configuration params
+    this->info.triggerLine  = tk::common::YAMLgetConf<int>(conf, "trigger_line", -1);
+
+    // set sensor status
+    if(this->log == nullptr)
+        this->senStatus = SensorStatus::ONLINE;
+    else 
+        this->senStatus = SensorStatus::OFFLINE;
+
+    /*
+    // init pool
+    if(this->poolSize < 1) {
+        tkWRN("You tried to set poolSize to a negative value, resetted to 1.")
+        this->poolSize = 1;
+    }
+    this->poolEmpty = true;
+    this->pool.init<T>(this->poolSize);
+    int idx;
+    for (int i = 0; i < this->poolSize; i++) {
+        auto data = dynamic_cast<T*>(this->pool.add(idx));
+        
+        data->header.name = name;
+        data->header.tf = getTf();
+
+        this->pool.releaseAdd(idx);
+    }
+    */
+
+    // init derived class
+    if (!initChild(conf, name, log)) {
+        tkERR("Error.\n");
+        return false;
+    }
+    return true;
+}
+
+
 void 
 Sensor::start() 
 {
@@ -189,7 +247,7 @@ tk::sensors::Sensor::close()
 		log->stop();
     
     // clear pool
-    pool.close();
+    //pool.close();
 
     return true;
 }
@@ -227,6 +285,7 @@ Sensor::readFrame()
     // get data from pool
     bool    retval;
     int     idx;
+    /*
     tk::data::SensorData* data = pool.add(idx);
 
     // read
@@ -237,7 +296,7 @@ Sensor::readFrame()
 
     // release pool
     pool.releaseAdd(idx);
-    
+    */
     return retval;
 }
 
@@ -245,11 +304,5 @@ tk::sensors::SensorStatus
 Sensor::status()
 {
     return this->senStatus;
-}
-
-void
-Sensor::release(const int idx) 
-{
-    pool.releaseGet(idx);
 }
 }}
