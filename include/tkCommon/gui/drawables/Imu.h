@@ -50,9 +50,8 @@ namespace tk{ namespace gui{
             float accHistory;
 
         public:
-
-            Imu();
-            Imu(tk::data::ImuData* imu);
+            Imu(const std::string& name = "imu", float acc_history = 10.0f);
+            Imu(tk::data::ImuData* imu, const std::string& name = "imu", float acc_history = 10.0f);
             ~Imu();
 
             void updateRef(tk::data::ImuData* imu);

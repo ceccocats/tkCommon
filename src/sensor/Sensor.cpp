@@ -133,8 +133,8 @@ bool
 Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log) {
     // get class name
     this->info.name             = name;
-    this->info.dataArrived      = 0;
     this->log                   = log;
+    this->readLoopStarted       = false;
 
     // check if paths passed are correct
     if (!conf) {
@@ -152,31 +152,13 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log) {
 
     // get configuration params
     this->info.triggerLine  = tk::common::YAMLgetConf<int>(conf, "trigger_line", -1);
+    this->poolSize          = tk::common::YAMLgetConf<int>(conf, "pool_size", 5);
 
     // set sensor status
     if(this->log == nullptr)
         this->senStatus = SensorStatus::ONLINE;
     else 
         this->senStatus = SensorStatus::OFFLINE;
-
-    /*
-    // init pool
-    if(this->poolSize < 1) {
-        tkWRN("You tried to set poolSize to a negative value, resetted to 1.")
-        this->poolSize = 1;
-    }
-    this->poolEmpty = true;
-    this->pool.init<T>(this->poolSize);
-    int idx;
-    for (int i = 0; i < this->poolSize; i++) {
-        auto data = dynamic_cast<T*>(this->pool.add(idx));
-        
-        data->header.name = name;
-        data->header.tf = getTf();
-
-        this->pool.releaseAdd(idx);
-    }
-    */
 
     // init derived class
     if (!initChild(conf, name, log)) {
@@ -190,29 +172,42 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log) {
 void 
 Sensor::start() 
 {
-    // start loop thread
-    pthread_attr_init(&attr);
-    pthread_create(&t0, &attr, &Sensor::loop_helper, this);
+    // start loop threads
+    readingThreads.resize(pool.size());
+
+    int i = 0;
+    for (std::map<uint32_t, SensorPool_t*>::iterator it = pool.begin(); it!=pool.end(); ++it) {
+        uint32_t  type = it->first;
+        readingThreads[i] = std::thread(&Sensor::loop, this, type);
+        i++;
+    }
+    
     readLoopStarted = true;
 }
 
-void* 
-Sensor::loop_helper(void *context) 
+void 
+Sensor::loop(uint32_t type) 
 {
-    return ((tk::sensors::Sensor*)context)->loop(nullptr);
-}
+    int     idx;
+    std::map<uint32_t, SensorPool_t*>::iterator it = pool.find(uint32_t(type)); 
+    if (it != pool.end()) {
+        while (senStatus != SensorStatus::STOPPING && senStatus != SensorStatus::ERROR) {
+            tk::data::SensorData* data = it->second->pool.add(idx);
+            
+            bool ok = read(data);
 
-void* 
-Sensor::loop(void *vargp) 
-{
-    while (senStatus != SensorStatus::STOPPING && senStatus != SensorStatus::ERROR) {
-        if (!readFrame()) {
-            tkWRN("Error while reading. Trying again in 2 seconds...\n");
-            sleep(2);
-            continue;
+            if (it->second->empty && ok)
+                it->second->empty = false;
+            
+            it->second->pool.releaseAdd(idx);
+
+            if (!ok) {
+                tkWRN("Error while reading. Trying again in 2 seconds...\n");
+                sleep(2);
+                continue;
+            }
         }
     }
-    pthread_exit(nullptr);
 }
 
 tk::common::Tfpose 
@@ -239,15 +234,26 @@ tk::sensors::Sensor::close()
 
     // stop online reading thread
     senStatus = SensorStatus::STOPPING;
-    if(readLoopStarted)
-        pthread_join(t0, nullptr);
+    if(readLoopStarted) {
+        for (int i = 0; i < readingThreads.size(); i++)
+            readingThreads[i].join();
+    }
     
     // stop log
 	if (senStatus == SensorStatus::OFFLINE)
 		log->stop();
     
-    // clear pool
-    //pool.close();
+    // clear pools
+    for (std::map<uint32_t,SensorPool_t*>::iterator it = pool.begin(); it!=pool.end(); ++it) {
+        it->second->pool.close();
+    }
+    pool.clear();
+
+    // close child
+    if (!closeChild()) {
+        tkERR("Error.\n");
+        return false;
+    }
 
     return true;
 }
@@ -268,35 +274,14 @@ Sensor::read(tk::data::SensorData* data)
     }
 
     if (retval)   
-        info.dataArrived++;
+        info.dataArrived.at(uint32_t(data->header.type))++;
 
     // fill data header
     if(data->header.name != info.name)
         data->header.name = info.name;
     data->header.tf         = getTf();
-    data->header.messageID  = info.dataArrived;
+    data->header.messageID  = info.dataArrived.at(uint32_t(data->header.type));
     
-    return retval;
-}
-
-bool 
-Sensor::readFrame() 
-{
-    // get data from pool
-    bool    retval;
-    int     idx;
-    /*
-    tk::data::SensorData* data = pool.add(idx);
-
-    // read
-    retval  = read(data);
-
-    if (poolEmpty && retval)
-        poolEmpty = false;
-
-    // release pool
-    pool.releaseAdd(idx);
-    */
     return retval;
 }
 

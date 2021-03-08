@@ -9,8 +9,8 @@
 
 namespace tk { namespace data {
 
-
-    enum class DataType : uint8_t{
+    
+    enum class DataType : uint32_t{
         NOT_SPEC    = 0,
         CLOUD       = 1,
         VEHICLE     = 2,
@@ -28,6 +28,29 @@ namespace tk { namespace data {
         DEPTH       = 14,
         ODOM        = 15
     };
+
+    static const char* ToStr (const DataType& type)
+    {
+        switch (type) {
+            case DataType::CLOUD:       return "cloud";
+            case DataType::VEHICLE:     return "vehicle";
+            case DataType::GPS:         return "gps";
+            case DataType::IMAGE:       return "image";
+            case DataType::RADAR:       return "radar";
+            case DataType::LINES:       return "lines";
+            case DataType::PERCEPTION:  return "perception";
+            case DataType::IMU:         return "imu";
+            case DataType::GPSIMU:      return "gps&imu";
+            case DataType::STEREO:      return "stereo";
+            case DataType::CAN:         return "can";
+            case DataType::VECTOR:      return "vector";
+            case DataType::ACTUATION:   return "actuation";
+            case DataType::DEPTH:       return "depth";
+            case DataType::ODOM:        return "odom";
+            default:                    return "???";
+                
+        }
+    }
 
     /**
      * @brief Header data class.
@@ -52,6 +75,7 @@ namespace tk { namespace data {
             this->messageID     = 0;
             this->type          = DataType::NOT_SPEC;
             this->fps           = 0;
+            this->name          = "???";
         }
 
         /**

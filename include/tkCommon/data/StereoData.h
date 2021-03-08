@@ -40,18 +40,13 @@ namespace tk{ namespace data{
 
         }
 
-/*
-        StereoData& operator=(StereoData& s){
- 
+        StereoData& operator=(const StereoData& s) {
             if(s.width != width || s.height != height || s.channels != channels){
                 init(s.width, s.height, s.channels);
             }
-            s.lockRead();
             data = s.data;
-            s.unlockRead();
             return *this;
         }
-*/
     };
 
 }}

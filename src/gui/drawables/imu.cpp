@@ -1,14 +1,16 @@
 #include "tkCommon/gui/drawables/Imu.h"
 
-tk::gui::Imu::Imu(){ 
-    this->accHistory = 10.0f;
-    this->initted = false;
+tk::gui::Imu::Imu(const std::string& name, float acc_history){ 
+    this->accHistory    = acc_history;
+    this->name          = name;
+    this->initted       = false;
 }
 
-tk::gui::Imu::Imu(tk::data::ImuData* imu){
-    this->imu = imu;  
-    this->accHistory = 10.0f;    
-    this->initted = true;
+tk::gui::Imu::Imu(tk::data::ImuData* imu, const std::string& name, float acc_history){
+    this->imu           = imu;  
+    this->accHistory    = acc_history;    
+    this->name          = name;
+    this->initted       = true;
 }
 
 tk::gui::Imu::~Imu(){

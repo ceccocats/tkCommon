@@ -1,7 +1,9 @@
 #pragma once
 
 #include <mutex>
-#include <pthread.h>
+#include <thread>
+#include <map>
+#include <utility>
 
 #include "tkCommon/common.h"
 #include "tkCommon/rt/Pool.h"
@@ -98,7 +100,7 @@ class SensorInfo{
         std::string     name;           /**< sensor name */
         float           version;        /**< program version */
         int             nSensors;       /**< number of sensors handled */
-        int             dataArrived;    /**< incremental counter */
+        std::map<uint32_t, int> dataArrived;    /**< incremental counter */
         int             triggerLine;
         bool            synched;        /**< tell if the sensor is synced with the log */
         tk::data::DataType type;      /**< type of the sensor, used for visualization */
@@ -111,7 +113,6 @@ class SensorInfo{
             name            = "???";
             version         = 1.0f;
             nSensors        = 1;
-            dataArrived     = 0;
             synched         = false;
             type            = tk::data::DataType::NOT_SPEC;
             triggerLine     = -1;
@@ -130,7 +131,8 @@ class SensorInfo{
 
 struct SensorPool_t {
     tk::rt::DataPool    pool;
-    int                 size, lastDataCounter;
+    int                 size;
+    uint32_t            lastDataCounter;
     bool                empty;
 };
 
@@ -214,20 +216,12 @@ class Sensor {
          */
         std::vector<tk::common::Tfpose> getTfs();
 
-    protected:
-    
-        // threads attributes
-        bool            readLoopStarted = false; /**< true if the read loop is started */
-        pthread_t       t0;
-        pthread_attr_t  attr;
-        
+    protected:    
         SensorStatus    senStatus;  /** Sensor status */
-
-        LogManager      *log = nullptr; 
-        
-        std::map<tk::data::DataType, SensorPool_t> pool;      /**< data pool */   
-
-        std::vector<tk::common::Tfpose> tf; /**< Sensor TF */
+        LogManager      *log;       /** Log Manager reference */
+        std::map<uint32_t, SensorPool_t*> pool;   /**< data pool */   
+        int poolSize;
+        std::vector<tk::common::Tfpose>             tf;     /**< Sensor TF */
 
         /**
          * @brief   Init sensor class, must be implemented by child.
@@ -274,16 +268,41 @@ class Sensor {
          */
         bool readFrame();
 
-    private:
-        uint32_t    lastDataCounter;    /**< Last data counter inserted in the pool */
-
         /**
-         * @brief   Method to launch internal reading thread
+         * @brief 
          * 
-         * @param context 
-         * @return void* 
+         * @tparam T 
          */
-        static void* loop_helper(void *context);
+        template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
+        void addPool(int sensorID = 0)
+        {
+            tk::sensors::SensorPool_t *sPool = new tk::sensors::SensorPool_t;
+            sPool->empty            = true;
+            sPool->size             = poolSize;
+            sPool->lastDataCounter  = -1;
+            sPool->pool.init<T>(sPool->size);
+
+            int idx;
+            for (int i = 0; i < sPool->size; i++) {
+                auto data = dynamic_cast<T*>(sPool->pool.add(idx));
+                
+                data->header.name       = info.name + "_" + tk::data::ToStr(T::type);
+                data->header.type       = T::type;
+                data->header.sensorID   = sensorID;
+                //data->header;
+
+                sPool->pool.releaseAdd(idx);
+            }
+            
+            // add pool
+            pool.insert(std::pair<uint32_t, tk::sensors::SensorPool_t*>(uint32_t(T::type) + uint32_t(sensorID*1000), sPool));
+            info.dataArrived.insert(std::pair<uint32_t, int>(uint32_t(T::type), 0));
+        }
+
+    private:
+        // threads attributes
+        bool                        readLoopStarted;    /**< true if the read loop is started */
+        std::vector<std::thread>    readingThreads;
 
         /**
          * @brief   Internal reading thread.
@@ -291,7 +310,7 @@ class Sensor {
          * @param   vargp   class reference
          * @return  void*   null
          */
-        void* loop(void *vargp);
+        void loop(uint32_t type);
 
     public:
         /**
@@ -305,34 +324,36 @@ class Sensor {
          * @return false    data is not available
          */
         template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
-        bool grab(const T* &data, int &idx, uint64_t timeout = 0) 
+        bool grab(const T* &data, int &idx, uint64_t timeout = 0, int sensorID = 0) 
         {    
             // check if the passed template is the same as the pointer
-            if (T::type != data->header.type) {
-                tkERR("Type mismatch between template and passed pointer.\n");
+            if (T::type != data->type) {
+                tkERR("Type mismatch between template ("<<tk::data::ToStr(T::type)<<" and passed pointer ("<<tk::data::ToStr(data->type)<<").\n");
                 return false;
             }
-            
+
             // check if template type is present inside pool
-            std::map<tk::data::DataType, SensorPool_t>::iterator it = pool.find(T::type); 
+            std::map<uint32_t, SensorPool_t*>::iterator it = pool.find(uint32_t(T::type) + uint32_t(sensorID*1000)); 
             if (it == pool.end()) {
                 tkERR("No pool present with this template type.\n");
                 return false;
             }
 
             // check if pool is empty
-            if (it->second.empty) {
+            if (it->second->empty) {
                 tkWRN("Pool empty.\n");
                 return false;
             }
             
             // grab
             if (timeout != 0) {     // locking
-                data = dynamic_cast<const T*>(it->second.pool.get(idx, timeout));
+                data = dynamic_cast<const T*>(it->second->pool.get(idx, timeout));
+                if (data == nullptr)
+                    tkWRN("Timeout.\n");
             } else {                // non locking
-                if (it->second.pool.newData(lastDataCounter)) {   // new data available
-                    it->second.lastDataCounter = (uint32_t) it->second.pool.inserted;
-                    data = dynamic_cast<const T*>(it->second.pool.get(idx)); 
+                if (it->second->pool.newData(it->second->lastDataCounter)) {   // new data available
+                    it->second->lastDataCounter = (uint32_t) it->second->pool.inserted;
+                    data = dynamic_cast<const T*>(it->second->pool.get(idx)); 
                 } else {                                    // no new data available
                     data = nullptr;
                 }
@@ -350,14 +371,14 @@ class Sensor {
         bool release(const int idx)
         {
             // check if template type is present inside pool
-            std::map<tk::data::DataType, SensorPool_t>::iterator it = pool.find(T::type); 
+            std::map<uint32_t, SensorPool_t*>::iterator it = pool.find(uint32_t(T::type)); 
             if (it == pool.end()) {
                 tkERR("No pool present with this template type.\n");
                 return false;
             }
 
             // release element
-            it->second.pool.releaseGet(idx);
+            it->second->pool.releaseGet(idx);
             return true;
         }                
 };

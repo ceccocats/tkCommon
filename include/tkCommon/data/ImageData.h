@@ -40,25 +40,18 @@ namespace tk{ namespace data{
 
         }
 
-/*
-        ImageData& operator=(const ImageData& s){
+        ImageData& operator=(const ImageData& s) {
  
             if(s.width != width || s.height != height || s.channels != channels){
                 release();
                 init(s.width, s.height, s.channels);
             }
-            s.lockRead();
-            memcpy(data.data(), s.data.data(), width * height * channels);
-            s.unlockRead();
+            //s.lockRead();
+            data = s.data;
+            //s.unlockRead();
             return *this;
         }
 
-        ImageData& operator=(const ImageData_gen& s){
- 
-            ImageData_gen::operator=(s);
-            return *this;
-        }
-*/
         bool empty() {return channels == 0 || width == 0 || height == 0 || data.size() == 0; }
 
         void release(){

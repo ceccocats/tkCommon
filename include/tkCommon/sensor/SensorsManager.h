@@ -18,7 +18,7 @@ namespace tk { namespace sensors {
         int                     id;
         bool                    locked;
         std::string             name;
-        tk::data::DataType    type;
+        tk::data::DataType      type;
         tk::gui::Drawable       *drawable;
     };
 
