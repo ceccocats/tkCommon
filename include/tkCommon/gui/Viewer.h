@@ -67,7 +67,7 @@ namespace tk { namespace gui {
         // user access callbacks
         std::vector<void (*)(int,int,int)> user_key_callbacks;
     
-    public:
+    private:
         
         Viewer();
         void  init();

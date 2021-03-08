@@ -12,7 +12,9 @@ namespace tk{ namespace gui{
         private:
             tk::data::CloudData*    cloud       = nullptr;
             tk::data::CloudData*    cldUpdate   = nullptr;
-            uint32_t counter = 0;
+
+            uint32_t counter    = 0;
+            bool updateCld      = false;
 
             int points;
             tk::gui::Buffer<float>  glbuffer;

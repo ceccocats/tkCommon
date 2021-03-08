@@ -120,7 +120,8 @@ tk::gui::Cloud4f::Cloud4f(std::string name){
     this->points       =  0;
     this->color        =  tk::gui::color::WHITE;
     this->color.a()    =  0.5;
-    this->update       =  true;
+    this->update       =  false;
+    this->updateCld    =  true;
     this->resetMinMax  =  true;
     this->updateMinMax =  false;
 
@@ -140,7 +141,8 @@ tk::gui::Cloud4f::Cloud4f(tk::data::CloudData* cloud, std::string name){
     this->cloud        =  cloud; 
     this->color        =  tk::gui::color::WHITE;
     this->color.a()    =  0.5;
-    this->update       =  true;
+    this->update       =  false;
+    this->updateCld    =  true;
     this->resetMinMax  =  true;
     this->updateMinMax =  false;
 
@@ -155,14 +157,6 @@ tk::gui::Cloud4f::Cloud4f(tk::data::CloudData* cloud, std::string name){
 
 tk::gui::Cloud4f::~Cloud4f(){
 
-}
-
-void 
-tk::gui::Cloud4f::updateRef(tk::data::CloudData* cloud){
-    mtxUpdate.lock();
-    this->cldUpdate = cloud;   
-    update = true;
-    mtxUpdate.unlock();
 }
 
 void 
@@ -185,43 +179,46 @@ tk::gui::Cloud4f::onInit(tk::gui::Viewer *viewer){
     cloudMods.push_back(cloudMod2.first.c_str());
 }
 
+void
+tk::gui::Cloud4f::updateRef(tk::data::CloudData* cloud){
+    mtxUpdate.lock();
+    cldUpdate = cloud;
+    update = true;
+    mtxUpdate.unlock();
+}
+
 void 
 tk::gui::Cloud4f::draw(tk::gui::Viewer *viewer){
+
     if(cldUpdate != nullptr){
-        //Case using updateRef
         if(update){
             mtxUpdate.lock();
             update = false;
             cloud = cldUpdate;
             mtxUpdate.unlock();
-
-            cloud->lockRead();
-            points = cloud->points.cols();
-            this->tf = cloud->header.tf;
-            glbuffer.setData(cloud->points.data(),cloud->points.size());
-            print.str("");
-            print<<(*cloud);
-            updateData();
-            cloud->unlockRead();
-            updateMinMax = false;
-        }
-    }else{
-        //Case using pointref
-        if(cloud->isChanged(counter)){
-            cloud->lockRead();
-            points = cloud->points.cols();
-            this->tf = cloud->header.tf;
-            glbuffer.setData(cloud->points.data(),cloud->points.size());
-            print.str("");
-            print<<(*cloud);
-            updateData();
-            cloud->unlockRead();
-            updateMinMax = false;
+            updateCld = true;
         }
     }
 
     if(cloud == nullptr){
         return;
+    }
+
+    if(cloud->isChanged(counter)){
+        updateCld = true;
+    }
+
+    if(updateCld){
+        updateCld = false;
+        cloud->lockRead();
+        points = cloud->points.cols();
+        this->tf = cloud->header.tf;
+        glbuffer.setData(cloud->points.data(),cloud->points.size());
+        print.str("");
+        print<<(*cloud);
+        updateData();
+        cloud->unlockRead();
+        updateMinMax = false;
     }
 
     if(updateMinMax == true){
