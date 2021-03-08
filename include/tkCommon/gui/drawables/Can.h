@@ -11,6 +11,7 @@ namespace tk{ namespace gui{
             bool initted;
             std::string name;
             tk::data::CanData_t* data;
+            tk::data::CanData_t* dataUpdate;
             std::stringstream print;
 
             int n = 0;

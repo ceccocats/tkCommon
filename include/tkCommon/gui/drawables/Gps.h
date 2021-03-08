@@ -25,6 +25,10 @@ namespace tk{ namespace gui{
             std::string name = "";
             std::stringstream print;
 
+            double x = 0;
+            double y = 0;
+            double z = 0;
+
         public:
             tk::gui::Color_t        color;
 

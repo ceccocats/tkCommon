@@ -43,25 +43,29 @@ tk::gui::Gps::draw(tk::gui::Viewer *viewer){
             update = false;
 
             gps->lockRead();
+            //this->tf = gps->header.tf;
             if(!geoConv.isInitialised() && gps->sats > 3 && gps->lat!=0 && gps->lon!=0 && gps->heigth!=0) {
                 geoConv.initialiseReference(gps->lat,gps->lon,gps->heigth);
             }
             
             print.str("");
             print<<(*gps);
-            double x, y, z;
             if (geoConv.isInitialised())
                 geoConv.geodetic2Enu(gps->lat,gps->lon,gps->heigth,&x, &y, &z);
             gps->unlockRead();
             
-            float RAGGIO = 2.0f; //TODO: BOSI
-            lastPos = (lastPos+1) % nPos;
-            circles[lastPos]->makeCircle(x,y,z,RAGGIO);                
+            if (geoConv.isInitialised()){
+                float RAGGIO = 2.0f; //TODO: BOSI
+                lastPos = (lastPos+1) % nPos;
+                circles[lastPos]->makeCircle(x,y,z,RAGGIO);  
+            }              
         }
-
-        for(int i = 0; i < nPos; i++){
-            circles[i]->draw(drwModelView,color,lineSize);
-        }   	
+        
+        if (geoConv.isInitialised()){
+            for(int i = 0; i < nPos; i++){
+                circles[i]->draw(drwModelView,color,lineSize);
+            }   	
+        }
     }
 }
 

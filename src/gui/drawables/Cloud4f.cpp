@@ -91,6 +91,7 @@ tk::gui::Cloud4f::updateData(){
             tk::math::Vec<float> *f = &cloud->features[features[selected[0]]];
             tkASSERT(f->size() == points,"Cloud corrupted\n");
             glbuffer.setData(f->data(), f->size(), cloud->points.size());
+
             if(autoMinMax == true){
                 float min =  999;
                 float max = -999;
@@ -158,8 +159,10 @@ tk::gui::Cloud4f::~Cloud4f(){
 
 void 
 tk::gui::Cloud4f::updateRef(tk::data::CloudData* cloud){
-    this->cloud = cloud;   
+    mtxUpdate.lock();
+    this->cldUpdate = cloud;   
     update = true;
+    mtxUpdate.unlock();
 }
 
 void 
@@ -184,6 +187,39 @@ tk::gui::Cloud4f::onInit(tk::gui::Viewer *viewer){
 
 void 
 tk::gui::Cloud4f::draw(tk::gui::Viewer *viewer){
+    if(cldUpdate != nullptr){
+        //Case using updateRef
+        if(update){
+            mtxUpdate.lock();
+            update = false;
+            cloud = cldUpdate;
+            mtxUpdate.unlock();
+
+            cloud->lockRead();
+            points = cloud->points.cols();
+            this->tf = cloud->header.tf;
+            glbuffer.setData(cloud->points.data(),cloud->points.size());
+            print.str("");
+            print<<(*cloud);
+            updateData();
+            cloud->unlockRead();
+            updateMinMax = false;
+        }
+    }else{
+        //Case using pointref
+        if(cloud->isChanged(counter)){
+            cloud->lockRead();
+            points = cloud->points.cols();
+            this->tf = cloud->header.tf;
+            glbuffer.setData(cloud->points.data(),cloud->points.size());
+            print.str("");
+            print<<(*cloud);
+            updateData();
+            cloud->unlockRead();
+            updateMinMax = false;
+        }
+    }
+
     if(cloud == nullptr){
         return;
     }
@@ -191,30 +227,20 @@ tk::gui::Cloud4f::draw(tk::gui::Viewer *viewer){
     if(updateMinMax == true){
         updateMinMax = false;
         resetMinMax  = true;
-        cloud->lockRead();
-        if(points != cloud->points.cols()){
-            points = cloud->points.cols();
-            glbuffer.setData(cloud->points.data(),cloud->points.size());
-            updateData();
-        }else{
-            updateData();
+        if(cloud->tryLockRead()){
+            if(points != cloud->points.cols()){
+                points = cloud->points.cols();
+                glbuffer.setData(cloud->points.data(),cloud->points.size());
+                print.str("");
+                print<<(*cloud);
+                updateData();
+            }else{
+                updateData();
+            }
+            cloud->unlockRead();
         }
-        cloud->unlockRead();
     }
-
-    if(cloud->isChanged(counter) || update){
-        update = false;
-
-        cloud->lockRead();
-        points = cloud->points.cols();
-        glbuffer.setData(cloud->points.data(),cloud->points.size());
-        updateData();
-        cloud->unlockRead();
-    }
-
-    glPointSize(pointSize);
-    glPushMatrix();
-    glMultMatrixf(this->cloud->header.tf.matrix().data());
+    
     if(cloudMod == cloudMod0.second){
         monocolorCloud->draw(drwModelView,&glbuffer, points, color);
     }
@@ -230,7 +256,6 @@ tk::gui::Cloud4f::draw(tk::gui::Viewer *viewer){
         shaderCloud->draw(drwModelView,shaderCloud->colormaps[selectedColorMap], &glbuffer, 
             points, minMax[0][0], minMax[1][0], axisShader, color.a());
     }
-    glPopMatrix();
     glPointSize(1.0);		
 }
 
@@ -292,11 +317,7 @@ tk::gui::Cloud4f::imGuiInfos(){
     if(cloud == nullptr){
         return;
     }
-
-    std::stringstream print;
-    print<<(*cloud);
     ImGui::Text("%s",print.str().c_str());
-    print.clear();
 }
 
 void 

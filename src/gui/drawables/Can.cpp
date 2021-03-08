@@ -22,15 +22,22 @@ tk::gui::Can::onInit(tk::gui::Viewer *viewer){
 
 void 
 tk::gui::Can::updateRef(tk::data::CanData_t* data){
-    this->data = data;
+    mtxUpdate.lock();
+    this->dataUpdate = data;
     update = initted = true;
+    mtxUpdate.unlock();
 }
 
 void 
 tk::gui::Can::draw(tk::gui::Viewer *viewer){
     if(initted){
         if(data->isChanged(counter) || update){
-            update = false;
+            if(update){
+                mtxUpdate.lock();
+                update = false;
+                data = dataUpdate;
+                mtxUpdate.unlock();
+            }
             data->lockRead();
             print.str("");
             print<<(*data);

@@ -25,6 +25,8 @@ tk::gui::GpsImu::onInit(tk::gui::Viewer *viewer){
 
 void 
 tk::gui::GpsImu::draw(tk::gui::Viewer *viewer){
+    gps->drwModelView = drwModelView;
+    imu->drwModelView = drwModelView;
     gps->draw(viewer);
     imu->draw(viewer);      
     update = gps->update && imu->update;            

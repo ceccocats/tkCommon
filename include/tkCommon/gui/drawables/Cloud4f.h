@@ -9,11 +9,11 @@ namespace tk{ namespace gui{
 
 	class Cloud4f : public Drawable {
 
-        public:
-            tk::data::CloudData*    cloud = nullptr;
+        private:
+            tk::data::CloudData*    cloud       = nullptr;
+            tk::data::CloudData*    cldUpdate   = nullptr;
             uint32_t counter = 0;
 
-        private:
             int points;
             tk::gui::Buffer<float>  glbuffer;
 
@@ -39,6 +39,8 @@ namespace tk{ namespace gui{
             bool resetMinMax;
 
             std::string name;
+
+            std::stringstream print;
             
             void updateData();
         public:
