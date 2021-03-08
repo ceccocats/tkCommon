@@ -85,7 +85,17 @@ struct MatSimple {
                 delete data;
         }
     }
-    
+
+    __host__ MatSimple<T, CUDA>& 
+    operator=(const MatSimple<T, CUDA>& s) {
+        resize(s.rows, s.cols);
+        if(CUDA) {
+            tkCUDA( cudaMemcpy(data, s.data, size * sizeof(T), cudaMemcpyDeviceToDevice) ); 
+        } else {
+            tkCUDA( cudaMemcpy(data, s.data, size * sizeof(T), cudaMemcpyHostToHost) ); 
+        }
+        return *this;
+    }    
 
 };
 

@@ -19,6 +19,17 @@ int main( int argc, char** argv){
     tk::math::Mat<float> m;
     m.useGPU();
     m.resize(3,3); 
+    m.writableMatrix() << 1, 0, 0,
+                            0, 1, 0,
+                            0, 0, 1;
+    m.print();
+    tk::math::Mat<float> m2;
+    m2 = m;
+    m2.print();
+    m2(1,1) = 10;
+    m2.print();
+    m.print();
+    
 
     print_cuda<<<1, 9>>>(m.gpu);
     cudaDeviceSynchronize();
