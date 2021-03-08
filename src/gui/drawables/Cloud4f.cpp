@@ -236,6 +236,7 @@ tk::gui::Cloud4f::draw(tk::gui::Viewer *viewer){
         }
     }
     
+    glPointSize(pointSize);
     if(cloudMod == cloudMod0.second){
         monocolorCloud->draw(drwModelView,&glbuffer, points, color);
     }
