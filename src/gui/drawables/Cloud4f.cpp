@@ -182,7 +182,7 @@ tk::gui::Cloud4f::onInit(tk::gui::Viewer *viewer){
 void
 tk::gui::Cloud4f::updateRef(tk::data::CloudData* cloud){
     mtxUpdate.lock();
-    cldUpdate = cloud;
+    cloud_tmp = cloud;
     update = true;
     mtxUpdate.unlock();
 }
@@ -190,14 +190,12 @@ tk::gui::Cloud4f::updateRef(tk::data::CloudData* cloud){
 void 
 tk::gui::Cloud4f::draw(tk::gui::Viewer *viewer){
 
-    if(cldUpdate != nullptr){
-        if(update){
-            mtxUpdate.lock();
-            update = false;
-            cloud = cldUpdate;
-            mtxUpdate.unlock();
-            updateCld = true;
-        }
+    if(update){
+        mtxUpdate.lock();
+        update = false;
+        cloud = cloud_tmp;
+        mtxUpdate.unlock();
+        updateCld = true;
     }
 
     if(cloud == nullptr){

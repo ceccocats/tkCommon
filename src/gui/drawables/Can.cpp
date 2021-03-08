@@ -1,15 +1,15 @@
 #include "tkCommon/gui/drawables/Can.h"
 
 tk::gui::Can::Can(std::string name){
-    this->name    = name;
-    this->initted = false;
+    this->name       = name;
+    this->updateCan  = false;
     msg.resize(nmsg);
 }
 
 tk::gui::Can::Can(tk::data::CanData_t* data, std::string name){
-    this->data    = data;
-    this->name    = name;
-    this->initted = true;
+    this->can        = data;
+    this->name       = name;
+    this->updateCan  = true;
     msg.resize(nmsg);
 }
 
@@ -23,30 +23,40 @@ tk::gui::Can::onInit(tk::gui::Viewer *viewer){
 void 
 tk::gui::Can::updateRef(tk::data::CanData_t* data){
     mtxUpdate.lock();
-    this->dataUpdate = data;
-    update = initted = true;
+    this->can_tmp = data;
+    update = true;
     mtxUpdate.unlock();
 }
 
 void 
 tk::gui::Can::draw(tk::gui::Viewer *viewer){
-    if(initted){
-        if(data->isChanged(counter) || update){
-            if(update){
-                mtxUpdate.lock();
-                update = false;
-                data = dataUpdate;
-                mtxUpdate.unlock();
-            }
-            data->lockRead();
-            print.str("");
-            print<<(*data);
 
-            msg[n] = print.str();
-            n = (n+1) % nmsg;
+    if(update){
+        mtxUpdate.lock();
+        update = false;
+        can = can_tmp;
+        mtxUpdate.unlock();
+        updateCan = true;
+    }
 
-            data->unlockRead();
-        }
+    if(can == nullptr){
+        return;
+    }
+
+    if(can->isChanged(counter)){
+        updateCan = true;
+    }
+
+    if(updateCan){
+        updateCan = false;
+        can->lockRead();
+        print.str("");
+        print<<(*can);
+
+        msg[n] = print.str();
+        n = (n+1) % nmsg;
+
+        can->unlockRead();
     }
 }
 

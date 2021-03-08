@@ -11,11 +11,11 @@ namespace tk{ namespace gui{
 
         private:
             std::vector<tk::gui::Texture<uint8_t>*>  textures; 
-            std::vector<tk::data::ImageData*>       images;
+            std::vector<tk::data::ImageData*>        images;
+            std::vector<std::mutex*>                  mutex;
             std::vector<bool>   updates;
             std::vector<bool>   ready;
             std::vector<uint32_t> counter;
-
 
             std::string name;
 

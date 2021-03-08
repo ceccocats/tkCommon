@@ -34,11 +34,12 @@ namespace tk{ namespace gui{
 
         private:
             tk::data::ImuData* imu;
+            tk::data::ImuData* imu_tmp;
             uint32_t counter = 0;
 
-            int nPos;
-            bool initted = false;
+            bool updateImu = false;
 
+            int nPos;
 
             std::string name = "";
             std::stringstream print;

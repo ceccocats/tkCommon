@@ -11,7 +11,7 @@ namespace tk{ namespace gui{
 
         private:
             tk::data::CloudData*    cloud       = nullptr;
-            tk::data::CloudData*    cldUpdate   = nullptr;
+            tk::data::CloudData*    cloud_tmp   = nullptr;
 
             uint32_t counter    = 0;
             bool updateCld      = false;
