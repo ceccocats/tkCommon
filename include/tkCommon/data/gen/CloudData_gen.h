@@ -32,6 +32,7 @@ public:
     static const CloudData_gen::featureType_t FEATURES_PROBABILITY;
     static const CloudData_gen::featureType_t FEATURES_NEAR_SCAN;
     static const CloudData_gen::featureType_t FEATURES_GROUND;
+    static const CloudData_gen::featureType_t FEATURES_REFLECTOR;
     static const CloudData_gen::featureType_t TIMESTAMP;
     tk::math::Mat<float> points;
     tk::math::Mat<float> ranges;

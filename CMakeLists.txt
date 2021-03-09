@@ -58,11 +58,11 @@ set(GUI_LIBS
 # Generate Data Headers
 #-------------------------------------------------------------------------------
 add_custom_command(OUTPUT 
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/*
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/GpsData_gen.h
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/_genDataHeaders.py
     COMMAND python3 _genDataHeaders.py)
-add_custom_target(tkdataheaders_gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/*)
+add_custom_target(tkdataheaders_gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/GpsData_gen.h)
 
 #-------------------------------------------------------------------------------
 # Generate shaders colorsmaps
