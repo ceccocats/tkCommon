@@ -31,7 +31,7 @@ public:
     static const featureType_t FEATURES_PROBABILITY;
     static const featureType_t FEATURES_NEAR_SCAN;
     static const featureType_t FEATURES_GROUND;
-    static const featureType_t TIMESTAMP;
+    static const featureType_t FEATURES_TIME;
     tk::math::Mat<float> points;
     tk::math::Mat<float> ranges;
     tk::common::Map<tk::math::Vec<float>> features;
