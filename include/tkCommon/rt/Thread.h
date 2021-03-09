@@ -18,7 +18,7 @@ public:
      Thread() {}
     ~Thread() {}
 
-    bool init(void *(*fun_ptr) (void *), void* args) {
+    bool init(void *(*fun_ptr) (void *), void* args = nullptr) {
         return pthread_create(&th, NULL, fun_ptr, args) == 0;
     }
 

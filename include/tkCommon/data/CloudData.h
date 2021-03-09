@@ -1,6 +1,11 @@
 #pragma once
 #include "tkCommon/data/gen/CloudData_gen.h"
 
+#ifdef ROS_ENABLED
+    #include <sensor_msgs/PointCloud2.h>
+    #include <sensor_msgs/point_cloud2_iterator.h>
+#endif
+
 namespace tk { namespace data {
 
     class CloudData : public CloudData_gen{
@@ -137,5 +142,49 @@ namespace tk { namespace data {
                 intensity->operator[](i) = float(value);
             }
         }
+
+        #ifdef ROS_ENABLED
+        bool toMsg(sensor_msgs::PointCloud2 &cloud) {
+            ros::Time ts;
+            std_msgs::Header header;
+            header.frame_id = "lidar";
+            header.stamp = ts.fromNSec(this->header.stamp*1e3);
+
+            cloud.header = header;
+            cloud.width  = size();
+            cloud.height = 1;
+            cloud.is_bigendian = false;
+            cloud.is_dense = true;
+
+            //fields setup
+            sensor_msgs::PointCloud2Modifier modifier(cloud);
+            modifier.setPointCloud2FieldsByString(1, "xyz");
+            cloud.point_step = addPointField(cloud, "intensity", 1, sensor_msgs::PointField::FLOAT32, cloud.point_step);
+            cloud.point_step = addPointField(cloud, "ring",      1, sensor_msgs::PointField::UINT16,  cloud.point_step);
+            cloud.point_step = addPointField(cloud, "time",      1, sensor_msgs::PointField::FLOAT32, cloud.point_step);
+            cloud.row_step = cloud.width * cloud.point_step;
+            cloud.data.resize(cloud.height * cloud.row_step);
+            
+            sensor_msgs::PointCloud2Iterator<float>    iter_x(cloud, "x");
+            sensor_msgs::PointCloud2Iterator<float>    iter_y(cloud, "y");
+            sensor_msgs::PointCloud2Iterator<float>    iter_z(cloud, "z");
+            sensor_msgs::PointCloud2Iterator<float>    iter_intensity(cloud, "intensity");
+            sensor_msgs::PointCloud2Iterator<uint16_t> iter_ring(cloud, "ring");
+            sensor_msgs::PointCloud2Iterator<float>    iter_time(cloud, "time");
+            tk::math::Vec<float> *fI = &features[tk::data::CloudData_gen::FEATURES_I];
+            tk::math::Vec<float> *fC = &features[tk::data::CloudData_gen::FEATURES_CHANNEL];
+            tk::math::Vec<float> *fT = &features[tk::data::CloudData_gen::FEATURES_TIME];
+
+            for(int i=0; i<size(); i++) {
+                *iter_x         = points(0,i);     ++iter_x; 
+                *iter_y         = points(1,i);     ++iter_y; 
+                *iter_z         = points(2,i);     ++iter_z; 
+                *iter_intensity = (*fI)[i]; ++iter_intensity; 
+                *iter_ring      = (*fC)[i]; ++iter_ring;  
+                *iter_time      = (*fT)[i]; ++iter_time;  
+            }
+        }
+        #endif
+
     };
 }}
