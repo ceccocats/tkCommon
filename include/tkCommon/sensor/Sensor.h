@@ -293,7 +293,7 @@ class Sensor {
             }
 
             // get configuration params
-            this->poolSize          = tk::common::YAMLgetConf<int>(conf, "pool_size", 2);
+            this->poolSize          = tk::common::YAMLgetConf<int>(conf, "pool_size", 5);
             this->info.triggerLine  = tk::common::YAMLgetConf<int>(conf, "trigger_line", -1);
 
             // set sensor status
