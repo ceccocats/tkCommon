@@ -181,14 +181,14 @@ namespace tk { namespace sensors {
                     auto ref = (tk::gui::Image*)drw->drawable;
                     if (drw->locked) {
                         if (ref->update == false) {
-                            self->sensors[drw->name]->release<tk::data::VectorData<tk::data::ImageData>>(drw->id);
+                            self->sensors[drw->name]->release<tk::data::ImageData>(drw->id);
                             drw->locked = false;
                         }
                     } else {
-                        const tk::data::VectorData<tk::data::ImageData>* d;
-                        if (self->sensors[drw->name]->grab<tk::data::VectorData<tk::data::ImageData>>(d,drw->id)) {
-                            auto a = (tk::data::VectorData<tk::data::ImageData>*)d;
-                            ref->updateRef(a);
+                        const tk::data::ImageData* d;
+                        if (self->sensors[drw->name]->grab<tk::data::ImageData>(d,drw->id)) {
+                            auto a = (tk::data::ImageData*)d;
+                            ref->updateRef(0,a);
                             drw->locked = true;
                         }
                     }

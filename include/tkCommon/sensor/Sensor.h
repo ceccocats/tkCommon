@@ -279,7 +279,7 @@ class Sensor {
             for (int i = 0; i < sPool->size; i++) {
                 auto data = dynamic_cast<T*>(sPool->pool.add(idx));
                 
-                data->header.name       = info.name + "_" + tk::data::ToStr(T::type);
+                data->header.name       = info.name + "_" + tk::data::ToStr(T::type) + "_" + std::to_string(sensorID);
                 data->header.type       = T::type;
                 data->header.sensorID   = sensorID;
 

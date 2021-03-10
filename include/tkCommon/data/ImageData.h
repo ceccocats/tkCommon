@@ -21,22 +21,16 @@ namespace tk{ namespace data{
 
         void init(){
 
-            lockWrite();
-        	ImageData_gen::init();
-            unlockWrite();
 
         }
         
         void init(int w, int h, int ch){
 
-            lockWrite();
-        	ImageData_gen::init();
             width = w;
             height = h;
             channels = ch;
             data.resize(width*height*channels);
             header.name = "image";
-            unlockWrite();
 
         }
 
@@ -58,12 +52,10 @@ namespace tk{ namespace data{
             if(empty())
                 return;
 
-            lockWrite();
             data.resize(0);
             width = 0;
             height = 0;
             channels = 0;
-            unlockWrite();
         }
 
         bool fromVar(tk::math::MatIO::var_t &var) {
