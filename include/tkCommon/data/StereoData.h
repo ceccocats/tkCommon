@@ -1,7 +1,6 @@
 #pragma once
 
 #include "tkCommon/data/ImageData.h"
-#include "tkCommon/data/DepthData.h"
 
 namespace tk{ namespace data{
 
@@ -18,7 +17,7 @@ namespace tk{ namespace data{
         ImageData left;
         ImageData right;
         ImageData color;
-        DepthData depth;
+        ImageDataU16 depth;
 
         void init(int w, int h, int c){
             data.init(w,h*2,c);
@@ -47,7 +46,7 @@ namespace tk{ namespace data{
         }
 
         void initDepth(int w, int h){
-            depth.init(w, h);
+            depth.init(w, h, 1);
             d_width = w;
             d_height = h;
 
