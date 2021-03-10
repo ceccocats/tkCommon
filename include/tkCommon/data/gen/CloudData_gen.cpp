@@ -25,8 +25,8 @@ namespace tk { namespace data {
  const CloudData_gen::featureType_t CloudData_gen::FEATURES_PROBABILITY = "f_probability";
  const CloudData_gen::featureType_t CloudData_gen::FEATURES_NEAR_SCAN = "f_near_scan";
  const CloudData_gen::featureType_t CloudData_gen::FEATURES_GROUND = "f_ground";
+ const CloudData_gen::featureType_t CloudData_gen::FEATURES_TIME = "f_time";
  const CloudData_gen::featureType_t CloudData_gen::FEATURES_REFLECTOR = "f_reflector";
- const CloudData_gen::featureType_t CloudData_gen::TIMESTAMP = "f_timestamp";
 
 
 }}

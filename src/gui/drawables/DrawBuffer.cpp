@@ -45,11 +45,8 @@ tk::gui::DrawBuffer::beforeDraw(tk::gui::Viewer *viewer) {
 void 
 tk::gui::DrawBuffer::draw(tk::gui::Viewer *viewer){
     for(int i = 0; i < drawables.size(); i++){
-        //glPushMatrix();
-        //glMultMatrixf(drawables[i]->tf.matrix().data());
         drawables[i]->drwModelView = drwModelView * glm::make_mat4x4(drawables[i]->tf.matrix().data());
         drawables[i]->draw(viewer);
-        //glPopMatrix();
     }
 }
 

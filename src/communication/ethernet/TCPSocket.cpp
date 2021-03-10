@@ -95,7 +95,7 @@ bool
 tk::communication::TCPSocket::close(){
 
     if(this->sock_client == 1)
-        return ::close(this->sock_fd) > 0;      //server
+        return ::close(this->sock_fd) > 0;
     
     return false;
 

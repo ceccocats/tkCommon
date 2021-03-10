@@ -16,6 +16,7 @@ namespace tk{ namespace gui{
 		bool follow = false;
 
 		bool update = false;
+		std::mutex mtxUpdate;
 
 		glm::mat4 drwModelView;
 

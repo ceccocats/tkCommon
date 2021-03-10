@@ -6,10 +6,12 @@ tk::gui::Image::Image(int n, std::string name){
     this->updates.resize(n);
     this->ready.resize(n);
     this->counter.resize(n);
+    this->mutex.resize(n);
     for(int i = 0; i < n; i++){
         this->updates[i] = false;
         this->ready[i]   = false;
         this->counter[i] = 0; 
+        this->mutex[i] = new std::mutex();
     }   
     this->name = name;
 }
@@ -23,12 +25,14 @@ tk::gui::Image::Image(std::string name, int n, ...){
     this->updates.resize(n);
     this->ready.resize(n);
     this->counter.resize(n);
+    this->mutex.resize(n);
 
     for(int i = 0; i < n; i++){
         this->images[i]  = va_arg(arguments, tk::data::ImageData*);
         this->updates[i] = false;
         this->ready[i]   = true;
         this->counter[i] = 0;
+        this->mutex[i] = new std::mutex();
     }
     va_end(arguments);
     this->name = name;
@@ -42,9 +46,11 @@ void
 tk::gui::Image::onInit(tk::gui::Viewer *viewer){
     for(int i = 0; i < images.size(); i++){
         if(this->ready[i] == true){
+            this->mutex[i]->lock();
             textures[i] = new tk::gui::Texture<uint8_t>();
             textures[i]->init(images[i]->width, images[i]->height, images[i]->channels);
             textures[i]->setData(images[i]->data.data());
+            this->mutex[i]->unlock();
         }
 
     }
@@ -54,8 +60,10 @@ void
 tk::gui::Image::updateRef(int index, tk::data::ImageData* img){
     tkASSERT(index <= images.size());
     
-    this->images[index]     = img;
-    this->updates[index]    = true;
+    this->mutex[index]->lock();
+    this->images[index]  = img;
+    this->updates[index] = true;
+    this->mutex[index]->unlock();
 }
 
 void 
@@ -72,11 +80,14 @@ tk::gui::Image::draw(tk::gui::Viewer *viewer){
         //init
         if(!ready[i] && updates[i]){
             this->ready[i]  = true;
+            this->mutex[i]->lock();
             textures[i]     = new tk::gui::Texture<uint8_t>();
             textures[i]->init(images[i]->width, images[i]->height, images[i]->channels);
+            this->mutex[i]->unlock();
         }
 
         if(ready[i]){
+            this->mutex[i]->lock();
             if(images[i]->isChanged(counter[i]) || updates[i]){
                 //Copy data
                 images[i]->lockRead();
@@ -84,6 +95,7 @@ tk::gui::Image::draw(tk::gui::Viewer *viewer){
                 images[i]->unlockRead();
                 this->updates[i]  = false;
             }
+            this->mutex[i]->unlock();
         }
 
         ImGui::Begin(name.c_str(), NULL, ImGuiWindowFlags_NoScrollbar);
@@ -107,8 +119,9 @@ tk::gui::Image::imGuiInfos(){
     for(int i = 0; i< images.size(); i++){
         std::stringstream print;
         if(ready[i] == true){
+            this->mutex[i]->lock();
             print<<(*images[i]);
-            //ImGui::Text("%s",images[i]->header.name.c_str());
+            this->mutex[i]->unlock();
             ImGui::Text("%s\n\n",print.str().c_str());
         }
         print.clear();
@@ -117,8 +130,10 @@ tk::gui::Image::imGuiInfos(){
 
 void 
 tk::gui::Image::onClose(){
-    for(int i = 0; i< images.size(); i++)
+    for(int i = 0; i< images.size(); i++){
         textures[i]->release();
+        delete mutex[i];
+    }
 }
 
 std::string 

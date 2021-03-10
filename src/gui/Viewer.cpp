@@ -291,6 +291,12 @@ Viewer::drawInfos(){
         ImGui::Text("Window size: %d x %d", width, height);
 
     }else{
+        std::stringstream ss;
+        ss << "tf: \n"<<"\tpos: "<<tk::common::tf2pose(drawables[imguiSelected]->tf)<<"\n";
+        ss            <<"\trot: "<<tk::common::tf2rot(drawables[imguiSelected]->tf)<<"\n";
+
+        ImGui::Text("%s", ss.str().c_str());
+        ImGui::Separator();
         drawables[imguiSelected]->imGuiInfos();
     }
 }

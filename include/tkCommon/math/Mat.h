@@ -171,7 +171,10 @@ public:
 
     friend std::ostream& 
     operator<<(std::ostream& os, Mat<T>& s) {
-        os<<"Mat ("<<s.rows()<<"x"<<s.cols()<<")";
+        if(s.size() <= 16)
+            s.print(os);
+        else
+            os<<"Mat ("<<s.rows()<<"x"<<s.cols()<<")";
         return os;
     }
 

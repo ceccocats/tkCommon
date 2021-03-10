@@ -100,8 +100,8 @@ genData(className, VARS, DEPS)
 className = "CloudData_gen"
 DEPS = ["#include \"tkCommon/math/Mat.h\"\n"]
 DEPS = ["#include \"tkCommon/math/Vec.h\"\n"]
-VARS = [ {"name":"type",                        "type":"static const DataType", "default": "DataType::CLOUD"},
-         {"name":"featureType_t",               "type":"typedef std::string"},
+VARS = [ {"name":"featureType_t",               "type": "typedef std::string"},
+         {"name":"type",                        "type":"static const DataType", "default": "DataType::CLOUD"},
          {"name":"FEATURES_NONE",               "type":"static const CloudData_gen::featureType_t", "default": "\"f_none\""},
          {"name":"FEATURES_I",                  "type":"static const CloudData_gen::featureType_t", "default": "\"f_intensity\""},
          {"name":"FEATURES_NOISE",              "type":"static const CloudData_gen::featureType_t", "default": "\"f_noise\""},
@@ -123,8 +123,8 @@ VARS = [ {"name":"type",                        "type":"static const DataType", 
          {"name":"FEATURES_PROBABILITY",        "type":"static const CloudData_gen::featureType_t", "default": "\"f_probability\""},
          {"name":"FEATURES_NEAR_SCAN",          "type":"static const CloudData_gen::featureType_t", "default": "\"f_near_scan\""},
          {"name":"FEATURES_GROUND",             "type":"static const CloudData_gen::featureType_t", "default": "\"f_ground\""},
+         {"name":"FEATURES_TIME",               "type":"static const CloudData_gen::featureType_t", "default": "\"f_time\""},
          {"name":"FEATURES_REFLECTOR",          "type":"static const CloudData_gen::featureType_t", "default": "\"f_reflector\""},
-         {"name":"TIMESTAMP",                   "type":"static const CloudData_gen::featureType_t", "default": "\"f_timestamp\""},
          {"name":"points",                      "type":"tk::math::Mat<float>"},
          {"name":"ranges",                      "type":"tk::math::Mat<float>"},
          {"name":"features",                    "type":"tk::common::Map<tk::math::Vec<float>>"}]

@@ -8,9 +8,10 @@ namespace tk{ namespace gui{
 
         private:
             uint32_t counter = 0;
-            bool initted;
+            bool updateCan = false;
             std::string name;
-            tk::data::CanData* data;
+            tk::data::CanData* can;
+            tk::data::CanData* can_tmp;
             std::stringstream print;
 
             int n = 0;

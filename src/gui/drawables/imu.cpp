@@ -3,14 +3,12 @@
 tk::gui::Imu::Imu(const std::string& name, float acc_history){ 
     this->accHistory    = acc_history;
     this->name          = name;
-    this->initted       = false;
 }
 
 tk::gui::Imu::Imu(tk::data::ImuData* imu, const std::string& name, float acc_history){
     this->imu           = imu;  
     this->accHistory    = acc_history;    
     this->name          = name;
-    this->initted       = true;
 }
 
 tk::gui::Imu::~Imu(){
@@ -19,8 +17,10 @@ tk::gui::Imu::~Imu(){
 
 void 
 tk::gui::Imu::updateRef(tk::data::ImuData* imu){
-    this->imu = imu;   
-    initted = update = true;
+    mtxUpdate.lock();
+    this->imu_tmp = imu;
+    update = true;
+    mtxUpdate.unlock();
 }
 
 void 
@@ -29,29 +29,43 @@ tk::gui::Imu::onInit(tk::gui::Viewer *viewer){
 
 void 
 tk::gui::Imu::draw(tk::gui::Viewer *viewer){
-    if(initted == true){
-        if(imu->isChanged(counter) || update){
-            update = false;
+    if(update){
+        mtxUpdate.lock();
+        update = false;
+        imu = imu_tmp;
+        mtxUpdate.unlock();
+        updateImu = true;
+    }
 
-            imu->lockRead();
-            name = imu->header.name;
-            print.str("");
-            print<<(*imu);
+    if(imu == nullptr){
+        return;
+    }
 
-            if(prec == 0){
-                prec = imu->header.stamp;
-            }
+    if(imu->isChanged(counter)){
+        updateImu = true;
+    }
 
-            t += float(imu->header.stamp - prec) * 1e-6;
-            
-            accX.AddPoint(t, imu->acc.x());
-            accY.AddPoint(t, imu->acc.y());
-            accZ.AddPoint(t, imu->acc.z());
-            
+    if(updateImu){
+        updateImu = false;
+
+        imu->lockRead();
+        name = imu->header.name;
+        print.str("");
+        print<<(*imu);
+
+        if(prec == 0){
             prec = imu->header.stamp;
-
-            imu->unlockRead();
         }
+
+        t += float(imu->header.stamp - prec) * 1e-6;
+        
+        accX.AddPoint(t, imu->acc.x());
+        accY.AddPoint(t, imu->acc.y());
+        accZ.AddPoint(t, imu->acc.z());
+        
+        prec = imu->header.stamp;
+
+        imu->unlockRead();
     }
 }
 

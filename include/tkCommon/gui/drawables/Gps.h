@@ -10,7 +10,10 @@ namespace tk{ namespace gui{
 
         private:
             tk::data::GpsData* gps;
+            tk::data::GpsData* gps_tmp;
             uint32_t counter = 0;
+
+            bool updateGps = false;
 
             int nPos;
             int lastPos;
@@ -20,10 +23,12 @@ namespace tk{ namespace gui{
 
             float lineSize = 2.0f;
 
-            bool initted = false;
-
             std::string name = "";
             std::stringstream print;
+
+            double x = 0;
+            double y = 0;
+            double z = 0;
 
         public:
             tk::gui::Color_t        color;

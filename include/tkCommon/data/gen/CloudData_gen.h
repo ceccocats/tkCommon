@@ -9,8 +9,8 @@ namespace tk { namespace data {
 class CloudData_gen : public SensorData
 {
 public:
-    static const DataType type;
     typedef std::string featureType_t;
+    static const DataType type;
     static const CloudData_gen::featureType_t FEATURES_NONE;
     static const CloudData_gen::featureType_t FEATURES_I;
     static const CloudData_gen::featureType_t FEATURES_NOISE;
@@ -32,8 +32,8 @@ public:
     static const CloudData_gen::featureType_t FEATURES_PROBABILITY;
     static const CloudData_gen::featureType_t FEATURES_NEAR_SCAN;
     static const CloudData_gen::featureType_t FEATURES_GROUND;
+    static const CloudData_gen::featureType_t FEATURES_TIME;
     static const CloudData_gen::featureType_t FEATURES_REFLECTOR;
-    static const CloudData_gen::featureType_t TIMESTAMP;
     tk::math::Mat<float> points;
     tk::math::Mat<float> ranges;
     tk::common::Map<tk::math::Vec<float>> features;
