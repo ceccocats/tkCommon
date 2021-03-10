@@ -37,6 +37,41 @@ void Texture<uint8_t>::init(int width, int height, int channels, bool anti_alias
 }
 
 template <>
+void Texture<uint16_t>::init(int width, int height, int channels, bool anti_aliasing){
+
+    this->width         =   width;
+    this->height        =  height;
+    this->anti_aliasing = anti_aliasing;
+
+    if(channels > 4 || channels < 1){
+        tkERR("You must set 1, 2, 3 or 4 channel. Abort\n");
+    }
+
+    type =   GL_UNSIGNED_SHORT;
+
+    if(channels == 1){
+        format = GL_LUMINANCE;
+        this->generateTexture(GL_LUMINANCE16);
+    }
+
+    if(channels == 2){
+        format = GL_RG;
+        this->generateTexture(GL_RG16);
+    }
+
+    if(channels == 3){
+        format = GL_RGB;
+        this->generateTexture(GL_RGB16);
+    }
+
+    if(channels == 4){
+        format = GL_RGBA;
+        this->generateTexture(GL_RGBA16);
+    }
+}
+
+
+template <>
 void Texture<float>::init(int width, int height, int channels, bool anti_aliasing){
 
     this->width         =   width;
