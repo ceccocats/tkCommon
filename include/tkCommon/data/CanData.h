@@ -3,7 +3,7 @@
 
 namespace tk { namespace data {
     
-    class CanData_t : public CanData_gen{
+    class CanData : public CanData_gen{
         
     public:
         // return integer ID
@@ -12,7 +12,7 @@ namespace tk { namespace data {
         // return data as a uint64_t pointer, useful for DBC encoding
         uint64_t *data() { return reinterpret_cast<uint64_t*>(frame.data); }
 
-        friend std::ostream& operator<<(std::ostream& os, const CanData_t& m) {
+        friend std::ostream& operator<<(std::ostream& os, const CanData& m) {
             os << std::setprecision(10) << m.header.stamp<< "\t"<<std::hex<<m.frame.can_id<<std::dec;
             os << "\t"<<std::hex;
             for(int i=0; i<m.frame.can_dlc; i++) {

@@ -10,7 +10,7 @@ namespace tk{ namespace gui{
             uint32_t counter = 0;
             bool initted;
             std::string name;
-            tk::data::CanData_t* data;
+            tk::data::CanData* data;
             std::stringstream print;
 
             int n = 0;
@@ -19,11 +19,11 @@ namespace tk{ namespace gui{
 
         public:
             Can(std::string name = "can");
-            Can(tk::data::CanData_t* data, std::string name = "can");
+            Can(tk::data::CanData* data, std::string name = "can");
             ~Can();
 
             void onInit(tk::gui::Viewer *viewer);
-            void updateRef(tk::data::CanData_t* data);
+            void updateRef(tk::data::CanData* data);
             void draw(tk::gui::Viewer *viewer);
             void imGuiInfos();
             void imGuiSettings();

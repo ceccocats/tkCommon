@@ -6,7 +6,7 @@ tk::gui::Can::Can(std::string name){
     msg.resize(nmsg);
 }
 
-tk::gui::Can::Can(tk::data::CanData_t* data, std::string name){
+tk::gui::Can::Can(tk::data::CanData* data, std::string name){
     this->data    = data;
     this->name    = name;
     this->initted = true;
@@ -21,7 +21,7 @@ tk::gui::Can::onInit(tk::gui::Viewer *viewer){
 }
 
 void 
-tk::gui::Can::updateRef(tk::data::CanData_t* data){
+tk::gui::Can::updateRef(tk::data::CanData* data){
     this->data = data;
     update = initted = true;
 }

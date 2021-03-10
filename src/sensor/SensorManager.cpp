@@ -259,13 +259,13 @@ namespace tk { namespace sensors {
                     auto ref = (tk::gui::Can*)drw->drawable;
                     if (drw->locked){
                         if (ref->update == false){
-                            self->sensors[drw->name]->release<tk::data::CanData_t>(drw->id);
+                            self->sensors[drw->name]->release<tk::data::CanData>(drw->id);
                             drw->locked = false;
                         }
                     } else {
-                        const tk::data::CanData_t* d;
-                        if (self->sensors[drw->name]->grab<tk::data::CanData_t>(d,drw->id)) {
-                            tk::data::CanData_t* a = (tk::data::CanData_t*)d;
+                        const tk::data::CanData* d;
+                        if (self->sensors[drw->name]->grab<tk::data::CanData>(d,drw->id)) {
+                            tk::data::CanData* a = (tk::data::CanData*)d;
                             ref->updateRef(a);
                             drw->locked = true;
                         }

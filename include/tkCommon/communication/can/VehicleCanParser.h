@@ -104,7 +104,7 @@ namespace tk { namespace communication {
          * @param frame input can frame
          * @param vehData output vehicle data
          */
-        void parse(tk::data::CanData_t &frame, tk::data::VehicleData &vehData) {
+        void parse(tk::data::CanData &frame, tk::data::VehicleData &vehData) {
             
             if(msgs.count(frame.id()) == 0)
                 return;

@@ -54,9 +54,8 @@ tk::gui::Gps::draw(tk::gui::Viewer *viewer){
                 geoConv.geodetic2Enu(gps->lat,gps->lon,gps->heigth,&x, &y, &z);
             gps->unlockRead();
             
-            float RAGGIO = 2.0f; //TODO: BOSI
             lastPos = (lastPos+1) % nPos;
-            circles[lastPos]->makeCircle(x,y,z,RAGGIO);                
+            circles[lastPos]->makeCircle(x, y, 0.0f, gps->cov(0, 0));                
         }
 
         for(int i = 0; i < nPos; i++){

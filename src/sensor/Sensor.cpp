@@ -196,9 +196,11 @@ Sensor::loop(uint32_t type)
             
             bool ok = read(data);
 
-            if (it->second->empty && ok)
+            if (it->second->empty == true && ok == true) {
+                tkDBG("primo elemento inserito nella pool.\n");
                 it->second->empty = false;
-            
+            }
+
             it->second->pool.releaseAdd(idx);
 
             if (!ok) {
@@ -274,13 +276,13 @@ Sensor::read(tk::data::SensorData* data)
     }
 
     if (retval)   
-        info.dataArrived.at(uint32_t(data->header.type))++;
+        info.dataArrived.at(uint32_t(data->header.type)+uint32_t(data->header.sensorID*1000))++;
 
     // fill data header
     if(data->header.name != info.name)
         data->header.name = info.name;
     data->header.tf         = getTf();
-    data->header.messageID  = info.dataArrived.at(uint32_t(data->header.type));
+    data->header.messageID  = info.dataArrived.at(uint32_t(data->header.type)+uint32_t(data->header.sensorID*1000));
     
     return retval;
 }

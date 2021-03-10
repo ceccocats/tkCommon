@@ -132,7 +132,6 @@ class SensorInfo{
 struct SensorPool_t {
     tk::rt::DataPool    pool;
     int                 size;
-    uint32_t            lastDataCounter;
     bool                empty;
 };
 
@@ -274,7 +273,6 @@ class Sensor {
             tk::sensors::SensorPool_t *sPool = new tk::sensors::SensorPool_t;
             sPool->empty            = true;
             sPool->size             = poolSize;
-            sPool->lastDataCounter  = -1;
             sPool->pool.init<T>(sPool->size);
 
             int idx;
@@ -284,14 +282,13 @@ class Sensor {
                 data->header.name       = info.name + "_" + tk::data::ToStr(T::type);
                 data->header.type       = T::type;
                 data->header.sensorID   = sensorID;
-                //data->header;
 
                 sPool->pool.releaseAdd(idx);
             }
             
             // add pool
             pool.insert(std::pair<uint32_t, tk::sensors::SensorPool_t*>(uint32_t(T::type) + uint32_t(sensorID*1000), sPool));
-            info.dataArrived.insert(std::pair<uint32_t, int>(uint32_t(T::type), 0));
+            info.dataArrived.insert(std::pair<uint32_t, int>(uint32_t(T::type) + uint32_t(sensorID*1000), 0));
         }
 
         template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
@@ -347,7 +344,7 @@ class Sensor {
             }
 
             // check if pool is empty
-            if (it->second->empty) {
+            if (it->second->empty == true) {
                 tkWRN("Pool empty.\n");
                 return false;
             }
@@ -358,12 +355,7 @@ class Sensor {
                 if (data == nullptr)
                     tkWRN("Timeout.\n");
             } else {                // non locking
-                //if (it->second->pool.newData(it->second->lastDataCounter)) {   // new data available
-                //    it->second->lastDataCounter = (uint32_t) it->second->pool.inserted;
                 data = dynamic_cast<const T*>(it->second->pool.get(idx)); 
-                //} else {                                    // no new data available
-                //    data = nullptr;
-                //}
             }
             return (data != nullptr)?true:false;
         }
