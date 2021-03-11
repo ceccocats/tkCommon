@@ -37,7 +37,7 @@ namespace tk { namespace common {
             unsigned hash_key = tk::common::key(key.c_str());
             return _map.count(hash_key);
         }
-        int size() {
+        int size() const {
             return _map.size();
         }
         T& operator[](unsigned key) {
@@ -52,7 +52,7 @@ namespace tk { namespace common {
         const std::vector<T*>& vals() {
             return _vals;
         }
-        const std::vector<std::string>& keys() {
+        const std::vector<std::string>& keys() const {
             return _keys;
         }
         friend std::ostream& operator<<(std::ostream& os, Map& s) {

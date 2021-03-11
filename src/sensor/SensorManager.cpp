@@ -1,120 +1,118 @@
 #include "tkCommon/sensor/SensorsManager.h"
 
-namespace tk { namespace sensors {
-    bool 
-    SensorsManager::init(YAML::Node conf, const std::string &logPath, const std::string &list) 
-    {    
-        // LOG
-        if (logPath != "") {
-            this->logPath       = logPath;
-            this->logManager    = new tk::sensors::LogManager();
-            if (!logManager->init(this->logPath)) {
-                tkERR("Error init logManger.\n");
-                return false;
-            }
-        }
-        
-        /*
-        // SYNCH BOX
-        if (conf["synch"].IsDefined()) {
-            Clock::get().init(conf["synch"]);
-        } else {
-            tkWRN("No synch parameter defined, skipping synch.\n");
-        }
-        */
-
-        // SPAWN SENSOR
-        if (!spawn(conf, list)) {
-            tkERR("Cannot spawn sensors.\n");
+using namespace tk::sensors;
+bool 
+SensorsManager::init(YAML::Node aConf, const std::string &aLogPath, const std::string &aList) 
+{    
+    // LOG
+    if (mLogPath != "") {
+        this->mLogPath      = aLogPath;
+        this->mLogManager   = new tk::sensors::LogManager();
+        if (!mLogManager->init(this->mLogPath)) {
+            tkERR("Error init logManger.\n");
             return false;
         }
+    }
+    
+    /*
+    // SYNCH BOX
+    if (conf["synch"].IsDefined()) {
+        Clock::get().init(conf["synch"]);
+    } else {
+        tkWRN("No synch parameter defined, skipping synch.\n");
+    }
+    */
 
-        return true;
+    // SPAWN SENSOR
+    if (!spawn(aConf, aList)) {
+        tkERR("Cannot spawn sensors.\n");
+        return false;
     }
 
-    void 
-    SensorsManager::start() 
-    {
-        for (std::map<std::string,tk::sensors::Sensor*>::iterator it = sensors.begin(); it!=sensors.end(); ++it)
-            it->second->start();
-        
-        //Clock::get().start();
+    return true;
+}
+
+void 
+SensorsManager::start() 
+{
+    for (const auto &sensor: mSensors)
+        sensor.second->start();
+    //Clock::get().start();
+}
+
+bool 
+SensorsManager::close() 
+{
+    for (const auto &sensor: mSensors)
+        sensor.second->close();
+    
+    //if (Clock::get().synchronized())
+    //    Clock::get().stop();
+}
+
+void 
+SensorsManager::startRecord(const std::string &aFolderPath) 
+{
+    for (const auto &sensor: mSensors)
+        sensor.second->startRecord(aFolderPath);
+    
+    if (tk::gui::Viewer::getInstance()->isRunning())
+        tk::gui::Viewer::getInstance()->add(new tk::gui::RecordInfo(aFolderPath));
+}
+
+void 
+SensorsManager::stopRecord() 
+{
+    for (const auto &sensor: mSensors)
+        sensor.second->stopRecord();
+}
+
+tk::sensors::Sensor* 
+SensorsManager::operator[](const std::string &aString)
+{
+    if (mSensors.find(aString) != mSensors.end())
+        return mSensors.find(aString)->second;
+    else {
+        tkERR("Cannot find \'"<<aString<<"\' sensor.\n");
+        return nullptr;
     }
+}
 
-    bool 
-    SensorsManager::close() 
-    {
-        for (std::map<std::string,tk::sensors::Sensor*>::iterator it = sensors.begin(); it!=sensors.end(); ++it)
-            it->second->close();
-        
-        //if (Clock::get().synchronized())
-        //    Clock::get().stop();
+void 
+SensorsManager::setReplayDebug(bool aDebug)
+{
+    if (mLogManager != nullptr) {
+        mLogManager->manualTick = aDebug;
+    } else {
+        tkWRN("You are in real time mode, this is not possible\n");
     }
+}
 
-    void 
-    SensorsManager::startRecord(const std::string &folderPath) 
-    {
-        for (std::map<std::string,tk::sensors::Sensor*>::iterator it = sensors.begin(); it!=sensors.end(); ++it)
-            it->second->startRecord(folderPath);
-        
-        if (tk::gui::Viewer::getInstance()->isRunning())
-            tk::gui::Viewer::getInstance()->add(new tk::gui::RecordInfo(folderPath));
+void 
+SensorsManager::skipDebugTime(timeStamp_t aTime)
+{
+    if (mLogManager != nullptr) {
+        mLogManager->setTick(mLogManager->getTick() + aTime);
+    } else {
+        tkWRN("You are in real time mode, this is not possible\n");
     }
+}
 
-    void 
-    SensorsManager::stopRecord() 
-    {
-        for (std::map<std::string,tk::sensors::Sensor*>::iterator it = sensors.begin(); it!=sensors.end(); ++it)
-            it->second->stopRecord();
+void 
+SensorsManager::waitSync(timeStamp_t aTime) 
+{
+    tkASSERT(mLogManager != nullptr);
+    mLogManager->setTick(aTime);
+    usleep(20000); // TODO: better sync
+
+    while (true) {
+        bool synched = true;
+        for (const auto sensor : mSensors)
+            synched &= sensor.second->info.synched;
+
+        if (synched)
+            break;
+
+        usleep(1000);
     }
-
-    tk::sensors::Sensor* 
-    SensorsManager::operator[](const std::string &s)
-    {
-        if (sensors.find(s) != sensors.end())
-            return sensors.find(s)->second;
-        else {
-            tkERR("Cannot find \'"<<s<<"\' sensor.\n");
-            return nullptr;
-        }
-    }
-
-    void 
-    SensorsManager::setReplayDebug(bool debug)
-    {
-        if (logManager != nullptr) {
-            logManager->manualTick = debug;
-        } else {
-            tkWRN("You are in real time mode, this is not possible\n");
-        }
-    }
-
-    void 
-    SensorsManager::skipDebugTime(timeStamp_t time)
-    {
-        if (logManager != nullptr) {
-            logManager->setTick(logManager->getTick() + time);
-        } else {
-            tkWRN("You are in real time mode, this is not possible\n");
-        }
-    }
-
-    void 
-    SensorsManager::waitSync(timeStamp_t time) 
-    {
-        tkASSERT(logManager != nullptr);
-        logManager->setTick(time);
-        usleep(20000); // TODO: better sync
-
-        while (true) {
-            bool synched = true;
-            for (auto s : sensors)
-                synched &= s.second->info.synched;
-
-            if (synched)
-                break;
-
-            usleep(1000);
-        }
-    }
-}}
+}

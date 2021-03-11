@@ -1,35 +1,27 @@
 #pragma once
 
-#include "tkCommon/gui/drawables/Drawable.h"
+#include "tkCommon/gui/drawables/DataDrawable.h"
 #include "tkCommon/data/RadarData.h"
 #include "tkCommon/gui/drawables/Cloud4f.h"
 
 namespace tk { namespace gui {
 
-	class Radar : public Drawable {
+	class Radar : public DataDrawable<tk::data::RadarData> {
 
         private:
-            tk::data::RadarData* radar;
-            uint32_t counter = 0;
-            bool initted = false;
+            tk::gui::Cloud4f *far_drw, *near_drw;
 
-            Cloud4f *far_drw, *near_drw;
-
-            std::string name = "";
-            std::stringstream print;
         public:
-            Radar();
-            Radar(const std::string& name);
+            Radar(const std::string& name = "radar");
             Radar(tk::data::RadarData* radar, const std::string& name);
             ~Radar();
 
-            void updateRef(tk::data::RadarData* radar);
             void onInit(tk::gui::Viewer *viewer);
-            void draw(tk::gui::Viewer *viewer);
             void imGuiSettings();
             void imGuiInfos();
-            void onClose();
             
-            std::string toString();
+        private:
+            void drawData(tk::gui::Viewer *viewer){};
+            void updateData(tk::gui::Viewer *viewer);
 	};
 }}

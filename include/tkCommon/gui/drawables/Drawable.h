@@ -15,9 +15,6 @@ namespace tk{ namespace gui{
 		bool enabled = true;
 		bool follow = false;
 
-		bool update = false;
-		std::mutex mtxUpdate;
-
 		glm::mat4 drwModelView;
 
 		tk::common::Tfpose tf = tk::common::Tfpose::Identity();
@@ -42,11 +39,12 @@ namespace tk{ namespace gui{
 
 		/** class name method */
 		virtual std::string toString(){
-			return "Drawable";
+			return name;
 		}
 
-	protected:
+	public:
 		tk::gui::shader::generic*	shader;
+		std::string name = "no name";
 	};
 }}
 #include "tkCommon/gui/Viewer.h"

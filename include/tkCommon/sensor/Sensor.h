@@ -10,6 +10,7 @@
 #include "tkCommon/data/SensorData.h"
 #include "tkCommon/sensor/LogManager.h"
 #include "tkCommon/gui/Viewer.h"
+#include "tkCommon/gui/drawables/Drawables.h"
 #include "tkCommon/communication/serial/SerialPort.h"
 
 
@@ -101,6 +102,7 @@ struct SensorPool_t {
     tk::rt::DataPool    pool;
     int                 size;
     bool                empty;
+    //tk::gui::DataDrawable   *drw;
 };
 
 typedef std::pair<tk::data::DataType, int> sensorKey;
@@ -219,11 +221,11 @@ class Sensor {
         std::vector<tk::common::Tfpose> getTfs() const;
 
     protected:    
-        SensorStatus    senStatus;  /** Sensor status */
-        LogManager      *log;       /** Log Manager reference */
-        std::map<sensorKey, SensorPool_t*> pool;   /**< data pool */   
-        int poolSize;
-        std::vector<tk::common::Tfpose>             tf;     /**< Sensor TF */
+        SensorStatus                        senStatus;  /**< Sensor status */
+        LogManager                          *log;       /**< Log Manager reference */
+        std::map<sensorKey, SensorPool_t*>  pool;       /**< data pool */   
+        int                                 poolSize;
+        std::vector<tk::common::Tfpose>     tf;         /**< Sensor TF */
 
         /**
          * @brief   Init sensor class, must be implemented by child.

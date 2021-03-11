@@ -1,41 +1,35 @@
 #include "tkCommon/gui/drawables/Image.h"
 
 tk::gui::Image::Image(int n, std::string name){
-    this->textures.resize(n);
-    this->images.resize(n);
-    this->updates.resize(n);
-    this->ready.resize(n);
-    this->counter.resize(n);
-    this->mutex.resize(n);
-    for(int i = 0; i < n; i++){
-        this->updates[i] = false;
-        this->ready[i]   = false;
-        this->counter[i] = 0; 
-        this->mutex[i] = new std::mutex();
-    }   
     this->name = name;
+
+    this->mutex.resize(n);
+    this->images.resize(n);
+    this->initted.resize(n);
+    this->counter.resize(n);
+    this->textures.resize(n);
+    this->new_ref_data.resize(n);
+
+    for(int i = 0; i < n; i++){
+        this->mutex[i] = new std::mutex();
+        this->images[i] = nullptr;
+        this->counter[i] = 0; 
+        this->initted[i] = false;
+        this->new_ref_data[i] = false;
+    }   
 }
 
-tk::gui::Image::Image(std::string name, int n, ...){
+tk::gui::Image::Image(std::string name, int n, ...) : Image(n,name){
     va_list arguments; 
 
     va_start(arguments, n);   
-    this->textures.resize(n);
-    this->images.resize(n);
-    this->updates.resize(n);
-    this->ready.resize(n);
-    this->counter.resize(n);
-    this->mutex.resize(n);
-
     for(int i = 0; i < n; i++){
-        this->images[i]  = va_arg(arguments, tk::data::ImageData*);
-        this->updates[i] = false;
-        this->ready[i]   = true;
-        this->counter[i] = 0;
-        this->mutex[i] = new std::mutex();
+        this->initted[i] = true;
+        this->images[i] = va_arg(arguments, tk::data::ImageData*);
     }
     va_end(arguments);
-    this->name = name;
+
+    this->drw_has_reference = true;
 }
 
 tk::gui::Image::~Image(){
@@ -45,80 +39,91 @@ tk::gui::Image::~Image(){
 void 
 tk::gui::Image::onInit(tk::gui::Viewer *viewer){
     for(int i = 0; i < images.size(); i++){
-        if(this->ready[i] == true){
+        if(drw_has_reference){
             this->mutex[i]->lock();
-            textures[i] = new tk::gui::Texture<uint8_t>();
-            textures[i]->init(images[i]->width, images[i]->height, images[i]->channels);
-            textures[i]->setData(images[i]->data.data());
+            this->textures[i] = new tk::gui::Texture<uint8_t>();
+            this->textures[i]->init(images[i]->width, images[i]->height, images[i]->channels);
+            this->textures[i]->setData(images[i]->data.data());
             this->mutex[i]->unlock();
         }
-
     }
 }
 
 void 
 tk::gui::Image::updateRef(int index, tk::data::ImageData* img){
-    tkASSERT(index <= images.size());
-    
     this->mutex[index]->lock();
-    this->images[index]  = img;
-    this->updates[index] = true;
+    this->images[index] = img;
+    this->new_ref_data[index] = true;
     this->mutex[index]->unlock();
 }
 
 void 
-tk::gui::Image::updateRef(tk::data::VectorData<tk::data::ImageData>* vecImg) {
-    for (int i = 0; i < vecImg->size(); i++)
-        updateRef(i, &vecImg->data[i]);
+tk::gui::Image::updateRef(tk::data::ImageData* img){
+    updateRef(img->header.sensorID,img);
+}
+
+void 
+tk::gui::Image::dataRef(tk::gui::Viewer *viewer){
+    for(int i = 0; i < images.size(); i++){
+        if(this->new_ref_data[i]){
+            this->mutex[i]->lock();
+            if(!this->initted[i]){
+                this->initted[i]  = true;
+                this->textures[i] = new tk::gui::Texture<uint8_t>();
+                this->textures[i]->init(images[i]->width, images[i]->height, images[i]->channels);
+            }
+            this->textures[i]->setData(images[i]->data.data());
+            this->new_ref_data[i] = false;
+            this->mutex[i]->unlock();
+        }
+    }
+}
+
+void 
+tk::gui::Image::dataUpd(tk::gui::Viewer *viewer){
+    for(int i = 0; i < images.size(); i++){
+        if(images[i]->isChanged(this->counter[i])){
+            this->images[i]->lockRead();
+            this->textures[i]->setData(images[i]->data.data());
+            this->images[i]->unlockRead();
+        }
+    }
 }
 
 void 
 tk::gui::Image::draw(tk::gui::Viewer *viewer){
+    if(drw_has_reference){
+        dataRef(viewer);
+    }else{
+        dataUpd(viewer);
+    }
 
+    //For each img
     for(int i = 0; i< images.size(); i++){
-
-        //init
-        if(!ready[i] && updates[i]){
-            this->ready[i]  = true;
-            this->mutex[i]->lock();
-            textures[i]     = new tk::gui::Texture<uint8_t>();
-            textures[i]->init(images[i]->width, images[i]->height, images[i]->channels);
-            this->mutex[i]->unlock();
-        }
-
-        if(ready[i]){
-            this->mutex[i]->lock();
-            if(images[i]->isChanged(counter[i]) || updates[i]){
-                //Copy data
-                images[i]->lockRead();
-                textures[i]->setData(images[i]->data.data());
-                images[i]->unlockRead();
-                this->updates[i]  = false;
-            }
-            this->mutex[i]->unlock();
-        }
-
         ImGui::Begin(name.c_str(), NULL, ImGuiWindowFlags_NoScrollbar);
-        if(this->ready[i] == true){
-            
+        if(this->initted[i]){
             float imgX = ImGui::GetWindowSize().x-20;
-            //int imgY = ImGui::GetWindowSize().y-35;
-            //float imgX = textures[i]->width;
             float imgY = imgX / ((float)textures[i]->width / textures[i]->height);
-            //ImGui::Text("%s",images[i]->header.name.c_str());
             ImGui::Image((void*)(intptr_t)textures[i]->id(), ImVec2(imgX, imgY));
             ImGui::Separator();
         }
         ImGui::End();
-
     }
+}
+
+bool 
+tk::gui::Image::isAsyncedCopied(int idx){
+    this->mutex[idx]->lock();
+    bool s = this->new_ref_data[idx];
+    this->mutex[idx]->unlock();
+    return s;
 }
 
 void 
 tk::gui::Image::imGuiInfos(){
     for(int i = 0; i< images.size(); i++){
         std::stringstream print;
-        if(ready[i] == true){
+        if(initted[i]){
             this->mutex[i]->lock();
             print<<(*images[i]);
             this->mutex[i]->unlock();
@@ -134,9 +139,4 @@ tk::gui::Image::onClose(){
         textures[i]->release();
         delete mutex[i];
     }
-}
-
-std::string 
-tk::gui::Image::toString(){
-    return name;
 }

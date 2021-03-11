@@ -166,12 +166,33 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log) {
         return false;
     }
 
+    /*
     // add a drawable foreach pool
     if (tk::gui::Viewer::getInstance()->isRunning()) {
         for (const auto &entry: pool) {
-
+            switch (entry.first.first)
+            {
+            case tk::data::DataType::IMU:
+                {
+                    tkWRN("Aggiungo un imu al viewer.\n");
+                    entry.second->drw   = new tk::gui::Imu(info.name + "_imu");
+                    tk::gui::Viewer::getInstance()->add(entry.second->drw);
+                }
+                break;
+            case tk::data::DataType::GPS:
+                {
+                    tkWRN("Aggiungo un gps al viewer.\n");
+                    entry.second->drw   = new tk::gui::Gps(info.name + "_gps");
+                    tk::gui::Viewer::getInstance()->add(entry.second->drw);
+                }
+                break;
+            default:
+                tkWRN("Data type not supported.\n");
+                break;
+            }
         }
     }
+    */
     return true;
 }
 
