@@ -1,6 +1,13 @@
 #include "tkCommon/gui/drawables/Image.h"
 
-tk::gui::Image::Image(int n, std::string name){
+tk::gui::Image::Image(std::string name, std::string imguiName){
+    if(imguiName.empty()){
+        this->imguiName = name;
+    }else{
+        this->imguiName = imguiName;
+    }
+
+    int n = 1;
     this->name = name;
 
     this->initted.resize(n);
@@ -9,11 +16,11 @@ tk::gui::Image::Image(int n, std::string name){
     for(int i = 0; i < n; i++){
         this->initted[i] = false;
     }   
-
+    
     init(n);
 }
 
-tk::gui::Image::Image(std::string name, int n, ...) : Image(n,name){
+tk::gui::Image::Image(std::string name, int n, ...) : Image(name, ""){
     va_list arguments; 
 
     va_start(arguments, n);   
@@ -64,7 +71,7 @@ tk::gui::Image::drawData(tk::gui::Viewer *viewer){
     print.clear();
 
     for(int i = 0; i< data.size(); i++){
-        ImGui::Begin(name.c_str(), NULL, ImGuiWindowFlags_NoScrollbar);
+        ImGui::Begin(imguiName.c_str(), NULL, ImGuiWindowFlags_NoScrollbar);
         if(this->initted[i]){
             float imgX = ImGui::GetWindowSize().x-20;
             float imgY = imgX / ((float)textures[i]->width / textures[i]->height);
@@ -79,7 +86,7 @@ tk::gui::Image::drawData(tk::gui::Viewer *viewer){
 
 void 
 tk::gui::Image::imGuiInfos(){
-    for(int i = 0; i< data.size(); i++){
+    for(int i = 0; i< data.size(); i++) {
         std::stringstream print;
         if(initted[i]){
             ImGui::Text("%s\n\n",print.str().c_str());
@@ -89,7 +96,7 @@ tk::gui::Image::imGuiInfos(){
 
 void 
 tk::gui::Image::onClose(){
-    for(int i = 0; i< data.size(); i++){
+    for(int i = 0; i< data.size(); i++) {
         textures[i]->release();
     }
 }

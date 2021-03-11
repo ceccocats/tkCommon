@@ -24,7 +24,8 @@ tk::gui::DataDrawable::init(int n){
 
 void 
 tk::gui::DataDrawable::updateRef(tk::data::SensorData* data){
-    int i = data->header.sensorID;
+    //int i = data->header.sensorID;
+    int i = 0;
 
     tkASSERT(i < this->data.size());
 
@@ -57,8 +58,8 @@ tk::gui::DataDrawable::draw(tk::gui::Viewer *viewer) {
                 }
             }
         }
-        this->drawData(viewer);
     }
+    this->drawData(viewer);
 }
 
 void 

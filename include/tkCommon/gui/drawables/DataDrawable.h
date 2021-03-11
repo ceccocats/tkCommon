@@ -5,8 +5,8 @@
 
 namespace tk{ namespace gui{
 
-	class DataDrawable : public Drawable {
-	public:
+class DataDrawable : public Drawable {
+    public:
 
         void draw(tk::gui::Viewer *viewer) final;
 
@@ -15,7 +15,7 @@ namespace tk{ namespace gui{
 
         ~DataDrawable();
 
-	protected:
+    protected:
 
         void init(int n = 1);
         void forceUpdate();

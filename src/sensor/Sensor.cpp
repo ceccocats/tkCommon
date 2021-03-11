@@ -173,32 +173,32 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log) {
             {
             case tk::data::DataType::IMU:
                 {
-                    entry.second->drw   = new tk::gui::Imu(info.name + "_imu");
+                    entry.second->drw   = new tk::gui::Imu(info.name + "_imu_" + std::to_string(entry.first.second));
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
             case tk::data::DataType::GPS:
                 {
-                    entry.second->drw   = new tk::gui::Gps(info.name + "_gps");
+                    entry.second->drw   = new tk::gui::Gps(info.name + "_gps_" + std::to_string(entry.first.second));
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
             case tk::data::DataType::RADAR:
                 {
-                    entry.second->drw   = new tk::gui::Radar(info.name + "_radar");
+                    entry.second->drw   = new tk::gui::Radar(info.name + "_radar_" + std::to_string(entry.first.second));
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
             case tk::data::DataType::CLOUD:
                 {
-                    entry.second->drw   = new tk::gui::Cloud4f(info.name + "_cloud");
+                    entry.second->drw   = new tk::gui::Cloud4f(info.name + "_cloud_" + std::to_string(entry.first.second));
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
             case tk::data::DataType::IMAGE:
                 {
-                    //entry.second->drw   = new tk::gui::Image(info.nSensors, info.name);
-                    //tk::gui::Viewer::getInstance()->add(entry.second->drw);
+                    entry.second->drw   = new tk::gui::Image(info.name + "_img_" + std::to_string(entry.first.second), info.name);
+                    tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
             default:
@@ -253,7 +253,7 @@ Sensor::loop(sensorKey key)
                 if (it->second->drw->isAsyncedCopied(data->header.sensorID)) {
                     if (data->tryLockRead()) {
                         it->second->drw->updateRef(data);
-                    } 
+                    }            
                 }
             }
         }

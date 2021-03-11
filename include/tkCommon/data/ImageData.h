@@ -22,21 +22,21 @@ namespace tk{ namespace data{
 
         void init(){
 
-            this->lockWrite();
-        	tk::data::ImageData_gen<T>::init();
-            this->unlockWrite();
+            //this->lockWrite();
+        	//tk::data::ImageData_gen<T>::init();
+            //this->unlockWrite();
 
         }
         
         void init(int w, int h, int ch){
 
-            this->lockWrite();
-        	tk::data::ImageData_gen<T>::init();
+            //this->try_lock();
+        	//tk::data::ImageData_gen<T>::init();
             this->width = w;
             this->height = h;
             this->channels = ch;
             this->data.resize(this->width*this->height*this->channels);
-            this->unlockWrite();
+            //this->unlockWrite();
 
         }
 
@@ -46,9 +46,9 @@ namespace tk{ namespace data{
                 release();
                 init(s.width, s.height, s.channels);
             }
-            s.lockRead();
+            //s.lockRead();
             memcpy(this->data.data(), s.data.data(), this->width * this->height * this->channels * sizeof(T));
-            s.unlockRead();
+            //s.unlockRead();
             return *this;
         }
 

@@ -13,8 +13,10 @@ namespace tk{ namespace gui{
             std::vector<tk::gui::Texture<uint8_t>*>  textures; 
             std::vector<bool>     initted;
 
+            std::string imguiName;
+
         public:
-            Image(int n, std::string name);
+            Image(std::string name, std::string imguiName = "");
             Image(std::string name, int n, ...);
             ~Image();
 
