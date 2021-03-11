@@ -130,10 +130,11 @@ VARS = [ {"name":"featureType_t",               "type": "typedef std::string"},
          {"name":"features",                    "type":"tk::common::Map<tk::math::Vec<float>>"}]
 genData(className, VARS, DEPS)
 
-className = "ImageData_gen"
+className = "ImageData_gen<T>"
 DEPS = ["#include \"tkCommon/math/Vec.h\"\n"]
 VARS = [ {"name":"type",        "type":"static const DataType", "default": "DataType::IMAGE"},
-         {"name":"data",        "type":"tk::math::Vec<uint8_t>"},
+         {"name":"T_type",      "type":"T_to_class_type<T>" },
+         {"name":"data",        "type":"tk::math::Vec<T>"},
          {"name":"width",       "type":"uint32_t", "default": "0"},
          {"name":"height",      "type":"uint32_t", "default": "0"},
          {"name":"channels",    "type":"uint32_t", "default": "0"}]
@@ -176,7 +177,7 @@ className = "StereoData_gen"
 DEPS = ["#include \"tkCommon/data/DepthData.h\"\n", 
         "#include \"tkCommon/data/ImageData.h\"\n"]
 VARS = [ {"name":"type",        "type":"static const DataType", "default": "DataType::STEREO"},
-         {"name":"data",        "type":"tk::data::ImageData", "init": "data.init()"}, 
+         #{"name":"data",        "type":"tk::data::ImageData", "init": "data.init()"}, 
          {"name":"width",       "type":"int", "default":"0"},
          {"name":"height",      "type":"int", "default":"0"},
          {"name":"channels",    "type":"int", "default":"0"},
@@ -184,10 +185,10 @@ VARS = [ {"name":"type",        "type":"static const DataType", "default": "Data
          {"name":"c_height",    "type":"int", "default":"0"},
          {"name":"c_channels",  "type":"int", "default":"0"},
          {"name":"d_width",     "type":"int", "default":"0"},
-         {"name":"d_height",    "type":"int", "default":"0"},
-         {"name":"left",        "type":"tk::data::ImageData", "init": "left.init()"},
-         {"name":"right",       "type":"tk::data::ImageData", "init": "right.init()"},
-         {"name":"color",       "type":"tk::data::ImageData", "init": "color.init()"},
-         {"name":"depth",       "type":"tk::data::DepthData", "init": "depth.init()"}
+         {"name":"d_height",    "type":"int", "default":"0"}
+         #{"name":"left",        "type":"tk::data::ImageData", "init": "left.init()"},
+         #{"name":"right",       "type":"tk::data::ImageData", "init": "right.init()"},
+         #{"name":"color",       "type":"tk::data::ImageData", "init": "color.init()"},
+         #{"name":"depth",       "type":"tk::data::DepthData", "init": "depth.init()"}
         ]
 genData(className, VARS, DEPS)

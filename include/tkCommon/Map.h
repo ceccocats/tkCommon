@@ -64,7 +64,12 @@ namespace tk { namespace common {
         }
         Map& operator=(const Map& s)
         {
-            _map = s._map;
+            _map.clear();
+            //_map = s._map;
+            for(auto const& i: s._map) {
+                _map[i.first] = i.second;
+            }
+
             _mapKeys = s._mapKeys;
             _keys = s._keys;
             _vals.resize(_map.size());

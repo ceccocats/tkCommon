@@ -3,7 +3,8 @@
 
 namespace tk { namespace data {
 
- const DataType ImageData_gen::type = DataType::IMAGE;
+template <class T>
+ const DataType ImageData_gen<T>::type = DataType::IMAGE;
 
 
 }}

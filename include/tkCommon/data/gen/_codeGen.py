@@ -85,7 +85,7 @@ class CppFile(CodeFile):
 		
 
 def isVarConst(name):
-	return name.startswith("const") or name.startswith("typedef") or name.startswith("static")
+	return name.startswith("const") or name.startswith("typedef") or name.startswith("static") or "T_to_class_type" in name
 	
 def isVarStatic(name):
 	return name.startswith("static")
@@ -94,8 +94,18 @@ def isVarStatic(name):
 def isVarSTD(name):
 	return name.startswith("std::") or name.startswith("struct") or name.endswith("*")
 
+# ImageData_gen<T>   ->   ['ImageData_gen', '<T>']
+# ImageData_gen      ->   ['ImageData_gen', ''   ]
+def splitTemplate(name):
+	vals = name.split("<")
+	if(len(vals) == 1):
+		return [ vals[0], "" ]
+	else:
+		return [ vals[0], "<" + vals[1]]
 
 def genData(className, VARS, DEPS = []):
+	[className, template] = splitTemplate(className)
+
 	print("[....] Generating", className)
 	cpp = CppFile(className + ".h")
 	cpp("// this file is generated DO NOT DIRECTLY MODIFY")
@@ -106,7 +116,9 @@ def genData(className, VARS, DEPS = []):
 	cpp("")
 	cpp("namespace tk { namespace data {\n")
 
-	with cpp.subs(ClassName=className):
+	with cpp.subs(ClassName=className, Template=template):
+		if(len(template) > 0):
+			cpp("template <class " + template[1:])
 		with cpp.block("class $ClassName$ : public SensorData", ";"):
 			cpp.label("public")
 			for var in VARS:
@@ -126,7 +138,7 @@ def genData(className, VARS, DEPS = []):
 						with cpp.subs(type=var["type"], var=var["name"], default=var["default"]):
 							cpp("$var$ = $default$;")
 
-			with cpp.block("$ClassName$& operator=(const $ClassName$& s)"):
+			with cpp.block("$ClassName$$Template$& operator=(const $ClassName$$Template$& s)"):
 				cpp("SensorData::operator=(s);")
 				for var in VARS:
 					if isVarConst(var["type"]):
@@ -135,8 +147,10 @@ def genData(className, VARS, DEPS = []):
 						cpp("$var$ = s.$var$;")
 				cpp("return *this;")
 
-			with cpp.block("friend std::ostream& operator<<(std::ostream& os, $ClassName$& s)"):
+			with cpp.block("friend std::ostream& operator<<(std::ostream& os, $ClassName$$Template$& s)"):
 				cpp("os<<\"$ClassName$\"<<std::endl;")
+				if(len(template) > 0):
+					cpp("os<<\"\ttype:  \"; s.T_type.print(os); os<<std::endl;")
 				cpp("os<<\"\theader.name:  \"<<s.header.name<<std::endl;")
 				cpp("os<<\"\theader.stamp: \"<<s.header.stamp<<std::endl;")
 				cpp("os<<\"\theader.fps:   \"<<s.header.fps<<std::endl;")
@@ -185,7 +199,7 @@ def genData(className, VARS, DEPS = []):
 
 		print("[....] Generating CPP: ", className)
 		cpp = CppFile(className + ".cpp")
-		with cpp.subs(ClassName=className):
+		with cpp.subs(ClassName=className, Template=template):
 
 			cpp("// this file is generated DO NOT DIRECTLY MODIFY")
 			cpp("#include \"tkCommon/data/gen/$ClassName$.h\"")
@@ -197,7 +211,9 @@ def genData(className, VARS, DEPS = []):
 					#tp.insert(-1, " "+className +"::")
 					tp = " ".join(tp)
 					with cpp.subs(type=tp, var=var["name"], default=var["default"]):
-						cpp("$type$ $ClassName$::$var$ = $default$;")
+						if len(template) > 0:
+							cpp("template <class " + template[1:])
+						cpp("$type$ $ClassName$$Template$::$var$ = $default$;")
 			cpp("")
 			cpp("\n}}")
 		cpp.close()

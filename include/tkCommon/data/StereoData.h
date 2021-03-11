@@ -6,7 +6,7 @@ namespace tk{ namespace data{
 
     class StereoData : public StereoData_gen{
         public:
-
+/*
         void init(int w, int h, int c){
             data.init(w,h*2,c);
             data.data.useGPU();
@@ -47,6 +47,6 @@ namespace tk{ namespace data{
             data = s.data;
             return *this;
         }
+        */
     };
-
 }}
