@@ -30,7 +30,7 @@ namespace tk{ namespace gui{
         }
     };
 
-	class Imu : public DataDrawable<tk::data::ImuData> {
+	class Imu : public DataDrawable{
 
         private:
             float t = 0;
@@ -48,7 +48,7 @@ namespace tk{ namespace gui{
             
         private:
             void drawData(tk::gui::Viewer *viewer){};
-            void updateData(tk::gui::Viewer *viewer);
+            void updateData(int i, tk::gui::Viewer *viewer);
 
 	};
 }}

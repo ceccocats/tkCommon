@@ -6,7 +6,7 @@
 
 namespace tk{ namespace gui{
 
-	class Gps : public DataDrawable<tk::data::GpsData> {
+	class Gps : public DataDrawable {
 
         private:
 
@@ -36,6 +36,6 @@ namespace tk{ namespace gui{
         
         private:
             void drawData(tk::gui::Viewer *viewer);
-            void updateData(tk::gui::Viewer *viewer);
+            void updateData(int i, tk::gui::Viewer *viewer);
 	};
 }}

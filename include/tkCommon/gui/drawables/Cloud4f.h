@@ -7,9 +7,11 @@
 
 namespace tk{ namespace gui{
 
-	class Cloud4f : public DataDrawable<tk::data::CloudData> {
+	class Cloud4f : public DataDrawable{
 
         private:
+            tk::data::CloudData* cloud;
+
             int points;
             tk::gui::Buffer<float>  glbuffer;
 
@@ -94,6 +96,6 @@ namespace tk{ namespace gui{
         
         private:
             void drawData(tk::gui::Viewer *viewer);
-            void updateData(tk::gui::Viewer *viewer);
+            void updateData(int i, tk::gui::Viewer *viewer);
 	};
 }}

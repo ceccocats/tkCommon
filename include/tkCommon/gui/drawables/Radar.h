@@ -6,7 +6,7 @@
 
 namespace tk { namespace gui {
 
-	class Radar : public DataDrawable<tk::data::RadarData> {
+	class Radar : public DataDrawable{
 
         private:
             tk::gui::Cloud4f *far_drw, *near_drw;
@@ -22,6 +22,6 @@ namespace tk { namespace gui {
             
         private:
             void drawData(tk::gui::Viewer *viewer){};
-            void updateData(tk::gui::Viewer *viewer);
+            void updateData(int i, tk::gui::Viewer *viewer);
 	};
 }}

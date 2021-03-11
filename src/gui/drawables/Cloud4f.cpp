@@ -11,18 +11,18 @@ tk::gui::Cloud4f::updateData(){
     //RGBA Cloud
     if(cloudMod == cloudMod1.second){
         //Update viz menu
-        if(featuresChannels.size() != (data->features.size()+1)){
+        if(featuresChannels.size() != (cloud->features.size()+1)){
             featuresChannels.clear();
             featuresChannels.push_back(featuresChannel0.first.c_str());
-            for(auto const& f : data->features.keys())
+            for(auto const& f : cloud->features.keys())
                 featuresChannels.push_back(f.c_str());
         }
 
         //channels
-        int offset = data->points.size();
+        int offset = cloud->points.size();
         for(int ch = 1; ch < 4; ch++){
             if(selected[ch] != featuresChannel0.second){
-                tk::math::Vec<float> *f = &data->features[featuresChannels[selected[ch]]];
+                tk::math::Vec<float> *f = &cloud->features[featuresChannels[selected[ch]]];
                 tkASSERT(f->size() == points,"Cloud corrupted\n");
                 glbuffer.setData(f->data(), f->size(), offset);
                 offset += f->size();
@@ -55,12 +55,12 @@ tk::gui::Cloud4f::updateData(){
     //Feature cloud
     if(cloudMod == cloudMod2.second){
         //Update feature viz list
-        if(features.size() != (data->features.size()+3)){
+        if(features.size() != (cloud->features.size()+3)){
             features.clear();
             features.push_back(feature0.first.c_str());
             features.push_back(feature1.first.c_str());
             features.push_back(feature2.first.c_str());
-            for(auto const& f : data->features.keys())
+            for(auto const& f : cloud->features.keys())
                 features.push_back(f.c_str());
         }
 
@@ -71,8 +71,8 @@ tk::gui::Cloud4f::updateData(){
                 if(autoMinMax == true){
                     float min =  999;
                     float max = -999;
-                    for(int i = 0; i < data->points.cols(); i++){
-                        float value = data->points(axis,i);
+                    for(int i = 0; i < cloud->points.cols(); i++){
+                        float value = cloud->points(axis,i);
                         if(value > max) max = value;
                         if(value < min) min = value;
                     }
@@ -94,9 +94,9 @@ tk::gui::Cloud4f::updateData(){
         //using features
         if(selected[0] > 2){
             axisShader = -1;
-            tk::math::Vec<float> *f = &data->features[features[selected[0]]];
+            tk::math::Vec<float> *f = &cloud->features[features[selected[0]]];
             tkASSERT(f->size() == points,"Cloud corrupted\n");
-            glbuffer.setData(f->data(), f->size(), data->points.size());
+            glbuffer.setData(f->data(), f->size(), cloud->points.size());
 
             if(autoMinMax == true){
                 float min =  999;
@@ -141,7 +141,7 @@ tk::gui::Cloud4f::Cloud4f(std::string name){
 }
 
 tk::gui::Cloud4f::Cloud4f(tk::data::CloudData* cloud, std::string name) : Cloud4f(name){
-    this->data =  cloud;
+    this->cloud =  cloud;
 }
 
 tk::gui::Cloud4f::~Cloud4f(){
@@ -170,13 +170,14 @@ tk::gui::Cloud4f::onInit(tk::gui::Viewer *viewer){
 
 
 void 
-tk::gui::Cloud4f::updateData(tk::gui::Viewer *viewer){
+tk::gui::Cloud4f::updateData(int i, tk::gui::Viewer *viewer){
 
-    points = data->points.cols();
-    this->tf = data->header.tf;
-    glbuffer.setData(data->points.data(),data->points.size());
+    cloud = (tk::data::CloudData*)data[0];
+    points = cloud->points.cols();
+    this->tf = cloud->header.tf;
+    glbuffer.setData(cloud->points.data(),cloud->points.size());
     print.str("");
-    print<<(*data);
+    print<<(*cloud);
     updateData();
 }
 
