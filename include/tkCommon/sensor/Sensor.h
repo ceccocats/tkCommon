@@ -102,7 +102,7 @@ struct SensorPool_t {
     tk::rt::DataPool    pool;
     int                 size;
     bool                empty;
-    //tk::gui::DataDrawable   *drw;
+    tk::gui::DataDrawable   *drw;
 };
 
 typedef std::pair<tk::data::DataType, int> sensorKey;

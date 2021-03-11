@@ -5,6 +5,8 @@ tk::gui::Radar::Radar(const std::string& name){
     this->name  = name;
     far_drw     = new tk::gui::Cloud4f("far");
     near_drw    = new tk::gui::Cloud4f("near");
+
+    init(1);
 }
 
 tk::gui::Radar::Radar(tk::data::RadarData* radar, const std::string& name) : Radar(name){

@@ -9,6 +9,8 @@ tk::gui::Image::Image(int n, std::string name){
     for(int i = 0; i < n; i++){
         this->initted[i] = false;
     }   
+
+    init(n);
 }
 
 tk::gui::Image::Image(std::string name, int n, ...) : Image(n,name){

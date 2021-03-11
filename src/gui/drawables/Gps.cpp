@@ -5,6 +5,7 @@ tk::gui::Gps::Gps(const std::string& name, int nPos, tk::gui::Color_t color){
     this->nPos      = nPos;
     this->lastPos   = -1;
     this->name      = name;
+    init(1);
     circles.resize(40);
 }
 
@@ -14,6 +15,7 @@ tk::gui::Gps::Gps(tk::data::GpsData* gps, const std::string& name, int nPos, tk:
     this->nPos      = nPos;
     this->lastPos   = -1;
     this->name      = name;
+    init(1);
     circles.resize(40);
 }
 

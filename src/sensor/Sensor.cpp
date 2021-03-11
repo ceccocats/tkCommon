@@ -166,7 +166,6 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log) {
         return false;
     }
 
-    /*
     // add a drawable foreach pool
     if (tk::gui::Viewer::getInstance()->isRunning()) {
         for (const auto &entry: pool) {
@@ -174,16 +173,32 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log) {
             {
             case tk::data::DataType::IMU:
                 {
-                    tkWRN("Aggiungo un imu al viewer.\n");
                     entry.second->drw   = new tk::gui::Imu(info.name + "_imu");
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
             case tk::data::DataType::GPS:
                 {
-                    tkWRN("Aggiungo un gps al viewer.\n");
                     entry.second->drw   = new tk::gui::Gps(info.name + "_gps");
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
+                }
+                break;
+            case tk::data::DataType::RADAR:
+                {
+                    entry.second->drw   = new tk::gui::Radar(info.name + "_radar");
+                    tk::gui::Viewer::getInstance()->add(entry.second->drw);
+                }
+                break;
+            case tk::data::DataType::CLOUD:
+                {
+                    entry.second->drw   = new tk::gui::Cloud4f(info.name + "_cloud");
+                    tk::gui::Viewer::getInstance()->add(entry.second->drw);
+                }
+                break;
+            case tk::data::DataType::IMAGE:
+                {
+                    //entry.second->drw   = new tk::gui::Image(info.nSensors, info.name);
+                    //tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
             default:
@@ -192,7 +207,6 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log) {
             }
         }
     }
-    */
     return true;
 }
 
@@ -236,7 +250,11 @@ Sensor::loop(sensorKey key)
 
             // GUI
             if (tk::gui::Viewer::getInstance()->isRunning()) {
-
+                if (it->second->drw->isAsyncedCopied(data->header.sensorID)) {
+                    if (data->tryLockRead()) {
+                        it->second->drw->updateRef(data);
+                    } 
+                }
             }
         }
     }

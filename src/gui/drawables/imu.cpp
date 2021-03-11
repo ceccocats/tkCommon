@@ -3,6 +3,7 @@
 tk::gui::Imu::Imu(const std::string& name, float delta_ts){ 
     this->delta_ts      = delta_ts;
     this->name          = name;
+    init(1);
 }
 
 tk::gui::Imu::Imu(tk::data::ImuData* imu, const std::string& name, float delta_ts) : Imu(name, delta_ts){

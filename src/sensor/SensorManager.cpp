@@ -5,7 +5,7 @@ bool
 SensorsManager::init(YAML::Node aConf, const std::string &aLogPath, const std::string &aList) 
 {    
     // LOG
-    if (mLogPath != "") {
+    if (aLogPath != "") {
         this->mLogPath      = aLogPath;
         this->mLogManager   = new tk::sensors::LogManager();
         if (!mLogManager->init(this->mLogPath)) {
@@ -22,6 +22,12 @@ SensorsManager::init(YAML::Node aConf, const std::string &aLogPath, const std::s
         tkWRN("No synch parameter defined, skipping synch.\n");
     }
     */
+
+    // GUI
+    if (tk::gui::Viewer::getInstance()->isRunning()) {
+        tk::gui::Viewer::getInstance()->add(new tk::gui::Grid());
+        tk::gui::Viewer::getInstance()->add(new tk::gui::Axis());
+    }
 
     // SPAWN SENSOR
     if (!spawn(aConf, aList)) {

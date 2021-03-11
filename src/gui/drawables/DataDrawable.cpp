@@ -39,13 +39,14 @@ void
 tk::gui::DataDrawable::draw(tk::gui::Viewer *viewer) {
     for(int i = 0; i < data.size(); i++){
         if(this->data[i] != nullptr){
-            if(this->drw_has_reference){
+            if(!this->drw_has_reference){
                 if(this->ref_mutex[i]->try_lock()){
                     if(this->new_ref_data[i]){
                         this->updateData(i,viewer);
                         this->new_ref_data[i] = false;
                     }
                     this->ref_mutex[i]->unlock();
+                    this->data[i]->unlockRead();
                 }
             }else{
                 if(this->data[i]->tryLockRead()){

@@ -138,6 +138,8 @@ tk::gui::Cloud4f::Cloud4f(std::string name){
     this->selected[1]       = featuresChannel0.second;
     this->selected[2]       = featuresChannel0.second;
     this->selected[3]       = featuresChannel0.second;
+
+    init(1);
 }
 
 tk::gui::Cloud4f::Cloud4f(tk::data::CloudData* cloud, std::string name) : Cloud4f(name){
