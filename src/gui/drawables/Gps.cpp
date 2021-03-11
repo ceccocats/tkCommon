@@ -9,7 +9,7 @@ tk::gui::Gps::Gps(const std::string& name, int nPos, tk::gui::Color_t color){
 }
 
 tk::gui::Gps::Gps(tk::data::GpsData* gps, const std::string& name, int nPos, tk::gui::Color_t color){
-    this->data      = gps;
+    this->data[0]   = gps;
     this->color     = color;  
     this->nPos      = nPos;
     this->lastPos   = -1;
@@ -29,21 +29,24 @@ tk::gui::Gps::onInit(tk::gui::Viewer *viewer){
 }
 
 void 
-tk::gui::Gps::updateData(tk::gui::Viewer *viewer){
-    this->tf = data->header.tf;
-    if(!geoConv.isInitialised() && data->sats > 3 && data->lat!=0 && data->lon!=0 && data->heigth!=0) {
-        geoConv.initialiseReference(data->lat,data->lon,data->heigth);
+tk::gui::Gps::updateData(int i, tk::gui::Viewer *viewer){
+
+    tk::data::GpsData* gps = (tk::data::GpsData*)data[0];
+
+    this->tf = gps->header.tf;
+    if(!geoConv.isInitialised() && gps->sats > 3 && gps->lat!=0 && gps->lon!=0 && gps->heigth!=0) {
+        geoConv.initialiseReference(gps->lat,gps->lon,gps->heigth);
     }
     
     print.str("");
-    print<<(*data);
+    print<<(*gps);
     if (geoConv.isInitialised())
-        geoConv.geodetic2Enu(data->lat,data->lon,data->heigth,&x, &y, &z);
+        geoConv.geodetic2Enu(gps->lat,gps->lon,gps->heigth,&x, &y, &z);
     z = 0.0f; //non using z
 
     if (geoConv.isInitialised()){
         lastPos = (lastPos+1) % nPos;
-        circles[lastPos]->makeCircle(x,y,z,data->cov(0, 0));  
+        circles[lastPos]->makeCircle(x,y,z,gps->cov(0, 0));  
     } 
 }
 

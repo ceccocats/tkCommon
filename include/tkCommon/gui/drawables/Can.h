@@ -4,7 +4,7 @@
 
 namespace tk{ namespace gui{
 
-	class Can : public DataDrawable<tk::data::CanData> {
+	class Can : public DataDrawable {
 
         private:
             static const int MAX_MSG = 40;
@@ -23,6 +23,6 @@ namespace tk{ namespace gui{
         
         private:
             void drawData(tk::gui::Viewer *viewer){};
-            void updateData(tk::gui::Viewer *viewer);
+            void updateData(int i, tk::gui::Viewer *viewer);
 	};
 }}

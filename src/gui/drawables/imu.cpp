@@ -6,7 +6,7 @@ tk::gui::Imu::Imu(const std::string& name, float delta_ts){
 }
 
 tk::gui::Imu::Imu(tk::data::ImuData* imu, const std::string& name, float delta_ts) : Imu(name, delta_ts){
-    this->data          = imu;
+    this->data[0] = imu;
 }
 
 tk::gui::Imu::~Imu(){
@@ -14,16 +14,17 @@ tk::gui::Imu::~Imu(){
 }
 
 void 
-tk::gui::Imu::updateData(tk::gui::Viewer *viewer){
+tk::gui::Imu::updateData(int i, tk::gui::Viewer *viewer){
+    tk::data::ImuData* imu = (tk::data::ImuData*)data[0];
     print.str("");
-    print<<(*data);
+    print<<(*imu);
     if(prec == 0)
-        prec = data->header.stamp;
-    t += float(data->header.stamp - prec) * 1e-6;
-    accX.AddPoint(t, data->acc.x());
-    accY.AddPoint(t, data->acc.y());
-    accZ.AddPoint(t, data->acc.z());
-    prec = data->header.stamp;
+        prec = imu->header.stamp;
+    t += float(imu->header.stamp - prec) * 1e-6;
+    accX.AddPoint(t, imu->acc.x());
+    accY.AddPoint(t, imu->acc.y());
+    accZ.AddPoint(t, imu->acc.z());
+    prec = imu->header.stamp;
 }
 
 void 
