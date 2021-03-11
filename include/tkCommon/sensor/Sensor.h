@@ -9,6 +9,7 @@
 #include "tkCommon/rt/Pool.h"
 #include "tkCommon/data/SensorData.h"
 #include "tkCommon/sensor/LogManager.h"
+#include "tkCommon/gui/Viewer.h"
 #include "tkCommon/communication/serial/SerialPort.h"
 
 
@@ -95,15 +96,24 @@ class SensorStatus {
         SensorStatus::Value value;
 };
 
+
+struct SensorPool_t {
+    tk::rt::DataPool    pool;
+    int                 size;
+    bool                empty;
+};
+
+typedef std::pair<tk::data::DataType, int> sensorKey;
+
 class SensorInfo{
     public:
         std::string     name;           /**< sensor name */
         float           version;        /**< program version */
         int             nSensors;       /**< number of sensors handled */
-        std::map<uint32_t, int> dataArrived;    /**< incremental counter */
+        std::map<sensorKey, int> dataArrived;    /**< incremental counter */
         int             triggerLine;
         bool            synched;        /**< tell if the sensor is synced with the log */
-        tk::data::DataType type;      /**< type of the sensor, used for visualization */
+        //tk::data::DataType type;      /**< type of the sensor, used for visualization */
 
         /**
          * @brief Construct a new SensorInfo object
@@ -114,7 +124,7 @@ class SensorInfo{
             version         = 1.0f;
             nSensors        = 1;
             synched         = false;
-            type            = tk::data::DataType::NOT_SPEC;
+            //type            = tk::data::DataType::NOT_SPEC;
             triggerLine     = -1;
         }
 
@@ -124,17 +134,10 @@ class SensorInfo{
             this->nSensors          = i.nSensors;
             this->dataArrived       = i.dataArrived;
             this->synched           = i.synched;
-            this->type              = i.type;
+            //this->type              = i.type;
             this->triggerLine       = i.triggerLine;
         }
 };
-
-struct SensorPool_t {
-    tk::rt::DataPool    pool;
-    int                 size;
-    bool                empty;
-};
-
 
 /**
  * @brief Sensor class interface
@@ -198,7 +201,7 @@ class Sensor {
          *
          * @return sensor   status
          */  
-        SensorStatus status();
+        SensorStatus status() const;
 
         /**
          * @brief   Get the TF object.
@@ -206,19 +209,19 @@ class Sensor {
          * @param id tf id
          * @return tk::common::Tfpose 
          */
-        tk::common::Tfpose getTf (const int id = 0);
+        tk::common::Tfpose getTf (const int id = 0) const;
 
         /**
          * @brief   Get vector of TF objects.
          * 
          * @return std::vector<tk::common::Tfpose> 
          */
-        std::vector<tk::common::Tfpose> getTfs();
+        std::vector<tk::common::Tfpose> getTfs() const;
 
     protected:    
         SensorStatus    senStatus;  /** Sensor status */
         LogManager      *log;       /** Log Manager reference */
-        std::map<uint32_t, SensorPool_t*> pool;   /**< data pool */   
+        std::map<sensorKey, SensorPool_t*> pool;   /**< data pool */   
         int poolSize;
         std::vector<tk::common::Tfpose>             tf;     /**< Sensor TF */
 
@@ -287,14 +290,14 @@ class Sensor {
             }
             
             // add pool
-            pool.insert(std::pair<uint32_t, tk::sensors::SensorPool_t*>(uint32_t(T::type) + uint32_t(sensorID*1000), sPool));
-            info.dataArrived.insert(std::pair<uint32_t, int>(uint32_t(T::type) + uint32_t(sensorID*1000), 0));
+            pool.insert(std::make_pair(std::make_pair(T::type, sensorID), sPool));
+            info.dataArrived.insert(std::make_pair(std::make_pair(T::type, sensorID), 0));
         }
 
         template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
         SensorPool_t* getPool(int sensorID = 0)
         {
-            std::map<uint32_t, SensorPool_t*>::iterator it = pool.find(uint32_t(T::type) + uint32_t(sensorID*1000)); 
+            std::map<sensorKey, SensorPool_t*>::iterator it = pool.find(std::make_pair(T::type, sensorID)); 
             if (it == pool.end()) {
                 tkERR("No pool present with this template type.\n");
                 return nullptr;
@@ -314,7 +317,7 @@ class Sensor {
          * @param   vargp   class reference
          * @return  void*   null
          */
-        void loop(uint32_t type);
+        void loop(sensorKey key);
 
     public:
         /**
@@ -329,17 +332,17 @@ class Sensor {
          */
         template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
         bool grab(const T* &data, int &idx, uint64_t timeout = 0, int sensorID = 0) 
-        {    
+        {   
             // check if the passed template is the same as the pointer
             if (T::type != data->type) {
-                tkERR("Type mismatch between template ("<<tk::data::ToStr(T::type)<<" and passed pointer ("<<tk::data::ToStr(data->type)<<").\n");
+                tkERR("Type mismatch between template ("<<tk::data::ToStr(T::type)<<" and passed const pointer ("<<tk::data::ToStr(data->type)<<").\n");
                 return false;
             }
 
             // check if template type is present inside pool
-            std::map<uint32_t, SensorPool_t*>::iterator it = pool.find(uint32_t(T::type) + uint32_t(sensorID*1000)); 
+            std::map<sensorKey, SensorPool_t*>::iterator it = pool.find(std::make_pair(T::type, sensorID)); 
             if (it == pool.end()) {
-                tkERR("No pool present with this template type.\n");
+                tkERR("No pool present with this template type "<<tk::data::ToStr(T::type)<<" and this ID "<<sensorID<<".\n");
                 return false;
             }
 
@@ -367,12 +370,12 @@ class Sensor {
          * @param idx   index of the data returned from the pool, given by the grab() method.
          */
         template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
-        bool release(const int idx)
+        bool release(const int idx, int sensorID = 0)
         {
             // check if template type is present inside pool
-            std::map<uint32_t, SensorPool_t*>::iterator it = pool.find(uint32_t(T::type)); 
+            std::map<sensorKey, SensorPool_t*>::iterator it = pool.find(std::make_pair(T::type, sensorID)); 
             if (it == pool.end()) {
-                tkERR("No pool present with this template type.\n");
+                tkERR("No pool present with this template type "<<tk::data::ToStr(T::type)<<" and this ID "<<sensorID<<".\n");
                 return false;
             }
 

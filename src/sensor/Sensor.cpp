@@ -165,6 +165,13 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log) {
         tkERR("Error.\n");
         return false;
     }
+
+    // add a drawable foreach pool
+    if (tk::gui::Viewer::getInstance()->isRunning()) {
+        for (const auto &entry: pool) {
+
+        }
+    }
     return true;
 }
 
@@ -174,22 +181,20 @@ Sensor::start()
 {
     // start loop threads
     readingThreads.resize(pool.size());
-
     int i = 0;
-    for (std::map<uint32_t, SensorPool_t*>::iterator it = pool.begin(); it!=pool.end(); ++it) {
-        uint32_t  type = it->first;
-        readingThreads[i] = std::thread(&Sensor::loop, this, type);
+    for (const auto &entry: pool) {
+        auto key = entry.first;
+        readingThreads[i] = std::thread(&Sensor::loop, this, key);
         i++;
     }
-    
     readLoopStarted = true;
 }
 
 void 
-Sensor::loop(uint32_t type) 
+Sensor::loop(sensorKey key) 
 {
     int     idx;
-    std::map<uint32_t, SensorPool_t*>::iterator it = pool.find(uint32_t(type)); 
+    std::map<sensorKey, SensorPool_t*>::iterator it = pool.find(key); 
     if (it != pool.end()) {
         while (senStatus != SensorStatus::STOPPING && senStatus != SensorStatus::ERROR) {
             tk::data::SensorData* data = it->second->pool.add(idx);
@@ -197,7 +202,6 @@ Sensor::loop(uint32_t type)
             bool ok = read(data);
 
             if (it->second->empty == true && ok == true) {
-                tkDBG("primo elemento inserito nella pool.\n");
                 it->second->empty = false;
             }
 
@@ -208,12 +212,17 @@ Sensor::loop(uint32_t type)
                 sleep(2);
                 continue;
             }
+
+            // GUI
+            if (tk::gui::Viewer::getInstance()->isRunning()) {
+
+            }
         }
     }
 }
 
 tk::common::Tfpose 
-Sensor::getTf(int id) 
+Sensor::getTf(int id) const
 {
     if(id >= tf.size())
         return tk::common::Tfpose::Identity();
@@ -222,7 +231,7 @@ Sensor::getTf(int id)
 }
 
 std::vector<tk::common::Tfpose> 
-Sensor::getTfs() 
+Sensor::getTfs() const
 {
     return tf;
 }
@@ -246,8 +255,8 @@ tk::sensors::Sensor::close()
 		log->stop();
     
     // clear pools
-    for (std::map<uint32_t,SensorPool_t*>::iterator it = pool.begin(); it!=pool.end(); ++it) {
-        it->second->pool.close();
+    for (const auto &entry: pool) {
+        entry.second->pool.close();
     }
     pool.clear();
 
@@ -275,20 +284,21 @@ Sensor::read(tk::data::SensorData* data)
             info.synched = true;
     }
 
-    if (retval)   
-        info.dataArrived.at(uint32_t(data->header.type)+uint32_t(data->header.sensorID*1000))++;
 
+    if (retval)   
+        info.dataArrived.at(std::make_pair(data->header.type, data->header.sensorID))++;
+    
     // fill data header
     if(data->header.name != info.name)
         data->header.name = info.name;
     data->header.tf         = getTf();
-    data->header.messageID  = info.dataArrived.at(uint32_t(data->header.type)+uint32_t(data->header.sensorID*1000));
+    data->header.messageID  = info.dataArrived.at(std::make_pair(data->header.type, data->header.sensorID));
     
     return retval;
 }
 
 tk::sensors::SensorStatus 
-Sensor::status()
+Sensor::status() const
 {
     return this->senStatus;
 }

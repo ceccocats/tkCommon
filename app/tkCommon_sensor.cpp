@@ -30,7 +30,7 @@ namespace tk { namespace sensors {
                 // DO stuff
             }
 
-            info.type = tk::data::DataType::GPSIMU;
+            //info.type = tk::data::DataType::GPSIMU;
             
             addPool<tk::data::GpsData>(0);
             addPool<tk::data::GpsData>(1);

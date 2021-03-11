@@ -2,26 +2,11 @@
 
 #include "tkCommon/gui/Viewer.h"
 #include "tkCommon/gui/drawables/Drawables.h"
-#include "tkCommon/data/VectorData.h"
-#include "tkCommon/data/StereoData.h"
-
-#include "tkCommon/rt/Task.h"
 
 #include "tkCommon/sensor/Sensor.h"
 #include "tkCommon/sensor/LogManager.h"
 
 namespace tk { namespace sensors {
-    /**
-     * @brief   Support data structure to link a drawable to each spawned sensor.
-     */
-    struct drawInfo{
-        int                     id;
-        bool                    locked;
-        std::string             name;
-        tk::data::DataType      type;
-        tk::gui::Drawable       *drawable;
-    };
-
     /**
      * @brief   SensorsManager is a wrapper class around the Sensor class 
      *          capable of handling multiple sensors at the same time.
@@ -35,11 +20,6 @@ namespace tk { namespace sensors {
         tk::sensors::LogManager*    logManager  = nullptr;
         std::string                 logPath     = "";
 
-        // GUI
-        tk::gui::Viewer*        viewer;
-        tk::rt::Thread          viewerThread;
-        std::vector<drawInfo>   drawables;
-
         /**
          * @brief   Spawn and initilize sensors.
          * 
@@ -51,7 +31,7 @@ namespace tk { namespace sensors {
          * @return false    if an error occours.
          */
         bool init(YAML::Node conf, const std::string &logPath = "", 
-                  const std::string &list="", tk::gui::Viewer* viewer = nullptr);
+                  const std::string &list="");
 
         /**
          * @brief   start all spawned sensors reading thread and an internal thread to update the viewer.
@@ -116,14 +96,5 @@ namespace tk { namespace sensors {
          * @return false    if an error occours.
          */
         virtual bool spawn(YAML::Node conf, const std::string &list="") = 0;
-
-    private:
-        /**
-         * @brief   Inernal thread to update the viewer.
-         * 
-         * @param args 
-         * @return void* 
-         */
-        static void* dataViewer(void *args);
     };
 }}
