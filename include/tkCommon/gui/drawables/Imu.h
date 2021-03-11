@@ -1,5 +1,5 @@
 #pragma once
-#include "tkCommon/gui/drawables/Drawable.h"
+#include "tkCommon/gui/drawables/DataDrawable.h"
 #include "tkCommon/data/ImuData.h"
 
 namespace tk{ namespace gui{
@@ -30,38 +30,25 @@ namespace tk{ namespace gui{
         }
     };
 
-	class Imu : public Drawable {
+	class Imu : public DataDrawable<tk::data::ImuData> {
 
         private:
-            tk::data::ImuData* imu;
-            tk::data::ImuData* imu_tmp;
-            uint32_t counter = 0;
-
-            bool updateImu = false;
-
-            int nPos;
-
-            std::string name = "";
-            std::stringstream print;
-
-            timeStamp_t prec = 0;
             float t = 0;
+            float delta_ts = 0;
+            timeStamp_t prec = 0;
             ScrollingBuffer accX, accY, accZ;
 
-            float accHistory;
-
         public:
-            Imu(const std::string& name = "imu", float acc_history = 10.0f);
-            Imu(tk::data::ImuData* imu, const std::string& name = "imu", float acc_history = 10.0f);
+            Imu(const std::string& name = "imu", float delta_ts = 10.0f);
+            Imu(tk::data::ImuData* imu, const std::string& name = "imu", float delta_ts = 10.0f);
             ~Imu();
 
-            void updateRef(tk::data::ImuData* imu);
-            void onInit(tk::gui::Viewer *viewer);
-            void draw(tk::gui::Viewer *viewer);
             void imGuiSettings();
             void imGuiInfos();
-            void onClose();
             
-            std::string toString();
+        private:
+            void drawData(tk::gui::Viewer *viewer){};
+            void updateData(tk::gui::Viewer *viewer);
+
 	};
 }}

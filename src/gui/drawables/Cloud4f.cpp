@@ -11,18 +11,18 @@ tk::gui::Cloud4f::updateData(){
     //RGBA Cloud
     if(cloudMod == cloudMod1.second){
         //Update viz menu
-        if(featuresChannels.size() != (cloud->features.size()+1)){
+        if(featuresChannels.size() != (data->features.size()+1)){
             featuresChannels.clear();
             featuresChannels.push_back(featuresChannel0.first.c_str());
-            for(auto const& f : cloud->features.keys())
+            for(auto const& f : data->features.keys())
                 featuresChannels.push_back(f.c_str());
         }
 
         //channels
-        int offset = cloud->points.size();
+        int offset = data->points.size();
         for(int ch = 1; ch < 4; ch++){
             if(selected[ch] != featuresChannel0.second){
-                tk::math::Vec<float> *f = &cloud->features[featuresChannels[selected[ch]]];
+                tk::math::Vec<float> *f = &data->features[featuresChannels[selected[ch]]];
                 tkASSERT(f->size() == points,"Cloud corrupted\n");
                 glbuffer.setData(f->data(), f->size(), offset);
                 offset += f->size();
@@ -35,16 +35,19 @@ tk::gui::Cloud4f::updateData(){
                         if(value < min) min = value;
                     }
                     if(resetMinMax == true){
+                        resetMinMax   = false;
                         minMax[0][ch] = min;
                         minMax[1][ch] = max;
                     }else{
                         minMax[0][ch] = 0.95*minMax[0][ch] + 0.05*min;
                         minMax[1][ch] = 0.95*minMax[1][ch] + 0.05*max;
                     }
+                }else{
+                    minMax[0][ch] = 0.0f;
+                    minMax[1][ch] = 1.0f;
                 }
             }
         }
-        resetMinMax = false;
         return;
     }
 
@@ -52,12 +55,12 @@ tk::gui::Cloud4f::updateData(){
     //Feature cloud
     if(cloudMod == cloudMod2.second){
         //Update feature viz list
-        if(features.size() != (cloud->features.size()+3)){
+        if(features.size() != (data->features.size()+3)){
             features.clear();
             features.push_back(feature0.first.c_str());
             features.push_back(feature1.first.c_str());
             features.push_back(feature2.first.c_str());
-            for(auto const& f : cloud->features.keys())
+            for(auto const& f : data->features.keys())
                 features.push_back(f.c_str());
         }
 
@@ -68,19 +71,22 @@ tk::gui::Cloud4f::updateData(){
                 if(autoMinMax == true){
                     float min =  999;
                     float max = -999;
-                    for(int i = 0; i < cloud->points.cols(); i++){
-                        float value = cloud->points(axis,i);
+                    for(int i = 0; i < data->points.cols(); i++){
+                        float value = data->points(axis,i);
                         if(value > max) max = value;
                         if(value < min) min = value;
                     }
                     if(resetMinMax == true){
-                        resetMinMax   = false;
+                        resetMinMax  = false;
                         minMax[0][0] = min;
                         minMax[1][0] = max;
                     }else{
                         minMax[0][0] = 0.95*minMax[0][0] + 0.05*min;
                         minMax[1][0] = 0.95*minMax[1][0] + 0.05*max;
                     }
+                }else{
+                    minMax[0][0] = 0.0f;
+                    minMax[1][0] = 1.0f;
                 }
             }
         }
@@ -88,9 +94,9 @@ tk::gui::Cloud4f::updateData(){
         //using features
         if(selected[0] > 2){
             axisShader = -1;
-            tk::math::Vec<float> *f = &cloud->features[features[selected[0]]];
+            tk::math::Vec<float> *f = &data->features[features[selected[0]]];
             tkASSERT(f->size() == points,"Cloud corrupted\n");
-            glbuffer.setData(f->data(), f->size(), cloud->points.size());
+            glbuffer.setData(f->data(), f->size(), data->points.size());
 
             if(autoMinMax == true){
                 float min =  999;
@@ -108,7 +114,10 @@ tk::gui::Cloud4f::updateData(){
                     minMax[0][0] = 0.95*minMax[0][0] + 0.05*min;
                     minMax[1][0] = 0.95*minMax[1][0] + 0.05*max;
                 }
-            }
+            }else{
+                    minMax[0][0] = 0.0f;
+                    minMax[1][0] = 1.0f;
+                }
         }
         return;
     }
@@ -120,10 +129,7 @@ tk::gui::Cloud4f::Cloud4f(std::string name){
     this->points       =  0;
     this->color        =  tk::gui::color::WHITE;
     this->color.a()    =  0.5;
-    this->update       =  false;
-    this->updateCld    =  true;
     this->resetMinMax  =  true;
-    this->updateMinMax =  false;
 
     //DefaultSelected
     this->cloudMod          = 0;
@@ -134,25 +140,8 @@ tk::gui::Cloud4f::Cloud4f(std::string name){
     this->selected[3]       = featuresChannel0.second;
 }
 
-tk::gui::Cloud4f::Cloud4f(tk::data::CloudData* cloud, std::string name){
-    //CloudParams
-    this->name         = name;
-    this->points       =  0;
-    this->cloud        =  cloud; 
-    this->color        =  tk::gui::color::WHITE;
-    this->color.a()    =  0.5;
-    this->update       =  false;
-    this->updateCld    =  true;
-    this->resetMinMax  =  true;
-    this->updateMinMax =  false;
-
-    //DefaultSelected
-    this->cloudMod          = 0;
-    this->selectedColorMap  = cloudMod0.second;
-    this->selected[0]       = feature0.second;
-    this->selected[1]       = featuresChannel0.second;
-    this->selected[2]       = featuresChannel0.second;
-    this->selected[3]       = featuresChannel0.second;
+tk::gui::Cloud4f::Cloud4f(tk::data::CloudData* cloud, std::string name) : Cloud4f(name){
+    this->data =  cloud;
 }
 
 tk::gui::Cloud4f::~Cloud4f(){
@@ -179,62 +168,20 @@ tk::gui::Cloud4f::onInit(tk::gui::Viewer *viewer){
     cloudMods.push_back(cloudMod2.first.c_str());
 }
 
-void
-tk::gui::Cloud4f::updateRef(tk::data::CloudData* cloud){
-    mtxUpdate.lock();
-    cloud_tmp = cloud;
-    update = true;
-    mtxUpdate.unlock();
+
+void 
+tk::gui::Cloud4f::updateData(tk::gui::Viewer *viewer){
+
+    points = data->points.cols();
+    this->tf = data->header.tf;
+    glbuffer.setData(data->points.data(),data->points.size());
+    print.str("");
+    print<<(*data);
+    updateData();
 }
 
 void 
-tk::gui::Cloud4f::draw(tk::gui::Viewer *viewer){
-
-    if(update){
-        mtxUpdate.lock();
-        update = false;
-        cloud = cloud_tmp;
-        mtxUpdate.unlock();
-        updateCld = true;
-    }
-
-    if(cloud == nullptr){
-        return;
-    }
-
-    if(cloud->isChanged(counter)){
-        updateCld = true;
-    }
-
-    if(updateCld){
-        updateCld = false;
-        cloud->lockRead();
-        points = cloud->points.cols();
-        this->tf = cloud->header.tf;
-        glbuffer.setData(cloud->points.data(),cloud->points.size());
-        print.str("");
-        print<<(*cloud);
-        updateData();
-        cloud->unlockRead();
-        updateMinMax = false;
-    }
-
-    if(updateMinMax == true){
-        updateMinMax = false;
-        resetMinMax  = true;
-        if(cloud->tryLockRead()){
-            if(points != cloud->points.cols()){
-                points = cloud->points.cols();
-                glbuffer.setData(cloud->points.data(),cloud->points.size());
-                print.str("");
-                print<<(*cloud);
-                updateData();
-            }else{
-                updateData();
-            }
-            cloud->unlockRead();
-        }
-    }
+tk::gui::Cloud4f::drawData(tk::gui::Viewer *viewer){
     
     glPointSize(pointSize);
     if(cloudMod == cloudMod0.second){
@@ -257,35 +204,33 @@ tk::gui::Cloud4f::draw(tk::gui::Viewer *viewer){
 
 void 
 tk::gui::Cloud4f::imGuiSettings(){
-    if(cloud == nullptr){
-        return;
-    }
-
     ImGui::SliderFloat("Size",&pointSize,1.0f,20.0f,"%.1f");
     ImGui::SliderFloat("Alpha",&color.a(),0,1.0f,"%.2f");
     if(ImGui::Combo("Draw mode", &cloudMod, cloudMods.data(), cloudMods.size())){
-        updateMinMax = true;
+        resetMinMax = true;
     }
     ImGui::Separator();
 
     //Color cloud
     if(cloudMod == cloudMod0.second){
         ImGui::ColorEdit3("Color", color.color);
-        return;
     }
 
     //RGBA cloud
     if(cloudMod == cloudMod1.second){
         if(ImGui::Combo("feature r", &selected[1], featuresChannels.data(), featuresChannels.size())){
-            updateMinMax = true;
+            resetMinMax = true;
+            forceUpdate();
         }
         if(selected[1] > 0){
             if(ImGui::Combo("feature g", &selected[2], featuresChannels.data(), featuresChannels.size())){
-                updateMinMax = true;
+                resetMinMax = true;
+                forceUpdate();
             }
             if(selected[2] > 0){
                 if(ImGui::Combo("feature b", &selected[3], featuresChannels.data(), featuresChannels.size())){
-                    updateMinMax = true;
+                    resetMinMax = true;
+                    forceUpdate();
                 }
             }else{
                 selected[3] = 0;
@@ -301,7 +246,8 @@ tk::gui::Cloud4f::imGuiSettings(){
     if(cloudMod == cloudMod2.second){
         ImGui::Combo("Color maps", &selectedColorMap, colorMaps.data(), colorMaps.size());
         if(ImGui::Combo("feature", &selected[0], features.data(), features.size())){
-            updateMinMax = true;
+            resetMinMax = true;
+            forceUpdate();
         }
         ImGui::Text("Min %f Max %f", minMax[0][0], minMax[1][0]);
         return;
@@ -310,9 +256,6 @@ tk::gui::Cloud4f::imGuiSettings(){
 
 void 
 tk::gui::Cloud4f::imGuiInfos(){
-    if(cloud == nullptr){
-        return;
-    }
     ImGui::Text("%s",print.str().c_str());
 }
 
@@ -328,9 +271,4 @@ tk::gui::Cloud4f::onClose(){
 
     pointcloudrgba->close();
     delete pointcloudrgba;
-}
-
-std::string 
-tk::gui::Cloud4f::toString(){
-    return name;
 }

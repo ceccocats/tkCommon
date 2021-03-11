@@ -10,14 +10,15 @@ namespace tk{ namespace gui{
 	class Image : public Drawable {
 
         private:
-            std::vector<tk::gui::Texture<uint8_t>*>  textures; 
-            std::vector<tk::data::ImageData*>        images;
             std::vector<std::mutex*>                  mutex;
-            std::vector<bool>   updates;
-            std::vector<bool>   ready;
+            std::vector<tk::data::ImageData*>        images;
+            std::vector<tk::gui::Texture<uint8_t>*>  textures; 
+
+            std::vector<bool>     new_ref_data;
+            std::vector<bool>     initted;
             std::vector<uint32_t> counter;
 
-            std::string name;
+            bool drw_has_reference = false;
 
         public:
             Image(int n, std::string name);
@@ -25,12 +26,15 @@ namespace tk{ namespace gui{
             ~Image();
 
             void onInit(tk::gui::Viewer *viewer);
+            bool isAsyncedCopied(int idx);
+            void updateRef(tk::data::ImageData* img);
             void updateRef(int index, tk::data::ImageData* img);
-            void updateRef(tk::data::VectorData<tk::data::ImageData> *vecImg);
             void draw(tk::gui::Viewer *viewer);
             void imGuiInfos();
             void onClose();
-
-            std::string toString();
+        
+        private:
+            void dataRef(tk::gui::Viewer *viewer);
+            void dataUpd(tk::gui::Viewer *viewer);
 	};
 }}

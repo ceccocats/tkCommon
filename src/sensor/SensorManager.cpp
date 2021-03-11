@@ -162,7 +162,7 @@ namespace tk { namespace sensors {
         while (self->viewer->isRunning()){
             for (int i = 0; i < self->drawables.size(); i++){
                 auto drw = &(self->drawables[i]);
-                if(drw->type == tk::data::DataType::CLOUD) {
+                /*if(drw->type == tk::data::DataType::CLOUD) {
                     auto ref = (tk::gui::Cloud4f*)drw->drawable;
                     if (drw->locked) {
                         if (ref->update == false) {
@@ -270,7 +270,7 @@ namespace tk { namespace sensors {
                             drw->locked = true;
                         }
                     }
-                } 
+                } */
             }
             t.wait();
         }

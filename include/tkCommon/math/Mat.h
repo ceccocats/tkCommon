@@ -120,13 +120,13 @@ public:
     }
     
     __host__ int
-    rows() { return cpu.rows; }
+    rows() const { return cpu.rows; }
 
     __host__ int
-    cols() { return cpu.cols; }
+    cols() const { return cpu.cols; }
 
     __host__ int
-    size() { return cpu.size; }
+    size() const { return cpu.size; }
 
     __host__ T*
     data() { return cpu.data; }

@@ -7,14 +7,14 @@ namespace tk { namespace rt {
 
 class Lockable{
     private:
-        std::mutex  MTX;
-        std::mutex  gMTX;
-        std::mutex  cvMTX;
+        mutable std::mutex  MTX;
+        mutable std::mutex  gMTX;
+        mutable std::mutex  cvMTX;
 
-        std::condition_variable CV;
+        mutable std::condition_variable CV;
         
-        uint32_t    counter;
-        uint32_t    nReader;
+        mutable uint32_t    counter;
+        mutable uint32_t    nReader;
         bool        writing;
         
     public:
@@ -47,7 +47,7 @@ class Lockable{
             return MTX.try_lock();
         }
 
-        void lockRead() {
+        void lockRead() const {
             std::unique_lock<std::mutex> lck(cvMTX);
                 while (writing) CV.wait(lck);
                 gMTX.lock();
@@ -58,7 +58,7 @@ class Lockable{
             cvMTX.unlock();
         }
 
-        void unlockRead() {
+        void unlockRead() const {
             gMTX.lock();
                 if (nReader == 1)
                     MTX.unlock();
@@ -69,7 +69,7 @@ class Lockable{
         }
 
 
-        bool tryLockRead() {
+        bool tryLockRead() const {
             gMTX.lock();
                 bool r = false;
                 if (nReader > 0)
@@ -83,7 +83,7 @@ class Lockable{
             return r;
         }
 
-        bool isChanged(uint32_t &counter) {
+        bool isChanged(uint32_t &counter) const {
             gMTX.lock();
                 bool r = false;
                 if (this->counter > counter) {
