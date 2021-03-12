@@ -26,7 +26,10 @@ namespace tk { namespace data {
         VECTOR      = 12,
         ACTUATION   = 13,
         DEPTH       = 14,
-        ODOM        = 15
+        ODOM        = 15,
+        IMAGEU8     = 16,
+        IMAGEU16    = 17,
+        IMAGEF      = 18
     };
 
     static const char* ToStr (const DataType& type)
