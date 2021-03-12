@@ -351,7 +351,7 @@ class Sensor {
 
             // check if pool is empty
             if (it->second->empty == true) {
-                tkWRN("Pool empty.\n");
+                //tkWRN("Pool empty.\n");
                 return false;
             }
             

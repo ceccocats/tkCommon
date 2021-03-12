@@ -82,7 +82,7 @@ namespace tk{ namespace data{
             this->unlockWrite();
         }
 
-        uint8_t* at(int row, int col){
+        T* at(int row, int col){
             return &this->data[(row*this->width + col) * this->channels];
         }
 

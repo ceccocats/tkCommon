@@ -107,6 +107,7 @@ add_library(tkGUI SHARED
     ${gui_utils}  
     ${imgui}
     ${implot}
+    src/sensor/LogManager.cpp
 )
 target_link_libraries(tkGUI ${CUDA_LIBRARIES} ${GUI_LIBS} tkCommon)
 

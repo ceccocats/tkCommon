@@ -1,8 +1,8 @@
 #pragma once
 #include <thread>
 #include "tkCommon/common.h"
+#include "tkCommon/gui/Viewer.h"
 
-extern bool gRun;
 namespace tk { namespace sensors {
 
     class LogManager {
@@ -50,6 +50,9 @@ namespace tk { namespace sensors {
          */
         void stop();
 
+        void startStop();
+        void exitStop();
+
     private:
         void start(timeStamp_t time);
 
@@ -58,5 +61,6 @@ namespace tk { namespace sensors {
         timeStamp_t startStamp = 0;       /**< start timestamp in log */
         bool        logStarted = false;   /**< true if log is started */
         std::mutex  startMtx;
+        std::mutex  startStopMtx;
     };
 }}

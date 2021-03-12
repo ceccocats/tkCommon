@@ -12,6 +12,8 @@ SensorsManager::init(YAML::Node aConf, const std::string &aLogPath, const std::s
             tkERR("Error init logManger.\n");
             return false;
         }
+        if (tk::gui::Viewer::getInstance()->isRunning())
+            tk::gui::Viewer::getInstance()->add(new tk::gui::ReplayInfo(mLogManager));
     }
     
     /*
