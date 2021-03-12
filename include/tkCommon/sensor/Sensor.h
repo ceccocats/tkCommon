@@ -276,8 +276,9 @@ class Sensor {
         void addPool(int sensorID = 0)
         {
             tk::sensors::SensorPool_t *sPool = new tk::sensors::SensorPool_t;
-            sPool->empty            = true;
-            sPool->size             = poolSize;
+            sPool->empty    = true;
+            sPool->size     = poolSize;
+            sPool->drw      = nullptr;
             sPool->pool.init<T>(sPool->size);
 
             int idx;
