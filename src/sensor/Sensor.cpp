@@ -196,6 +196,9 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log) {
                 }
                 break;
             case tk::data::DataType::IMAGE:
+            case tk::data::DataType::IMAGEU8:
+            case tk::data::DataType::IMAGEU16:
+            case tk::data::DataType::IMAGEF:
                 {
                     entry.second->drw   = new tk::gui::Image(info.name + "_img_" + std::to_string(entry.first.second), info.name);
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
