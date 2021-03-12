@@ -97,10 +97,10 @@ int tk::communication::PCAPHandler::getPacket(uint8_t* buffer, timeStamp_t& stam
 
     int len = parser.computeNextPacket(pcapFile,buffer,stamp);
 
-    if(len < 0){
+    /*if(len < 0){
         tkWRN("Reading error.\n");
         return -1;
-    }
+    }*/
 
     return len;
 }
