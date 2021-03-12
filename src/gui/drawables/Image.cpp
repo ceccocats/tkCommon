@@ -10,10 +10,6 @@ tk::gui::Image::Image(std::string name, std::string imguiName, tk::data::SensorD
     this->name = name;
 }
 
-tk::gui::Image::Image(std::string name, tk::data::SensorData* img) : Image(name, name, img){
-
-}
-
 tk::gui::Image::~Image(){
 
 }

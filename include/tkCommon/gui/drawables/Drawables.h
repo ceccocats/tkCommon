@@ -5,6 +5,7 @@
 #include <tkCommon/gui/drawables/CameraAR.h>
 #include <tkCommon/gui/drawables/Prisms.h>
 #include <tkCommon/gui/drawables/Image.h>
+#include <tkCommon/gui/drawables/Stereo.h>
 #include <tkCommon/gui/drawables/Mesh.h>
 #include <tkCommon/gui/drawables/Plot.h>
 #include <tkCommon/gui/drawables/PolyLine.h>

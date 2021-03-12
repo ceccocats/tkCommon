@@ -1,25 +1,28 @@
 #pragma once
-#include "tkCommon/gui/drawables/DataDrawable.h"
-#include "tkCommon/data/ImageData.h"
+#include "tkCommon/gui/drawables/Image.h"
+#include "tkCommon/data/StereoData.h"
 #include "tkCommon/data/VectorData.h"
 
 #include <cstdarg>
 
 namespace tk{ namespace gui{
 
-	class Image : public DataDrawable {
+	class Stereo : public DataDrawable {
 
         private:
-            tk::gui::TextureGeneric* texture = nullptr;
-            int textureType = -1;
+            std::vector<tk::gui::Image*>  images;
+
+            bool has_depth;
+            bool has_rgb;
 
             std::string imguiName;
 
         public:
-            Image(std::string name, std::string imguiName = "", tk::data::SensorData* img = nullptr);
-            ~Image();
+            Stereo(std::string name);
+            ~Stereo();
 
             void onInit(tk::gui::Viewer *viewer);
+            void updateRef(tk::data::StereoData* img);
             void imGuiInfos();
             void onClose();
         

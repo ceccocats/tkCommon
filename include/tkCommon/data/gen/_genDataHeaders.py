@@ -174,10 +174,9 @@ VARS = [ {"name":"type",        "type":"static const DataType", "default": "Data
 genData(className, VARS, DEPS)
 
 className = "StereoData_gen"
-DEPS = ["#include \"tkCommon/data/DepthData.h\"\n", 
-        "#include \"tkCommon/data/ImageData.h\"\n"]
+DEPS = ["#include \"tkCommon/data/ImageData.h\"\n"]
 VARS = [ {"name":"type",        "type":"static const DataType", "default": "DataType::STEREO"},
-         #{"name":"data",        "type":"tk::data::ImageData", "init": "data.init()"}, 
+         {"name":"data",        "type":"tk::data::ImageDataU8", "init": "data.init()"}, 
          {"name":"width",       "type":"int", "default":"0"},
          {"name":"height",      "type":"int", "default":"0"},
          {"name":"channels",    "type":"int", "default":"0"},
@@ -185,10 +184,10 @@ VARS = [ {"name":"type",        "type":"static const DataType", "default": "Data
          {"name":"c_height",    "type":"int", "default":"0"},
          {"name":"c_channels",  "type":"int", "default":"0"},
          {"name":"d_width",     "type":"int", "default":"0"},
-         {"name":"d_height",    "type":"int", "default":"0"}
-         #{"name":"left",        "type":"tk::data::ImageData", "init": "left.init()"},
-         #{"name":"right",       "type":"tk::data::ImageData", "init": "right.init()"},
-         #{"name":"color",       "type":"tk::data::ImageData", "init": "color.init()"},
-         #{"name":"depth",       "type":"tk::data::DepthData", "init": "depth.init()"}
+         {"name":"d_height",    "type":"int", "default":"0"},
+         {"name":"left",        "type":"tk::data::ImageData", "init": "left.init()"},
+         {"name":"right",       "type":"tk::data::ImageData", "init": "right.init()"},
+         {"name":"color",       "type":"tk::data::ImageData", "init": "color.init()"},
+         {"name":"depth",       "type":"tk::data::ImageDataX<uint16_t>", "init": "depth.init()"}
         ]
 genData(className, VARS, DEPS)

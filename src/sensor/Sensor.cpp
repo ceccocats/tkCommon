@@ -201,6 +201,12 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log) {
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
+            case tk::data::DataType::STEREO:
+                {
+                    entry.second->drw   = new tk::gui::Stereo(info.name);
+                    tk::gui::Viewer::getInstance()->add(entry.second->drw);
+                }
+                break;
             default:
                 tkWRN("Data type not supported.\n");
                 break;

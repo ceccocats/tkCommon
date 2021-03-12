@@ -52,7 +52,7 @@ namespace tk{ namespace data{
             return *this;
         }
 
-        ImageDataX<T>& operator=(ImageData_gen<T>& s){
+        ImageDataX<T>& operator=(const ImageData_gen<T>& s){
  
             ImageData_gen<T>::operator=(s);
             return *this;
