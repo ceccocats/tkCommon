@@ -10,6 +10,16 @@ namespace tk{ namespace data{
 
         ImageDataX() : ImageData_gen<T>(){
             this->data.useGPU();
+
+            if(this->T_type.id == tk::data::UINT8){
+                this->header.type = tk::data::DataType::IMAGEU8;
+            }
+            if(this->T_type.id == tk::data::UINT16){
+                this->header.type = tk::data::DataType::IMAGEU16;
+            }
+            if(this->T_type.id == tk::data::FLOAT){
+                this->header.type = tk::data::DataType::IMAGEF;
+            }
         }
 
         ImageDataX(const ImageDataX<T>& s)  : ImageData_gen<T>() {
