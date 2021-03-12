@@ -5,12 +5,10 @@ tk::gui::Radar::Radar(const std::string& name){
     this->name  = name;
     far_drw     = new tk::gui::Cloud4f("far");
     near_drw    = new tk::gui::Cloud4f("near");
-
-    init(1);
 }
 
 tk::gui::Radar::Radar(tk::data::RadarData* radar, const std::string& name) : Radar(name){
-    this->data[0] = radar;
+    this->data = radar;
 }
 
 tk::gui::Radar::~Radar(){
@@ -27,8 +25,8 @@ tk::gui::Radar::onInit(tk::gui::Viewer *viewer){
 }
 
 void 
-tk::gui::Radar::updateData(int i,tk::gui::Viewer *viewer){
-    tk::data::RadarData* radar = (tk::data::RadarData*)data[0];
+tk::gui::Radar::updateData(tk::gui::Viewer *viewer){
+    tk::data::RadarData* radar = (tk::data::RadarData*)data;
     far_drw->updateRef(&radar->far);
     far_drw->updateRef(&radar->near);
     print.str("");

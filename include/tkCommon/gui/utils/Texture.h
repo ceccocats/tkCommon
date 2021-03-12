@@ -15,8 +15,11 @@
 
 namespace tk { namespace gui {
 
+class TextureGeneric{
+};
+
 template <class T>
-class Texture
+class Texture : public TextureGeneric
 {
     private:
         GLenum          format;

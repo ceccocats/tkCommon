@@ -3,11 +3,10 @@
 tk::gui::Imu::Imu(const std::string& name, float delta_ts){ 
     this->delta_ts      = delta_ts;
     this->name          = name;
-    init(1);
 }
 
 tk::gui::Imu::Imu(tk::data::ImuData* imu, const std::string& name, float delta_ts) : Imu(name, delta_ts){
-    this->data[0] = imu;
+    this->data = imu;
 }
 
 tk::gui::Imu::~Imu(){
@@ -15,8 +14,8 @@ tk::gui::Imu::~Imu(){
 }
 
 void 
-tk::gui::Imu::updateData(int i, tk::gui::Viewer *viewer){
-    tk::data::ImuData* imu = (tk::data::ImuData*)data[0];
+tk::gui::Imu::updateData(tk::gui::Viewer *viewer){
+    tk::data::ImuData* imu = (tk::data::ImuData*)data;
     print.str("");
     print<<(*imu);
     if(prec == 0)
