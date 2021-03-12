@@ -10,23 +10,22 @@ namespace tk{ namespace gui{
 	class Image : public DataDrawable {
 
         private:
-            std::vector<tk::gui::Texture<uint8_t>*>  textures; 
-            std::vector<bool>     initted;
+            tk::gui::TextureGeneric* texture = nullptr;
+            int textureType = -1;
 
             std::string imguiName;
 
         public:
-            Image(std::string name, std::string imguiName = "");
-            Image(std::string name, int n, ...);
+            Image(std::string name, std::string imguiName = "", tk::data::SensorData* img = nullptr);
+            Image(std::string name, tk::data::SensorData* img = nullptr);
             ~Image();
 
             void onInit(tk::gui::Viewer *viewer);
-            void updateRef(int index, tk::data::ImageData* img);
             void imGuiInfos();
             void onClose();
         
         private:
             void drawData(tk::gui::Viewer *viewer);
-            void updateData(int i, tk::gui::Viewer *viewer);
+            void updateData(tk::gui::Viewer *viewer);
 	};
 }}

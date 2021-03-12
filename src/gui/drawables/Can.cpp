@@ -3,11 +3,10 @@
 tk::gui::Can::Can(std::string name){
     this->name              = name;
     msg.setDim(n_msg);
-    init(1);
 }
 
 tk::gui::Can::Can(tk::data::CanData* data, std::string name) : Can(name){
-    this->data[0] = data;
+    this->data = data;
 }
 
 tk::gui::Can::~Can(){
@@ -17,7 +16,7 @@ tk::gui::Can::~Can(){
 void
 tk::gui::Can::updateData(int i, tk::gui::Viewer *viewer){
     print.str("");
-    print<<(*((tk::data::CanData*)data[0]));
+    print<<(*((tk::data::CanData*)data));
     msg.add(print.str());
 }
 

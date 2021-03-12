@@ -11,27 +11,24 @@ class DataDrawable : public Drawable {
         void draw(tk::gui::Viewer *viewer) final;
 
         virtual void updateRef(tk::data::SensorData* data) final;
-        virtual bool isAsyncedCopied(int idx = 0) final;
-
-        ~DataDrawable();
+        virtual bool synched() final;
 
     protected:
 
-        void init(int n = 1);
         void forceUpdate();
 
         virtual void drawData(tk::gui::Viewer *viewer) = 0; 
-        virtual void updateData(int i,tk::gui::Viewer *viewer) = 0; 
+        virtual void updateData(tk::gui::Viewer *viewer) = 0; 
 
-        std::vector<tk::data::SensorData*> data;
-        std::vector<uint32_t> counter;
+        tk::data::SensorData* data = nullptr;
+        uint32_t counter = 0;
 
         std::stringstream print;
 
     private:
 
-        std::vector<std::mutex*> ref_mutex;
-        std::vector<bool> new_ref_data;
+        std::mutex ref_mutex;
+        bool new_ref_data = false;
 
         bool drw_has_reference = true;
 	};

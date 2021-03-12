@@ -1,34 +1,17 @@
 #include "tkCommon/gui/drawables/Image.h"
 
-tk::gui::Image::Image(std::string name, std::string imguiName){
+tk::gui::Image::Image(std::string name, std::string imguiName, tk::data::SensorData* img){
     if(imguiName.empty()){
         this->imguiName = name;
     }else{
         this->imguiName = imguiName;
     }
-
-    int n = 1;
+    this->data = img;
     this->name = name;
-
-    this->initted.resize(n);
-    this->textures.resize(n);
-
-    for(int i = 0; i < n; i++){
-        this->initted[i] = false;
-    }   
-    
-    init(n);
 }
 
-tk::gui::Image::Image(std::string name, int n, ...) : Image(name, ""){
-    va_list arguments; 
+tk::gui::Image::Image(std::string name, tk::data::SensorData* img) : Image(name, name, img){
 
-    va_start(arguments, n);   
-    for(int i = 0; i < n; i++){
-        this->initted[i] = true;
-        this->data[i]    = va_arg(arguments, tk::data::ImageData*);
-    }
-    va_end(arguments);
 }
 
 tk::gui::Image::~Image(){
@@ -37,66 +20,118 @@ tk::gui::Image::~Image(){
 
 void 
 tk::gui::Image::onInit(tk::gui::Viewer *viewer){
-    for(int i = 0; i < data.size(); i++){
-        if(initted[i]){
-            tk::data::ImageData* img = (tk::data::ImageData*)data[i];
-            img->lockRead();
-            this->textures[i] = new tk::gui::Texture<uint8_t>();
-            this->textures[i]->init(img->width, img->height, img->channels);
-            this->textures[i]->setData(img->data.data());
-            img->unlockRead();
+    if(data != nullptr){
+        data->lockRead();
+        //if(img->T_type.id == tk::data::UINT8){
+            textureType = 0;
+            texture = new tk::gui::Texture<uint8_t>();
+            tk::gui::Texture<uint8_t>* textU8 = (tk::gui::Texture<uint8_t>*)texture;
+            tk::data::ImageDataU8* imgU8 = (tk::data::ImageDataU8*)data;
+            textU8->init(imgU8->width, imgU8->height, imgU8->channels);
+            textU8->setData(imgU8->data.data());
+        /*}
+        if(img->T_type.id  == tk::data::UINT16){
+            textureType = 1;
+            texture = new tk::gui::Texture<uint16_t>();
+            tk::gui::Texture<uint16_t>* textU16 = (tk::gui::Texture<uint16_t>*)texture;
+            tk::data::ImageDataU16* imgU16 = (tk::data::ImageDataU16*)data;
+            textU16->init(imgU16->width, imgU16->height, imgU16->channels);
+            textU16->setData(imgU16->data.data());
+        }
+        if(img->T_type.id  == tk::data::FLOAT){
+            textureType = 2;
+            texture = new tk::gui::Texture<float>();
+            tk::gui::Texture<float>* textF = (tk::gui::Texture<float>*)texture;
+            tk::data::ImageDataF* imgF = (tk::data::ImageDataF*)data;
+            textF->init(imgF->width, imgF->height, imgF->channels);
+            textF->setData(imgF->data.data());
+        }*/
+        data->unlockRead();
+        if(texture == nullptr){
+            tkERR("Image type not supported\n");
         }
     }
 }
 
 void 
-tk::gui::Image::updateRef(int index, tk::data::ImageData* img){
-    img->header.sensorID = index;
-    DataDrawable::updateRef((tk::data::SensorData*)img);
-}
-
-void 
-tk::gui::Image::updateData(int i, tk::gui::Viewer *viewer){
-    tk::data::ImageData* img = (tk::data::ImageData*)data[i];
-    if(!this->initted[i]){
-        this->initted[i]  = true;
-        this->textures[i] = new tk::gui::Texture<uint8_t>();
-        this->textures[i]->init(img->width, img->height, img->channels);
+tk::gui::Image::updateData(tk::gui::Viewer *viewer){
+    if(texture == nullptr){
+        onInit(viewer);
     }
-    this->textures[i]->setData(img->data.data());
+    //if(textureType == 0){
+        tk::gui::Texture<uint8_t>* textU8 = (tk::gui::Texture<uint8_t>*)texture;
+        tk::data::ImageDataU8* imgU8 = (tk::data::ImageDataU8*)data;
+        textU8->setData(imgU8->data.data());
+    /*}
+    if(textureType == 1){
+        tk::gui::Texture<uint16_t>* textU16 = (tk::gui::Texture<uint16_t>*)texture;
+        tk::data::ImageDataU16* imgU16 = (tk::data::ImageDataU16*)data;
+        textU16->setData(imgU16->data.data());
+    }
+    if(textureType == 2){
+        tk::gui::Texture<float>* textF = (tk::gui::Texture<float>*)texture;
+        tk::data::ImageDataF* imgF = (tk::data::ImageDataF*)data;
+        textF->setData(imgF->data.data());
+    }*/
 }
 
 void 
 tk::gui::Image::drawData(tk::gui::Viewer *viewer){
     print.clear();
 
-    for(int i = 0; i< data.size(); i++){
-        ImGui::Begin(imguiName.c_str(), NULL, ImGuiWindowFlags_NoScrollbar);
-        if(this->initted[i]){
-            float imgX = ImGui::GetWindowSize().x-20;
-            float imgY = imgX / ((float)textures[i]->width / textures[i]->height);
-            ImGui::Image((void*)(intptr_t)textures[i]->id(), ImVec2(imgX, imgY));
-            ImGui::Separator();
-            tk::data::ImageData* img = (tk::data::ImageData*)data[i];
-            print<<(*img);
+    ImGui::Begin(imguiName.c_str(), NULL, ImGuiWindowFlags_NoScrollbar);
+    if(texture != nullptr){
+        float imgX = ImGui::GetWindowSize().x-20;
+        
+        //if(textureType == 0){
+            tk::gui::Texture<uint8_t>* textU8 = (tk::gui::Texture<uint8_t>*)texture;
+            float imgY = imgX / ((float)textU8->width / textU8->height);
+            ImGui::Image((void*)(intptr_t)textU8->id(), ImVec2(imgX, imgY));
+
+            tk::data::ImageDataU8* imgU8 = (tk::data::ImageDataU8*)data;
+            print<<(*imgU8);
+        /*}
+        if(textureType == 1){
+            tk::gui::Texture<uint16_t>* textU16 = (tk::gui::Texture<uint16_t>*)texture;
+            float imgY = imgX / ((float)textU16->width / textU16->height);
+            ImGui::Image((void*)(intptr_t)textU16->id(), ImVec2(imgX, imgY));
+
+            tk::data::ImageDataU16* imgU16 = (tk::data::ImageDataU16*)data;
+            print<<(*imgU16);
         }
-        ImGui::End();
+        if(textureType == 2){
+            tk::gui::Texture<float>* textF = (tk::gui::Texture<float>*)texture;
+            float imgY = imgX / ((float)textF->width / textF->height);
+            ImGui::Image((void*)(intptr_t)textF->id(), ImVec2(imgX, imgY));
+
+            tk::data::ImageDataF* imgF = (tk::data::ImageDataF*)data;
+            print<<(*imgF);
+        }*/
+        ImGui::Separator();
     }
+    ImGui::End();
 }
 
 void 
 tk::gui::Image::imGuiInfos(){
-    for(int i = 0; i< data.size(); i++) {
-        std::stringstream print;
-        if(initted[i]){
-            ImGui::Text("%s\n\n",print.str().c_str());
-        }
-    }
+    ImGui::Text("%s\n\n",print.str().c_str());
 }
 
 void 
 tk::gui::Image::onClose(){
-    for(int i = 0; i< data.size(); i++) {
-        textures[i]->release();
+    //if(textureType == 0){
+        tk::gui::Texture<uint8_t>* textU8 = (tk::gui::Texture<uint8_t>*)texture;
+        textU8->release();
+    /*}
+    if(textureType == 1){
+        tk::gui::Texture<uint16_t>* textU16 = (tk::gui::Texture<uint16_t>*)texture;
+        textU16->release();
+    }
+    if(textureType == 2){
+        tk::gui::Texture<float>* textF = (tk::gui::Texture<float>*)texture;
+        textF->release();
+    }*/
+    if(texture != nullptr){
+        delete texture;
     }
 }

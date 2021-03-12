@@ -1,7 +1,7 @@
 #include "tkCommon/gui/drawables/Cloud4f.h"
 
 void 
-tk::gui::Cloud4f::updateData(){
+tk::gui::Cloud4f::updateData(tk::data::CloudData* cloud){
 
     //Colored Cloud
     if(cloudMod == cloudMod0.second){
@@ -138,12 +138,10 @@ tk::gui::Cloud4f::Cloud4f(std::string name){
     this->selected[1]       = featuresChannel0.second;
     this->selected[2]       = featuresChannel0.second;
     this->selected[3]       = featuresChannel0.second;
-
-    init(1);
 }
 
 tk::gui::Cloud4f::Cloud4f(tk::data::CloudData* cloud, std::string name) : Cloud4f(name){
-    this->cloud =  cloud;
+    this->data =  cloud;
 }
 
 tk::gui::Cloud4f::~Cloud4f(){
@@ -172,15 +170,15 @@ tk::gui::Cloud4f::onInit(tk::gui::Viewer *viewer){
 
 
 void 
-tk::gui::Cloud4f::updateData(int i, tk::gui::Viewer *viewer){
+tk::gui::Cloud4f::updateData(tk::gui::Viewer *viewer){
 
-    cloud = (tk::data::CloudData*)data[0];
+    tk::data::CloudData* cloud = (tk::data::CloudData*)data;
     points = cloud->points.cols();
     this->tf = cloud->header.tf;
     glbuffer.setData(cloud->points.data(),cloud->points.size());
     print.str("");
     print<<(*cloud);
-    updateData();
+    updateData(cloud);
 }
 
 void 

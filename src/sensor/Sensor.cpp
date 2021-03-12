@@ -250,9 +250,9 @@ Sensor::loop(sensorKey key)
                 continue;
             }
 
-            // GUI
+            // GUI  
             if (tk::gui::Viewer::getInstance()->isRunning() && it->second->drw != nullptr) {
-                if (it->second->drw->isAsyncedCopied(data->header.sensorID)) {
+                if (it->second->drw->synched()) {
                     if (data->tryLockRead()) {
                         it->second->drw->updateRef(data);
                     }            

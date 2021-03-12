@@ -1,22 +1,14 @@
 #include "tkCommon/gui/drawables/Gps.h"
 
 tk::gui::Gps::Gps(const std::string& name, int nPos, tk::gui::Color_t color){
-    this->color     = color;  
-    this->nPos      = nPos;
-    this->lastPos   = -1;
-    this->name      = name;
-    init(1);
-    circles.resize(40);
+    this->color   = color;  
+    this->nPos    = nPos;
+    this->lastPos = -1;
+    this->name    = name;
 }
 
-tk::gui::Gps::Gps(tk::data::GpsData* gps, const std::string& name, int nPos, tk::gui::Color_t color){
-    this->data[0]   = gps;
-    this->color     = color;  
-    this->nPos      = nPos;
-    this->lastPos   = -1;
-    this->name      = name;
-    init(1);
-    circles.resize(40);
+tk::gui::Gps::Gps(tk::data::GpsData* gps, const std::string& name, int nPos, tk::gui::Color_t color) :Gps(name,nPos,color){
+    this->data     = gps;  
 }
 
 tk::gui::Gps::~Gps(){
@@ -31,9 +23,9 @@ tk::gui::Gps::onInit(tk::gui::Viewer *viewer){
 }
 
 void 
-tk::gui::Gps::updateData(int i, tk::gui::Viewer *viewer){
+tk::gui::Gps::updateData(tk::gui::Viewer *viewer){
 
-    tk::data::GpsData* gps = (tk::data::GpsData*)data[0];
+    tk::data::GpsData* gps = (tk::data::GpsData*)data;
 
     this->tf = gps->header.tf;
     if(!geoConv.isInitialised() && gps->sats > 3 && gps->lat!=0 && gps->lon!=0 && gps->heigth!=0) {
