@@ -11,11 +11,11 @@ tk::gui::Stereo::Stereo(std::string name){
     int n = 4;
 
     images.resize(n);
-    for (int i = 0; i < n ; ++i){
-        images[i] = new tk::gui::Image(name);
-    }
 
-    tkDBG("Created with "<< n <<" Images\n");
+    images[0] = new tk::gui::Image( name + "_left", name );
+    images[1] = new tk::gui::Image( name + "_right", name );
+    images[2] = new tk::gui::Image( name + "_rgb", name );
+    images[3] = new tk::gui::Image( name + "_depth", name );
 
 }
 

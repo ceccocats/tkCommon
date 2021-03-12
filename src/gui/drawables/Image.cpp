@@ -45,6 +45,7 @@ tk::gui::Image::onInit(tk::gui::Viewer *viewer){
         data->unlockRead();
         if(texture == nullptr){
             tkERR("Image type not supported\n");
+            tkDBG((int)data->header.type<<"\n");
         }
     }
 }

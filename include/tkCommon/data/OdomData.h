@@ -25,7 +25,7 @@ namespace tk { namespace data {
             q.normalize();
             msg.pose.pose.orientation   = tf2::toMsg(q);
 
-            msg.twist.twist.linear.x    = speed;
+            msg.twist.twist.linear.x    = speed.x();
         }
 
         void fromRos(nav_msgs::Odometry &msg) {
@@ -46,7 +46,7 @@ namespace tk { namespace data {
             this->angle.y()  = rpy(1);
             this->angle.z()  = rpy(2);
 
-            this->speed = std::sqrt(std::pow(msg.twist.twist.linear.x, 2) + std::pow(msg.twist.twist.linear.y, 2) + std::pow(msg.twist.twist.linear.z, 2)); 
+            this->speed.x() = std::sqrt(std::pow(msg.twist.twist.linear.x, 2) + std::pow(msg.twist.twist.linear.y, 2) + std::pow(msg.twist.twist.linear.z, 2)); 
         }
 #endif
     };
