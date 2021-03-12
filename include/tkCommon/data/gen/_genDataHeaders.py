@@ -11,7 +11,7 @@ DEPS = [ "#include \"tkCommon/math/Vec.h\"" ]
 VARS = [ {"name":"type",        "type":"static const DataType", "default": "DataType::ODOM"},  
          {"name":"pose",        "type":"tk::math::Vec3<double>"},
          {"name":"angle",       "type":"tk::math::Vec3<double>"},
-         {"name":"speed",       "type":"double" , "default": "0"}
+         {"name":"speed",       "type":"tk::math::Vec3<double>"}
         ]
 genData(className, VARS, DEPS)
 
