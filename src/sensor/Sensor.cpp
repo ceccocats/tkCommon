@@ -202,7 +202,7 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log) {
                 }
                 break;
             default:
-                tkWRN("Data type not supported.\n");
+                tkWRN("Data of type: "<<tk::data::ToStr(entry.first.first)<<" not supported in tk::Viewer.\n");
                 break;
             }
         }
@@ -243,13 +243,15 @@ Sensor::loop(sensorKey key)
             it->second->pool.releaseAdd(idx);
 
             if (!ok) {
+                if (status() == SensorStatus::STOPPING)
+                    continue;
                 tkWRN("Error while reading. Trying again in 2 seconds...\n");
                 sleep(2);
                 continue;
             }
 
             // GUI
-            if (tk::gui::Viewer::getInstance()->isRunning()) {
+            if (tk::gui::Viewer::getInstance()->isRunning() && it->second->drw != nullptr) {
                 if (it->second->drw->isAsyncedCopied(data->header.sensorID)) {
                     if (data->tryLockRead()) {
                         it->second->drw->updateRef(data);
@@ -282,28 +284,29 @@ tk::sensors::Sensor::close()
     if (senStatus == SensorStatus::RECORDING)
         stopRecord();
 
-    // stop online reading thread
-    senStatus = SensorStatus::STOPPING;
-    if(readLoopStarted) {
-        for (int i = 0; i < readingThreads.size(); i++)
-            readingThreads[i].join();
-    }
-    
     // stop log
 	if (senStatus == SensorStatus::OFFLINE)
 		log->stop();
     
-    // clear pools
-    for (const auto &entry: pool) {
-        entry.second->pool.close();
+    // stop reading thread
+    senStatus = SensorStatus::STOPPING;
+    if(readLoopStarted) {
+        for (int i = 0; i < readingThreads.size(); i++) {
+            readingThreads[i].join();
+        }
     }
-    pool.clear();
 
     // close child
     if (!closeChild()) {
         tkERR("Error.\n");
         return false;
     }
+
+    // clear pools
+    for (const auto &entry: pool) {
+        entry.second->pool.close();
+    }
+    pool.clear();
 
     return true;
 }

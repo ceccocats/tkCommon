@@ -11,12 +11,11 @@ public:
     static const DataType type;
     tk::math::Vec3<double> pose;
     tk::math::Vec3<double> angle;
-    double speed;
+    tk::math::Vec3<double> speed;
     
     void init() override
     {
         SensorData::init();
-        speed = 0;
     }
     OdomData_gen& operator=(const OdomData_gen& s)
     {
