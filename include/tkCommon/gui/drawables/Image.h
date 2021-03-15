@@ -3,8 +3,6 @@
 #include "tkCommon/data/ImageData.h"
 #include "tkCommon/data/VectorData.h"
 
-#include <cstdarg>
-
 namespace tk{ namespace gui{
 
 	class Image : public DataDrawable {
