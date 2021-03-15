@@ -129,6 +129,7 @@ namespace tk { namespace data {
             msg.stamp.sec    = this->stamp / 1e-6;
             msg.stamp.nsec   = (this->stamp - msg.stamp.sec) * 1e3;
             msg.seq          = this->messageID;
+            msg.frame_id     = "base_link";
         }
 
         void fromRos(std_msgs::Header &msg) {
