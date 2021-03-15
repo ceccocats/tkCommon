@@ -8,7 +8,7 @@ if(CUDA_FOUND)
     add_definitions(-DTKCUDA_ENABLED)
 endif()
 
-find_package(Eigen3 3.3.9 REQUIRED)
+find_package(Eigen3 REQUIRED)
 #find_package(yaml-cpp REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)

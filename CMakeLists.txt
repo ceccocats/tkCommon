@@ -23,7 +23,7 @@ endif()
 #-------------------------------------------------------------------------------
 # External Libraries
 #-------------------------------------------------------------------------------
-find_package(Eigen3 3.3.9 REQUIRED)
+find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 message("-- Eigen: " ${EIGEN3_INCLUDE_DIR})
 
@@ -107,7 +107,6 @@ add_library(tkGUI SHARED
     ${gui_utils}  
     ${imgui}
     ${implot}
-    src/sensor/LogManager.cpp
 )
 target_link_libraries(tkGUI ${CUDA_LIBRARIES} ${GUI_LIBS} tkCommon)
 

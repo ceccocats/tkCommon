@@ -13,12 +13,6 @@ namespace tk { namespace sensors {
         tkASSERT(manualTick);
         logTick = time;
     }
-
-    timeStamp_t 
-    LogManager::getTick() {
-        return logTick;
-    }
-
         
     void* 
     LogManager::logTicker(void *args) {
@@ -83,18 +77,6 @@ namespace tk { namespace sensors {
     void 
     LogManager::stop() {
         stopped = true;
-    }
-
-    void 
-    LogManager::startStop(){
-        if(!startStopMtx.try_lock()){
-            startStopMtx.unlock();
-        }
-    }
-
-    void 
-    LogManager::exitStop(){
-        startStopMtx.unlock();
     }
 
     void 

@@ -29,11 +29,6 @@ namespace tk { namespace sensors {
         void setTick(timeStamp_t time);
 
         /**
-         * @brief get current tick
-         */
-        timeStamp_t getTick();
-
-        /**
          * @brief auto-ticker thread
          */
         static void *logTicker(void *args);
@@ -50,8 +45,22 @@ namespace tk { namespace sensors {
          */
         void stop();
 
-        void startStop();
-        void exitStop();
+        void 
+        startStop(){
+            if(!startStopMtx.try_lock()){
+                startStopMtx.unlock();
+            }
+        }
+
+        void 
+        exitStop(){
+            startStopMtx.unlock();
+        }
+
+        timeStamp_t 
+        getTick() {
+            return logTick;
+        }
 
     private:
         void start(timeStamp_t time);

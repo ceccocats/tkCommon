@@ -43,7 +43,7 @@ void* th_cloud(void* cloudptr){
 	Eigen::MatrixXf points = Eigen::MatrixXf(4, N);
 
 	tk::rt::Task t;
-    t.init(1000);
+    t.init(10000);
 
 	float rot = 0;
 	cloud->header.name = "fake_cloud";

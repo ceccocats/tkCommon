@@ -40,7 +40,7 @@ class pointcloud4f  : public tk::gui::shader::generic
         void draw(glm::mat4& modelview, tk::gui::Buffer<float>* buffer, int n, tk::gui::Color_t color = tk::gui::color::WHITE){
 
             if(n == 0){
-                tkWRN("Pontcloud has 0 points\n")
+                //tkWRN("Pontcloud has 0 points\n")
                 return;
             }
 
