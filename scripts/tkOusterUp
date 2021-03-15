@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ##################
-ipOutster="192.168.1.203"
+ipOutster="192.168.1.204"
 ipDest="192.168.1.200"
 dev="eth0"
 ##################
@@ -9,7 +9,7 @@ dev="eth0"
 config=2048x10
 ##################
 ## TIME_FROM_INTERNAL_OSC, TIME_FROM_SYNC_PULSE_IN, TIME_FROM_PTP_1588
-timestamp_mode=TIME_FROM_SYNC_PULSE_IN
+timestamp_mode=TIME_FROM_PTP_1588
 ##################
 ## ACTIVE_HIGH, ACTIVE_LOW
 sync_pulse_in_polarity=ACTIVE_HIGH
