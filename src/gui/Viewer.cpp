@@ -314,6 +314,8 @@ Viewer::beforeDraw(){
 
 void 
 Viewer::draw() {
+    glfwGetFramebufferSize(window, &width, &height);
+
     for (auto const& drawable : drawables){
         if(drawable.second->enabled){
             drawable.second->drwModelView = modelview * glm::make_mat4x4(drawable.second->tf.matrix().data());
