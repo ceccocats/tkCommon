@@ -1,61 +1,82 @@
 #!/bin/bash
 
 ##################
-ipOutster="192.168.1.203"
-ipDest="192.168.1.100"
-dev="eth1"
-##################
-
+ipOutster="192.168.1.204"
+ipDest="192.168.1.200"
+dev="eth0"
 ##################
 ## 512x10, 1024x10, 2048x10, 512x20, 1024x20
 config=2048x10
 ##################
+## TIME_FROM_INTERNAL_OSC, TIME_FROM_SYNC_PULSE_IN, TIME_FROM_PTP_1588
+timestamp_mode=TIME_FROM_PTP_1588
+##################
+## ACTIVE_HIGH, ACTIVE_LOW
+sync_pulse_in_polarity=ACTIVE_HIGH
+nmea_in_polarity=ACTIVE_LOW
+##################
+## BAUD_9600, BAUD_115200
+nmea_baud_rate=BAUD_9600
+##################
 
+echo -e "\e[43mConnecting to LiDAR at $ipOutster and setting:\e[0m"
+echo -e "\e[43m\tDest: $ipDest on $dev\e[0m"
+echo -e "\e[43m\tConfig: $config\e[0m"
+echo -e "\e[43m\tTimestamp: $timestamp_mode\e[0m"
+
+
+check() {
+	if [ $? != "0" ]; then
+		echo -e"\e[41mError\e[0m"
+	else
+		echo -e "\e[42mDone\e[0m"
+	fi
+}
+
+#Setting route
 sudo route add $ipOutster dev $dev
 
-echo -e "\e[43mConnecting to LiDAR at $ip and setting $config configuration...\e[0m"
-
-#set destination ip (this pc)
+#set destination ip
 echo "set_config_param udp_ip $ipDest" | nc $ipOutster 7501 -q 1
-
-if [ $? != "0" ]; then
-	echo -e"\e[41mError setting ip dest $ipDest\e[0m"
-else
-	echo -e "\e[42mSet ip dest $ipDest (this pc)\e[0m"
-fi
+check
 
 #set udp_port
 echo "set_config_param udp_port_lidar 7502" | nc $ipOutster 7501 -q 1
+check
 
-if [ $? != "0" ]; then
-	echo -e"\e[41mError\e[0m"
-else
-	echo -e "\e[42mSet udp_port\e[0m"
-fi
+echo "set_config_param beta.bloom_reduction_enable false" | nc $ipOutster 7501 -q 1
+check
 
 #set lidar mode
 echo "set_config_param lidar_mode $config" | nc $ipOutster 7501 -q 1
-if [ $? != "0" ]; then
-	echo -e "\e[41mError setting lidar mode $config\e[0m"
+check
+
+#set timestamp mode
+echo "set_config_param timestamp_mode $timestamp_mode" | nc $ipOutster 7501 -q 1
+check
+
+if [ $timestamp_mode == "TIME_FROM_SYNC_PULSE_IN" ]; then
+	echo -e "\e[43mSetting polarity and nmea baudrate...\e[0m"
+	echo "set_config_param sync_pulse_in_polarity $sync_pulse_in_polarity" | nc $ipOutster 7501 -q 1
+	check
+	echo "set_config_param nmea_baud_rate $nmea_baud_rate" | nc $ipOutster 7501 -q 1
+	check
+	echo "set_config_param nmea_in_polarity $nmea_in_polarity" | nc $ipOutster 7501 -q 1
+	check 
+	echo "set_config_param multipurpose_io_mode INPUT_NMEA_UART" | nc $ipOutster 7501 -q 1
+	check
 else
-	echo -e "\e[42mSet lidar mode $config\e[0m"
+	echo "set_config_param multipurpose_io_mode OFF" | nc $ipOutster 7501 -q 1
+	check
 fi
 
 #Save configs
 echo "write_config_txt" | nc $ipOutster 7501 -q 1
-if [ $? != "0" ]; then
-	echo -e "\e[41mError saving configuration\e[0m"
-else
-	echo -e "\e[42mConfiguration saved for next reboots\e[0m"
-fi
+check
 
 #start sensor
 echo "reinitialize" | nc $ipOutster 7501 -q 1
-if [ $? != "0" ]; then
-	echo -e "\e[41mError starting sensor\e[0m"
-else
-	echo -e "\e[42mSensor start successfully. You must attend 10 seconds\e[0m"
-fi
+check
 
 
 

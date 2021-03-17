@@ -291,6 +291,12 @@ Viewer::drawInfos(){
         ImGui::Text("Window size: %d x %d", width, height);
 
     }else{
+        std::stringstream ss;
+        ss << "tf: \n"<<"\tpos: "<<tk::common::tf2pose(drawables[imguiSelected]->tf)<<"\n";
+        ss            <<"\trot: "<<tk::common::tf2rot(drawables[imguiSelected]->tf)<<"\n";
+
+        ImGui::Text("%s", ss.str().c_str());
+        ImGui::Separator();
         drawables[imguiSelected]->imGuiInfos();
     }
 }
@@ -384,6 +390,16 @@ Viewer::runloop() {
         glClearColor(background.r(), background.g(), background.b(), background.a());
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        ///////Retro compatibility
+        glMatrixMode( GL_PROJECTION );
+        glLoadIdentity();
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity() ;
+        glPushMatrix();
+        glMultMatrixf(glm::value_ptr(camera.projection));
+        glMultMatrixf(glm::value_ptr(camera.modelView));
+        /////////////////////////
+
         // apply camera matrix
         modelview = camera.projection * camera.modelView;
         
@@ -399,6 +415,11 @@ Viewer::runloop() {
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        ///////Retro compatibility
+        glPopMatrix();
+        /////////////////////////
+
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

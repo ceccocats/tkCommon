@@ -1,95 +1,53 @@
 #include "tkCommon/gui/drawables/Radar.h"
 
-namespace tk { namespace gui {
-    Radar::Radar()
-    {
-        
-    }
 
-    Radar::Radar(const std::string& name)
-    {
-        far_drw     = new tk::gui::Cloud4f("far");
-        near_drw    = new tk::gui::Cloud4f("near");
-        this->name  = name;
-    }
+tk::gui::Radar::Radar(const std::string& name){
+    this->name  = name;
+    far_drw     = new tk::gui::Cloud4f("far");
+    near_drw    = new tk::gui::Cloud4f("near");
+}
 
-    Radar::Radar(tk::data::RadarData* radar, const std::string& name)
-    {
-        far_drw     = new tk::gui::Cloud4f("far");
-        near_drw    = new tk::gui::Cloud4f("near");
-        this->radar = radar;
-        this->name  = name;
-    }
+tk::gui::Radar::Radar(tk::data::RadarData* radar, const std::string& name) : Radar(name){
+    this->data = radar;
+}
+
+tk::gui::Radar::~Radar(){
+
+}
+
+void 
+tk::gui::Radar::onInit(tk::gui::Viewer *viewer){
+    far_drw->pointSize  = 5.0f;
+    near_drw->pointSize = 5.0f;
     
-    Radar::~Radar()
-    {
+    viewer->add(far_drw);
+    viewer->add(near_drw);
+}
 
-    }
+void 
+tk::gui::Radar::updateData(tk::gui::Viewer *viewer){
+    tk::data::RadarData* radar = (tk::data::RadarData*)data;
+    far_drw->updateRef(&radar->far);
+    far_drw->updateRef(&radar->near);
+    print.str("");
+    print<<(*radar);
+}
 
-    void 
-    Radar::updateRef(tk::data::RadarData* radar)
-    {
-        this->radar = radar;   
-        far_drw->updateRef(&radar->far);
-        near_drw->updateRef(&radar->near);
-        initted = update = true;
-    }
+void 
+tk::gui::Radar::imGuiSettings(){
+    ImGui::BeginGroup();
+    ImGui::BeginChild("FAR", ImVec2{-1, ImGui::GetContentRegionAvail().y/2}, true);
+    ImGui::TextDisabled("FAR");
+    far_drw->imGuiSettings();
+    ImGui::EndChild();
+    ImGui::BeginChild("NEAR", ImVec2{-1, ImGui::GetContentRegionAvail().y}, true);
+    ImGui::TextDisabled("NEAR");
+    near_drw->imGuiSettings();
+    ImGui::EndChild();
+    ImGui::EndGroup(); 
+}
 
-    void 
-    Radar::onInit(tk::gui::Viewer *viewer)
-    {
-        far_drw->pointSize  = 5.0f;
-        near_drw->pointSize = 5.0f;
-        
-        viewer->add(far_drw);
-        viewer->add(near_drw);
-    }
-
-    void 
-    Radar::draw(tk::gui::Viewer *viewer)
-    {
-        if (initted) {
-            if(radar->isChanged(counter) || update) {
-                update = false;
-
-                radar->lockRead();
-                print.str("");
-                print<<(*radar); 
-                radar->unlockRead();
-            }     
-        }
-    }
-
-    void 
-    Radar::imGuiSettings()
-    {
-        ImGui::BeginGroup();
-        ImGui::BeginChild("FAR", ImVec2{-1, ImGui::GetContentRegionAvail().y/2}, true);
-        ImGui::TextDisabled("FAR");
-        far_drw->imGuiSettings();
-        ImGui::EndChild();
-        ImGui::BeginChild("NEAR", ImVec2{-1, ImGui::GetContentRegionAvail().y}, true);
-        ImGui::TextDisabled("NEAR");
-        near_drw->imGuiSettings();
-        ImGui::EndChild();
-        ImGui::EndGroup(); 
-    }
-
-    void 
-    Radar::imGuiInfos()
-    {
-        ImGui::Text("%s",print.str().c_str());
-    }
-
-    void 
-    Radar::onClose()
-    {
-        
-    }
-    
-    std::string 
-    Radar::toString()
-    {
-        return name;
-    }
-}}
+void 
+tk::gui::Radar::imGuiInfos(){
+    ImGui::Text("%s",print.str().c_str());
+}

@@ -451,6 +451,7 @@ namespace tk { namespace common {
      * @return
      */
     inline YAML::Node YAMLloadConf(std::string conf_file) {
+        tkDBG("Loading YAML: "<<conf_file<<"\n");
         return YAML::LoadFile(conf_file);
     }
 

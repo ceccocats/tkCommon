@@ -13,28 +13,24 @@ namespace tk { namespace sensors {
         tkASSERT(manualTick);
         logTick = time;
     }
-
-    timeStamp_t 
-    LogManager::getTick() {
-        return logTick;
-    }
-
         
     void* 
     LogManager::logTicker(void *args) {
         LogManager *self = (LogManager*) args;
         timeStamp_t ts = 100;
-        timeStamp_t inc = float(ts)*self->speed;
 
         std::chrono::microseconds inc_chrono {ts};
         std::chrono::system_clock::time_point currentpt = std::chrono::system_clock::now();
-        while (gRun) {
+        while (tk::gui::Viewer::getInstance()->isRunning()) {
             if(self->manualTick) { 
                 // manual tick (do nothing and restore start point in case it will switch automatic tick)
                 usleep(500000);
                 currentpt = std::chrono::system_clock::now();
             } else {
                 // increment tick counter
+                self->startStopMtx.lock();
+                self->startStopMtx.unlock();
+                timeStamp_t inc = float(ts)*self->speed;
                 self->logTick += inc;
                 currentpt += inc_chrono;
                 std::this_thread::sleep_until(currentpt);

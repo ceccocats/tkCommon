@@ -22,7 +22,7 @@ namespace tk{ namespace gui{
             uint32_t counter = 0;
             float lineSize = 1.0f;
 
-            std::string name;
+            bool update;
 
         public:
             tk::gui::Color_t        color;
@@ -36,7 +36,5 @@ namespace tk{ namespace gui{
             void imGuiSettings();
             void imGuiInfos();
             void onClose();
-
-            std::string toString();
 	};
 }}

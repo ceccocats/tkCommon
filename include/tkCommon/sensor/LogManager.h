@@ -1,8 +1,8 @@
 #pragma once
 #include <thread>
 #include "tkCommon/common.h"
+#include "tkCommon/gui/Viewer.h"
 
-extern bool gRun;
 namespace tk { namespace sensors {
 
     class LogManager {
@@ -29,11 +29,6 @@ namespace tk { namespace sensors {
         void setTick(timeStamp_t time);
 
         /**
-         * @brief get current tick
-         */
-        timeStamp_t getTick();
-
-        /**
          * @brief auto-ticker thread
          */
         static void *logTicker(void *args);
@@ -50,6 +45,23 @@ namespace tk { namespace sensors {
          */
         void stop();
 
+        void 
+        startStop(){
+            if(!startStopMtx.try_lock()){
+                startStopMtx.unlock();
+            }
+        }
+
+        void 
+        exitStop(){
+            startStopMtx.unlock();
+        }
+
+        timeStamp_t 
+        getTick() {
+            return logTick;
+        }
+
     private:
         void start(timeStamp_t time);
 
@@ -58,5 +70,6 @@ namespace tk { namespace sensors {
         timeStamp_t startStamp = 0;       /**< start timestamp in log */
         bool        logStarted = false;   /**< true if log is started */
         std::mutex  startMtx;
+        std::mutex  startStopMtx;
     };
 }}

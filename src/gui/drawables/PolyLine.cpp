@@ -55,8 +55,3 @@ tk::gui::PolyLine::onClose(){
     delete shaderLine;
     glData.release();
 }
-
-std::string 
-tk::gui::PolyLine::toString(){
-    return name;
-}

@@ -2,26 +2,11 @@
 
 #include "tkCommon/gui/Viewer.h"
 #include "tkCommon/gui/drawables/Drawables.h"
-#include "tkCommon/data/VectorData.h"
-#include "tkCommon/data/StereoData.h"
-
-#include "tkCommon/rt/Task.h"
 
 #include "tkCommon/sensor/Sensor.h"
 #include "tkCommon/sensor/LogManager.h"
 
 namespace tk { namespace sensors {
-    /**
-     * @brief   Support data structure to link a drawable to each spawned sensor.
-     */
-    struct drawInfo{
-        int                     id;
-        bool                    locked;
-        std::string             name;
-        tk::data::sensorType    type;
-        tk::gui::Drawable       *drawable;
-    };
-
     /**
      * @brief   SensorsManager is a wrapper class around the Sensor class 
      *          capable of handling multiple sensors at the same time.
@@ -29,16 +14,11 @@ namespace tk { namespace sensors {
     class SensorsManager {
     public:
         // Sensors
-        std::map<std::string,tk::sensors::Sensor*>  sensors;
+        std::map<std::string,tk::sensors::Sensor*>  mSensors;
         
         // LOG
-        tk::sensors::LogManager*    logManager  = nullptr;
-        std::string                 logPath     = "";
-
-        // GUI
-        tk::gui::Viewer*        viewer;
-        tk::rt::Thread          viewerThread;
-        std::vector<drawInfo>   drawables;
+        tk::sensors::LogManager*    mLogManager  = nullptr;
+        std::string                 mLogPath     = "";
 
         /**
          * @brief   Spawn and initilize sensors.
@@ -50,8 +30,8 @@ namespace tk { namespace sensors {
          * @return true     if no error occours.
          * @return false    if an error occours.
          */
-        bool init(YAML::Node conf, const std::string &logPath = "", 
-                  const std::string &list="", tk::gui::Viewer* viewer = nullptr);
+        bool init(YAML::Node aConf, const std::string &aLogPath = "", 
+                  const std::string &aList="");
 
         /**
          * @brief   start all spawned sensors reading thread and an internal thread to update the viewer.
@@ -71,7 +51,7 @@ namespace tk { namespace sensors {
          * 
          * @param folderPath    path to a folder where the sensor will create his save file.
          */
-        void startRecord(const std::string &folderPath);
+        void startRecord(const std::string &aFolderPath);
 
         /**
          * @brief   stop recording for all spawned sensor.
@@ -84,27 +64,27 @@ namespace tk { namespace sensors {
          * @param s     string, must be the same passed inside list parameter on init method.
          * @return tk::sensors::Sensor*     reference to Sensor
          */
-        tk::sensors::Sensor* operator[](const std::string &s);
+        tk::sensors::Sensor* operator[](const std::string &aString);
 
         /**
          * @brief   Set the Replay Debug object
          * 
          * @param debug 
          */
-        void setReplayDebug(bool debug);
+        void setReplayDebug(bool aDebug);
 
         /**
          * @brief   Skip time.
          * 
          * @param time  Amount of time to be skipped.
          */
-        void skipDebugTime(timeStamp_t time);
+        void skipDebugTime(timeStamp_t aTime);
 
         /**
          * @brief   When LogManger is in manual mode, wait until all sensors reached logTick
          * @param time ref logTick time
          */
-        void waitSync(timeStamp_t time);
+        void waitSync(timeStamp_t aTime);
 
     protected:
         /**
@@ -115,15 +95,6 @@ namespace tk { namespace sensors {
          * @return true     if no error occours.
          * @return false    if an error occours.
          */
-        virtual bool spawn(YAML::Node conf, const std::string &list="") = 0;
-
-    private:
-        /**
-         * @brief   Inernal thread to update the viewer.
-         * 
-         * @param args 
-         * @return void* 
-         */
-        static void* dataViewer(void *args);
+        virtual bool spawn(YAML::Node aConf, const std::string &aList="") = 0;
     };
 }}

@@ -9,6 +9,7 @@ namespace tk { namespace data {
 class DepthData_gen : public SensorData
 {
 public:
+    static const DataType type;
     tk::math::Vec<uint16_t> data;
     uint32_t width;
     uint32_t height;
@@ -32,6 +33,7 @@ public:
         os<<"DepthData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;
         os<<"	header.stamp: "<<s.header.stamp<<std::endl;
+        os<<"	header.fps:   "<<s.header.fps<<std::endl;
         os<<"	data: "<<s.data<<std::endl;
         os<<"	width: "<<s.width<<std::endl;
         os<<"	height: "<<s.height<<std::endl;

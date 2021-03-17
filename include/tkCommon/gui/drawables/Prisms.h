@@ -9,6 +9,8 @@ namespace tk{ namespace gui{
             tk::common::Prisms prisms;
             tk::common::Prisms* ref;
             uint32_t counter = 0;
+
+            bool update;
         public:
 
             tk::gui::Color_t color;
@@ -23,7 +25,5 @@ namespace tk{ namespace gui{
             void imGuiInfos();
             void imGuiSettings();
             void onClose();
-
-            std::string toString();
 	};
 }}

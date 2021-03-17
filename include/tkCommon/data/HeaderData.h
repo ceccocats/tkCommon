@@ -2,68 +2,58 @@
 
 #include "tkCommon/common.h"
 #include "tkCommon/math/MatIO.h"
-#include <mutex>
+
+#ifdef ROS_ENABLED
+#include <std_msgs/Header.h>
+#endif
 
 namespace tk { namespace data {
 
-    class sensorType{
-
-    public:
-        enum Value : uint8_t{
+    
+    enum class DataType : uint32_t{
         NOT_SPEC    = 0,
-        LIDAR       = 1,
+        CLOUD       = 1,
         VEHICLE     = 2,
         GPS         = 3,
-        CAMDATA     = 4,
+        IMAGE       = 4,
         RADAR       = 5,
         LINES       = 6,
         PERCEPTION  = 7,
         IMU         = 8,
         GPSIMU      = 9,
         STEREO      = 10,
-        CAN         = 11
-        };
-
-        /**
-         * @brief   method for convert id to lane string name
-         */
-        std::string toString(){
-            if(value == sensorType::NOT_SPEC)   return std::string{"not specified"};
-            if(value == sensorType::LIDAR)      return std::string{"lidar"};
-            if(value == sensorType::VEHICLE)    return std::string{"vehicle"};
-            if(value == sensorType::GPS)        return std::string{"gps"};
-            if(value == sensorType::CAMDATA)    return std::string{"camera"};
-            if(value == sensorType::RADAR)      return std::string{"radar"};
-            if(value == sensorType::PERCEPTION) return std::string{"perception"};
-            if(value == sensorType::IMU)        return std::string{"imu"};
-            if(value == sensorType::GPSIMU)     return std::string{"gps&imu"};
-            return std::string{"type error"};
-        }
-
-        bool operator!=(sensorType::Value v) noexcept {
-            return v != value;
-        }
-
-        bool operator==(sensorType::Value v) noexcept {
-            return v == value;
-        }
-
-        bool operator!=(sensorType &s) noexcept {
-            return s.value != value;
-        }
-
-        bool operator==(sensorType &s) noexcept {
-            return s.value == value;
-        }
-
-        void operator=(sensorType::Value v) noexcept {
-            value = v;
-        }
-
-    private:
-        sensorType::Value value = sensorType::Value::NOT_SPEC;
+        CAN         = 11,
+        VECTOR      = 12,
+        ACTUATION   = 13,
+        DEPTH       = 14,
+        ODOM        = 15,
+        IMAGEU8     = 16,
+        IMAGEU16    = 17,
+        IMAGEF      = 18
     };
 
+    static const char* ToStr (const DataType& type)
+    {
+        switch (type) {
+            case DataType::CLOUD:       return "cloud";
+            case DataType::VEHICLE:     return "vehicle";
+            case DataType::GPS:         return "gps";
+            case DataType::IMAGE:       return "image";
+            case DataType::RADAR:       return "radar";
+            case DataType::LINES:       return "lines";
+            case DataType::PERCEPTION:  return "perception";
+            case DataType::IMU:         return "imu";
+            case DataType::GPSIMU:      return "gps&imu";
+            case DataType::STEREO:      return "stereo";
+            case DataType::CAN:         return "can";
+            case DataType::VECTOR:      return "vector";
+            case DataType::ACTUATION:   return "actuation";
+            case DataType::DEPTH:       return "depth";
+            case DataType::ODOM:        return "odom";
+            default:                    return "???";
+                
+        }
+    }
 
     /**
      * @brief Header data class.
@@ -73,18 +63,22 @@ namespace tk { namespace data {
     public:
         std::string         name   = "";                             /**< Name of the sensor. */
         tk::common::Tfpose  tf     = tk::common::Tfpose::Identity(); /**< TF in respect to back axel, @see tk::common::Tfpose. */
-        sensorType          type;
+        DataType            type;
         
         timeStamp_t         stamp     = 0; /**< Time stamp, expressed in microseconds. */
         int                 sensorID  = 0; /**< ID of the sensor. */
         int                 messageID = 0; /**< Incremental message counter. */
+
+        float               fps = 0;
 
         void init() {
             this->stamp         = 0;
             this->tf            = tk::common::Tfpose::Identity();
             this->sensorID      = 0;
             this->messageID     = 0;
-            this->type          = sensorType::NOT_SPEC;
+            this->type          = DataType::NOT_SPEC;
+            this->fps           = 0;
+            this->name          = "???";
         }
 
         /**
@@ -98,6 +92,7 @@ namespace tk { namespace data {
             this->sensorID      = s.sensorID;
             this->messageID     = s.messageID;
             this->type          = s.type;
+            this->fps           = s.fps;
 
             // safe string update
             if(this->name != s.name) {
@@ -128,5 +123,19 @@ namespace tk { namespace data {
             var["name"].get(this->name);
             return true;
         }
+
+#ifdef ROS_ENABLED
+        void toRos(std_msgs::Header &msg) {
+            msg.stamp.sec    = this->stamp / 1e-6;
+            msg.stamp.nsec   = (this->stamp - msg.stamp.sec) * 1e3;
+            msg.seq          = this->messageID;
+            msg.frame_id     = "base_link";
+        }
+
+        void fromRos(std_msgs::Header &msg) {
+            this->stamp      = msg.stamp.toNSec() / 1e6;    
+            this->messageID  = msg.seq;
+        }
+#endif
     };
 }}

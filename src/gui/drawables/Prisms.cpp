@@ -1,15 +1,14 @@
 #include "tkCommon/gui/drawables/Prisms.h"
 
 tk::gui::Prisms::Prisms(tk::gui::Color_t color){
-    update  = false;
+    name = "prisms";
+    update = false;
     this->color = color;
 }
 
-tk::gui::Prisms::Prisms(tk::common::Prisms& prisms,tk::gui::Color_t color){
+tk::gui::Prisms::Prisms(tk::common::Prisms& prisms,tk::gui::Color_t color) : Prisms(color){
     ref     = &prisms;
     update  = true;
-
-    this->color = color;
 }
 
 tk::gui::Prisms::~Prisms(){
@@ -101,9 +100,4 @@ tk::gui::Prisms::imGuiSettings(){
 
 void 
 tk::gui::Prisms::onClose(){
-}
-
-std::string 
-tk::gui::Prisms::toString(){
-    return "Prisms";
 }

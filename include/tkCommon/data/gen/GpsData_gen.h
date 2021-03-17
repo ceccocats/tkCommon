@@ -8,6 +8,7 @@ namespace tk { namespace data {
 class GpsData_gen : public SensorData
 {
 public:
+    static const DataType type;
     timeStamp_t utcStamp;
     double lat;
     double lon;
@@ -52,6 +53,7 @@ public:
         os<<"GpsData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;
         os<<"	header.stamp: "<<s.header.stamp<<std::endl;
+        os<<"	header.fps:   "<<s.header.fps<<std::endl;
         os<<"	utcStamp: "<<s.utcStamp<<std::endl;
         os<<"	lat: "<<s.lat<<std::endl;
         os<<"	lon: "<<s.lon<<std::endl;

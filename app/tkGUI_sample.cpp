@@ -18,6 +18,7 @@ void* th_gps(void* gpsptr){
 	gps->heigth = 0.1f;
 	gps->sats   = 20;
 	gps->header.name = "fake_gps";
+	gps->header.stamp = getTimeStamp();
 
 	tk::rt::Task t;
     t.init(1000);
@@ -25,6 +26,7 @@ void* th_gps(void* gpsptr){
 	while(viewer->isRunning()){
 		gps->lockWrite();
 		gps->lat += 0.00000001;
+		gps->header.stamp += 1000;
 		gps->unlockWrite();
 		t.wait();
 	}
@@ -41,10 +43,11 @@ void* th_cloud(void* cloudptr){
 	Eigen::MatrixXf points = Eigen::MatrixXf(4, N);
 
 	tk::rt::Task t;
-    t.init(1000);
+    t.init(10000);
 
 	float rot = 0;
 	cloud->header.name = "fake_cloud";
+	cloud->header.stamp = getTimeStamp();
 	while(viewer->isRunning()){
 
 		for(int i=0; i<N; i++) {
@@ -61,6 +64,7 @@ void* th_cloud(void* cloudptr){
 
 		cloud->lockWrite();
 		cloud->points.copyFrom(points.data(),points.rows(),points.cols());
+		cloud->header.stamp += 1000;
 		cloud->unlockWrite();
 
 		rot += 0.01;

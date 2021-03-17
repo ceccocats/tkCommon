@@ -9,6 +9,7 @@ namespace tk { namespace data {
 class CanData_gen : public SensorData
 {
 public:
+    static const DataType type;
     struct can_frame frame;
     
     void init() override
@@ -26,6 +27,7 @@ public:
         os<<"CanData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;
         os<<"	header.stamp: "<<s.header.stamp<<std::endl;
+        os<<"	header.fps:   "<<s.header.fps<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)

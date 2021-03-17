@@ -39,11 +39,16 @@ class pointcloud4f  : public tk::gui::shader::generic
 
         void draw(glm::mat4& modelview, tk::gui::Buffer<float>* buffer, int n, tk::gui::Color_t color = tk::gui::color::WHITE){
 
+            if(n == 0){
+                //tkWRN("Pontcloud has 0 points\n")
+                return;
+            }
+
             buffer->setVertexAttribs(vertexPointer);
 
             std::memcpy(glm::value_ptr(pointColor), color.color, sizeof(pointColor));
 
-            shader.use();
+            shader.use();;
             shader.setMat4("modelview",modelview);
             shader.setVec4("color",pointColor);
 

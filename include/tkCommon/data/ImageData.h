@@ -4,92 +4,112 @@
 
 namespace tk{ namespace data{
 
-    class ImageData : public ImageData_gen{
+    template<class T>
+    class ImageDataX: public tk::data::ImageData_gen<T>{
         public:
 
-        ImageData(){
-            data.useGPU();
+        ImageDataX() : ImageData_gen<T>(){
+            this->data.useGPU();
+
+            if(this->T_type.id == tk::data::UINT8){
+                this->header.type = tk::data::DataType::IMAGEU8;
+            }
+            if(this->T_type.id == tk::data::UINT16){
+                this->header.type = tk::data::DataType::IMAGEU16;
+            }
+            if(this->T_type.id == tk::data::FLOAT){
+                this->header.type = tk::data::DataType::IMAGEF;
+            }
         }
 
-        ImageData(const ImageData& s){
-            ImageData();
-            width = s.width;
-            height = s.height;
-            channels = s.channels;
-            data = s.data;
+        ImageDataX(const ImageDataX<T>& s)  : ImageData_gen<T>() {
+            ImageDataX();
+            this->width = s.width;
+            this->height = s.height;
+            this->channels = s.channels;
+            this->data = s.data;
         }
 
         void init(){
 
-            lockWrite();
-        	ImageData_gen::init();
-            unlockWrite();
+            //this->lockWrite();
+        	//tk::data::ImageData_gen<T>::init();
+            //this->unlockWrite();
 
         }
         
         void init(int w, int h, int ch){
 
-            lockWrite();
-        	ImageData_gen::init();
-            width = w;
-            height = h;
-            channels = ch;
-            data.resize(width*height*channels);
-            header.name = sensorType::CAMDATA;
-            unlockWrite();
+            //this->try_lock();
+        	//tk::data::ImageData_gen<T>::init();
+            this->width = w;
+            this->height = h;
+            this->channels = ch;
+            this->data.resize(this->width*this->height*this->channels);
+            //this->unlockWrite();
 
         }
 
-        ImageData& operator=(ImageData& s){
+        ImageDataX<T>& operator=(ImageDataX<T>& s){
  
-            if(s.width != width || s.height != height || s.channels != channels){
+            if(s.width != this->width || s.height != this->height || s.channels != this->channels){
                 release();
                 init(s.width, s.height, s.channels);
             }
-            s.lockRead();
-            memcpy(data.data(), s.data.data(), width * height * channels);
-            s.unlockRead();
+            //s.lockRead();
+            memcpy(this->data.data(), s.data.data(), this->width * this->height * this->channels * sizeof(T));
+            //s.unlockRead();
             return *this;
         }
 
-        ImageData& operator=(ImageData_gen& s){
+        ImageDataX<T>& operator=(const ImageData_gen<T>& s){
  
-            ImageData_gen::operator=(s);
+            ImageData_gen<T>::operator=(s);
             return *this;
         }
 
-        bool empty() {return channels == 0 || width == 0 || height == 0 || data.size() == 0; }
+        bool empty() {return this->channels == 0 || this->width == 0 || this->height == 0 || this->data.size() == 0; }
 
         void release(){
             if(empty())
                 return;
 
-            lockWrite();
-            data.resize(0);
-            width = 0;
-            height = 0;
-            channels = 0;
-            unlockWrite();
+            this->lockWrite();
+            this->data.resize(0);
+            this->width = 0;
+            this->height = 0;
+            this->channels = 0;
+            this->unlockWrite();
         }
+
+        T* at(int row, int col){
+            return &this->data[(row*this->width + col) * this->channels];
+        }
+
 
         bool fromVar(tk::math::MatIO::var_t &var) {
             if(var.empty())
                 return false;
-            bool ok = ImageData_gen::fromVar(var["info"]);
-            tk::data::HeaderData tmp = header; // header will be overwrited by init
+            bool ok = tk::data::ImageData_gen<T>::fromVar(var["info"]);
+            tk::data::HeaderData tmp = this->header; // header will be overwrited by init
             if(ok) {
-                init(width, height, channels);
-                header = tmp;
-                data.fromVar(var["data"]);
+                init(this->width, this->height, this->channels);
+                this->header = tmp;
+                this->data.fromVar(var["data"]);
             }
             return ok;
         }
         bool toVar(std::string name, tk::math::MatIO::var_t &var) {
             std::vector<tk::math::MatIO::var_t> structVars(2);
-            ImageData_gen::toVar("info", structVars[0]);
-            data.toVar("data", structVars[1]);
+            tk::data::ImageData_gen<T>::toVar("info", structVars[0]);
+            this->data.toVar("data", structVars[1]);
             return var.setStruct(name, structVars);
         }
 
     };
+
+typedef tk::data::ImageDataX<uint8_t>   ImageData;
+typedef tk::data::ImageDataX<float>     ImageDataF;
+typedef tk::data::ImageDataX<uint8_t>   ImageDataU8;
+typedef tk::data::ImageDataX<uint16_t>  ImageDataU16;
 }}

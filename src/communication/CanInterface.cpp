@@ -72,7 +72,7 @@ namespace tk { namespace communication {
     }
 
     int
-    CanInterface::read(tk::data::CanData_t *data) {
+    CanInterface::read(tk::data::CanData *data) {
 
         if(offlineMode){
 
@@ -186,7 +186,7 @@ namespace tk { namespace communication {
     }
 
     bool
-    CanInterface::write (tk::data::CanData_t *data) {
+    CanInterface::write (tk::data::CanData *data) {
         if(offlineMode)
             return false;
 

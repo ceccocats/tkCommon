@@ -23,7 +23,7 @@ endif()
 #-------------------------------------------------------------------------------
 # External Libraries
 #-------------------------------------------------------------------------------
-find_package(Eigen3 3.3.9 REQUIRED)
+find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 message("-- Eigen: " ${EIGEN3_INCLUDE_DIR})
 
@@ -83,19 +83,22 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawa
 #-------------------------------------------------------------------------------
 # Build Libraries
 #-------------------------------------------------------------------------------
+file(GLOB data_gen  "include/tkCommon/data/gen/*.cpp")
+file(GLOB data      "include/tkCommon/data/*.cpp")
 add_library(tkCommon SHARED
     src/common.cpp
     src/log.cpp
     src/version.cpp
     src/CmdParser.cpp 
     src/rt/Profiler.cpp
-    include/tkCommon/data/gen/CloudData_gen.cpp   
+    ${data_gen}
+    ${data} 
 )
 target_link_libraries(tkCommon yaml-cpp matio dl)
 
 file(GLOB gui_utils "src/gui/utils/*.cpp")
-file(GLOB imgui "src/gui/imgui/*.cpp")
-file(GLOB implot "src/gui/implot/*.cpp")
+file(GLOB imgui     "src/gui/imgui/*.cpp")
+file(GLOB implot    "src/gui/implot/*.cpp")
 file(GLOB drawables "src/gui/drawables/*.cpp")
 
 add_library(tkGUI SHARED
@@ -107,6 +110,12 @@ add_library(tkGUI SHARED
 )
 target_link_libraries(tkGUI ${CUDA_LIBRARIES} ${GUI_LIBS} tkCommon)
 
+add_library(tkMath SHARED 
+    src/math/CSpline.cpp 
+    src/math/CSpline2D.cpp 
+    src/math/CSpline3D.cpp
+)
+
 add_library(tkCommunication SHARED
     src/communication/ethernet/UDPSocket.cpp
     src/communication/ethernet/TCPSocket.cpp
@@ -117,12 +126,7 @@ add_library(tkCommunication SHARED
     src/communication/serial/SerialPort.cpp
     src/communication/car/CarControl.cpp
 )
-target_link_libraries(tkCommunication pcap serial)
-
-add_library(tkMath SHARED 
-    src/math/CSpline.cpp 
-    src/math/CSpline2D.cpp 
-    src/math/CSpline3D.cpp)
+target_link_libraries(tkCommunication tkCommon pcap serial)
 
 add_library(tkJoystick SHARED 
     src/joystick/Joystick.cpp
@@ -172,7 +176,7 @@ foreach(cpp ${tkpackage_APPScpp})
 endforeach()
 foreach(app ${tkpackage_APPS})
     add_executable(${app} "app/${app}.cpp")
-    target_link_libraries(${app} tkCommon tkGUI tkCommunication tkMath tkJoystick ${GUI_LIBS} ${CUDA_LIBRARIES})
+    target_link_libraries(${app} tkCommon tkGUI tkCommunication tkMath tkJoystick tkSensor ${GUI_LIBS} ${CUDA_LIBRARIES})
 endforeach()
 
 if(CUDA_FOUND)

@@ -53,9 +53,9 @@ namespace tk { namespace communication {
         }
 
         //write data
-        veh->odom.x = veh->x;
-        veh->odom.y = veh->y;
-        veh->odom.yaw = -veh->carDirection +M_PI/2;
+        veh->odom.pose.x() = veh->x;
+        veh->odom.pose.y() = veh->y;
+        veh->odom.angle.z() = -veh->carDirection +M_PI/2;
         //veh->odom.tf.copyFrom(tk::common::odom2tf(veh->x, veh->y, -veh->carDirection +M_PI/2).matrix().data(), 4,4);
         //veh->odom.header.stamp = t;
     }
@@ -104,7 +104,7 @@ namespace tk { namespace communication {
          * @param frame input can frame
          * @param vehData output vehicle data
          */
-        void parse(tk::data::CanData_t &frame, tk::data::VehicleData &vehData) {
+        void parse(tk::data::CanData &frame, tk::data::VehicleData &vehData) {
             
             if(msgs.count(frame.id()) == 0)
                 return;

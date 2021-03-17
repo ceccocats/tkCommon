@@ -36,7 +36,7 @@ void CarControl::writeLoop() {
 }
 void CarControl::readLoop() {
 
-    tk::data::CanData_t data;
+    tk::data::CanData data;
     while(run) {
         soc->read(&data);
     
@@ -69,8 +69,8 @@ void CarControl::readLoop() {
                 memcpy(&alfa, &data.frame.data[1+4], 2);
                 x =  __bswap_32(x);
                 alfa =  __bswap_16(alfa);               
-                odom.x = float(x)/2e4;
-                odom.yaw = float(alfa)*1.54;
+                odom.pose.x() = float(x)/2e4;
+                odom.angle.z() = float(alfa)*1.54;
                 odom.header.stamp = data.header.stamp;
             }
             if(data.id() == ODOM1_ID) {
@@ -79,8 +79,8 @@ void CarControl::readLoop() {
                 memcpy(&vel, &data.frame.data[1+4], 2);
                 y =  __bswap_32(y);
                 vel =  __bswap_16(vel);               
-                odom.y = float(y)/2e4;
-                odom.speed = vel;
+                odom.pose.y() = float(y)/2e4;
+                odom.speed.x() = vel;
                 odom.header.stamp = data.header.stamp;
             }
         }
@@ -91,7 +91,7 @@ void CarControl::readLoop() {
 
 
 void CarControl::setSteerZero() {
-    tk::data::CanData_t data;
+    tk::data::CanData data;
     data.frame.can_dlc = 1;
     data.frame.can_id = SET_ZERO_STEERING_ID;
     data.frame.data[0] = steerECU;
@@ -99,7 +99,7 @@ void CarControl::setSteerZero() {
     return;
 }
 void CarControl::resetSteerMotor() {
-    tk::data::CanData_t data;
+    tk::data::CanData data;
     data.frame.can_dlc = 0;
     data.frame.can_id = RESET_ERR_STEERING_ID;
     soc->write(&data);
@@ -108,7 +108,7 @@ void CarControl::resetSteerMotor() {
 void CarControl::sendGenericCmd(std::string cmd) {
     tkASSERT(cmd.size() < 8-2)
 
-    tk::data::CanData_t data;
+    tk::data::CanData data;
     data.frame.can_dlc = 8;
     data.frame.can_id = GENERIC_CMD_ID;
     
@@ -123,7 +123,7 @@ void CarControl::setSteerPos(int32_t pos, uint8_t acc, uint16_t vel) {
     pos = __bswap_32(pos);
     vel = __bswap_16(vel);
 
-    tk::data::CanData_t data;
+    tk::data::CanData data;
     data.frame.can_dlc = 8;
     data.frame.can_id = SET_STEERING_ID;
     data.frame.data[0] = steerECU;
@@ -136,7 +136,7 @@ void CarControl::setSteerPos(int32_t pos, uint8_t acc, uint16_t vel) {
 void CarControl::setAccPos(uint16_t pos) {
     pos = __bswap_16(pos);
 
-    tk::data::CanData_t data;
+    tk::data::CanData data;
     data.frame.can_dlc = 3;
     data.frame.can_id = SET_ACC_ID;
     data.frame.data[0] = accECU;
@@ -147,7 +147,7 @@ void CarControl::setAccPos(uint16_t pos) {
 void CarControl::setBrakePos(uint16_t pos) {
     pos = __bswap_16(pos);
 
-    tk::data::CanData_t data;
+    tk::data::CanData data;
     data.frame.can_dlc = 3;
     data.frame.can_id = SET_BRAKE_ID;
     data.frame.data[0] = steerECU;
@@ -156,7 +156,7 @@ void CarControl::setBrakePos(uint16_t pos) {
     return;
 }
 void CarControl::sendAccEnable(bool status) {
-    tk::data::CanData_t data;
+    tk::data::CanData data;
     data.frame.can_dlc = 2;
     data.frame.can_id = ACC_RELE_ID;
     data.frame.data[0] = accECU;
@@ -165,7 +165,7 @@ void CarControl::sendAccEnable(bool status) {
 }
 
 void CarControl::sendOdomEnable(bool status) {
-    tk::data::CanData_t data;
+    tk::data::CanData data;
     data.frame.can_dlc = 2;
     data.frame.can_id = SET_ACTIVE_ID;
     data.frame.data[0] = accECU;
@@ -179,7 +179,7 @@ void CarControl::sendOdomEnable(bool status) {
 }
 
 void CarControl::sendEngineStart() {
-    tk::data::CanData_t data;
+    tk::data::CanData data;
     data.frame.can_dlc = 1;
     data.frame.can_id = ON_OFF_ID;
     data.frame.data[0] = steerECU;
@@ -187,7 +187,7 @@ void CarControl::sendEngineStart() {
 }
 
 void CarControl::requestSteerPos() {
-    tk::data::CanData_t data;
+    tk::data::CanData data;
     data.frame.can_dlc = 1;
     data.frame.can_id = GET_STEERING_ID;
     data.frame.data[0] = steerECU;
@@ -195,7 +195,7 @@ void CarControl::requestSteerPos() {
 }
 
 void CarControl::requestAccPos() {
-    tk::data::CanData_t data;
+    tk::data::CanData data;
     data.frame.can_dlc = 1;
     data.frame.can_id = GET_ACC_ID;
     data.frame.data[0] = accECU;
@@ -203,7 +203,7 @@ void CarControl::requestAccPos() {
 }
 
 void CarControl::requestBrakePos() {
-    tk::data::CanData_t data;
+    tk::data::CanData data;
     data.frame.can_dlc = 1;
     data.frame.can_id = GET_BRAKE_ID;
     data.frame.data[0] = steerECU;
@@ -211,7 +211,7 @@ void CarControl::requestBrakePos() {
 }
 
 void CarControl::requestMotorId() {
-    tk::data::CanData_t data;
+    tk::data::CanData data;
     data.frame.can_dlc = 0;
     data.frame.can_id = GET_HW_ID;
     soc->write(&data);

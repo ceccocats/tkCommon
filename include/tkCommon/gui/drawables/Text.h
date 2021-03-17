@@ -7,7 +7,6 @@ namespace tk{ namespace gui{
 	class Text : public Drawable {
         private:
             std::string text_str;
-            std::mutex text_mutex;
 
         public:
             float text_height = 1.0;

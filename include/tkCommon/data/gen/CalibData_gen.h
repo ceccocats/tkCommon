@@ -9,6 +9,7 @@ namespace tk { namespace data {
 class CalibData_gen : public SensorData
 {
 public:
+    static const DataType type;
     int w;
     int h;
     tk::math::Mat<float> k;
@@ -39,6 +40,7 @@ public:
         os<<"CalibData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;
         os<<"	header.stamp: "<<s.header.stamp<<std::endl;
+        os<<"	header.fps:   "<<s.header.fps<<std::endl;
         os<<"	w: "<<s.w<<std::endl;
         os<<"	h: "<<s.h<<std::endl;
         os<<"	k: "<<s.k<<std::endl;

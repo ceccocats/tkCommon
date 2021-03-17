@@ -1,17 +1,17 @@
 // this file is generated DO NOT DIRECTLY MODIFY
 #pragma once
 #include "tkCommon/data/SensorData.h"
-#include "tkCommon/math/Mat.h"
+#include "tkCommon/math/Vec.h"
 
 namespace tk { namespace data {
 
 class OdomData_gen : public SensorData
 {
 public:
-    float x;
-    float y;
-    float yaw;
-    float speed;
+    static const DataType type;
+    tk::math::Vec3<double> pose;
+    tk::math::Vec3<double> angle;
+    tk::math::Vec3<double> speed;
     
     void init() override
     {
@@ -20,9 +20,8 @@ public:
     OdomData_gen& operator=(const OdomData_gen& s)
     {
         SensorData::operator=(s);
-        x = s.x;
-        y = s.y;
-        yaw = s.yaw;
+        pose = s.pose;
+        angle = s.angle;
         speed = s.speed;
         return *this;
     }
@@ -31,29 +30,27 @@ public:
         os<<"OdomData_gen"<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;
         os<<"	header.stamp: "<<s.header.stamp<<std::endl;
-        os<<"	x: "<<s.x<<std::endl;
-        os<<"	y: "<<s.y<<std::endl;
-        os<<"	yaw: "<<s.yaw<<std::endl;
+        os<<"	header.fps:   "<<s.header.fps<<std::endl;
+        os<<"	pose: "<<s.pose<<std::endl;
+        os<<"	angle: "<<s.angle<<std::endl;
         os<<"	speed: "<<s.speed<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)
     {
-        std::vector<tk::math::MatIO::var_t> structVars(5);
+        std::vector<tk::math::MatIO::var_t> structVars(4);
         structVars[0].set("header", header);
-        structVars[1].set("x", x);
-        structVars[2].set("y", y);
-        structVars[3].set("yaw", yaw);
-        structVars[4].set("speed", speed);
+        structVars[1].set("pose", pose);
+        structVars[2].set("angle", angle);
+        structVars[3].set("speed", speed);
         return var.setStruct(name, structVars);
     }
     bool fromVar(tk::math::MatIO::var_t &var)
     {
         if(var.empty()) return false;
         var["header"].get(header);
-        var["x"].get(x);
-        var["y"].get(y);
-        var["yaw"].get(yaw);
+        var["pose"].get(pose);
+        var["angle"].get(angle);
         var["speed"].get(speed);
         return true;
     }

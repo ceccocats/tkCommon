@@ -6,10 +6,13 @@
 
 namespace tk { namespace data {
 
+template <class T>
 class ImageData_gen : public SensorData
 {
 public:
-    tk::math::Vec<uint8_t> data;
+    static const DataType type;
+    T_to_class_type<T> T_type;
+    tk::math::Vec<T> data;
     uint32_t width;
     uint32_t height;
     uint32_t channels;
@@ -21,7 +24,7 @@ public:
         height = 0;
         channels = 0;
     }
-    ImageData_gen& operator=(const ImageData_gen& s)
+    ImageData_gen<T>& operator=(const ImageData_gen<T>& s)
     {
         SensorData::operator=(s);
         data = s.data;
@@ -30,11 +33,13 @@ public:
         channels = s.channels;
         return *this;
     }
-    friend std::ostream& operator<<(std::ostream& os, ImageData_gen& s)
+    friend std::ostream& operator<<(std::ostream& os, ImageData_gen<T>& s)
     {
         os<<"ImageData_gen"<<std::endl;
+        os<<"	type:  "; s.T_type.print(os); os<<std::endl;
         os<<"	header.name:  "<<s.header.name<<std::endl;
         os<<"	header.stamp: "<<s.header.stamp<<std::endl;
+        os<<"	header.fps:   "<<s.header.fps<<std::endl;
         os<<"	data: "<<s.data<<std::endl;
         os<<"	width: "<<s.width<<std::endl;
         os<<"	height: "<<s.height<<std::endl;

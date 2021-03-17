@@ -1,5 +1,5 @@
 #pragma once
-#include "tkCommon/gui/drawables/Drawable.h"
+#include "tkCommon/gui/drawables/DataDrawable.h"
 #include "tkCommon/gui/shader/pointcloudColorMaps.h"
 #include "tkCommon/gui/shader/pointcloudRGBA.h"
 #include "tkCommon/gui/shader/pointcloud4f.h"
@@ -7,16 +7,12 @@
 
 namespace tk{ namespace gui{
 
-	class Cloud4f : public Drawable {
-
-        public:
-            tk::data::CloudData*    cloud = nullptr;
-            uint32_t counter = 0;
+	class Cloud4f : public DataDrawable{
 
         private:
+
             int points;
             tk::gui::Buffer<float>  glbuffer;
-
 
             std::pair<std::string,int>  cloudMod0 = {"Colored Cloud",0};
             std::pair<std::string,int>  cloudMod1 = {"RGBA Cloud",1};
@@ -37,10 +33,8 @@ namespace tk{ namespace gui{
             tk::gui::shader::pointcloudRGBA* pointcloudrgba;
 
             bool resetMinMax;
-
-            std::string name;
             
-            void updateData();
+            void updateData(tk::data::CloudData* cloud);
         public:
 
             /**
@@ -85,12 +79,6 @@ namespace tk{ namespace gui{
              */
             float minMax[2][4];
             /**
-             * @brief 
-             * Method that update min and max 
-             */
-            bool updateMinMax;
-            
-            /**
              * @brief Construct a new Cloud 4f using one color
              * 
              * @param cloud pointcloud ref
@@ -100,13 +88,13 @@ namespace tk{ namespace gui{
             Cloud4f(tk::data::CloudData* cloud, std::string name = "cloud4f");
             ~Cloud4f();
 
-            void updateRef(tk::data::CloudData* cloud);
             void onInit(tk::gui::Viewer *viewer);
-            void draw(tk::gui::Viewer *viewer);
             void imGuiSettings();
             void imGuiInfos();
             void onClose();
-            
-            std::string toString();
+        
+        private:
+            void drawData(tk::gui::Viewer *viewer);
+            void updateData(tk::gui::Viewer *viewer);
 	};
 }}
