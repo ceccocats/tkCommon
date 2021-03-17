@@ -17,7 +17,7 @@
 
 #else
 
-#define tkCUDA(x) { tkWRN("compiled without cuda, this feature is not avaible\n"); }
+#define tkCUDA(x)  (tkWRN("compiled without cuda, this feature is not avaible\n"))
 #define __host__ 
 #define __device__
 #endif
