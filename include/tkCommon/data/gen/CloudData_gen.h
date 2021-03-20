@@ -41,6 +41,7 @@ public:
     void init() override
     {
         SensorData::init();
+        header.type = type;
     }
     CloudData_gen& operator=(const CloudData_gen& s)
     {

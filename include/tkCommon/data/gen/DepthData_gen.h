@@ -17,6 +17,7 @@ public:
     void init() override
     {
         SensorData::init();
+        header.type = type;
         width = 0;
         height = 0;
     }

@@ -126,14 +126,14 @@ namespace tk { namespace data {
 
 #ifdef ROS_ENABLED
         void toRos(std_msgs::Header &msg) {
-            msg.stamp.sec    = this->stamp / 1e-6;
-            msg.stamp.nsec   = (this->stamp - msg.stamp.sec) * 1e3;
+            msg.stamp.sec    = this->stamp / 1e6;
+            msg.stamp.nsec   = (this->stamp - msg.stamp.sec*1e6) * 1e3;
             msg.seq          = this->messageID;
             msg.frame_id     = "base_link";
         }
 
         void fromRos(std_msgs::Header &msg) {
-            this->stamp      = msg.stamp.toNSec() / 1e6;    
+            this->stamp      = msg.stamp.toNSec() / 1e3;    
             this->messageID  = msg.seq;
         }
 #endif

@@ -19,6 +19,7 @@ public:
     void init() override
     {
         SensorData::init();
+        header.type = type;
         gps.init();;
         imu.init();;
     }

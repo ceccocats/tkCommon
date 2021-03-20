@@ -16,6 +16,7 @@ public:
     void init() override
     {
         SensorData::init();
+        header.type = type;
         near.init();
         far.init();
     }

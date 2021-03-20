@@ -3,6 +3,7 @@
 
 #ifdef ROS_ENABLED
 #include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/point_cloud2_iterator.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/point_cloud_conversion.h>
 #endif
@@ -162,7 +163,7 @@ namespace tk { namespace data {
 
         void toRos(sensor_msgs::PointCloud2 &msg) {
             this->header.toRos(msg.header);
-
+            /*
             sensor_msgs::PointCloud tmp;
             tk::math::Vec<float>*   intensity = nullptr;
             if (this->features.exists(FEATURES_I))
@@ -185,6 +186,41 @@ namespace tk { namespace data {
 
             // convert
             sensor_msgs::convertPointCloudToPointCloud2(tmp, msg);
+            */
+
+            msg.width  = size();
+            msg.height = 1;
+            msg.is_bigendian = false;
+            msg.is_dense = true;
+
+            //fields setup
+            sensor_msgs::PointCloud2Modifier modifier(msg);
+            modifier.setPointCloud2FieldsByString(1, "xyz");
+            msg.point_step = addPointField(msg, "intensity", 1, sensor_msgs::PointField::FLOAT32, msg.point_step);
+            msg.point_step = addPointField(msg, "ring",      1, sensor_msgs::PointField::UINT16,  msg.point_step);
+            msg.point_step = addPointField(msg, "time",      1, sensor_msgs::PointField::FLOAT32, msg.point_step);
+            msg.row_step = msg.width * msg.point_step;
+            msg.data.resize(msg.height * msg.row_step);
+            
+            sensor_msgs::PointCloud2Iterator<float>    iter_x(msg, "x");
+            sensor_msgs::PointCloud2Iterator<float>    iter_y(msg, "y");
+            sensor_msgs::PointCloud2Iterator<float>    iter_z(msg, "z");
+            sensor_msgs::PointCloud2Iterator<float>    iter_intensity(msg, "intensity");
+            sensor_msgs::PointCloud2Iterator<uint16_t> iter_ring(msg, "ring");
+            sensor_msgs::PointCloud2Iterator<float>    iter_time(msg, "time");
+            tk::math::Vec<float> *fI = &features[tk::data::CloudData_gen::FEATURES_I];
+            tk::math::Vec<float> *fC = &features[tk::data::CloudData_gen::FEATURES_CHANNEL];
+            tk::math::Vec<float> *fT = &features[tk::data::CloudData_gen::FEATURES_TIME];
+
+            for(int i=0; i<size(); i++) {
+                *iter_x         = points(0,i);     ++iter_x; 
+                *iter_y         = points(1,i);     ++iter_y; 
+                *iter_z         = points(2,i);     ++iter_z; 
+                *iter_intensity = (*fI)[i]; ++iter_intensity; 
+                *iter_ring      = (*fC)[i]; ++iter_ring;  
+                *iter_time      = (*fT)[i]; ++iter_time;  
+            }
+
         }
 
         void fromRos(sensor_msgs::LaserScan &msg) {

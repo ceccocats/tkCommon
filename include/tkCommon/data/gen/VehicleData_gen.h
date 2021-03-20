@@ -47,6 +47,7 @@ public:
     void init() override
     {
         SensorData::init();
+        header.type = type;
         CAR_WHEELBASE = 0;
         CAR_BACK2AXLE = 0;
         CAR_MASS = 0;

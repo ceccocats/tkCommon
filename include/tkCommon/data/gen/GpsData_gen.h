@@ -23,6 +23,7 @@ public:
     void init() override
     {
         SensorData::init();
+        header.type = type;
         utcStamp = 0;
         lat = 0;
         lon = 0;

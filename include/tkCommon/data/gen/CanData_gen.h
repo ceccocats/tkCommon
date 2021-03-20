@@ -15,6 +15,7 @@ public:
     void init() override
     {
         SensorData::init();
+        header.type = type;
     }
     CanData_gen& operator=(const CanData_gen& s)
     {

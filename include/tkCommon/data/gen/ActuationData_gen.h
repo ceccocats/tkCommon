@@ -17,6 +17,7 @@ public:
     void init() override
     {
         SensorData::init();
+        header.type = type;
         steerAngle = 0;
         accel = 0;
         speed = 0;

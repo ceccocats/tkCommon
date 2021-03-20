@@ -23,6 +23,7 @@ public:
     void init() override
     {
         SensorData::init();
+        header.type = type;
         sideSlip = 0;
     }
     ImuData_gen& operator=(const ImuData_gen& s)

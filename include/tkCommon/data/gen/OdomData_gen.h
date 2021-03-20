@@ -16,6 +16,7 @@ public:
     void init() override
     {
         SensorData::init();
+        header.type = type;
     }
     OdomData_gen& operator=(const OdomData_gen& s)
     {

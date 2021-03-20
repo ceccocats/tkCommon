@@ -128,6 +128,7 @@ def genData(className, VARS, DEPS = []):
 			
 			with cpp.block("void init() override"):
 				cpp("SensorData::init();")
+				cpp("header.type = type;")
 				for var in VARS:
 					if("init" in var):
 						with cpp.subs(init=var["init"]):
