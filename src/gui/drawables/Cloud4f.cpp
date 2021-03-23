@@ -209,12 +209,14 @@ tk::gui::Cloud4f::imGuiSettings(){
     ImGui::SliderFloat("Alpha",&color.a(),0,1.0f,"%.2f");
     if(ImGui::Combo("Draw mode", &cloudMod, cloudMods.data(), cloudMods.size())){
         resetMinMax = true;
+        forceUpdate();
     }
     ImGui::Separator();
 
     //Color cloud
     if(cloudMod == cloudMod0.second){
         ImGui::ColorEdit3("Color", color.color);
+        forceUpdate();
     }
 
     //RGBA cloud
