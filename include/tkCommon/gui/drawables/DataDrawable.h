@@ -21,7 +21,7 @@ class DataDrawable : public Drawable {
         virtual void updateData(tk::gui::Viewer *viewer) = 0; 
 
         tk::data::SensorData* data = nullptr;
-        uint32_t counter = sizeof(uint32_t);
+        uint32_t counter = 9999;
 
         std::stringstream print;
 
