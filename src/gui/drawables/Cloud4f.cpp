@@ -166,9 +166,6 @@ tk::gui::Cloud4f::onInit(tk::gui::Viewer *viewer){
     cloudMods.push_back(cloudMod0.first.c_str());
     cloudMods.push_back(cloudMod1.first.c_str());
     cloudMods.push_back(cloudMod2.first.c_str());
-
-    if(data != nullptr)
-        updateData(viewer);
 }
 
 
