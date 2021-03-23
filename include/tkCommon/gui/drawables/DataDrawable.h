@@ -31,5 +31,7 @@ class DataDrawable : public Drawable {
         bool new_ref_data = false;
 
         bool drw_has_reference = true;
+
+        bool first_data = true;
 	};
 }}

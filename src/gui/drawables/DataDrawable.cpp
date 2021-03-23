@@ -14,7 +14,8 @@ tk::gui::DataDrawable::draw(tk::gui::Viewer *viewer) {
     if(this->data != nullptr){
         if(this->drw_has_reference){
             if(this->data->tryLockRead()){
-                if(this->data->isChanged(counter)){
+                if(first_data || this->data->isChanged(counter)){
+                    first_data = false;
                     this->updateData(viewer);
                 }
                 this->data->unlockRead();
