@@ -225,7 +225,7 @@ class Sensor {
          * 
          * @return std::vector<tk::data::DataType> 
          */
-        const std::vector<tk::data::DataType>& getTypes() { return avaibleTypes; };
+        const std::vector<sensorKey>& getTypes() { return avaibleTypes; };
 
         
 
@@ -233,7 +233,7 @@ class Sensor {
         SensorStatus                        senStatus;  /**< Sensor status */
         LogManager                          *log;       /**< Log Manager reference */
         std::map<sensorKey, SensorPool_t*>  pool;       /**< data pool */  
-        std::vector<tk::data::DataType>     avaibleTypes; /**< data types provided by the sensor */ 
+        std::vector<sensorKey>              avaibleTypes; /**< data types provided by the sensor */ 
         int                                 poolSize;
         std::vector<tk::common::Tfpose>     tf;         /**< Sensor TF */
 
@@ -305,7 +305,7 @@ class Sensor {
             // add pool
             pool.insert(std::make_pair(std::make_pair(T::type, sensorID), sPool));
             info.dataArrived.insert(std::make_pair(std::make_pair(T::type, sensorID), 0));
-            avaibleTypes.push_back(T::type);
+            avaibleTypes.push_back(std::make_pair(T::type, sensorID));
         }
 
         template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>

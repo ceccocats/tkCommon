@@ -39,6 +39,9 @@ namespace tk { namespace data {
             case DataType::VEHICLE:     return "vehicle";
             case DataType::GPS:         return "gps";
             case DataType::IMAGE:       return "image";
+            case DataType::IMAGEU8:     return "imageU8";
+            case DataType::IMAGEU16:    return "imageU16";
+            case DataType::IMAGEF:      return "imageF";
             case DataType::RADAR:       return "radar";
             case DataType::LINES:       return "lines";
             case DataType::PERCEPTION:  return "perception";
