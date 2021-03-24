@@ -31,11 +31,10 @@ namespace tk{ namespace gui{
 
             tk::gui::shader::pointcloud4f*   monocolorCloud;
             tk::gui::shader::pointcloudRGBA* pointcloudrgba;
-
-            bool resetMinMax;
             
             void updateData(tk::data::CloudData* cloud);
         public:
+            bool resetMinMax;
 
             /**
              * @brief 
