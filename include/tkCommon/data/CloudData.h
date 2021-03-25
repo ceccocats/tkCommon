@@ -145,6 +145,63 @@ namespace tk { namespace data {
             }
         }
 
+        void toKitty(const std::string& fileName){
+            std::ofstream output(fileName.c_str(), std::ios::out | std::ios::binary);
+            if(!output.good()){
+                tkERR("Error creating file\n");
+            }   
+
+            bool hasF = false;
+            if (features.exists(tk::data::CloudData_gen::FEATURES_I)) {
+                hasF = true;
+            }  
+
+            tk::math::Vec4f point;
+            for(int i = 0; i < points.cols(); i++){
+                point[0] = points(0,i);
+                point[1] = points(1,i);
+                point[2] = points(2,i);
+                if(hasF){
+                    auto intensity = &features[tk::data::CloudData_gen::FEATURES_I];
+                    point[3] = (*intensity)[i];
+                }else{
+                    point[3] = 0;
+                }
+                output.write((char *) &point.cpu.data, 4*sizeof(float));
+            }
+            output.close();
+        }
+
+        void fromKitty(const std::string& fileName){
+            std::fstream input(fileName.c_str(), std::ios::in | std::ios::binary);
+            if(!input.good()){
+                tkERR("Error loading file\n");
+            }
+            input.seekg(0, std::ios::beg);           
+
+            std::vector<tk::math::Vec4f> data;            
+            for (int i = 0; input.good() && !input.eof(); i++) {
+                tk::math::Vec4f point;
+                input.read((char *) &point.cpu.data, 4*sizeof(float));
+                data.push_back(point);
+            }
+            input.close();
+
+            if (!features.exists(tk::data::CloudData_gen::FEATURES_I)) {
+                features.add(tk::data::CloudData_gen::FEATURES_I);
+            } 
+            resize(data.size());
+
+            auto intensity = &features[tk::data::CloudData_gen::FEATURES_I];
+            for(int i = 0; i < data.size(); i++){
+                points(0,i) = data[i][0];
+                points(1,i) = data[i][1];
+                points(2,i) = data[i][2];
+                points(3,i) = 1;
+                (*intensity)[i] = data[i][3];
+            }
+        }
+
 #ifdef ROS_ENABLED
         void toRos(sensor_msgs::LaserScan &msg) {
             this->header.toRos(msg.header);
