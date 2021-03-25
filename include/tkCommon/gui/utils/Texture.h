@@ -38,6 +38,7 @@ class Texture : public TextureGeneric
         GLuint          texture;
         int             width;
         int             height;
+        int             channels;
 
         /**
          * Init method

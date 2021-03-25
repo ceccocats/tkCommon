@@ -58,16 +58,37 @@ tk::gui::Image::updateData(tk::gui::Viewer *viewer){
     if(textureType == 0){
         tk::gui::Texture<uint8_t>* textU8 = (tk::gui::Texture<uint8_t>*)texture;
         tk::data::ImageDataU8* imgU8 = (tk::data::ImageDataU8*)data;
+        if(imgU8->width != textU8->width || imgU8->height != textU8->height || imgU8->channels != textU8->channels){
+            textU8->release();
+            delete texture;
+            texture = new tk::gui::Texture<uint8_t>();
+            textU8 = (tk::gui::Texture<uint8_t>*)texture;
+            textU8->init(imgU8->width, imgU8->height, imgU8->channels);
+        }
         textU8->setData(imgU8->data.data());
     }
     if(textureType == 1){
         tk::gui::Texture<uint16_t>* textU16 = (tk::gui::Texture<uint16_t>*)texture;
         tk::data::ImageDataU16* imgU16 = (tk::data::ImageDataU16*)data;
+        if(imgU16->width != textU16->width || imgU16->height != textU16->height || imgU16->channels != textU16->channels){
+            textU16->release();
+            delete texture;
+            texture = new tk::gui::Texture<uint16_t>();
+            textU16 = (tk::gui::Texture<uint16_t>*)texture;
+            textU16->init(imgU16->width, imgU16->height, imgU16->channels);
+        }
         textU16->setData(imgU16->data.data());
     }
     if(textureType == 2){
         tk::gui::Texture<float>* textF = (tk::gui::Texture<float>*)texture;
         tk::data::ImageDataF* imgF = (tk::data::ImageDataF*)data;
+        if(imgF->width != textF->width || imgF->height != textF->height || imgF->channels != textF->channels){
+            textF->release();
+            delete texture;
+            texture = new tk::gui::Texture<float>();
+            textF = (tk::gui::Texture<float>*)texture;
+            textF->init(imgF->width, imgF->height, imgF->channels);
+        }
         textF->setData(imgF->data.data());
     }
 }

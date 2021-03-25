@@ -1,6 +1,7 @@
 #pragma once
 
 #include "tkCommon/data/gen/ImageData_gen.h"
+#include "tkCommon/gui/utils/CommonViewer.h"
 
 #ifdef ROS_ENABLED
 #include <sensor_msgs/Image.h>
@@ -108,6 +109,18 @@ namespace tk{ namespace data{
             tk::data::ImageData_gen<T>::toVar("info", structVars[0]);
             this->data.toVar("data", structVars[1]);
             return var.setStruct(name, structVars);
+        }
+
+        void toKitty(const std::string& fileName){
+            tkASSERT("Not implemented");
+        }
+
+        void fromKitty(const std::string& fileName){
+            int height, width, channels;
+            uint8_t* image = tk::gui::common::loadImage(fileName, &width, &height, &channels);
+            init(width,height,channels);
+            memcpy(this->data.cpu.data, image, height*width*channels);
+            free(image);
         }
 
 

@@ -7,6 +7,7 @@ void Texture<uint8_t>::init(int width, int height, int channels, bool anti_alias
 
     this->width         =   width;
     this->height        =  height;
+    this->channels      = channels;
     this->anti_aliasing = anti_aliasing;
 
     if(channels > 4 || channels < 1){
@@ -41,6 +42,7 @@ void Texture<uint16_t>::init(int width, int height, int channels, bool anti_alia
 
     this->width         =   width;
     this->height        =  height;
+    this->channels      = channels;
     this->anti_aliasing = anti_aliasing;
 
     if(channels > 4 || channels < 1){
@@ -76,6 +78,7 @@ void Texture<float>::init(int width, int height, int channels, bool anti_aliasin
 
     this->width         =   width;
     this->height        =  height;
+    this->channels      = channels;
     this->anti_aliasing = anti_aliasing;
 
     if(channels > 4 || channels < 1){

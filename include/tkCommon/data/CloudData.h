@@ -156,18 +156,18 @@ namespace tk { namespace data {
                 hasF = true;
             }  
 
-            tk::math::Vec4f point;
+            float data[4];
             for(int i = 0; i < points.cols(); i++){
-                point[0] = points(0,i);
-                point[1] = points(1,i);
-                point[2] = points(2,i);
+                data[0] = points(0,i);
+                data[1] = points(1,i);
+                data[2] = points(2,i);
                 if(hasF){
                     auto intensity = &features[tk::data::CloudData_gen::FEATURES_I];
-                    point[3] = (*intensity)[i];
+                    data[3] = (*intensity)[i];
                 }else{
-                    point[3] = 0;
+                    data[3] = 0;
                 }
-                output.write((char *) &point.cpu.data, 4*sizeof(float));
+                output.write((char *) data, 4*sizeof(float));
             }
             output.close();
         }
@@ -179,10 +179,13 @@ namespace tk { namespace data {
             }
             input.seekg(0, std::ios::beg);           
 
-            std::vector<tk::math::Vec4f> data;            
+            std::vector<tk::common::Vector4<float>> data;            
             for (int i = 0; input.good() && !input.eof(); i++) {
-                tk::math::Vec4f point;
-                input.read((char *) &point.cpu.data, 4*sizeof(float));
+                tk::common::Vector4<float> point;
+                input.read((char *) &point.x, sizeof(float));
+                input.read((char *) &point.y, sizeof(float));
+                input.read((char *) &point.z, sizeof(float));
+                input.read((char *) &point.i, sizeof(float));
                 data.push_back(point);
             }
             input.close();
@@ -194,11 +197,11 @@ namespace tk { namespace data {
 
             auto intensity = &features[tk::data::CloudData_gen::FEATURES_I];
             for(int i = 0; i < data.size(); i++){
-                points(0,i) = data[i][0];
-                points(1,i) = data[i][1];
-                points(2,i) = data[i][2];
+                points(0,i) = data[i].x;
+                points(1,i) = data[i].y;
+                points(2,i) = data[i].z;
                 points(3,i) = 1;
-                (*intensity)[i] = data[i][3];
+                (*intensity)[i] = data[i].i;
             }
         }
 
