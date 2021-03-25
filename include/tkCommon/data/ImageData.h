@@ -2,6 +2,10 @@
 
 #include "tkCommon/data/gen/ImageData_gen.h"
 
+#ifdef ROS_ENABLED
+#include <sensor_msgs/Image.h>
+#endif
+
 namespace tk{ namespace data{
 
     template<class T>
@@ -105,6 +109,41 @@ namespace tk{ namespace data{
             this->data.toVar("data", structVars[1]);
             return var.setStruct(name, structVars);
         }
+
+
+#ifdef ROS_ENABLED
+        void toRos(sensor_msgs::Image &msg) {
+            tkASSERT(sizeof(T) == sizeof(uint8_t))
+            this->header.toRos(msg.header);
+            msg.width  = this->width;
+            msg.height = this->height;
+            if(this->channels == 4)
+                msg.encoding = "rgba8";
+            if(this->channels == 3)
+                msg.encoding = "rgb8";
+            if(this->channels == 1)
+                msg.encoding = "mono8";
+
+            msg.step = this->width*this->channels*sizeof(T);
+            msg.data.resize(this->width * this->height * this->channels);
+            memcpy(msg.data.data(), this->data.cpu.data, this->width * this->height * this->channels * sizeof(T));                
+        }
+
+        void fromRos(sensor_msgs::Image &msg) {
+            tkASSERT(sizeof(T) == sizeof(uint8_t))
+            this->header.fromRos(msg.header);
+            this->header.type   = DataType::IMAGEU8; 
+
+            int width  = msg.width;
+            int height = msg.height;
+            int channels = 0;
+            channels = msg.encoding == "rgba8"? 4 : channels;
+            channels = msg.encoding == "rgb8"? 3 : channels;
+            channels = msg.encoding == "mono8"? 1 : channels;
+            init(width, height, channels);
+            memcpy(this->data, msg.data.data(), width*height*channels*sizeof(uint8_t));
+        }
+#endif
 
     };
 
