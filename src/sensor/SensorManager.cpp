@@ -2,7 +2,7 @@
 
 using namespace tk::sensors;
 bool 
-SensorsManager::init(YAML::Node aConf, const std::string &aLogPath, const std::string &aList) 
+SensorsManager::init(YAML::Node aConf, const std::string &aLogPath, const std::string &aList, const bool &aGui) 
 {    
     // LOG
     if (aLogPath != "") {
@@ -12,9 +12,10 @@ SensorsManager::init(YAML::Node aConf, const std::string &aLogPath, const std::s
             tkERR("Error init logManger.\n");
             return false;
         }
-        if (tk::gui::Viewer::getInstance()->isRunning())
+        if (tk::gui::Viewer::getInstance()->isRunning()) //mGui not checked, replayinfo is useful
             tk::gui::Viewer::getInstance()->add(new tk::gui::ReplayInfo(mLogManager));
     }
+    mGui = aGui;
     
     /*
     // SYNCH BOX
@@ -26,7 +27,7 @@ SensorsManager::init(YAML::Node aConf, const std::string &aLogPath, const std::s
     */
 
     // GUI
-    if (tk::gui::Viewer::getInstance()->isRunning()) {
+    if (mGui && tk::gui::Viewer::getInstance()->isRunning()) {
         tk::gui::Viewer::getInstance()->add(new tk::gui::Grid());
         tk::gui::Viewer::getInstance()->add(new tk::gui::Axis());
     }

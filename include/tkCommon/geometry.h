@@ -32,6 +32,7 @@ namespace tk{ namespace common{
 
 	class Prisms : public tk::rt::Lockable{
 		public:
+			tk::common::Tfpose tf = tk::common::Tfpose::Identity();
 			std::vector<Prism> data;
 			Prisms(){}
 			~Prisms(){}

@@ -157,7 +157,7 @@ class Sensor {
          * @return true     successful init
          * @return false    unsuccessful init
          */
-        virtual bool init(const YAML::Node conf, const std::string &name, LogManager *log = nullptr) final;
+        virtual bool init(const YAML::Node conf, const std::string &name, LogManager *log = nullptr, const bool &aGui = true) final;
 
         /**
          * @brief   Start internal thread that read the sensor and fills the internal pool

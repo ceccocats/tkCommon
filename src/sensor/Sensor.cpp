@@ -130,7 +130,7 @@ Clock::getTimeStamp(int frameCounter, int triggerLine)
 
 
 bool 
-Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log) {
+Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log, const bool &aGui) {
     // get class name
     this->info.name             = name;
     this->log                   = log;
@@ -167,7 +167,7 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log) {
     }
 
     // add a drawable foreach pool
-    if (tk::gui::Viewer::getInstance()->isRunning()) {
+    if (aGui && tk::gui::Viewer::getInstance()->isRunning()) {
         for (const auto &entry: pool) {
             switch (entry.first.first)
             {

@@ -200,6 +200,28 @@ tk::gui::Cloud4f::drawData(tk::gui::Viewer *viewer){
         shaderCloud->draw(drwModelView,shaderCloud->colormaps[selectedColorMap], &glbuffer, 
             points, minMax[0][0], minMax[1][0], axisShader, color.a());
     }
+    //////////////////////////////
+    //Debug
+    /*auto points = &((tk::data::CloudData*)data)->points;
+    if(points->cols() > 1024){
+        for(int i = 0; i < 1024; i++){
+            for(int j = 127; j>0; j--){
+                float x0 = (*points)(0,128*i+j);
+                float y0 = (*points)(1,128*i+j);
+                float z0 = (*points)(2,128*i+j);
+                float x1 = (*points)(0,128*i+j-1);
+                float y1 = (*points)(1,128*i+j-1);
+                float z1 = (*points)(2,128*i+j-1);
+                if(!(x0 == 0.0f && x0 == y0 && y0 == z0) && !(x1 == 0.0f && x1 == y1 && y1 == z1)){
+                    glBegin(GL_LINES);
+                        glVertex3f(x0,y0,z0);
+                        glVertex3f(x1,y1,z1);
+                    glEnd();    
+                }
+            }
+        }
+    }*/
+    //////////////////////////////
     glPointSize(1.0);		
 }
 

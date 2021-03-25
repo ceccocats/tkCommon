@@ -43,7 +43,6 @@ class pointcloudColorMaps  : public tk::gui::shader::generic
                     
                     std::string name    = filename.substr(0,filename.size()-5);
                     shaders[name]       = new tk::gui::Shader();
-                    colormaps.push_back(name);
 
 
                     std::string path    = fragment+"pointcloud_"+filename;                    
@@ -55,7 +54,12 @@ class pointcloudColorMaps  : public tk::gui::shader::generic
             } else {
                 tkERR("Directory not exists\n")
                 return;
-            }         
+            }     
+
+            //Fill name ordered
+            for (auto const& x : shaders){
+                colormaps.push_back(x.first);
+            }    
         }
 
         ~pointcloudColorMaps(){

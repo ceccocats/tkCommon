@@ -26,4 +26,5 @@ make -j8
 |[Argh!](https://github.com/adishavit/argh)| Adi Shavit| Argh! |
 |[geodetic_utils](https://github.com/ethz-asl/geodetic_utils)| Enric Galceran, Marija Popović |BSD3|
 |[gamepad](https://github.com/elanthis/gamepad)| seanmiddleditch | MIT|
+|[colormap-shaders](https://github.com/kbinani/colormap-shaders)| kbinani | MIT|
 

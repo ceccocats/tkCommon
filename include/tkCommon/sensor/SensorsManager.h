@@ -15,6 +15,7 @@ namespace tk { namespace sensors {
     public:
         // Sensors
         std::map<std::string,tk::sensors::Sensor*>  mSensors;
+        bool mGui;
         
         // LOG
         tk::sensors::LogManager*    mLogManager  = nullptr;
@@ -31,7 +32,7 @@ namespace tk { namespace sensors {
          * @return false    if an error occours.
          */
         bool init(YAML::Node aConf, const std::string &aLogPath = "", 
-                  const std::string &aList="");
+                  const std::string &aList="", const bool &aGui = true);
 
         /**
          * @brief   start all spawned sensors reading thread and an internal thread to update the viewer.

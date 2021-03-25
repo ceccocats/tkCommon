@@ -32,6 +32,7 @@ tk::gui::Prisms::draw(tk::gui::Viewer *viewer){
 
         ref->lockRead();
         prisms.data.resize(ref->data.size());
+        tf = ref->tf;
         for(int i = 0; i < ref->data.size(); i++){
             prisms.data[i].height = ref->data[i].height;
             prisms.data[i].points = ref->data[i].points;
@@ -46,6 +47,7 @@ tk::gui::Prisms::draw(tk::gui::Viewer *viewer){
         auto height = prisms.data[i].height;
 
         glPushMatrix();{
+            glMultMatrixf(glm::value_ptr(glm::make_mat4x4(tf.matrix().data())));
             glDepthMask(GL_FALSE);
             glColor4f(color.r(),color.g(),color.b(),color.a());
             glBegin(GL_POLYGON);
