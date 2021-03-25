@@ -119,7 +119,7 @@ namespace tk{ namespace data{
             int height, width, channels;
             uint8_t* image = tk::gui::common::loadImage(fileName, &width, &height, &channels);
             init(width,height,channels);
-            memcpy(this->data.cpu.data, image, height*width*channels);
+            memcpy(this->data.cpu.data, image, height*width*channels*sizeof(uint8_t));
             free(image);
         }
 
