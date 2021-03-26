@@ -285,6 +285,11 @@ class Sensor {
         template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
         void addPool(int sensorID = 0)
         {
+            tkASSERT(poolSize > 0);
+
+            if (poolSize == 1)
+                tkWRN("PoolSize is set to 1 element, this is not optimal even if you have just one reader.\n")
+
             tk::sensors::SensorPool_t *sPool = new tk::sensors::SensorPool_t;
             sPool->empty    = true;
             sPool->size     = poolSize;
@@ -340,7 +345,7 @@ class Sensor {
          * 
          * @param data      returned data
          * @param idx       index of the data returned from the pool, used in release() method.
-         * @param timeout   grab timeout
+         * @param timeout   grab timeout [micro]
          * @return true     data is available
          * @return false    data is not available
          */
@@ -369,11 +374,17 @@ class Sensor {
             // grab
             if (timeout != 0) {     // locking
                 data = dynamic_cast<const T*>(it->second->pool.get(idx, timeout));
-                if (data == nullptr)
-                    tkWRN("Timeout.\n");
             } else {                // non locking
                 data = dynamic_cast<const T*>(it->second->pool.get(idx)); 
             }
+
+            // error handling
+            if (idx == -1) {
+                tkWRN("Timeout.\n");
+            } else if (idx == -2) {
+                tkWRN("No free elemnt in the pool.\n");
+            }
+
             return (data != nullptr)?true:false;
         }
 
