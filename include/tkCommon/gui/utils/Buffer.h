@@ -89,6 +89,11 @@ class Buffer
         int size();
 
         /**
+         * empty method
+         */
+        bool empty();
+
+        /**
          * use method for set GL_ARRAY_BUFFER in shader
          */
         void use();
@@ -130,6 +135,11 @@ void Buffer<T>::release(){
 template <typename T>
 bool Buffer<T>::hasEBO(){
     return initEBO;
+}
+
+template <typename T>
+bool Buffer<T>::empty(){
+    return _size == 0;
 }
 
 template <typename T>

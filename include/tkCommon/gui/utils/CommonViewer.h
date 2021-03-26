@@ -3,11 +3,11 @@
 #include <string>
 
 #include "tkCommon/common.h"
-
 #include "tkCommon/gui/utils/Shader.h"
 #include "tkCommon/gui/utils/Buffer.h"
 #include "tkCommon/gui/utils/Texture.h"
 #include "tkCommon/gui/utils/Color.h"
+#include <glm/glm.hpp>
 
 void inline glCheckError_(const char *file, int line)
 {
@@ -83,7 +83,5 @@ struct object3D_t {
 
 uint8_t* loadImage(std::string filename, int* width, int* height, int* channels);
 bool     loadOBJ(std::string filename, object3D_t &obj);
-
-
 
 }}}

@@ -30,8 +30,33 @@ class texture : public tk::gui::shader::generic
             users++;
             return &instance;
         }
-        void draw(glm::mat4& modelview, tk::gui::Texture<uint8_t>* text, tk::gui::Buffer<float>* buffer, int triangles);
+        template <class T>
+        void draw(glm::mat4& modelview, tk::gui::Texture<T>* text, tk::gui::Buffer<float>* buffer, int triangles);
         void close();
 };
+
+
+template <typename T> 
+void texture::draw(glm::mat4& modelview, tk::gui::Texture<T>* text, tk::gui::Buffer<float>* buffer, int triangles){
+
+    buffer->setVertexAttribs(vertexPointer);
+
+    shader.use();
+    shader.setMat4("modelview",modelview);
+    text->use();
+    buffer->use();
+
+    if(buffer->hasEBO()){
+        glDrawElements(GL_TRIANGLES, triangles, GL_UNSIGNED_INT, 0);
+    }else{
+        glDrawArrays(GL_TRIANGLES, 0, triangles);
+    }
+
+    buffer->unuse();
+    text->unuse();
+    shader.unuse();
+
+    glCheckError();
+}
 
 }}}

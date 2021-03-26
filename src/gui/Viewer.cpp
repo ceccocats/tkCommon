@@ -170,9 +170,18 @@ Viewer::init() {
     //tkLogo
     int height, width;
     uint8_t* image = tk::gui::common::loadImage(std::string(tkCommon_PATH) + "data/tk.png", &width, &height, &channels);
+    //Set trasparency
+    for(int i = 0; i < width*height; i++){
+        if(image[i*4] == 0)
+            image[i*4 + 3] = 0;
+        else
+            image[i*4 + 3] = 128;
+    }
     logo.init(width,height,channels);
     logo.setData(image);
     free(image);
+    drwLogo = tk::gui::shader::texture::getInstance();
+    pos.init();
 }
 
 void 
@@ -186,6 +195,9 @@ Viewer::imguiDraw(){
     ImGui::Separator();
     for(int i = 0; i < drawables.size(); i++){
         std::string selectName = drawables[i]->toString();
+
+        if(selectName.empty())
+            continue;
 
         if(drawables[i]->enabled == false){
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 0.4f));
@@ -328,6 +340,18 @@ Viewer::draw() {
             drawable.second->draw(Viewer::instance);
         }
     }
+    drawLogo();
+}
+
+void
+Viewer::drawLogo(){
+
+    verticesCube2D[5]  = verticesCube2D[10] = 1.3 - height/(float)width;
+    pos.setData(verticesCube2D.data(),20);
+	pos.setIndexVector(indicesCube2D.data(),6);
+
+    glm::mat4 view2D = glm::mat4(1.0f);
+    drwLogo->draw<uint8_t>(view2D,&logo,&pos,6);
 }
 
 void 
@@ -364,11 +388,12 @@ Viewer::follow() {
 
 void 
 Viewer::close() { 
-    logo.release();
     for (auto const& drawable : drawables){
         drawable.second->onClose();
         delete drawable.second;
     }   
+    drwLogo->close();
+    logo.release();
     tkMSG("closed\n");
 }
 

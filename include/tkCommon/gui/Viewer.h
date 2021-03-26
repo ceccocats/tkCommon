@@ -7,8 +7,8 @@
 #include <signal.h>
 #include <iostream>
 #include <fstream>
-#include "tkCommon/gui/utils/CommonViewer.h"
 #include "tkCommon/gui/drawables/Drawable.h"
+#include "tkCommon/gui/shader/texture.h"
 #include "tkCommon/gui/utils/Camera.h"
 #include "tkCommon/gui/imgui/imgui.h"
 #include "tkCommon/gui/imgui/imgui_impl_glfw.h"
@@ -96,31 +96,41 @@ namespace tk { namespace gui {
         std::string windowName = "tkGUI";
         Color_t     background = tk::gui::color::DARK_GRAY;
 
-        int     width = 800;
-        int     height = 800;
+        int width = 800;
+        int height = 800;
         double  dt = 1.0/60;
-        bool    useImGUI;
-
-        int     imguiSelected = -1;
-
-        bool    running = false;
-
+        bool useImGUI;
+        int imguiSelected = -1;
+        bool running = false;
 
         glm::vec3   lightPos;
-
         glm::mat4   modelview;
-
         GLFWwindow *window;
-        const char *glsl_version = "#version 130";
+        const char *glsl_version = "#version 330";
 
         GLint total_mem_kb = 0;
         GLint cur_avail_mem_kb = 0;
-        const int   nUsage = 30;
-        float       gpuUsage[30]; 
-        const int   nFPS = 30;
-        float       vizFPS[30];
+        const int nUsage = 30;
+        const int nFPS = 30;
+        float gpuUsage[30]; 
+        float vizFPS[30];
 
+        //logo
         tk::gui::Texture<uint8_t> logo;
+        tk::gui::Buffer<float> pos;
+        tk::gui::shader::texture* drwLogo;
+        std::vector<float> verticesCube2D = {
+            //positions				//texture cords
+            0.95f,-0.95f, 0.0f,   	1.0f, 1.0f,
+            0.7f, -0.95f, 0.0f,   	0.0f, 1.0f,
+            0.7f, -0.6f,  0.0f,   	0.0f, 0.0f,
+            0.95f,-0.6f,  0.0f,   	1.0f, 0.0f
+        };
+        std::vector<unsigned int> indicesCube2D = {  
+            0, 1, 2, // first triangle
+            0, 3, 2  // second triangle
+        };
+        void drawLogo();
 
         // glfw callbacks
         static void errorCallback(int error, const char* description);
