@@ -93,6 +93,10 @@ class Lockable{
             gMTX.unlock();
             return r;
         }
+
+        uint32_t getReaders() const {
+            return nReader;
+        }
 };
 
 }}

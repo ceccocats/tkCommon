@@ -34,6 +34,13 @@ private:
     getLast(int &id) {
         gmtx.lock();
 
+            // no free element in the pool
+            if(locked >= size) {
+                id  = -2;
+                gmtx.unlock();
+                return nullptr;
+            }
+
             id = last;
             // starting from last,
             int i = 0;
@@ -44,6 +51,9 @@ private:
                     break;
                 i++;
             }
+
+            if (data[id]->getReaders() == 1)
+                locked++;
         gmtx.unlock();
         return dynamic_cast<const tk::data::SensorData*>(data[id]);
     }
@@ -103,9 +113,9 @@ public:
     tk::data::SensorData* 
     add(int &id) {
         gmtx.lock();
-            // no space in the pool
+            // no free element in the pool
             if(locked >= size) {
-                id  = -1;
+                id  = -2;
                 gmtx.unlock();
                 return nullptr;
             }
@@ -186,6 +196,9 @@ public:
     releaseGet(const int id) {
         gmtx.lock();
             data[id]->unlockRead();
+
+            if (data[id]->getReaders() == 0)
+                locked--;
         gmtx.unlock();
     }
 

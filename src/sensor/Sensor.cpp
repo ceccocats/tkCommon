@@ -242,6 +242,12 @@ Sensor::loop(sensorKey key)
     if (it != pool.end()) {
         while (senStatus != SensorStatus::STOPPING && senStatus != SensorStatus::ERROR) {
             tk::data::SensorData* data = it->second->pool.add(idx);
+
+            if (idx == -2) {
+                tkWRN("No free element in the pool. Trying again in 2 seconds...\n");
+                sleep(2);
+                continue;
+            }
             
             bool ok = read(data);
 

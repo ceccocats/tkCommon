@@ -32,8 +32,9 @@ namespace tk { namespace sensors {
 
             //info.type = tk::data::DataType::GPSIMU;
             
-            addPool<tk::data::GpsData>(0);
-            addPool<tk::data::GpsData>(1);
+            //addPool<tk::data::GpsData>(0);
+            //addPool<tk::data::GpsData>(1);
+            poolSize = 5;
             addPool<tk::data::ImuData>();
 
             tkDBG("Init succesful.\n");
@@ -55,8 +56,9 @@ namespace tk { namespace sensors {
             
             if (data->header.type == tk::data::DataType::IMU) {
                 auto imu = dynamic_cast<tk::data::ImuData*>(data);
-                //tkDBG("Scrivo un imu.\n");
-                usleep(100000);
+                tkDBG("Scrivo un imu.\n");
+                sleep(1);
+                //usleep(100000);
                 return true;
             }
 
@@ -84,24 +86,23 @@ void gpsGrab(uint32_t sensorID) {
             tkWRN("Leggo GPS "<<(int) sensorID<<"\n");
             sensor.release<tk::data::GpsData>(idx);
         } else {
-            tkERR("aspetto\n");
+            //tkERR("aspetto\n");
             usleep(10000);
         }
     }
 }
 
 void imuGrab() {
-    //sleep(2);
+    usleep(500000);
     int idx;
     const tk::data::ImuData *data;
     while(gRun) {
         if (sensor.grab<tk::data::ImuData>(data, idx, 1000000)) {
             tkWRN("Leggo IMU\n");
+            sleep(1);
             sensor.release<tk::data::ImuData>(idx);
-        } else {
-            tkERR("aspetto\n");
+        } else
             usleep(10000);
-        }
     }
 }
 
@@ -123,14 +124,14 @@ int main(int argc, char** argv) {
     sensor.start();
 
     std::thread imuTH(imuGrab);
-    std::thread gps0TH(gpsGrab, 0);
-    std::thread gps1TH(gpsGrab, 1);
+    //std::thread gps0TH(gpsGrab, 0);
+    //std::thread gps1TH(gpsGrab, 1);
     
     //---------------------------------------------
 
     imuTH.join();
-    gps0TH.join();
-    gps1TH.join();
+    //gps0TH.join();
+    //gps1TH.join();
 
     sensor.close();
     return 0;
