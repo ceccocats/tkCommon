@@ -91,8 +91,8 @@ tk::gui::Plot::addPoint(tk::math::Vec3<float> pt) {
 
 void 
 tk::gui::Plot::onInit(tk::gui::Viewer *viewer){
-    shaderLine    = new tk::gui::shader::linesMonocolor();
-    shaderAxis    = new tk::gui::shader::axisPlot();
+    shaderLine    = tk::gui::shader::linesMonocolor::getInstance();
+    shaderAxis    = tk::gui::shader::axisPlot::getInstance();
     shaderCircle  = new tk::gui::shader::circle();
     glData.init();
 }
@@ -145,11 +145,9 @@ void
 tk::gui::Plot::onClose(){
     glData.release();
     shaderLine->close();
-    delete shaderLine;
+    shaderAxis->close();
     shaderCircle->close();
     delete shaderCircle; 
-    shaderAxis->close();
-    delete shaderAxis;
 }
 
 std::string 

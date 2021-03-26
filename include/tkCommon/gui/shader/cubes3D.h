@@ -21,49 +21,18 @@ namespace tk { namespace gui { namespace shader {
  */
 class cubes3D : public tk::gui::shader::generic
 {
+    private:
+        cubes3D();
+        static int users;
     public:
-        bool init(){
-            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/cubes3D.vert";
-            std::string geometry    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/cubes3D.geom";
-            std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/cubes3D.frag";
-            
-            bool status = shader.init(vertex, fragment, geometry);
-            if(status == false)
-                return false;
-
-            //Xcenter. Ycenter, Zcenter
-            vertexPointer.push_back({3,13,0});
-            //Xsize, Ysize, Zsize
-            vertexPointer.push_back({3,13,3});
-            //roll, pitch, yaw
-            vertexPointer.push_back({3,13,6});
-            //red, green, blue, alpha
-            vertexPointer.push_back({4,13,9});
-            return true;
+        ~cubes3D();
+        static cubes3D* getInstance(){
+            static cubes3D instance;
+            users++;
+            return &instance;
         }
-
-        void draw(glm::mat4& modelview, tk::gui::Buffer<float>* buffer, int n, glm::vec3& lightPos){
-
-            buffer->setVertexAttribs(vertexPointer);
-
-            shader.use();
-            shader.setMat4("modelview",modelview);
-            shader.setVec3("lightPos", lightPos);
-
-            buffer->use();
-            glDrawArrays(GL_POINTS, 0, n);
-            buffer->unuse();
-
-            shader.unuse();
-
-            glCheckError();
-        }
-
-        bool close(){
-            return shader.close();
-        }
-
-
+        void draw(glm::mat4& modelview, tk::gui::Buffer<float>* buffer, int n, glm::vec3& lightPos);
+        void close();
 };
 
 }}}

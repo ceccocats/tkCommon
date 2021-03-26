@@ -16,9 +16,7 @@ tk::gui::Text::setText(std::string t) {
 
 void 
 tk::gui::Text::onInit(tk::gui::Viewer *viewer){
-    shader = new tk::gui::shader::text();
-    tk::gui::shader::text* shaderText = (tk::gui::shader::text*) shader;
-    shaderText->init();
+    shader = tk::gui::shader::text::getInstance();
 }
 
 void 
@@ -36,7 +34,6 @@ void
 tk::gui::Text::onClose(){
     tk::gui::shader::text* shaderText = (tk::gui::shader::text*) shader;
     shaderText->close();
-    delete shader;
 }
 
 std::string 

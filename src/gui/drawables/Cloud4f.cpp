@@ -152,9 +152,9 @@ void
 tk::gui::Cloud4f::onInit(tk::gui::Viewer *viewer){
     
     //init shaders
-    monocolorCloud  = new tk::gui::shader::pointcloud4f();
-    pointcloudrgba  = new tk::gui::shader::pointcloudRGBA();
-    shader          = new tk::gui::shader::pointcloudColorMaps();
+    monocolorCloud  = tk::gui::shader::pointcloud4f::getInstance();
+    pointcloudrgba  = tk::gui::shader::pointcloudRGBA::getInstance();
+    shader          = tk::gui::shader::pointcloudColorMaps::getInstance();
     glbuffer.init();
 
     //fill data for menu
@@ -288,12 +288,8 @@ void
 tk::gui::Cloud4f::onClose(){
     tk::gui::shader::pointcloudColorMaps* shaderCloud = (tk::gui::shader::pointcloudColorMaps*) shader;
     shaderCloud->close();
-    glbuffer.release();
-    delete shaderCloud;
-
     monocolorCloud->close();
-    delete monocolorCloud;
-
     pointcloudrgba->close();
-    delete pointcloudrgba;
+
+    glbuffer.release();
 }

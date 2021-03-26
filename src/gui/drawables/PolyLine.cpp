@@ -20,7 +20,7 @@ tk::gui::PolyLine::updateRef(tk::gui::line* line){
 
 void 
 tk::gui::PolyLine::onInit(tk::gui::Viewer *viewer){
-    shader = new tk::gui::shader::linesMonocolor();
+    shader = tk::gui::shader::linesMonocolor::getInstance();
 }
 
 void 

@@ -20,38 +20,17 @@ namespace tk { namespace gui { namespace shader {
  */
 class axis : public tk::gui::shader::generic
 {
+    private:
+        axis();    
+        static int users;
     public:
-        axis(){
-            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/axis.vert";
-            std::string geometry    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/axis.geom";
-            std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/axis.frag";
-            
-            shader.init(vertex, fragment, geometry);
+        static axis* getInstance(){
+            static axis instance;
+            users++;
+            return &instance;
         }
-
-        ~axis(){
-            
-        }
-
-        void draw(glm::mat4& modelview, float width, float height){
-            
-            shader.use();
-            shader.setMat4("modelview", modelview);
-            shader.setInt("width",width);
-		    shader.setInt("height",height);
-
-            glLineWidth(3.0);
-            glDrawArrays(GL_POINTS, 0, 1);
-            glLineWidth(1.0);
-            
-            shader.unuse();
-
-            glCheckError();
-        }
-
-        bool close(){
-            return shader.close();
-        }
+        void draw(glm::mat4& modelview, float width, float height);
+        void close();
 };
 
 }}}

@@ -19,6 +19,7 @@ void* th_gps(void* gpsptr){
 	gps->sats   = 20;
 	gps->header.name = "fake_gps";
 	gps->header.stamp = getTimeStamp();
+	gps->cov(0, 0) = 2;
 
 	tk::rt::Task t;
     t.init(1000);

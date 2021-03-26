@@ -12,7 +12,7 @@ tk::gui::Mesh::~Mesh(){
 
 void 
 tk::gui::Mesh::onInit(tk::gui::Viewer *viewer){
-    shader = new tk::gui::shader::mesh();
+    shader = tk::gui::shader::mesh::getInstance();
 
     tk::gui::common::object3D_t objMesh;
     tk::gui::common::loadOBJ(filename, objMesh);
@@ -72,7 +72,6 @@ void
 tk::gui::Mesh::onClose(){
     tk::gui::shader::mesh* shaderMesh= (tk::gui::shader::mesh*) shader;
     shaderMesh->close();
-    delete shaderMesh;
 
     for(int i = 0; i < obj.size(); i++){
         obj[i].release(); 

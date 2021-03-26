@@ -20,43 +20,18 @@ namespace tk { namespace gui { namespace shader {
  */
 class axisPlot : public tk::gui::shader::generic
 {
+    private:
+        axisPlot();
+        static int users;
+
     public:
-        axisPlot(){
-            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/axisPlot.vert";
-            std::string geometry    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/axisPlot.geom";
-            std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/axis.frag";
-            
-            shader.init(vertex, fragment, geometry);
-            vertexPointer.resize(2);
+        static axisPlot* getInstance(){
+            static axisPlot instance;
+            users++;
+            return &instance;
         }
-
-        ~axisPlot(){
-            
-        }
-
-        void draw(glm::mat4& modelview,tk::gui::Buffer<float>* buffer, int n, float size = 1.0f){
-
-            vertexPointer[0] = {3,3,0};
-            vertexPointer[1] = {3,3,n*3};
-            buffer->setVertexAttribs(vertexPointer);
-
-            shader.use();
-            shader.setMat4("modelview",modelview);
-
-            buffer->use();
-            glLineWidth(size);
-            glDrawArrays(GL_POINTS, 0, n);
-            glLineWidth(1.0);
-            buffer->unuse();
-            
-            shader.unuse();
-
-            glCheckError();
-        }
-
-        bool close(){
-            return shader.close();
-        }
+        void draw(glm::mat4& modelview,tk::gui::Buffer<float>* buffer, int n, float size = 1.0f);
+        void close();
 };
 
 }}}

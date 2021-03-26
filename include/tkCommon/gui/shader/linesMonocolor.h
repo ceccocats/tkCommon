@@ -22,6 +22,9 @@ class linesMonocolor : public tk::gui::shader::generic
 {
     private:
         glm::vec4 linesColor;
+        static int users;
+
+        linesMonocolor();
 
     public:
 
@@ -39,43 +42,14 @@ class linesMonocolor : public tk::gui::shader::generic
         };
 
     public:
-        
-        linesMonocolor(){
-            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/linesMonocolor.vert";
-            std::string geometry    = "";
-            std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/linesMonocolor.frag";
-            
-            shader.init(vertex, fragment, geometry);
-
-            vertexPointer.resize(1);
+       static linesMonocolor* getInstance(){
+            static linesMonocolor instance;
+            users++;
+            return &instance;
         }
-
         void draw(glm::mat4& modelview, tk::gui::Buffer<float>* buffer, int n, int size = 1.0f, 
-                tk::gui::Color_t color = tk::gui::color::WHITE, GLenum linemode = GL_LINE_STRIP, int offset = 0){
-
-            vertexPointer[0] = {3,3,offset};
-            buffer->setVertexAttribs(vertexPointer);
-
-            std::memcpy(glm::value_ptr(linesColor), color.color, sizeof(linesColor));
-
-            shader.use();
-            shader.setMat4("modelview",modelview);
-            shader.setVec4("color",linesColor);
-
-            buffer->use();
-            glLineWidth(size);
-            glDrawArrays(linemode, 0, n);
-            glLineWidth(1.0f);
-            buffer->unuse();
-
-            shader.unuse();
-
-            glCheckError();
-        }
-
-        bool close(){
-            return shader.close();
-        }
+                tk::gui::Color_t color = tk::gui::color::WHITE, GLenum linemode = GL_LINE_STRIP, int offset = 0);
+        void close();
 };
 
 }}}

@@ -20,6 +20,9 @@ namespace tk { namespace gui { namespace shader {
  */
 class lines : public tk::gui::shader::generic
 {
+    private:
+        lines();
+        static int users;
 
     public:
 
@@ -34,40 +37,13 @@ class lines : public tk::gui::shader::generic
         };
 
     public:
-        
-        lines(){
-            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/lines.vert";
-            std::string geometry    = "";
-            std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/lines.frag";
-            
-            shader.init(vertex, fragment, geometry);
-            
-            vertexPointer.resize(2);
-            vertexPointer[0] = {3,7,0};
-            vertexPointer[1] = {4,7,3};
+        static lines* getInstance(){
+            static lines instance;
+            users++;
+            return &instance;
         }
-
-        void draw(glm::mat4& modelview, tk::gui::Buffer<float>* buffer, int n, float size = 1.0f, GLenum linemode = GL_LINE_STRIP){
-
-            buffer->setVertexAttribs(vertexPointer);
-
-            shader.use();
-            shader.setMat4("modelview",modelview);
-
-            buffer->use();
-            glLineWidth(size);
-            glDrawArrays(linemode, 0, n);
-            glLineWidth(1.0f);
-            buffer->unuse();
-
-            shader.unuse();
-
-            glCheckError();
-        }
-
-        bool close(){
-            return shader.close();
-        }
+        void draw(glm::mat4& modelview, tk::gui::Buffer<float>* buffer, int n, float size = 1.0f, GLenum linemode = GL_LINE_STRIP);
+        void close();
 };
 
 }}}

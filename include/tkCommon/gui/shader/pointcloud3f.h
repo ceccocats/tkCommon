@@ -22,45 +22,18 @@ class pointcloud3f  : public tk::gui::shader::generic
 {
     private:
         glm::vec4 pointColor;
+        static int users;
+
+        pointcloud3f();
 
     public:
-        bool init(){
-            std::string vertex      = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloud3f.vert";
-            std::string geometry    = "";
-            std::string fragment    = std::string(tkCommon_PATH) + "include/tkCommon/gui/shader/glsl/pointcloudFrag/pointcloud_uniformColor.frag";
-            
-            bool status = shader.init(vertex, fragment, geometry);
-            if(status == false)
-                return false;
-
-            vertexPointer.push_back({3,3,0});
-            return true;
+        static pointcloud3f* getInstance(){
+            static pointcloud3f instance;
+            users++;
+            return &instance;
         }
-
-        void draw(glm::mat4& modelview, tk::gui::Buffer<float>* buffer, int n, tk::gui::Color_t color = tk::gui::color::WHITE){
-
-            buffer->setVertexAttribs(vertexPointer);
-
-            std::memcpy(glm::value_ptr(pointColor), color.color, sizeof(pointColor));
-
-            shader.use();
-            shader.setMat4("modelview",modelview);
-            shader.setVec4("color",pointColor);
-
-            buffer->use();
-            glDrawArrays(GL_POINTS, 0, n);
-            buffer->unuse();
-
-            shader.unuse();
-
-            glCheckError();
-        }
-
-        bool close(){
-            return shader.close();
-        }
-
-
+        void draw(glm::mat4& modelview, tk::gui::Buffer<float>* buffer, int n, tk::gui::Color_t color = tk::gui::color::WHITE);
+        void close();
 };
 
 }}}

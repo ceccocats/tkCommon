@@ -100,6 +100,7 @@ file(GLOB gui_utils "src/gui/utils/*.cpp")
 file(GLOB imgui     "src/gui/imgui/*.cpp")
 file(GLOB implot    "src/gui/implot/*.cpp")
 file(GLOB drawables "src/gui/drawables/*.cpp")
+file(GLOB shader    "src/gui/shader/*.cpp")
 
 add_library(tkGUI SHARED
     src/gui/Viewer.cpp
@@ -107,6 +108,7 @@ add_library(tkGUI SHARED
     ${gui_utils}  
     ${imgui}
     ${implot}
+    ${shader}
 )
 target_link_libraries(tkGUI ${CUDA_LIBRARIES} ${GUI_LIBS} tkCommon)
 

@@ -11,7 +11,7 @@ tk::gui::Grid::~Grid(){
 
 void 
 tk::gui::Grid::onInit(tk::gui::Viewer *viewer){
-    shader = new tk::gui::shader::grid();
+    shader = tk::gui::shader::grid::getInstance();
 }
 
 void 
@@ -31,14 +31,13 @@ tk::gui::Grid::draw(tk::gui::Viewer *viewer){
     shaderGrid->draw(drwModelView,dim,n);
 }
 
+std::string 
+tk::gui::Grid::toString(){
+    return "grid";
+}
+
 void 
 tk::gui::Grid::onClose(){
     tk::gui::shader::grid* shaderGrid = (tk::gui::shader::grid*) shader;
     shaderGrid->close();
-    delete shaderGrid;
-}
-
-std::string 
-tk::gui::Grid::toString(){
-    return "grid";
 }
