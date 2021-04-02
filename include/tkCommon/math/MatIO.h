@@ -582,11 +582,11 @@ class MatDump {
         if(mat.create(file)) {
             tk::math::MatIO::var_t var;
             bool ok = toVar(name, var);
-            mat.write(var);
+            ok = ok && mat.write(var);
             std::string version_str = tk::common::tkVersionGit();
-            mat.write("tkversion", version_str);
+            ok = ok && mat.write("tkversion", version_str);
             std::string date_str = getTimeStampString();
-            mat.write("date", date_str);
+            ok = ok && mat.write("date", date_str);
             var.release();
             mat.close();
             return ok;

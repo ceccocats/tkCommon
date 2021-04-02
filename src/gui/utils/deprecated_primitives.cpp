@@ -60,5 +60,78 @@ void genTexture(cv::Mat img, GLuint &tex) {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void drawCircle(tk::common::Vector3<float> pose, float r, int res, bool filled) {
+
+    int res_1 = res;
+    if(filled) {
+        glBegin(GL_TRIANGLE_FAN);
+        glVertex3f(pose.x, pose.y, pose.z);
+        res_1++;
+    } else {
+        glBegin(GL_LINE_LOOP);
+    }
+    for (int j = 0; j < res_1; j++)   {
+        float theta = 2.0f * 3.1415926f * float(j) / float(res);//get the current angle 
+        float xr = r * cosf(theta);//calculate the x component 
+        float yr = r * sinf(theta);//calculate the y component
+
+        glVertex3f(pose.x + xr, pose.y + yr, pose.z);//output vertex
+    }
+    glEnd();
+}
+
+void drawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled) {
+    if (!filled)
+        glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
+
+    glPushMatrix();
+    glTranslatef(pose.x, pose.y, pose.z);
+    glScalef(size.x, size.y, size.z);
+
+    // BACK
+    glBegin(GL_POLYGON);
+    glVertex3f(  0.5, -0.5, 0.5 );
+    glVertex3f(  0.5,  0.5, 0.5 );
+    glVertex3f( -0.5,  0.5, 0.5 );
+    glVertex3f( -0.5, -0.5, 0.5 );
+    glEnd();
+    
+    // RIGHT
+    glBegin(GL_POLYGON);
+    glVertex3f( 0.5, -0.5, -0.5 );
+    glVertex3f( 0.5,  0.5, -0.5 );
+    glVertex3f( 0.5,  0.5,  0.5 );
+    glVertex3f( 0.5, -0.5,  0.5 );
+    glEnd();
+    
+    // LEFT
+    glBegin(GL_POLYGON);
+    glVertex3f( -0.5, -0.5,  0.5 );
+    glVertex3f( -0.5,  0.5,  0.5 );
+    glVertex3f( -0.5,  0.5, -0.5 );
+    glVertex3f( -0.5, -0.5, -0.5 );
+    glEnd();
+    
+    // TOP
+    glBegin(GL_POLYGON);
+    glVertex3f(  0.5,  0.5,  0.5 );
+    glVertex3f(  0.5,  0.5, -0.5 );
+    glVertex3f( -0.5,  0.5, -0.5 );
+    glVertex3f( -0.5,  0.5,  0.5 );
+    glEnd();
+    
+    // BOTTOM
+    glBegin(GL_POLYGON);
+    glVertex3f(  0.5, -0.5, -0.5 );
+    glVertex3f(  0.5, -0.5,  0.5 );
+    glVertex3f( -0.5, -0.5,  0.5 );
+    glVertex3f( -0.5, -0.5, -0.5 );
+    glEnd();
+
+    glPopMatrix();
+
+    if (!filled)
+        glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
+}
   
 }}} // namespace name
