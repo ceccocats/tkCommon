@@ -46,17 +46,18 @@ void drawTexture(GLuint tex, float sx, float sy) {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void genTexture(cv::Mat img, GLuint &tex) {
+void genTexture(uint8_t *data, int width, int height, int channels, GLuint &tex) {
+    int step = width*channels*sizeof(uint8_t);
     //upload to GPU texture
     glGenTextures(1, &tex);
     glBindTexture(GL_TEXTURE_2D, tex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     //use fast 4-byte alignment (default anyway) if possible
-    glPixelStorei(GL_UNPACK_ALIGNMENT, (img.step & 3) ? 1 : 4);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, (step & 3) ? 1 : 4);
     //set length of one complete row in data (doesn't need to equal image.cols)
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, img.step/img.elemSize());
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.cols, img.rows, 0, GL_RGB, GL_UNSIGNED_BYTE, img.data);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, step/channels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
