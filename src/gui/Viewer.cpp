@@ -348,7 +348,10 @@ Viewer::draw() {
 void
 Viewer::drawLogo(){
 
+    //width
     verticesCube2D[5]  = verticesCube2D[10] = 1.3 - height/(float)width;
+    //height
+    verticesCube2D[11] = verticesCube2D[16] = -0.6;
     pos.setData(verticesCube2D.data(),20);
 	pos.setIndexVector(indicesCube2D.data(),6);
 
