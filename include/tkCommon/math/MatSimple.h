@@ -42,9 +42,10 @@ struct MatSimple {
     }
 
     // copy constructor for std::vector
-    MatSimple(const MatSimple &m) : MatSimple() {
-        *this = m;
-    }
+    // NOTE this is disabled because on cuda is passed by value 
+    //MatSimple(const MatSimple &m) : MatSimple() {
+    //    *this = m;
+    //}
 
 
     __host__ __device__ T&  

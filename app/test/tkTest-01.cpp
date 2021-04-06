@@ -115,20 +115,20 @@ TEST_CASE("Test mat class") {
         }
 
         // mat simple
-        {
-            std::vector<tk::math::MatSimple<float, false>> vec;
-            for(int i=0; i<100; i++) {
-                vec.resize(i+1);
-                vec[i].resize(3,3);
-                memcpy(vec[i].data, mat.cpu.data, sizeof(float)*3*3);
-            }
-            for(int n=0; n<100; n++) {
-                for (int i = 0; i < mat.rows(); i++) 
-                for (int j = 0; j < mat.cols(); j++) {
-                    REQUIRE(vec[n].at(i, j) == mat(i, j));
-                }
-            }
-        }
+        //{
+        //    std::vector<tk::math::MatSimple<float, false>> vec;
+        //    for(int i=0; i<100; i++) {
+        //        vec.resize(i+1);
+        //        vec[i].resize(3,3);
+        //        memcpy(vec[i].data, mat.cpu.data, sizeof(float)*3*3);
+        //    }
+        //    for(int n=0; n<100; n++) {
+        //        for (int i = 0; i < mat.rows(); i++) 
+        //        for (int j = 0; j < mat.cols(); j++) {
+        //            REQUIRE(vec[n].at(i, j) == mat(i, j));
+        //        }
+        //    }
+        //}
     }
 
 
