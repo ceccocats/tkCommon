@@ -49,7 +49,7 @@ bool PlotManager::plotExist(std::string id) {
 
 void PlotManager::addPoint(std::string id, tk::common::Vector3<float> pt) {
     if(plotExist(id)) {
-        plots[id].points.add(tk::common::odom2tf(pt.x, pt.y, pt.z, 0, 0, 0));
+        plots[id].points.add(tk::common::odom2tf(pt.x(), pt.y(), pt.z(), 0, 0, 0));
         plots[id].updateLimits();
     }
 }
@@ -63,7 +63,7 @@ void PlotManager::addPoint(std::string id, tk::common::Tfpose pt) {
 
 void PlotManager::addPoints(std::string id, std::vector<tk::common::Vector3<float>> pts) {
     for(int i=0; i<pts.size(); i++) {
-        plots[id].points.add(tk::common::odom2tf(pts[i].x, pts[i].y, pts[i].z, 0, 0, 0));
+        plots[id].points.add(tk::common::odom2tf(pts[i].x(), pts[i].y(), pts[i].z(), 0, 0, 0));
         plots[id].updateLimits();
     }
 }

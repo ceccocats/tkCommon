@@ -66,7 +66,7 @@ void drawCircle(tk::common::Vector3<float> pose, float r, int res, bool filled) 
     int res_1 = res;
     if(filled) {
         glBegin(GL_TRIANGLE_FAN);
-        glVertex3f(pose.x, pose.y, pose.z);
+        glVertex3f(pose.x(), pose.y(), pose.z());
         res_1++;
     } else {
         glBegin(GL_LINE_LOOP);
@@ -76,7 +76,7 @@ void drawCircle(tk::common::Vector3<float> pose, float r, int res, bool filled) 
         float xr = r * cosf(theta);//calculate the x component 
         float yr = r * sinf(theta);//calculate the y component
 
-        glVertex3f(pose.x + xr, pose.y + yr, pose.z);//output vertex
+        glVertex3f(pose.x() + xr, pose.y() + yr, pose.z());//output vertex
     }
     glEnd();
 }
@@ -86,8 +86,8 @@ void drawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, 
         glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
 
     glPushMatrix();
-    glTranslatef(pose.x, pose.y, pose.z);
-    glScalef(size.x, size.y, size.z);
+    glTranslatef(pose.x(), pose.y(), pose.z());
+    glScalef(size.x(), size.y(), size.z());
 
     // BACK
     glBegin(GL_POLYGON);

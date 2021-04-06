@@ -52,20 +52,20 @@ tk::gui::Prisms::draw(tk::gui::Viewer *viewer){
             glColor4f(color.r(),color.g(),color.b(),color.a());
             glBegin(GL_POLYGON);
             for(int i = points.size()-1;i >=0; i--){
-                glVertex3f(points[i].x, points[i].y, base_z);
+                glVertex3f(points[i].x(), points[i].y(), base_z);
             }
             glEnd();
             for(int i = 0; i < points.size(); i++){
                 glBegin(GL_POLYGON);
-                glVertex3f(points[i].x, points[i].y, base_z);
-                glVertex3f(points[i].x, points[i].y, base_z+height);
-                glVertex3f(points[(i+1)%points.size()].x, points[(i+1)%points.size()].y, base_z+height);
-                glVertex3f(points[(i+1)%points.size()].x, points[(i+1)%points.size()].y, base_z);
+                glVertex3f(points[i].x(), points[i].y(), base_z);
+                glVertex3f(points[i].x(), points[i].y(), base_z+height);
+                glVertex3f(points[(i+1)%points.size()].x(), points[(i+1)%points.size()].y(), base_z+height);
+                glVertex3f(points[(i+1)%points.size()].x(), points[(i+1)%points.size()].y(), base_z);
                 glEnd();
             }
             glBegin(GL_POLYGON);
             for(int i = points.size()-1;i >=0; i--){
-                glVertex3f(points[i].x, points[i].y, base_z + height);
+                glVertex3f(points[i].x(), points[i].y(), base_z + height);
             }
             glEnd();
             glDepthMask(GL_TRUE);
@@ -74,16 +74,16 @@ tk::gui::Prisms::draw(tk::gui::Viewer *viewer){
             glLineWidth(2);
             glBegin(GL_LINES);
             for(int i = 0 ;i <points.size(); i++){
-                glVertex3f(points[i].x, points[i].y, base_z);
-                glVertex3f(points[(i+1)%points.size()].x, points[(i+1)%points.size()].y, base_z);
+                glVertex3f(points[i].x(), points[i].y(), base_z);
+                glVertex3f(points[(i+1)%points.size()].x(), points[(i+1)%points.size()].y(), base_z);
             }
             for(int i = 0; i < points.size(); i++){
-                glVertex3f(points[i].x, points[i].y, base_z);
-                glVertex3f(points[i].x, points[i].y, base_z+height);
+                glVertex3f(points[i].x(), points[i].y(), base_z);
+                glVertex3f(points[i].x(), points[i].y(), base_z+height);
             }
             for(int i = 0 ;i <points.size(); i++){
-                glVertex3f(points[i].x, points[i].y, base_z+height);
-                glVertex3f(points[(i+1)%points.size()].x, points[(i+1)%points.size()].y, base_z+height);
+                glVertex3f(points[i].x(), points[i].y(), base_z+height);
+                glVertex3f(points[(i+1)%points.size()].x(), points[(i+1)%points.size()].y(), base_z+height);
             }
             glEnd();
         }glPopMatrix();

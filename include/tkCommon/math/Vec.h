@@ -43,11 +43,54 @@ public:
 
 };
 
+template<class T, int N>
+class VecStatic : public MatStatic<T, N, 1> {
+public: 
+
+    VecStatic() : MatStatic<T,N,1>() {
+        for(int i=0; i<N; i++) {
+            this->mData[i] = 0;
+        }
+    }
+
+    VecStatic<T,N>& operator += ( VecStatic<T,N> const& s ) {
+        for(int i=0; i<N; i++) {
+            this->mData[i] += s.mData[i];
+        }
+        return *this;
+    }
+
+    template<int DIM>
+    VecStatic<T,DIM> sub() {
+        VecStatic<T,DIM> v;
+        memcpy(v.data(), this->mData, sizeof(T)*DIM);
+        return v;
+    }
+
+    T dist(VecStatic<T,N> const& s) {
+        T d = 0;
+        for(int i=0; i<N; i++) {
+            d += (this->mData[i] - s.mData[i])*(this->mData[i] - s.mData[i]);
+        }
+        return sqrt(d);
+    }
+
+    friend std::ostream& 
+    operator<<(std::ostream& os, VecStatic<T,N>& s) {
+        os<<"vec"<<N<<" ( ";
+        for(int i=0; i<N; i++)
+            os<<s.mData[i]<<" ";
+        os<<")";
+        return os;
+    }
+};
+
+
 template<class T>
-class Vec2 : public MatStatic<T,2,1> {
+class Vec2 : public VecStatic<T,2> {
 public:
 
-    Vec2() : MatStatic<T,2,1>(){
+    Vec2() : VecStatic<T,2>(){
     }
 
     Vec2(T x, T y) {
@@ -58,15 +101,15 @@ public:
     ~Vec2() {
     }
 
-    T& x() { return this->cpu.data[0]; }
-    T& y() { return this->cpu.data[1]; }
+    T& x() { return this->mData[0]; }
+    T& y() { return this->mData[1]; }
 };
 
 template<class T>
-class Vec3 : public MatStatic<T,3,1> {
+class Vec3 : public VecStatic<T,3> {
 public:
 
-    Vec3() : MatStatic<T,3,1>(){
+    Vec3() : VecStatic<T,3>(){
     }
 
     Vec3(T x, T y, T z) {
@@ -78,16 +121,16 @@ public:
     ~Vec3() {
     }
 
-    T& x() { return this->cpu.data[0]; }
-    T& y() { return this->cpu.data[1]; }
-    T& z() { return this->cpu.data[2]; }
+    T& x() { return this->mData[0]; }
+    T& y() { return this->mData[1]; }
+    T& z() { return this->mData[2]; }
 };
 
 template<class T>
-class Vec4 : public MatStatic<T,4,1> {
+class Vec4 : public VecStatic<T,4> {
 public:
 
-    Vec4() : MatStatic<T,4,1>(){
+    Vec4() : VecStatic<T,4>(){
     }
 
     Vec4(T x, T y, T z, T w) {
@@ -100,10 +143,10 @@ public:
     ~Vec4() {
     }
 
-    T& x() { return this->cpu.data[0]; }
-    T& y() { return this->cpu.data[1]; }
-    T& z() { return this->cpu.data[2]; }
-    T& w() { return this->cpu.data[3]; }
+    T& x() { return this->mData[0]; }
+    T& y() { return this->mData[1]; }
+    T& z() { return this->mData[2]; }
+    T& w() { return this->mData[3]; }
 };
 
 

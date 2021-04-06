@@ -182,10 +182,10 @@ namespace tk { namespace data {
             std::vector<tk::common::Vector4<float>> data;            
             for (int i = 0; input.good() && !input.eof(); i++) {
                 tk::common::Vector4<float> point;
-                input.read((char *) &point.x, sizeof(float));
-                input.read((char *) &point.y, sizeof(float));
-                input.read((char *) &point.z, sizeof(float));
-                input.read((char *) &point.i, sizeof(float));
+                input.read((char *) &point.x(), sizeof(float));
+                input.read((char *) &point.y(), sizeof(float));
+                input.read((char *) &point.z(), sizeof(float));
+                input.read((char *) &point.w(), sizeof(float));
                 data.push_back(point);
             }
             input.close();
@@ -197,11 +197,11 @@ namespace tk { namespace data {
 
             auto intensity = &features[tk::data::CloudData_gen::FEATURES_I];
             for(int i = 0; i < data.size(); i++){
-                points(0,i) = data[i].x;
-                points(1,i) = data[i].y;
-                points(2,i) = data[i].z;
+                points(0,i) = data[i].x();
+                points(1,i) = data[i].y();
+                points(2,i) = data[i].z();
                 points(3,i) = 1;
-                (*intensity)[i] = data[i].i;
+                (*intensity)[i] = data[i].w();
             }
         }
 

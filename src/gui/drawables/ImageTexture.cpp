@@ -63,24 +63,24 @@ tk::gui::ImageTexture::setPos(std::vector<tk::common::Vector3<float>> fourVertic
         indices[5] = 2;
     }  
 
-    vertices[0] =  fourVertices[0].x;
-    vertices[1] =  fourVertices[0].y;
-    vertices[2] =  fourVertices[0].z;
+    vertices[0] =  fourVertices[0].x();
+    vertices[1] =  fourVertices[0].y();
+    vertices[2] =  fourVertices[0].z();
     vertices[3] =  0.0f;
     vertices[4] =  1.0f;
-    vertices[5] =  fourVertices[1].x;
-    vertices[6] =  fourVertices[1].y;
-    vertices[7] =  fourVertices[1].z;
+    vertices[5] =  fourVertices[1].x();
+    vertices[6] =  fourVertices[1].y();
+    vertices[7] =  fourVertices[1].z();
     vertices[8] =  1.0f;
     vertices[9] =  1.0f;
-    vertices[10] = fourVertices[2].x;
-    vertices[11] = fourVertices[2].y;
-    vertices[12] = fourVertices[2].z;
+    vertices[10] = fourVertices[2].x();
+    vertices[11] = fourVertices[2].y();
+    vertices[12] = fourVertices[2].z();
     vertices[13] = 1.0f;
     vertices[14] = 0.0f;
-    vertices[15] = fourVertices[3].x;
-    vertices[16] = fourVertices[3].y;
-    vertices[17] = fourVertices[3].z;
+    vertices[15] = fourVertices[3].x();
+    vertices[16] = fourVertices[3].y();
+    vertices[17] = fourVertices[3].z();
     vertices[18] = 0.0f;
     vertices[19] = 0.0f;
 

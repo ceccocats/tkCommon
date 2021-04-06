@@ -8,12 +8,12 @@
 #include <string>
 #include <sstream>
 #include <initializer_list>
-#include "tkCommon/common.h"
 #include "tkCommon/cuda.h"
+#include "tkCommon/exceptions.h"
 
 namespace tk { namespace math {
 
-template<class T, bool CUDA = true>
+template<class T, bool CUDA>
 struct MatSimple {
     T* data;
     int rows, cols;
@@ -41,6 +41,13 @@ struct MatSimple {
         owned = true;
     }
 
+    // copy constructor for std::vector
+    // NOTE this is disabled because on cuda is passed by value 
+    //MatSimple(const MatSimple &m) : MatSimple() {
+    //    *this = m;
+    //}
+
+
     __host__ __device__ T&  
     at(int r, int c) { 
         return data[r+c*rows];
@@ -66,7 +73,7 @@ struct MatSimple {
                         tkCUDA( cudaMallocHost(&data, maxSize * sizeof(T)) );
                 } else {
                     if(data != nullptr)
-                        delete data;
+                        delete [] data;
                     data = new T[maxSize];
                 }
             }
@@ -82,17 +89,27 @@ struct MatSimple {
             if(CUDA)
                 tkCUDA( cudaFree(data) );
             else
-                delete data;
+                delete [] data;
         }
     }
 
     __host__ MatSimple<T, CUDA>& 
     operator=(const MatSimple<T, CUDA>& s) {
-        resize(s.rows, s.cols);
-        if(CUDA) {
-            tkCUDA( cudaMemcpy(data, s.data, size * sizeof(T), cudaMemcpyDeviceToDevice) ); 
+        if(owned) {
+            data = s.data;
+            rows = s.rows;
+            cols = s.cols;
+            size = s.size;
+            maxSize = s.maxSize;
+            owned = s.owned;
+            integrated_memory = s.integrated_memory;
         } else {
-            tkCUDA( cudaMemcpy(data, s.data, size * sizeof(T), cudaMemcpyHostToHost) ); 
+            resize(s.rows, s.cols);
+            if(CUDA) {
+                tkCUDA( cudaMemcpy(data, s.data, size * sizeof(T), cudaMemcpyDeviceToDevice) ); 
+            } else {
+                tkCUDA( cudaMemcpy(data, s.data, size * sizeof(T), cudaMemcpyHostToHost) ); 
+            }
         }
         return *this;
     }    

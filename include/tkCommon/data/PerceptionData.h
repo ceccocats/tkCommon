@@ -10,12 +10,12 @@ class box{
         tk::common::Vector3<float> pose; //Position: X,Y,Z
         tk::common::Vector3<float> size; //Size:     W,H,D
         tk::common::Vector3<float> rot;  //Rotation: roll, pitch, yaw
-        float &x = pose.x;
-        float &y = pose.y;
-        float &z = pose.z;
-        float &w = size.x;
-        float &h = size.y;
-        float &d = size.z;
+        float &x = pose.x();
+        float &y = pose.y();
+        float &z = pose.z();
+        float &w = size.x();
+        float &h = size.y();
+        float &d = size.z();
 
         box(){
             pose = tk::common::Vector3<float>(0,0,0);

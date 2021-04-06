@@ -225,24 +225,24 @@ namespace tk { namespace common {
         tk::common::Vector3<double> rot;
         tk::common::Vector3<double> p0, p1;
 
-        p0.x = 0; p0.y = -50; p0.z = -(p0.x*a +p0.y*b +d)/c;
-        p1.x = 0; p1.y = +50; p1.z = -(p1.x*a +p1.y*b +d)/c;
-        rot.x = atan2(p0.z - p1.z, p0.y - p1.y);
-        if(rot.x != rot.x)
-            rot.x =0;
+        p0.x() = 0; p0.y() = -50; p0.z() = -(p0.x()*a +p0.y()*b +d)/c;
+        p1.x() = 0; p1.y() = +50; p1.z() = -(p1.x()*a +p1.y()*b +d)/c;
+        rot.x() = atan2(p0.z() - p1.z(), p0.y() - p1.y());
+        if(rot.x() != rot.x())
+            rot.x() =0;
 
-        p0.x = -50; p0.y = 0; p0.z = -(p0.x*a +p0.y*b +d)/c;
-        p1.x = +50; p1.y = 0; p1.z = -(p1.x*a +p1.y*b +d)/c;
-        rot.y = atan2(p0.z - p1.z, p0.x - p1.x);
-        if(rot.y != rot.y)
-            rot.y =0;
+        p0.x() = -50; p0.y() = 0; p0.z() = -(p0.x()*a +p0.y()*b +d)/c;
+        p1.x() = +50; p1.y() = 0; p1.z() = -(p1.x()*a +p1.y()*b +d)/c;
+        rot.y() = atan2(p0.z() - p1.z(), p0.x() - p1.x());
+        if(rot.y() != rot.y())
+            rot.y() =0;
 
-        rot.z =0;
+        rot.z() =0;
 
         double h = -d/c;
         if(h != h)
             h =0;
 
-        return tk::common::odom2tf(0, 0, h, rot.x, rot.y, rot.z);
+        return tk::common::odom2tf(0, 0, h, rot.x(), rot.y(), rot.z());
     }
 }}
