@@ -40,12 +40,12 @@ namespace tk { namespace gui {
                     conf.mins = { x, y, z };
                     conf.maxs = { x, y, z };
                 }
-                if(x < conf.mins.x) conf.mins.x = x;
-                if(y < conf.mins.y) conf.mins.y = y;
-                if(z < conf.mins.z) conf.mins.z = z;
-                if(x > conf.maxs.x) conf.maxs.x = x;
-                if(y > conf.maxs.y) conf.maxs.y = y;
-                if(z > conf.maxs.z) conf.maxs.z = z;
+                if(x < conf.mins.x()) conf.mins.x() = x;
+                if(y < conf.mins.y()) conf.mins.y() = y;
+                if(z < conf.mins.z()) conf.mins.z() = z;
+                if(x > conf.maxs.x()) conf.maxs.x() = x;
+                if(y > conf.maxs.y()) conf.maxs.y() = y;
+                if(z > conf.maxs.z()) conf.maxs.z() = z;
             }
         };
 

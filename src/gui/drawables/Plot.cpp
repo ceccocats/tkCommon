@@ -2,9 +2,9 @@
 
 void 
 tk::gui::Plot::updateLimits() {
-    float x = points.head(0).x;
-    float y = points.head(0).y;
-    float z = points.head(0).z;
+    float x = points.head(0).x();
+    float y = points.head(0).y();
+    float z = points.head(0).z();
 
     if(points.size() == 1) {
         mins = { x, y, z };

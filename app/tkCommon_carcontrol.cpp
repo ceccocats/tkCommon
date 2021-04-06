@@ -90,12 +90,12 @@ int main( int argc, char** argv){
 		tk::common::Vector2<float> stickL;
         float triggerL, triggerR;
         joy.update();
-		joy.getStickLeft(stickL.x,stickL.y);
+		joy.getStickLeft(stickL.x(),stickL.y());
 		joy.getTriggerLeft(triggerL);
 		joy.getTriggerRight(triggerR);
 
         // commands
-        steer    = tk::math::lerp(steer, stickL.x, smoothSteer);
+        steer    = tk::math::lerp(steer, stickL.x(), smoothSteer);
         throttle = /*-triggerL + triggerR;*/ tk::math::lerp(throttle, -triggerL + triggerR, smoothThrottle);
 
         // update viewer

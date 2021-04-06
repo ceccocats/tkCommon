@@ -49,9 +49,9 @@ void Camera::setViewPort(int x, int y, int width, int height) {
 }
 
 void Camera::setCenter(tk::common::Vector3<float> p) {
-    center.x = tk::math::lerp<float>(center.x, p.x, 0.1);
-    center.y = tk::math::lerp<float>(center.y, p.y, 0.1);
-    center.z = tk::math::lerp<float>(center.z, p.z, 0.1);
+    center.x = tk::math::lerp<float>(center.x, p.x(), 0.1);
+    center.y = tk::math::lerp<float>(center.y, p.y(), 0.1);
+    center.z = tk::math::lerp<float>(center.z, p.z(), 0.1);
 }
 
 

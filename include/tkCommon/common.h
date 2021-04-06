@@ -115,233 +115,6 @@ namespace tk { namespace common {
      */
     Tfpose odom2tf(float x, float y, float z, float qx, float qy, float qz, float qw);
 
-    /**
-     * Rect [ x y w h ]
-     * @tparam T
-     */
-    
-    //template <class T> 
-    //class Rect {
-    //    public:
-    //        T x, y, w, h;
-//
-    //        /**
-    //         * init all to zero
-    //         */
-    //        Rect() {
-    //            x = y = w = h = 0;
-    //        }
-//
-    //        /**
-    //         * init with values
-    //         * @param x
-    //         * @param y
-    //         * @param z
-    //         * @param i
-    //         */
-    //        Rect(T x, T y, T w, T h) {
-    //            this->x = x;
-    //            this->y = y;
-    //            this->w = w;
-    //            this->h = h;
-    //        }
-//
-    //        ~Rect() {}
-//
-    //        /**
-    //         * override ostream to a nice print
-    //         * @param os
-    //         * @param v
-    //         * @return
-    //         */
-    //        friend std::ostream& operator<<(std::ostream& os, const Rect& v) {
-    //            os << "Rect(" << v.x <<", "<< v.y <<", "<< v.w <<", "<< v.h <<")";
-    //            return os;
-    //        }  
-    //};
-
-    /**
-     * Vector of 4 elements [ x y z i ]
-     * @tparam T
-     */
-    template <class T> 
-    class Vector4 {
-        public:
-            T x, y, z, i;
-
-            /**
-             * init all to zero
-             */
-            Vector4() {
-                x = y = z = i = 0;
-            }
-
-            /**
-             * init with values
-             * @param x
-             * @param y
-             * @param z
-             * @param i
-             */
-            Vector4(T x, T y, T z, T i) {
-                this->x = x;
-                this->y = y;
-                this->z = z;
-                this->i = i;
-            }
-
-            ~Vector4() {}
-
-            /**
-             * override ostream to a nice print
-             * @param os
-             * @param v
-             * @return
-             */
-            friend std::ostream& operator<<(std::ostream& os, const Vector4& v) {
-                os << "v4(" << v.x <<", "<< v.y <<", "<< v.z <<", "<< v.i <<")";
-                return os;
-            }  
-
-            bool isZero() { return x == 0 && y == 0 && z == 0 && i == 0; } 
-    };
-
-
-    /**
-     * Vector of 3 elements [ x y z ]
-     * @tparam T
-     */
-    template <class T>
-    class Vector3 {
-        public:        
-            T x, y, z;
-
-            /**
-             * init all to zero
-             */
-            Vector3() {
-                x = y = z = 0;
-            }
-
-            /**
-             * init with values
-             * @param x
-             * @param y
-             * @param z
-             */
-            Vector3(T x, T y, T z) {
-                this->x = x;
-                this->y = y;
-                this->z = z;
-            }
-
-            ~Vector3() {}
-
-            T dist2(Vector3<T> v) {
-                T dx = x-v.x;
-                T dy = y-v.y;
-                T dz = z-v.z;
-                return dx*dx + dy*dy + dz*dz;
-            }
-
-            T dist(Vector3<T> v) {
-                T dx = x-v.x;
-                T dy = y-v.y;
-                T dz = z-v.z;
-                return sqrt(dx*dx + dy*dy + dz*dz);
-            }
-
-            T dist2_2d(Vector3<T> v) {
-                T dx = x-v.x;
-                T dy = y-v.y;
-                return dx*dx + dy*dy;
-            }
-
-            T dist_2d(Vector3<T> v) {
-                T dx = x-v.x;
-                T dy = y-v.y;
-                return sqrt(dx*dx + dy*dy);
-            }
-
-            /**
-             * override ostream for a nice print
-             * @param os
-             * @param v
-             * @return
-             */
-            friend std::ostream& operator<<(std::ostream& os, const Vector3& v) {
-                os << "v3(" << v.x <<", "<< v.y <<", "<< v.z <<")";
-                return os;
-            }  
-
-            bool isZero() { return x == 0 && y == 0 && z == 0; }
-
-            void applyTf(tk::common::Tfpose tf) {
-                tk::common::Tfpose ptf = tk::common::odom2tf(x, y, z, 0, 0, 0);
-                ptf = tf * ptf;
-                x = ptf.matrix()(0, 3);
-                y = ptf.matrix()(1, 3);
-                z = ptf.matrix()(2, 3);
-                return;
-            }
-
-            Vector3& operator+=(const Vector3& vec){
-
-                this->x += vec.x;
-                this->y += vec.y;
-                this->z += vec.z;
-                return *this;
-            }
-     };
-
-    /**
-     * Vector of 2 elements [ x y ]
-     * @tparam T
-     */
-    template <class T>
-    class Vector2 {
-        public:        
-            T x, y;
-
-            /**
-             * init all to zero
-             */
-            Vector2() {
-                x = y = 0;
-            }
-
-            /**
-             * init with values
-             * @param x
-             * @param y
-             */
-            Vector2(T x, T y) {
-                this->x = x;
-                this->y = y;
-            }
-
-            ~Vector2() {}
-
-            Vector2& operator=(const Vector2& s){
-
-                this->x = s.x;
-                this->y = s.y;
-                return *this;
-            }
-
-            /**
-             * override ostream for a nice print
-             * @param os
-             * @param v
-             * @return
-             */
-            friend std::ostream& operator<<(std::ostream& os, const Vector2& v) {
-                os << "v2(" << v.x <<", "<< v.y <<")";
-                return os;
-            }  
-
-            bool isZero() { return x == 0 && y == 0; } 
-    };
 
     /**
      * Read odometry from ifstream as a TfPose
@@ -383,13 +156,6 @@ namespace tk { namespace common {
     Eigen::Isometry3f tfInterpolate(const Eigen::Isometry3f& t1,
                                     const Eigen::Isometry3f& t2, const double ratio);
 
-    /**
-     * Extract 3d translation from TfPose
-     * @param tf
-     * @return
-     */
-    Vector3<float> tf2pose(Tfpose tf);
-
 
     /**
      * check if x is close to y
@@ -402,40 +168,6 @@ namespace tk { namespace common {
      */
     bool isclose(double x, double y, double r_tol=1.e-5, double a_tol=1.e-8);
 
-    /**
-     * Extract 3d rotation from TfPose
-     * @param tf
-     * @return
-     */
-    Vector3<float> tf2rot(Tfpose tf);
-
-
-    /**
-     * Tell if point c is on the left side respect to the segment a - b
-     * @tparam T
-     * @param a
-     * @param b
-     * @param c
-     * @return
-     */
-    template <class T>
-    bool pointIsleft(tk::common::Vector2<T> a, tk::common::Vector2<T> b, tk::common::Vector2<T> c) {
-        return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
-    }
-
-    /**
-     * Tell if point c is on the left side respect to the segment a - b
-     * It is a 2d computation even with vector3
-     * @tparam T
-     * @param a
-     * @param b
-     * @param c
-     * @return
-     */
-    template <class T>
-    bool pointIsleft(tk::common::Vector3<T> a, tk::common::Vector3<T> b, tk::common::Vector3<T> c) {
-        return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
-    }
 
     /**
      * Calculate tf from plane coeffs
@@ -510,4 +242,64 @@ namespace tk { namespace common {
 
 }}
 
+namespace tk { namespace math {
+    template<class T> class Vec2;
+    template<class T> class Vec3;
+    template<class T> class Vec4;
+}}
+
+namespace tk { namespace common {
+
+    template<typename T>
+    using Vector2 = tk::math::Vec2<T>;
+    template<typename T>
+    using Vector3 = tk::math::Vec3<T>;
+    template<typename T>
+    using Vector4 = tk::math::Vec4<T>;
+
+    /**
+     * Extract 3d translation from TfPose
+     * @param tf
+     * @return
+     */
+    Vector3<float> tf2pose(Tfpose tf);
+    /**
+     * Extract 3d rotation from TfPose
+     * @param tf
+     * @return
+     */
+    Vector3<float> tf2rot(Tfpose tf);
+
+
+    /**
+     * Tell if point c is on the left side respect to the segment a - b
+     * @tparam T
+     * @param a
+     * @param b
+     * @param c
+     * @return
+     */
+    template <class T>
+    inline bool pointIsleft(tk::common::Vector2<T> a, tk::common::Vector2<T> b, tk::common::Vector2<T> c) {
+        return ((b.x() - a.x())*(c.y() - a.y()) - (b.y() - a.y())*(c.x() - a.x())) > 0;
+    }
+
+    /**
+     * Tell if point c is on the left side respect to the segment a - b
+     * It is a 2d computation even with vector3
+     * @tparam T
+     * @param a
+     * @param b
+     * @param c
+     * @return
+     */
+    template <class T>
+    inline bool pointIsleft(tk::common::Vector3<T> a, tk::common::Vector3<T> b, tk::common::Vector3<T> c) {
+        return ((b.x() - a.x())*(c.y() - a.y()) - (b.y() - a.y())*(c.x() - a.x())) > 0;
+    }
+
+}}
+
+
 #include "tkCommon/math/Mat.h"
+#include "tkCommon/math/Vec.h"

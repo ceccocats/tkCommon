@@ -14,16 +14,16 @@ uint8_t* loadImage(std::string filename, int* width, int* height, int* channels)
 }
 
 void copyVertexFromOBJL(vertex_t *tkv, objl::Vertex* v){
-    tkv->position.x = v->Position.X;
-    tkv->position.y = v->Position.Y;
-    tkv->position.z = v->Position.Z;
+    tkv->position.x() = v->Position.X;
+    tkv->position.y() = v->Position.Y;
+    tkv->position.z() = v->Position.Z;
 
-    tkv->normal.x = v->Normal.X;
-    tkv->normal.y = v->Normal.Y;
-    tkv->normal.z = v->Normal.Z;
+    tkv->normal.x() = v->Normal.X;
+    tkv->normal.y() = v->Normal.Y;
+    tkv->normal.z() = v->Normal.Z;
 
-    tkv->texCoord.x = v->TextureCoordinate.X;
-    tkv->texCoord.y = 1 - v->TextureCoordinate.Y;
+    tkv->texCoord.x() = v->TextureCoordinate.X;
+    tkv->texCoord.y() = 1 - v->TextureCoordinate.Y;
 }
 
 bool loadOBJ(std::string filename, object3D_t &obj) {
