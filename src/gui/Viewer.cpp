@@ -174,8 +174,12 @@ Viewer::init() {
     for(int i = 0; i < width*height; i++){
         if(image[i*4] == 0)
             image[i*4 + 3] = 0;
-        else
+        else{
+            image[i*4] = 255;
+            image[i*4 + 1] = 255;
+            image[i*4 + 2] = 255;
             image[i*4 + 3] = 128;
+        }
     }
     logo.init(width,height,channels);
     logo.setData(image);
@@ -348,7 +352,21 @@ Viewer::draw() {
 void
 Viewer::drawLogo(){
 
-    verticesCube2D[5]  = verticesCube2D[10] = 1.3 - height/(float)width;
+    int w=90, h=90, padding=20;
+    int w2=width/2, h2=height/2;
+
+    verticesCube2D[0] = (float)(w2-padding)/w2;
+    verticesCube2D[1] = (float)(-h2+padding)/h2;
+
+    verticesCube2D[5] = (float)(w2-w-padding)/w2;
+    verticesCube2D[6] = (float)(-h2+padding)/h2;
+
+    verticesCube2D[10] = (float)(w2-w-padding)/w2;
+    verticesCube2D[11] = (float)(-h2+h+padding)/h2;
+
+    verticesCube2D[15] = (float)(w2-padding)/w2;
+    verticesCube2D[16] = (float)(-h2+h+padding)/h2;
+
     pos.setData(verticesCube2D.data(),20);
 	pos.setIndexVector(indicesCube2D.data(),6);
 
