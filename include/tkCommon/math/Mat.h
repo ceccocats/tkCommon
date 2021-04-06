@@ -50,12 +50,24 @@ public:
     Mat(void) {
         init();
     }
+    
+    // copy constructor for std::vector
+    Mat(const Mat &m) {
+        init();
+        *this = m;
+    }
+
 
     Mat(T *data_h, T *data_d, int r, int c) {
         init();
-        if(data_h != nullptr)
+        if(data_h != nullptr) {
+            cpu.release();
+            cpu.owned = true;
             cpu = MatSimple<T, false>(data_h, r, c);
+        }
         if(data_d != nullptr) {
+            gpu.release();
+            gpu.owned = true;
             _use_gpu = true;
             gpu = MatSimple<T, true>(data_d, r, c);
         }
@@ -210,25 +222,95 @@ public:
 
 };
 
+//#pragma pack(push, 1)
 template<class T, int R, int C>
-class MatStatic : public Mat<T> {
+class MatStatic : public tk::math::MatDump {
     
-private:
-    T static_data[R*C];
+protected:
+    T mData[R*C];
 
 public:
-    MatStatic() : Mat<T>(static_data, nullptr, R, C) {
+    MatStatic() {
     }
 
     template<typename OtherDerived>
-    Mat<T>& operator=(const Eigen::MatrixBase <OtherDerived>& other) {
+    MatStatic<T,R,C>& operator=(const Eigen::MatrixBase <OtherDerived>& other) {
         tkASSERT(R == other.rows() && C == other.cols());
-        Eigen::Map<Eigen::Matrix<T,-1,-1>> m(this->cpu.data, this->cpu.rows, this->cpu.cols);
+        Eigen::Map<Eigen::Matrix<T,R,C>> m(this->mData);
         m = other;
         return *this;
     }
 
+    __host__ int
+    rows() const { return R; }
+
+    __host__ int
+    cols() const { return C; }
+
+    __host__ int
+    size() const { return R*C; }
+
+    __host__ T*
+    data() { return this->mData; }
+
+    friend std::ostream& 
+    operator<<(std::ostream& os, MatStatic<T,R,C>& s) {
+        if(s.size() <= 16)
+            s.print(os);
+        else
+            os<<"MatStatic ("<<s.rows()<<"x"<<s.cols()<<")";
+        return os;
+    }
+
+    __host__ void 
+    print(std::ostream &os = std::cout) {
+        int r = rows();
+        int c = cols();
+        os<<"MatStatic ("<<r<<"x"<<c<<")\n";
+        for(int i = 0; i < r; ++i) {
+            os << std::endl;
+            for(int j = 0; j < c; ++j) {
+                os << std::right << std::setw(20) << mData[i+j*r];
+            }
+        }
+        os<<std::endl;
+    }
+
+    __host__
+    const Eigen::Map<Eigen::Matrix<T,R,C>> matrix() {
+        return Eigen::Map<Eigen::Matrix<T,R,C>>(mData);
+    }
+    
+    __host__
+    Eigen::Map<Eigen::Matrix<T,R,C>> writableMatrix() {
+        return Eigen::Map<Eigen::Matrix<T,R,C>>(mData);
+    }
+
+
+    bool   toVar(std::string name, MatIO::var_t &var) {
+        Eigen::Matrix<T,R,C> m = matrix();
+        return var.set(name, m);
+    }
+    bool fromVar(MatIO::var_t &var) {
+        if(var.empty())
+            return false;
+        Eigen::Matrix<T,R,C> m;
+        bool ok = var.get(m);
+        *this = m;
+        return ok;
+    }
+
+    __host__ T&
+    operator()(int i, int j) {
+        return mData[i+j*R]; 
+    }
+
+    __host__ T&
+    operator[](int n) {
+        return mData[n]; 
+    }
 };
+//#pragma pack(pop)
 
 
 typedef MatStatic<double,2,2> Mat2d;

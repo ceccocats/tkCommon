@@ -58,8 +58,8 @@ public:
     ~Vec2() {
     }
 
-    T& x() { return this->cpu.data[0]; }
-    T& y() { return this->cpu.data[1]; }
+    T& x() { return this->mData[0]; }
+    T& y() { return this->mData[1]; }
 };
 
 template<class T>
@@ -78,9 +78,9 @@ public:
     ~Vec3() {
     }
 
-    T& x() { return this->cpu.data[0]; }
-    T& y() { return this->cpu.data[1]; }
-    T& z() { return this->cpu.data[2]; }
+    T& x() { return this->mData[0]; }
+    T& y() { return this->mData[1]; }
+    T& z() { return this->mData[2]; }
 };
 
 template<class T>
@@ -100,10 +100,10 @@ public:
     ~Vec4() {
     }
 
-    T& x() { return this->cpu.data[0]; }
-    T& y() { return this->cpu.data[1]; }
-    T& z() { return this->cpu.data[2]; }
-    T& w() { return this->cpu.data[3]; }
+    T& x() { return this->mData[0]; }
+    T& y() { return this->mData[1]; }
+    T& z() { return this->mData[2]; }
+    T& w() { return this->mData[3]; }
 };
 
 

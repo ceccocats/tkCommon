@@ -31,7 +31,10 @@ struct _mat_t {
 
 namespace tk { namespace  math {
 
-template <typename Tp> struct matio_type;
+template <typename Tp> struct matio_type {
+    static const matio_types tid = MAT_T_UNKNOWN;   
+    static const matio_classes cid = MAT_C_EMPTY;   
+};
 template <> struct matio_type<int8_t>   { typedef int8_t type;    static const matio_types tid = MAT_T_INT8;   static const matio_classes cid = MAT_C_INT8;   };
 template <> struct matio_type<uint8_t>  { typedef uint8_t type;   static const matio_types tid = MAT_T_UINT8;  static const matio_classes cid = MAT_C_UINT8;  };
 template <> struct matio_type<int16_t>  { typedef int16_t type;   static const matio_types tid = MAT_T_INT16;  static const matio_classes cid = MAT_C_INT16;  };
@@ -255,7 +258,9 @@ public:
             memcpy(mat.data(), var->data, mat.size()*var->data_size);
             return true;
         }
-        template<typename T>
+        template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool get(MatSimple<T,false> &mat);
+        template<class T, typename std::enable_if<!std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
         bool get(MatSimple<T,false> &mat) {
             matio_type<T> mat_type;
             if(!check(var, mat_type.tid, 2))
@@ -264,7 +269,9 @@ public:
             memcpy(mat.data, var->data, mat.size*var->data_size);
             return true;
         }
-        template<typename T>
+        template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool get(std::vector<T> &vec);
+        template<class T, typename std::enable_if<!std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
         bool get(std::vector<T> &vec) {
             matio_type<T> mat_type;
             if(!check(var, mat_type.tid, 2))
@@ -296,6 +303,10 @@ public:
         template<class T, typename std::enable_if<!std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
         bool set(std::string name, T &a) {
             matio_type<T> mat_type;
+            if(mat_type.tid == MAT_T_UNKNOWN) {
+                tkERR("could not serialize this type\n");
+                return false;
+            }
             release();
             size_t dim[2] = { 1, 1 }; // 1x1, single value
             var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, &a, 0);
@@ -304,22 +315,38 @@ public:
         template<typename T, int A, int B>
         bool set(std::string name, Eigen::Matrix<T, A, B> &mat) {
             matio_type<T> mat_type;
+            if(mat_type.tid == MAT_T_UNKNOWN) {
+                tkERR("could not serialize this type\n");
+                return false;
+            }
             release();
             size_t dim[2] = { (size_t) mat.rows(), (size_t) mat.cols() }; 
             var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, mat.data(), 0);
             return true;
         }
-        template<typename T>
+        template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool set(std::string name, MatSimple<T,false> &mat);
+        template<class T, typename std::enable_if<!std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
         bool set(std::string name, MatSimple<T,false> &mat) {
             matio_type<T> mat_type;
+            if(mat_type.tid == MAT_T_UNKNOWN) {
+                tkERR("could not serialize this type\n");
+                return false;
+            }
             release();
             size_t dim[2] = { (size_t) mat.rows, (size_t) mat.cols }; 
             var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, mat.data, 0);
             return true;
         }
-        template<typename T>
+        template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool set(std::string name, std::vector<T> &vec);
+        template<class T, typename std::enable_if<!std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
         bool set(std::string name, std::vector<T> &vec) {
             matio_type<T> mat_type;
+            if(mat_type.tid == MAT_T_UNKNOWN) {
+                tkERR("could not serialize this type\n");
+                return false;
+            }
             release();
             size_t dim[2] = { (size_t) vec.size(), 1 }; 
             var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, vec.data(), 0);
@@ -555,11 +582,11 @@ public:
 class MatDump {
     public: 
 
-    virtual bool   toVar(std::string name, MatIO::var_t &var) {
+    bool toVar(std::string name, MatIO::var_t &var) {
         tkFATAL("Not implemented");
         return false;
     }
-    virtual bool fromVar(MatIO::var_t &var) {
+    bool fromVar(MatIO::var_t &var) {
         tkFATAL("Not implemented");
         return false;
     }
@@ -602,8 +629,43 @@ bool MatIO::var_t::get(T &m) {
     return m.fromVar(*this);
 }
 template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type>
+bool MatIO::var_t::get(MatSimple<T,false> &mat) {
+    bool ok = true;
+    mat.resize(size(), 1);
+    for(int i = 0; i < size(); i++){
+        ok = ok && mat.data[i].fromVar((*this)[(*this)[i]]);
+    }
+    return ok;
+}
+template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type>
+bool MatIO::var_t::get(std::vector<T> &vec) {
+    bool ok = true;
+    vec.resize(size(), 1);
+    for(int i = 0; i < size(); i++){
+        ok = ok && vec[i].fromVar((*this)[(*this)[i]]);
+    }
+    return ok;
+}
+
+template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type>
 bool MatIO::var_t::set(std::string name, T &m) {
     return m.toVar(name, *this);
+}
+template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type>
+bool MatIO::var_t::set(std::string name, MatSimple<T,false> &mat) {
+    std::vector<tk::math::MatIO::var_t> vars(mat.size);
+    for(int i=0; i<mat.size; i++) {
+        mat.data[i].toVar(name, vars[i]);
+    }
+    return setCells(name, vars);
+}
+template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type>
+bool MatIO::var_t::set(std::string name, std::vector<T> &vec) {
+    std::vector<tk::math::MatIO::var_t> vars(vec.size());
+    for(int i=0; i<vec.size(); i++) {
+        vec[i].toVar(name, vars[i]);
+    }
+    return setCells(name, vars);
 }
 
 
