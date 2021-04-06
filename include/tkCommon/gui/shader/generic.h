@@ -1,6 +1,8 @@
 #pragma once
-
+#include <glm/glm.hpp>
+#include "tkCommon/gui/utils/Shader.h"
 #include "tkCommon/gui/utils/CommonViewer.h"
+
 
 namespace tk { namespace gui { namespace shader {
 
