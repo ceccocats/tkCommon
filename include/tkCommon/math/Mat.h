@@ -8,6 +8,7 @@
 #include <string>
 #include <sstream>
 #include <initializer_list>
+#include "tkCommon/common.h"
 #include "tkCommon/cuda.h"
 #include "tkCommon/math/MatSimple.h"
 #include "tkCommon/math/MatIO.h"

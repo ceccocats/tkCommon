@@ -15,8 +15,8 @@ bool CSpline2D::init(std::vector<tk::common::Vector2<float>> waypoints) {
     x = VectorXd(nx);
     y = VectorXd(nx);
     for (int i = 0; i < nx; i++) {
-        x(i) = waypoints[i].x;
-        y(i) = waypoints[i].y;
+        x(i) = waypoints[i].x();
+        y(i) = waypoints[i].y();
     }
 
     s = calc_s();
@@ -64,12 +64,12 @@ tk::common::Vector2<float> CSpline2D::calc_position(double s, double d) {
         double cos_yaw = cos(yaw);
         double x = 0;
         double y = -d;
-        p.x = x*cos_yaw - y*sin_yaw;
-        p.y = x*sin_yaw + y*cos_yaw;
+        p.x() = x*cos_yaw - y*sin_yaw;
+        p.y() = x*sin_yaw + y*cos_yaw;
     }
 
-    p.x += sx.calc(s);
-    p.y += sy.calc(s);
+    p.x() += sx.calc(s);
+    p.y() += sy.calc(s);
     return p;
 }
 

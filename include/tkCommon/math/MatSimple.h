@@ -8,8 +8,8 @@
 #include <string>
 #include <sstream>
 #include <initializer_list>
-#include "tkCommon/common.h"
 #include "tkCommon/cuda.h"
+#include "tkCommon/exceptions.h"
 
 namespace tk { namespace math {
 

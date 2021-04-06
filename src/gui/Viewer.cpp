@@ -303,9 +303,11 @@ Viewer::drawInfos(){
         ImGui::Text("Window size: %d x %d", width, height);
 
     }else{
+        tk::common::Vector3<float> pos = tk::common::tf2pose(drawables[imguiSelected]->tf);
+        tk::common::Vector3<float> rot = tk::common::tf2rot(drawables[imguiSelected]->tf);
         std::stringstream ss;
-        ss << "tf: \n"<<"\tpos: "<<tk::common::tf2pose(drawables[imguiSelected]->tf)<<"\n";
-        ss            <<"\trot: "<<tk::common::tf2rot(drawables[imguiSelected]->tf)<<"\n";
+        ss << "tf: \n"<<"\tpos: "<<pos<<"\n";
+        ss            <<"\trot: "<<rot<<"\n";
 
         ImGui::Text("%s", ss.str().c_str());
         ImGui::Separator();
@@ -379,9 +381,9 @@ Viewer::follow() {
     }
 
     if(n > 0){
-        center.x /= n;
-        center.y /= n;
-        center.z /= n;
+        center.x() /= n;
+        center.y() /= n;
+        center.z() /= n;
         camera.setCenter(center);
     }
 }

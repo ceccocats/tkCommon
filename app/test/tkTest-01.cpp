@@ -1,4 +1,5 @@
 #include "tkCommon/catch2/catch.hpp"
+#include "tkCommon/common.h"
 #include "tkCommon/math/Mat.h"
 #include "tkCommon/math/MatIO.h"
 #include "tkCommon/math/Vec.h"

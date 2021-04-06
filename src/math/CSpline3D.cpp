@@ -16,9 +16,9 @@ bool CSpline3D::init(std::vector<tk::common::Vector3<float>> waypoints) {
     y = VectorXd(nx);
     z = VectorXd(nx);
     for (int i = 0; i < nx; i++) {
-        x(i) = waypoints[i].x;
-        y(i) = waypoints[i].y;
-        z(i) = waypoints[i].z;
+        x(i) = waypoints[i].x();
+        y(i) = waypoints[i].y();
+        z(i) = waypoints[i].z();
     }
 
     s = calc_s();
@@ -72,14 +72,14 @@ tk::common::Vector3<float> CSpline3D::calc_position(double s, double d) {
         double cos_yaw = cos(yaw);
         double x = 0;
         double y = -d;
-        p.x = x*cos_yaw - y*sin_yaw;
-        p.y = x*sin_yaw + y*cos_yaw;
-        p.z = 0;
+        p.x() = x*cos_yaw - y*sin_yaw;
+        p.y() = x*sin_yaw + y*cos_yaw;
+        p.z() = 0;
     }
 
-    p.x += sx.calc(s);
-    p.y += sy.calc(s);
-    p.z += sz.calc(s);
+    p.x() += sx.calc(s);
+    p.y() += sy.calc(s);
+    p.z() += sz.calc(s);
     return p;
 }
 

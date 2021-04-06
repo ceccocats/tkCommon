@@ -43,11 +43,37 @@ public:
 
 };
 
+template<class T, int N>
+class VecStatic : public MatStatic<T, N, 1> {
+public: 
+
+    VecStatic() : MatStatic<T,N,1>() {
+        for(int i=0; i<N; i++) {
+            this->mData[i] = 0;
+        }
+    }
+
+    VecStatic<T,N>& operator += ( VecStatic<T,N> const& s ) {
+        for(int i=0; i<N; i++) {
+            this->mData[i] += s.mData[i];
+        }
+        return *this;
+    }
+
+    template<int DIM>
+    VecStatic<T,DIM> sub() {
+        VecStatic<T,DIM> v;
+        memcpy(v.data(), this->mData, sizeof(T)*DIM);
+        return v;
+    }
+};
+
+
 template<class T>
-class Vec2 : public MatStatic<T,2,1> {
+class Vec2 : public VecStatic<T,2> {
 public:
 
-    Vec2() : MatStatic<T,2,1>(){
+    Vec2() : VecStatic<T,2>(){
     }
 
     Vec2(T x, T y) {
@@ -63,10 +89,10 @@ public:
 };
 
 template<class T>
-class Vec3 : public MatStatic<T,3,1> {
+class Vec3 : public VecStatic<T,3> {
 public:
 
-    Vec3() : MatStatic<T,3,1>(){
+    Vec3() : VecStatic<T,3>(){
     }
 
     Vec3(T x, T y, T z) {
@@ -84,10 +110,10 @@ public:
 };
 
 template<class T>
-class Vec4 : public MatStatic<T,4,1> {
+class Vec4 : public VecStatic<T,4> {
 public:
 
-    Vec4() : MatStatic<T,4,1>(){
+    Vec4() : VecStatic<T,4>(){
     }
 
     Vec4(T x, T y, T z, T w) {

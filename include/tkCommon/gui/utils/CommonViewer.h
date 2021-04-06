@@ -50,12 +50,12 @@ struct mesh_t{
         float* temp = new float[(*n)];
 
         for(int i = 0; i < vertices.size(); i++){
-            temp[i * 6 + 0] = vertices[i].position.x;
-            temp[i * 6 + 1] = vertices[i].position.y;
-            temp[i * 6 + 2] = vertices[i].position.z;
-            temp[i * 6 + 3] = vertices[i].normal.x;
-            temp[i * 6 + 4] = vertices[i].normal.y;
-            temp[i * 6 + 5] = vertices[i].normal.z;
+            temp[i * 6 + 0] = vertices[i].position.x();
+            temp[i * 6 + 1] = vertices[i].position.y();
+            temp[i * 6 + 2] = vertices[i].position.z();
+            temp[i * 6 + 3] = vertices[i].normal.x();
+            temp[i * 6 + 4] = vertices[i].normal.y();
+            temp[i * 6 + 5] = vertices[i].normal.z();
         }
         return temp;
     }
@@ -66,11 +66,11 @@ struct mesh_t{
         float* temp = new float[(*n)];
 
         for(int i = 0; i < vertices.size(); i++){
-            temp[i * 5 + 0] = vertices[i].position.x;
-            temp[i * 5 + 1] = vertices[i].position.y;
-            temp[i * 5 + 2] = vertices[i].position.z;
-            temp[i * 5 + 3] = vertices[i].texCoord.x;
-            temp[i * 5 + 4] = vertices[i].texCoord.y;
+            temp[i * 5 + 0] = vertices[i].position.x();
+            temp[i * 5 + 1] = vertices[i].position.y();
+            temp[i * 5 + 2] = vertices[i].position.z();
+            temp[i * 5 + 3] = vertices[i].texCoord.x();
+            temp[i * 5 + 4] = vertices[i].texCoord.y();
         }
         return temp;
     }
