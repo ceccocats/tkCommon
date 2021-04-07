@@ -3,11 +3,11 @@
 #include <string>
 
 #include "tkCommon/common.h"
-#include "tkCommon/gui/utils/Shader.h"
+//#include "tkCommon/gui/utils/Shader.h"
 #include "tkCommon/gui/utils/Buffer.h"
 #include "tkCommon/gui/utils/Texture.h"
 #include "tkCommon/gui/utils/Color.h"
-#include <glm/glm.hpp>
+//#include <glm/glm.hpp>
 
 void inline glCheckError_(const char *file, int line)
 {
