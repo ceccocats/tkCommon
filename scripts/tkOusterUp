@@ -44,7 +44,7 @@ check
 echo "set_config_param udp_port_lidar 7502" | nc $ipOutster 7501 -q 1
 check
 
-echo "set_config_param beta.bloom_reduction_enable false" | nc $ipOutster 7501 -q 1
+echo "set_config_param beta.bloom_reduction_enable true" | nc $ipOutster 7501 -q 1
 check
 
 #set lidar mode

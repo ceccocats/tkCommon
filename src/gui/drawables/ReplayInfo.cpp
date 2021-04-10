@@ -8,7 +8,7 @@ tk::gui::ReplayInfo::ReplayInfo(tk::sensors::LogManager* manager){
 void 
 tk::gui::ReplayInfo::imGuiSettings(){
     if(manager != nullptr){
-        if(ImGui::SliderFloat("Replay speed",&speed,0.1,5,"%.1fx")){
+        if(ImGui::SliderFloat("Replay speed",&speed,0.1,20,"%.1fx")){
             manager->speed = speed;
         }
         if (ImGui::Button("start/stop")){
