@@ -240,6 +240,18 @@ namespace tk { namespace common {
         return tk::common::odom2tf(x,y,z,roll,pitch,yaw);
     }
 
+    inline tk::common::Tfpose cam2tf(tk::common::Tfpose cam) {
+        static tk::common::Tfpose c2w_conversion = odom2tf(0,0,0,0,M_PI_2,-M_PI_2);
+
+        return cam * c2w_conversion;
+    }
+
+    inline tk::common::Tfpose tf2cam(tk::common::Tfpose tf) {
+        static tk::common::Tfpose w2c_conversion = odom2tf(0,0,0,M_PI_2,0,M_PI_2);
+
+        return tf * w2c_conversion;
+    }
+
 }}
 
 namespace tk { namespace math {
