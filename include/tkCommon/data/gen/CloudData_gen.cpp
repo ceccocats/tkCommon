@@ -7,6 +7,7 @@ namespace tk { namespace data {
  const CloudData_gen::featureType_t CloudData_gen::FEATURES_NONE = "f_none";
  const CloudData_gen::featureType_t CloudData_gen::FEATURES_I = "f_intensity";
  const CloudData_gen::featureType_t CloudData_gen::FEATURES_NOISE = "f_noise";
+ const CloudData_gen::featureType_t CloudData_gen::FEATURES_SIGNAL_NOISE = "f_signal_noise";
  const CloudData_gen::featureType_t CloudData_gen::FEATURES_CHANNEL = "f_channel";
  const CloudData_gen::featureType_t CloudData_gen::FEATURES_R = "f_r";
  const CloudData_gen::featureType_t CloudData_gen::FEATURES_G = "f_g";
