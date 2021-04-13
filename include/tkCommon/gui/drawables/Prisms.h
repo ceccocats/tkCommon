@@ -15,8 +15,8 @@ namespace tk{ namespace gui{
 
             tk::gui::Color_t color;
 
-            Prisms(tk::gui::Color_t color = tk::gui::color::RED);
-            Prisms(tk::common::Prisms& prisms,tk::gui::Color_t color = tk::gui::color::RED);
+            Prisms(tk::gui::Color_t color = tk::gui::color::RED, std::string name = "Prisms");
+            Prisms(tk::common::Prisms& prisms,tk::gui::Color_t color = tk::gui::color::RED, std::string name = "Prisms");
             ~Prisms();
 
             void updateData(tk::common::Prisms& prisms);

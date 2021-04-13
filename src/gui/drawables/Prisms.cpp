@@ -1,12 +1,12 @@
 #include "tkCommon/gui/drawables/Prisms.h"
 
-tk::gui::Prisms::Prisms(tk::gui::Color_t color){
-    name = "prisms";
+tk::gui::Prisms::Prisms(tk::gui::Color_t color, std::string name){
+    this->name = name;
     update = false;
     this->color = color;
 }
 
-tk::gui::Prisms::Prisms(tk::common::Prisms& prisms,tk::gui::Color_t color) : Prisms(color){
+tk::gui::Prisms::Prisms(tk::common::Prisms& prisms,tk::gui::Color_t color, std::string name) : Prisms(color, name){
     ref     = &prisms;
     update  = true;
 }
