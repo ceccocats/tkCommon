@@ -112,7 +112,7 @@ namespace tk{ namespace data{
         }
 
         void toKitty(const std::string& fileName){
-            tkASSERT("Not implemented");
+            tk::gui::common::writeImagePng(fileName,this->data.cpu.data,this->width,this->height,this->channels);
         }
 
         void fromKitty(const std::string& fileName){

@@ -77,6 +77,7 @@ namespace tk { namespace data {
         }
 
         void gammaCorrectionIntensity(){
+            //From ouster
 
             if(features.size() == 0){
                 tkERR("Empty\n");
@@ -88,28 +89,6 @@ namespace tk { namespace data {
                     return;
             }
             tk::math::Vec<float> *intensity = &features[tk::data::CloudData::FEATURES_I];
-
-            // Get low and high value
-            /*double lo = 99999.0f; 
-            double hi = -9999.0f;
-            for(int i = 0; i < f->size(); i++){
-                if(f->data_h[i] < lo)
-                    lo = f->data_h[i];
-                if(f->data_h[i] > hi)
-                    hi = f->data_h[i];
-            }
-
-            // Calculate values for gamma correction
-            lo *= 10.0f;
-            hi /= 10.0f;
-            if (lo_state_i < 0.0f) {
-                lo_state_i = lo;
-                hi_state_i = hi;
-            }
-            lo_state_i = 0.8f * lo_state_i + 0.2f * lo;
-            hi_state_i = 0.8f * hi_state_i + 0.2f * hi;*/
-
-
 
             const size_t n = intensity->size();
             const size_t kth_extreme = n / 100;
@@ -148,7 +127,7 @@ namespace tk { namespace data {
         void toKitty(const std::string& fileName){
             std::ofstream output(fileName.c_str(), std::ios::out | std::ios::binary);
             if(!output.good()){
-                tkERR("Error creating file\n");
+                tkERR("Error creating file "<<fileName<<"\n");
             }   
 
             bool hasF = false;

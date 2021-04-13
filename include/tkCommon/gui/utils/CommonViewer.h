@@ -82,6 +82,7 @@ struct object3D_t {
 
 
 uint8_t* loadImage(std::string filename, int* width, int* height, int* channels);
+void     writeImagePng(const std::string&, void* data, const int& width, const int& height, const int& channels);
 bool     loadOBJ(std::string filename, object3D_t &obj);
 
 }}}
