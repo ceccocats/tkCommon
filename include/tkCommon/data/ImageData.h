@@ -154,7 +154,7 @@ namespace tk{ namespace data{
             channels = msg.encoding == "rgb8"? 3 : channels;
             channels = msg.encoding == "mono8"? 1 : channels;
             init(width, height, channels);
-            memcpy(this->data, msg.data.data(), width*height*channels*sizeof(uint8_t));
+            memcpy(this->data.cpu.data, msg.data.data(), width*height*channels*sizeof(uint8_t));
         }
 #endif
 

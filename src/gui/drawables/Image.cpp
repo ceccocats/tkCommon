@@ -55,6 +55,7 @@ tk::gui::Image::updateData(tk::gui::Viewer *viewer){
     if(texture == nullptr){
         onInit(viewer);
     }
+    this->tf = data->header.tf;
     if(textureType == 0){
         tk::gui::Texture<uint8_t>* textU8 = (tk::gui::Texture<uint8_t>*)texture;
         tk::data::ImageDataU8* imgU8 = (tk::data::ImageDataU8*)data;
