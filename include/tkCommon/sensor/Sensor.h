@@ -303,6 +303,7 @@ class Sensor {
                 data->header.name       = info.name + "_" + tk::data::ToStr(T::type) + "_" + std::to_string(sensorID);
                 data->header.type       = T::type;
                 data->header.sensorID   = sensorID;
+                data->header.tf         = getTf();
 
                 sPool->pool.releaseAdd(idx);
             }

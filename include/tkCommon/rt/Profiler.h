@@ -35,10 +35,8 @@ public:
     ~Profiler() {}
 
     static Profiler* getInstance(){
-            if (Profiler::instance == nullptr) {
-            Profiler::instance = new Profiler();
-        }
-        return Profiler::instance;
+        static Profiler inst;
+        return &inst;
     }
 
     void tic(std::string key) {

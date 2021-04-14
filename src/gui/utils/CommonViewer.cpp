@@ -1,5 +1,6 @@
 #include "tkCommon/gui/utils/CommonViewer.h"
 #include "tkCommon/gui/utils/stb_image.h"
+#include "tkCommon/gui/utils/stbi_image_write.h"
 #include "tkCommon/gui/utils/OBJ_Loader.h"
 
 namespace tk { namespace gui { namespace common {
@@ -11,6 +12,10 @@ uint8_t* loadImage(std::string filename, int* width, int* height, int* channels)
         tkERR(std::string{"Error opening: "+filename+"\n"});
     }
     return data;
+}
+
+void writeImagePng(const std::string& filename, void* data, const int& width, const int& height, const int& channels){
+    stbi_write_png(filename.c_str(),width,height,channels,data,channels * width);
 }
 
 void copyVertexFromOBJL(vertex_t *tkv, objl::Vertex* v){

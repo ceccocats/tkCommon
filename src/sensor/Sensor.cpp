@@ -345,10 +345,6 @@ Sensor::read(tk::data::SensorData* data)
     if (retval)   
         info.dataArrived.at(std::make_pair(data->header.type, data->header.sensorID))++;
     
-    // fill data header
-    if(data->header.name != info.name)
-        data->header.name = info.name;
-    data->header.tf         = getTf();
     data->header.messageID  = info.dataArrived.at(std::make_pair(data->header.type, data->header.sensorID));
     
     return retval;
