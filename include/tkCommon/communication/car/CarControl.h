@@ -31,6 +31,7 @@ namespace tk { namespace communication {
         bool run = true;
 
         // ecu ids
+        uint8_t brakeECU = 3;
         uint8_t steerECU = 15;
         uint8_t accECU = 6;
 

@@ -172,7 +172,7 @@ int main( int argc, char** argv){
 
             if(fabs(throttle) > 0.05) {
                 accReq   = throttle > 0 ? throttle*100 : 0;
-                brakeReq = throttle < 0 ? -throttle*6000 : 0;
+                brakeReq = throttle < 0 ? -throttle*15000 : 0;
             }
 
             std::cout<<"Req: "<<steerReq<<" "<<accReq<<" "<<brakeReq<<"\n";
