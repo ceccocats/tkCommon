@@ -49,7 +49,12 @@ tk::gui::Prisms::draw(tk::gui::Viewer *viewer){
         glPushMatrix();{
             glMultMatrixf(glm::value_ptr(glm::make_mat4x4(tf.matrix().data())));
             glDepthMask(GL_FALSE);
-            glColor4f(color.r(),color.g(),color.b(),color.a());
+            if(i < colors.size()){
+                glColor4f(colors[i].r(),colors[i].g(),colors[i].b(),color.a());
+            }
+            else{
+                glColor4f(color.r(),color.g(),color.b(),color.a());
+            }
             glBegin(GL_POLYGON);
             for(int i = points.size()-1;i >=0; i--){
                 glVertex3f(points[i].x(), points[i].y(), base_z);
@@ -70,7 +75,12 @@ tk::gui::Prisms::draw(tk::gui::Viewer *viewer){
             glEnd();
             glDepthMask(GL_TRUE);
 
-            glColor4f(color.r(),color.g(),color.b(),color.a());
+            if(i < colors.size()){
+                glColor4f(colors[i].r(),colors[i].g(),colors[i].b(),color.a());
+            }
+            else{
+                glColor4f(color.r(),color.g(),color.b(),color.a());
+            }
             glLineWidth(2);
             glBegin(GL_LINES);
             for(int i = 0 ;i <points.size(); i++){

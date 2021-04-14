@@ -12,7 +12,7 @@ namespace tk{ namespace gui{
 
             bool update;
         public:
-
+            std::vector<tk::gui::Color_t> colors;
             tk::gui::Color_t color;
 
             Prisms(tk::gui::Color_t color = tk::gui::color::RED, std::string name = "Prisms");

@@ -28,6 +28,12 @@ namespace tk{ namespace common{
 				this->base_z = d.base_z;
 			}
 			~Prism(){}
+
+			Prism& operator=(const tk::common::Prism& d){
+				this->points = d.points;
+				this->height = d.height;
+				this->base_z = d.base_z;
+			}
 	};
 
 	class Prisms : public tk::rt::Lockable{
