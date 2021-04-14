@@ -155,7 +155,7 @@ int main( int argc, char** argv){
             std::cout<<"!!!! Engine !!!!\n";
             carCtrl.sendAccEnable(true);
             usleep(1000);
-            carCtrl.setBrakePos(2000);
+            carCtrl.setBrakePos(8000);
             sleep(1);
             carCtrl.sendEngineStart();
             sleep(1);
