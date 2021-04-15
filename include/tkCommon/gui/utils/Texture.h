@@ -169,7 +169,16 @@ void Texture<T>::generateTexture(GLenum format){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    int step = width*channels*sizeof(T);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, (step & 3) ? 1 : 4);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, step/channels);
+
     glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
+
+    //Reset to default
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+
     unuse();
 }
 

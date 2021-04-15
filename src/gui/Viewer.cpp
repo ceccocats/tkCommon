@@ -150,13 +150,22 @@ Viewer::init() {
     camera.init();
     camera.setViewPort(0, 0, width, height);
 
+    //Check that we are running on GPU not integrated
+    std::string vendor = (const char*)glGetString(GL_VENDOR);
+    std::string name   = (const char*)glGetString(GL_RENDERER);
+    if(vendor.find("NVIDIA") != std::string::npos && name.find("integrated") == std::string::npos){
+        gpu = true;
+    }
+
     //Graphics
     for(int i = 0; i < nFPS; i++){
         vizFPS[i] = 0;
     }
-    glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &total_mem_kb);
-    for(int i = 0; i < nUsage; i++){
-        gpuUsage[i] = 0;
+    if(gpu){
+        glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &total_mem_kb);
+        for(int i = 0; i < nUsage; i++){
+            gpuUsage[i] = 0;
+        }
     }
 
     // lights
@@ -283,11 +292,13 @@ Viewer::drawInfos(){
         static int update = 15;
         if(update == 15){
             update = 0;
-            glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
-            for(int i = nUsage-1; i > 0; i--){
-                gpuUsage[i] = gpuUsage[i-1];
+            if(gpu){
+                glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
+                for(int i = nUsage-1; i > 0; i--){
+                    gpuUsage[i] = gpuUsage[i-1];
+                }
+                gpuUsage[0] = (total_mem_kb - cur_avail_mem_kb)/1024.0;
             }
-            gpuUsage[0] = (total_mem_kb - cur_avail_mem_kb)/1024.0;
 
             for(int i = nFPS-1; i > 0; i--){
                 vizFPS[i] = vizFPS[i-1];
@@ -297,12 +308,14 @@ Viewer::drawInfos(){
         }else{
             update++;
         }
-        std::string usage = std::to_string((int)((total_mem_kb - cur_avail_mem_kb)/1024.0)) + " / " + std::to_string((int)(total_mem_kb/1024.0)) + " MB";
-        std::string text = "GPU memory";
-        ImGui::PlotLines(usage.c_str(),(const float*)gpuUsage,IM_ARRAYSIZE(gpuUsage),nUsage,text.c_str(),0,total_mem_kb/1024.0);
-        usage = std::to_string((int)vizFPS[0]) + " FPS";
-        text = "FPS";
-        ImGui::PlotLines(usage.c_str(),(const float*)vizFPS,IM_ARRAYSIZE(vizFPS),nFPS,text.c_str(),0,120.0);
+        if(gpu){
+            std::string text = "GPU memory";
+            std::string usage = std::to_string((int)((total_mem_kb - cur_avail_mem_kb)/1024.0)) + " / " + std::to_string((int)(total_mem_kb/1024.0)) + " MB";
+            ImGui::PlotLines(usage.c_str(),(const float*)gpuUsage,IM_ARRAYSIZE(gpuUsage),nUsage,text.c_str(),0,total_mem_kb/1024.0);
+        }
+        std::string fps = std::to_string((int)vizFPS[0]) + " FPS";
+        std::string textFps = "FPS";
+        ImGui::PlotLines(fps.c_str(),(const float*)vizFPS,IM_ARRAYSIZE(vizFPS),nFPS,textFps.c_str(),0,120.0);
 
         ImGui::Text("Window size: %d x %d", width, height);
 

@@ -114,6 +114,7 @@ namespace tk { namespace gui {
         const int nFPS = 30;
         float gpuUsage[30]; 
         float vizFPS[30];
+        bool gpu = false;
 
         //logo
         tk::gui::Texture<uint8_t> logo;

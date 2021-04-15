@@ -66,6 +66,23 @@ public:
         memcpy(v.data(), this->mData, sizeof(T)*DIM);
         return v;
     }
+
+    T dist(VecStatic<T,N> const& s) {
+        T d = 0;
+        for(int i=0; i<N; i++) {
+            d += (this->mData[i] - s.mData[i])*(this->mData[i] - s.mData[i]);
+        }
+        return sqrt(d);
+    }
+
+    friend std::ostream& 
+    operator<<(std::ostream& os, VecStatic<T,N>& s) {
+        os<<"vec"<<N<<" ( ";
+        for(int i=0; i<N; i++)
+            os<<s.mData[i]<<" ";
+        os<<")";
+        return os;
+    }
 };
 
 

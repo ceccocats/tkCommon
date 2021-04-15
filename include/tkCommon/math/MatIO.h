@@ -640,7 +640,7 @@ bool MatIO::var_t::get(MatSimple<T,false> &mat) {
 template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type>
 bool MatIO::var_t::get(std::vector<T> &vec) {
     bool ok = true;
-    vec.resize(size(), 1);
+    vec.resize(size());
     for(int i = 0; i < size(); i++){
         ok = ok && vec[i].fromVar((*this)[(*this)[i]]);
     }
