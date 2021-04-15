@@ -442,7 +442,11 @@ Viewer::runloop() {
         initDrawables();
         beforeDraw();
 
+        // update camera
         follow();
+        camera.updateEye();
+        camera.updateMatrices();
+
         glViewport(camera.viewport[0], camera.viewport[1], camera.viewport[2], camera.viewport[3]);
 
         glClearColor(background.r(), background.g(), background.b(), background.a());
