@@ -174,6 +174,11 @@ void Texture<T>::generateTexture(GLenum format){
     glPixelStorei(GL_UNPACK_ROW_LENGTH, step/channels);
 
     glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
+
+    //Reset to default
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+
     unuse();
 }
 
