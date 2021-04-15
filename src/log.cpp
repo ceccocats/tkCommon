@@ -14,6 +14,10 @@ namespace tk {
         std::string msg     = formatMsg(args);
         std::string name    = formatName(pretty); 
 
+        // newline if not already inserted
+        if(msg.back() != '\n')
+            msg.push_back('\n');
+
         // log to file if enabled
         if (fileLogEnabled)
             fileLog<<name<<msg;
