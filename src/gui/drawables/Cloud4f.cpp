@@ -142,6 +142,7 @@ tk::gui::Cloud4f::Cloud4f(std::string name){
 
 tk::gui::Cloud4f::Cloud4f(tk::data::CloudData* cloud, std::string name) : Cloud4f(name){
     this->data =  cloud;
+    this->mDrwHasReference = true;
 }
 
 tk::gui::Cloud4f::~Cloud4f(){

@@ -29,12 +29,13 @@ class DataDrawable : public Drawable {
 
         std::stringstream print;
 
+        bool mDrwHasReference;
+
     private:
 
         //std::mutex  mPointerMutex;
         //bool        mNewPointer;
 
-        bool mDrwHasReference;
         bool mFirstData;
 
         bool mDrwHasPool;
