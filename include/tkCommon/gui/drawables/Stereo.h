@@ -22,7 +22,7 @@ namespace tk{ namespace gui{
             ~Stereo();
 
             void onInit(tk::gui::Viewer *viewer);
-            void updateRef(tk::data::StereoData* img);
+            //void updateRef(tk::data::StereoData* img);
             void imGuiInfos();
             void onClose();
         

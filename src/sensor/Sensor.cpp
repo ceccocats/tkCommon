@@ -174,24 +174,28 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log, co
             case tk::data::DataType::IMU:
                 {
                     entry.second->drw   = new tk::gui::Imu(info.name + "_imu_" + std::to_string(entry.first.second));
+                    entry.second->drw->setPool(&entry.second->pool);
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
             case tk::data::DataType::GPS:
                 {
                     entry.second->drw   = new tk::gui::Gps(info.name + "_gps_" + std::to_string(entry.first.second));
+                    entry.second->drw->setPool(&entry.second->pool);
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
             case tk::data::DataType::RADAR:
                 {
                     entry.second->drw   = new tk::gui::Radar(info.name + "_radar_" + std::to_string(entry.first.second));
+                    entry.second->drw->setPool(&entry.second->pool);
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
             case tk::data::DataType::CLOUD:
                 {
                     entry.second->drw   = new tk::gui::Cloud4f(info.name + "_cloud_" + std::to_string(entry.first.second));
+                    entry.second->drw->setPool(&entry.second->pool);
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
@@ -201,12 +205,14 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log, co
             case tk::data::DataType::IMAGEF:
                 {
                     entry.second->drw   = new tk::gui::Image(info.name + "_img_" + std::to_string(entry.first.second), info.name);
+                    entry.second->drw->setPool(&entry.second->pool);
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
             case tk::data::DataType::STEREO:
                 {
                     entry.second->drw   = new tk::gui::Stereo(info.name);
+                    entry.second->drw->setPool(&entry.second->pool);
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
@@ -255,7 +261,7 @@ Sensor::loop(sensorKey key)
                 it->second->empty = false;
             }
 
-            it->second->pool.releaseAdd(idx);
+            it->second->pool.releaseAdd(idx, ok);
 
             if (!ok) {
                 if (status() == SensorStatus::STOPPING)
@@ -263,15 +269,6 @@ Sensor::loop(sensorKey key)
                 tkWRN("Error while reading. Trying again in 2 seconds...\n");
                 sleep(2);
                 continue;
-            }
-
-            // GUI  
-            if (tk::gui::Viewer::getInstance()->isRunning() && it->second->drw != nullptr) {
-                if (it->second->drw->synched()) {
-                    if (data->tryLockRead()) {
-                        it->second->drw->updateRef(data);
-                    }            
-                }
             }
         }
     }

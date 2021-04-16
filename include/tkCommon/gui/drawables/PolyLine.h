@@ -30,7 +30,7 @@ namespace tk{ namespace gui{
             PolyLine(tk::gui::line* line, std::string name = "PolyLines", tk::gui::Color_t col = tk::gui::color::RED);
             ~PolyLine();
 
-            void updateRef(tk::gui::line* line);
+            //void updateRef(tk::gui::line* line);
             void onInit(tk::gui::Viewer *viewer);
             void draw(tk::gui::Viewer *viewer);
             void imGuiSettings();
