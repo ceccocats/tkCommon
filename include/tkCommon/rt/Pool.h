@@ -139,25 +139,28 @@ public:
     }
 
     /**
-     * @brief Method to release a pointer to sensor data in writing mode.
+     * @brief   Method to release a pointer to sensor data in writing mode.
      * 
-     * @param id   index of the data inside of the pool
+     * @param aID   index of the data inside of the pool
+     * @param aSuccesfulRead 
      */
     void 
-    releaseAdd(const int id) {
+    releaseAdd(const int aID, bool aSuccesfulRead = false) {
         gmtx.lock();
             // check if was really locked
-            if(!data[id]->tryLock()) {
+            if(!data[aID]->tryLock()) {
                 locked--;
             }
             
             // unlock anyway
-            data[id]->unlockWrite(); 
+            data[aID]->unlockWrite(); 
 
-            inserted++;
+            if (aSuccesfulRead) {
+                inserted++;
 
-            // notify new data available
-            cv.notify_all();
+                // notify new data available
+                cv.notify_all();
+            }
         gmtx.unlock();
     }
 

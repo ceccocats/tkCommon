@@ -27,8 +27,12 @@ tk::gui::Radar::onInit(tk::gui::Viewer *viewer){
 void 
 tk::gui::Radar::updateData(tk::gui::Viewer *viewer){
     tk::data::RadarData* radar = (tk::data::RadarData*)data;
-    far_drw->updateRef(&radar->far);
-    far_drw->updateRef(&radar->near);
+
+    far_drw->data = dynamic_cast<tk::data::SensorData*>(&radar->far);
+    far_drw->updateData(viewer);
+    near_drw->data = dynamic_cast<tk::data::SensorData*>(&radar->near);
+    near_drw->updateData(viewer);
+
     print.str("");
     print<<(*radar);
 }

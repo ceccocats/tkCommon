@@ -1,45 +1,81 @@
 #include "tkCommon/gui/drawables/DataDrawable.h"
 
+using namespace tk::gui;
+
+DataDrawable::DataDrawable()
+{
+    this->data                  = nullptr;
+    this->counter               = 0;
+    this->mDrwHasReference      = false;
+    this->mDrwHasPool           = false;
+    this->mFirstData            = true;
+}
+
+/*
 void 
-tk::gui::DataDrawable::updateRef(tk::data::SensorData* data){
-    ref_mutex.lock();
-    this->data = data;
-    new_ref_data      = true;
-    drw_has_reference = false;
-    ref_mutex.unlock();
+DataDrawable::updateRef(tk::data::SensorData* data)
+{    
+    this->mPointerMutex.lock();
+    this->data              = data;
+    this->mNewPointer       = true;
+    this->mDrwHasReference  = false;
+    this->mDrwHasPool       = false;
+    this->mPointerMutex.unlock();
+}
+*/
+
+void 
+DataDrawable::setPool(tk::rt::DataPool *aPool) 
+{
+    this->mPool             = aPool;
+    this->mPoolLastData     = 0;
+    this->mDrwHasPool       = true;
+    this->mDrwHasReference  = false;
 }
 
 void 
-tk::gui::DataDrawable::draw(tk::gui::Viewer *viewer) {
-    if(this->data != nullptr){
-        if(this->drw_has_reference){
-            if(this->data->tryLockRead()){
-                if(first_data || this->data->isChanged(counter)){
-                    first_data = false;
-                    this->updateData(viewer);
-                }
-                this->data->unlockRead();
-            }
-        }else{
-            if(this->ref_mutex.try_lock()){
-                if(this->new_ref_data){
-                    this->updateData(viewer);
-                    this->new_ref_data = false;
-                }
-                this->ref_mutex.unlock();
-                this->data->unlockRead();
+DataDrawable::draw(Viewer *viewer) 
+{
+    if (this->mDrwHasPool) {
+        if(this->mPool->newData(this->mPoolLastData)) {
+            int idx;
+
+            // grab last inserted element
+            this->data = (tk::data::SensorData *) this->mPool->get(idx);
+            if (this->data != nullptr) {
+                this->mPoolLastData = this->data->header.messageID;
+                this->updateData(viewer);
+
+                // release data
+                this->mPool->releaseGet(idx);
             }
         }
+    } else if (this->data != nullptr) {
+        if (this->mDrwHasReference) {
+            if(this->data->tryLockRead()) {
+                if(mFirstData || this->data->isChanged(counter)){
+                    mFirstData = false;
+                    this->updateData(viewer);
+                }
+                this->data->unlockRead();
+            }
+        } 
+        /*
+        else {
+            if (this->mNewPointer && this->mPointerMutex.try_lock()) {
+                this->updateData(viewer);
+                this->mNewPointer = false;
+                this->mPointerMutex.unlock();
+            }
+        } 
+        */
     }
+
     this->drawData(viewer);
 }
 
 void 
-tk::gui::DataDrawable::forceUpdate(){
+DataDrawable::forceUpdate() 
+{
     counter -= 1;
-}
-
-bool 
-tk::gui::DataDrawable::synched(){
-    return !this->new_ref_data;
 }

@@ -20,9 +20,10 @@ namespace tk{ namespace gui{
             void onInit(tk::gui::Viewer *viewer);
             void imGuiInfos();
             void onClose();
+            void updateData(tk::gui::Viewer *viewer);
         
         private:
             void drawData(tk::gui::Viewer *viewer);
-            void updateData(tk::gui::Viewer *viewer);
+            
 	};
 }}

@@ -1,18 +1,22 @@
 #pragma once
 #include "tkCommon/gui/drawables/Drawable.h"
 #include "tkCommon/data/SensorData.h"
+#include "tkCommon/rt/Pool.h"
 
 
 namespace tk{ namespace gui{
 
 class DataDrawable : public Drawable {
     public:
+        DataDrawable();
 
         void draw(tk::gui::Viewer *viewer) final;
 
-        virtual void updateRef(tk::data::SensorData* data) final;
-        virtual bool synched() final;
+        //virtual void updateRef(tk::data::SensorData* data) final;
 
+        virtual void setPool(tk::rt::DataPool *aPool) final;
+
+        tk::data::SensorData* data;
     protected:
 
         void forceUpdate();
@@ -20,18 +24,21 @@ class DataDrawable : public Drawable {
         virtual void drawData(tk::gui::Viewer *viewer) = 0; 
         virtual void updateData(tk::gui::Viewer *viewer) = 0; 
 
-        tk::data::SensorData* data = nullptr;
-        uint32_t counter = 0;
+        
+        uint32_t counter;
 
         std::stringstream print;
 
     private:
 
-        std::mutex ref_mutex;
-        bool new_ref_data = false;
+        //std::mutex  mPointerMutex;
+        //bool        mNewPointer;
 
-        bool drw_has_reference = true;
+        bool mDrwHasReference;
+        bool mFirstData;
 
-        bool first_data = true;
+        bool mDrwHasPool;
+        tk::rt::DataPool *mPool;
+        int mPoolLastData;
 	};
 }}

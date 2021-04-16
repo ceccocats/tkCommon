@@ -12,11 +12,13 @@ tk::gui::PolyLine::~PolyLine(){
 
 }
 
+/*
 void 
 tk::gui::PolyLine::updateRef(tk::gui::line* line){
     this->line = line;   
     update = true;
 }
+*/
 
 void 
 tk::gui::PolyLine::onInit(tk::gui::Viewer *viewer){
