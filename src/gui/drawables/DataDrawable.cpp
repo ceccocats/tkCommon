@@ -6,7 +6,7 @@ DataDrawable::DataDrawable()
 {
     this->data                  = nullptr;
     this->counter               = 0;
-    this->mDrwHasReference      = false;
+    this->mDrwHasReference      = true;
     this->mDrwHasPool           = false;
     this->mFirstData            = true;
 }
