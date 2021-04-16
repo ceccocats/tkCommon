@@ -314,6 +314,7 @@ class Sensor {
             avaibleTypes.push_back(std::make_pair(T::type, sensorID));
         }
 
+    public:    
         template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
         SensorPool_t* getPool(int sensorID = 0)
         {
