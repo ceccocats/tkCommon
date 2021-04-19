@@ -195,7 +195,7 @@ int main( int argc, char** argv){
                 c->accReq = accReq;
                 c->brakeReq = brakeReq;
 
-                carCtrl.setVel(-1);
+                carCtrl.setVel(-10);
                 carCtrl.setAccPos(accReq); 
                 carCtrl.setBrakePos(brakeReq);
             }else{

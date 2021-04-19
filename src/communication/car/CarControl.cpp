@@ -29,7 +29,7 @@ void CarControl::writeLoop() {
     tk::rt::Task t;
     t.init(20000);
     while(run) {
-        if(velocity >= 0) {
+        if(velocity > -5) {
             pidTorque = pid.calculate(0.02,velocity-odom.speed.x());
             if(pidTorque<0) pidTorque-=0.5;
             if(pidTorque > 0)
