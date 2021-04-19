@@ -67,9 +67,9 @@ public:
         return v;
     }
 
-    T dist(VecStatic<T,N> const& s) {
+    T dist(VecStatic<T,N> const& s, int DIM = N) {
         T d = 0;
-        for(int i=0; i<N; i++) {
+        for(int i=0; i<DIM; i++) {
             d += (this->mData[i] - s.mData[i])*(this->mData[i] - s.mData[i]);
         }
         return sqrt(d);
