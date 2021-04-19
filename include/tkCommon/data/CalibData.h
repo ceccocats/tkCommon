@@ -1,11 +1,14 @@
 #pragma once
 #include "tkCommon/data/gen/CalibData_gen.h"
 #include "tkCommon/utils.h"
+#include "tkCommon/common.h"
 
 namespace tk{ namespace data{
 
     class CalibData : public CalibData_gen{
         public:
+
+        tk::common::Tfpose tf;
 
         void init(){
             CalibData_gen::init();
@@ -65,6 +68,10 @@ namespace tk{ namespace data{
             for(int i = 0; i < 3; i++) for(int j = 0; j < 3; j++)
                     r[i*3+j] = r_tmp[i*3 + j];
                     //r(i,j) = r_tmp[i*3 + j];
+    
+            std::vector<tk::common::Tfpose> tfs = tk::common::YAMLreadTf(conf["tf"]);
+            if(!tfs.empty())
+                this->tf = tfs[0];
 
             return true;
         }

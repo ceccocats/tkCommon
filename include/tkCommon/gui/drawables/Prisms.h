@@ -5,7 +5,7 @@
 namespace tk{ namespace gui{
 
 	class Prisms : public Drawable {
-        private:
+        protected:
             tk::common::Prisms prisms;
             tk::common::Prisms* ref;
             uint32_t counter = 0;
@@ -22,6 +22,7 @@ namespace tk{ namespace gui{
             void updateData(tk::common::Prisms& prisms);
             void onInit(tk::gui::Viewer *viewer);
             void draw(tk::gui::Viewer *viewer);
+            void drawPrisms(tk::gui::Viewer *viewer);
             void imGuiInfos();
             void imGuiSettings();
             void onClose();

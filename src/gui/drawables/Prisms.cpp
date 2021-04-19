@@ -26,20 +26,7 @@ tk::gui::Prisms::onInit(tk::gui::Viewer *viewer){
 }
 
 void 
-tk::gui::Prisms::draw(tk::gui::Viewer *viewer){
-    if(ref->isChanged(counter) || update){
-        update      = false;
-
-        ref->lockRead();
-        prisms.data.resize(ref->data.size());
-        tf = ref->tf;
-        for(int i = 0; i < ref->data.size(); i++){
-            prisms.data[i].height = ref->data[i].height;
-            prisms.data[i].points = ref->data[i].points;
-            prisms.data[i].base_z = ref->data[i].base_z;
-        }
-        ref->unlockRead();
-    }
+tk::gui::Prisms::drawPrisms(tk::gui::Viewer *viewer){
 
     for(int i = 0; i < prisms.data.size(); i++){
         auto points = prisms.data[i].points;
@@ -98,6 +85,25 @@ tk::gui::Prisms::draw(tk::gui::Viewer *viewer){
             glEnd();
         }glPopMatrix();
     }
+}
+
+void 
+tk::gui::Prisms::draw(tk::gui::Viewer *viewer){
+    if(ref->isChanged(counter) || update){
+        update      = false;
+
+        ref->lockRead();
+        prisms.data.resize(ref->data.size());
+        tf = ref->tf;
+        for(int i = 0; i < ref->data.size(); i++){
+            prisms.data[i].height = ref->data[i].height;
+            prisms.data[i].points = ref->data[i].points;
+            prisms.data[i].base_z = ref->data[i].base_z;
+        }
+        ref->unlockRead();
+    }
+
+    drawPrisms(viewer);
 }
 
 void 
