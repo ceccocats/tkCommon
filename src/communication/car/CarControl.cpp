@@ -6,6 +6,7 @@ using namespace tk::communication;
 bool CarControl::init(tk::communication::CanInterface *soc) {
     this->soc = soc;
     run = true;
+    pid.init(1,1,1,-1,1);
     pthread_create(&writeTh, NULL, writeCaller, (void*)this);
     pthread_create(&readTh, NULL, readCaller, (void*)this);
     return true;
@@ -28,6 +29,12 @@ void CarControl::writeLoop() {
     tk::rt::Task t;
     t.init(20000);
     while(run) {
+        double value = pid.calculate(0.02,velocity-odom.speed.x());
+        if(value > 0)
+            setAccPos(value*100);
+        else    
+            setBrakePos(value*-15000);
+
         requestSteerPos();
         requestAccPos();
         requestBrakePos();
@@ -150,7 +157,7 @@ void CarControl::setBrakePos(uint16_t pos) {
     tk::data::CanData data;
     data.frame.can_dlc = 3;
     data.frame.can_id = SET_BRAKE_ID;
-    data.frame.data[0] = steerECU;
+    data.frame.data[0] = brakeECU;
     memcpy(&data.frame.data[1], &pos, 2);
     soc->write(&data);
     return;
@@ -206,7 +213,7 @@ void CarControl::requestBrakePos() {
     tk::data::CanData data;
     data.frame.can_dlc = 1;
     data.frame.can_id = GET_BRAKE_ID;
-    data.frame.data[0] = steerECU;
+    data.frame.data[0] = brakeECU;
     soc->write(&data);
 }
 
@@ -215,4 +222,8 @@ void CarControl::requestMotorId() {
     data.frame.can_dlc = 0;
     data.frame.can_id = GET_HW_ID;
     soc->write(&data);
+}
+
+void CarControl::setVel(float vel){
+    velocity = vel;
 }

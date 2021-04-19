@@ -1,6 +1,7 @@
 #pragma once
 #include "tkCommon/communication/CanInterface.h"
 #include "tkCommon/data/OdomData.h"
+#include "tkCommon/PID.h"
 
 namespace tk { namespace communication {
 
@@ -31,6 +32,7 @@ namespace tk { namespace communication {
         bool run = true;
 
         // ecu ids
+        uint8_t brakeECU = 3;
         uint8_t steerECU = 15;
         uint8_t accECU = 6;
 
@@ -39,6 +41,9 @@ namespace tk { namespace communication {
         int steerPos = 0;                   /**< current steer value      */
         int brakePos = 0;                   /**< current brake value      */
         int accPos = 0;                     /**< current accel value      */
+
+        tk::common::PID pid;
+        float velocity = 0;
 
         /**
          *  Init the sistem on a specified CAN socket
@@ -94,11 +99,15 @@ namespace tk { namespace communication {
          *  Set Odometry stream enabled or not
          */
         void sendOdomEnable(bool status);
-
         /**
          *  Simulate pression off engine start
          */
         void sendEngineStart();
+        /**
+         * Set vel
+         * 
+         */
+        void setVel(float vel);
 
     private:
         // request info from the system
