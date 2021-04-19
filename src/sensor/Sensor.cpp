@@ -135,6 +135,7 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log, co
     this->info.name             = name;
     this->log                   = log;
     this->readLoopStarted       = false;
+    this->usingPool             = false;
 
     // check if paths passed are correct
     if (!conf) {
@@ -229,6 +230,7 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log, co
 void 
 Sensor::start() 
 {
+    usingPool   = true;
     // start loop threads
     readingThreads.resize(pool.size());
     int i = 0;
@@ -263,7 +265,9 @@ Sensor::loop(sensorKey key)
 
             it->second->pool.releaseAdd(idx, ok);
 
-            if (!ok) {
+            if (ok) {
+                info.dataArrived.at(key)    = it->second->pool.inserted;
+            } else {
                 if (status() == SensorStatus::STOPPING)
                     continue;
                 tkWRN("Error while reading. Trying again in 2 seconds...\n");
@@ -338,11 +342,9 @@ Sensor::read(tk::data::SensorData* data)
             info.synched = true;
     }
 
-
-    if (retval)   
-        info.dataArrived.at(std::make_pair(data->header.type, data->header.sensorID))++;
-    
-    data->header.messageID  = info.dataArrived.at(std::make_pair(data->header.type, data->header.sensorID));
+    if (retval && !usingPool) {
+        ++data->header.messageID;
+    }
     
     return retval;
 }
