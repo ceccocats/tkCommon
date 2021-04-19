@@ -38,7 +38,9 @@ class Control : public tk::gui::Drawable{
             ImGui::End();
 
             ImGui::Begin("PID", NULL, ImGuiWindowFlags_NoScrollbar);
-            ImGui::SliderFloat("Velocity",&vel,0.0f,30.0f,"%.1f km/h",0.1f);
+            ImGui::Text("Throttle %f", throttle);
+            ImGui::Text("CurVel %f", curVel);
+            ImGui::SliderFloat("Velocity",&vel,-1.0f,30.0f,"%.1f km/h",0.1f);
             ImGui::SliderFloat("kp",&kp,-3.0f,3.0f,"%.1f",0.1f);
             ImGui::SliderFloat("ki",&ki,-3.0f,3.0f,"%.1f",0.1f);
             ImGui::SliderFloat("kd",&kd,-3.0f,3.0f,"%.1f",0.1f);
@@ -67,9 +69,10 @@ class Control : public tk::gui::Drawable{
         float brakeReq = 0;
 
         float kp  = 1.0f;
-        float ki  = 1.0f;
-        float kd  = 1.0f;
+        float ki  = 0.0f;
+        float kd  = 0.0f;
         float vel = 0.0f;
+        float curVel = 0.0f;
 
         bool joystick = true;
 };
@@ -103,7 +106,7 @@ int main( int argc, char** argv){
     
     tkASSERT(canSoc.initSocket(soc_file));
     carCtrl.init(&canSoc);
-    carCtrl.sendOdomEnable(false);
+    carCtrl.sendOdomEnable(true);
     
     tk::rt::Task t;
     t.init(50*1e3);
@@ -192,12 +195,15 @@ int main( int argc, char** argv){
                 c->accReq = accReq;
                 c->brakeReq = brakeReq;
 
+                carCtrl.setVel(-1);
                 carCtrl.setAccPos(accReq); 
                 carCtrl.setBrakePos(brakeReq);
             }else{
                 carCtrl.pid.setGain(c->kp,c->ki,c->kd);
                 carCtrl.setVel(c->vel);
+                c->throttle = carCtrl.pidTorque;
             }
+            c->curVel = carCtrl.odom.speed.x();
         }
         t.wait();
     }

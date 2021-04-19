@@ -43,6 +43,7 @@ namespace tk { namespace communication {
         int accPos = 0;                     /**< current accel value      */
 
         tk::common::PID pid;
+        float pidTorque = 0;
         float velocity = 0;
 
         /**

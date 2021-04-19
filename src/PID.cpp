@@ -48,7 +48,7 @@ namespace tk { namespace common {
         // Save error to previous error
         _pre_error = error;
 
-        std::cout<<"PID Debug:\n\tdt: "<<dt<<"\n\tPout: "<<Pout<<"\n\tIout: "<<Iout<<"\n\tDout: "<<Dout<<"\n";
+        //std::cout<<"PID Debug:\n\tdt: "<<dt<<"\n\tPout: "<<Pout<<"\n\tIout: "<<Iout<<"\n\tDout: "<<Dout<<"\n";
 
         return output;
     }
