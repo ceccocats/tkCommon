@@ -44,7 +44,12 @@ class Lockable{
         }
 
         bool tryLock() {
-            return MTX.try_lock();
+            if (MTX.try_lock()) {
+                writing = true;
+                return true;
+            } else {
+                return false;
+            }
         }
 
         void lockRead() const {

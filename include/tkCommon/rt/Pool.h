@@ -127,15 +127,13 @@ public:
                     locked++;
                     break;
                 }
-                    
                 freeID = (freeID+1) % size;
             }
 
-            last    = freeID;
-            id      = freeID;
+            id = freeID;
         gmtx.unlock();
 
-        return dynamic_cast<tk::data::SensorData*>(data[last]);
+        return dynamic_cast<tk::data::SensorData*>(data[id]);
     }
 
     /**
@@ -151,13 +149,15 @@ public:
             if(!data[aID]->tryLock()) {
                 locked--;
             }
-            
             // unlock anyway
             data[aID]->unlockWrite(); 
 
+            last = aID;
+
             if (aSuccesfulRead) {
                 inserted++;
-
+                data[aID]->header.messageID = inserted;
+                
                 // notify new data available
                 cv.notify_all();
             }
@@ -173,6 +173,11 @@ public:
      */
     const tk::data::SensorData* 
     get(int &id, uint64_t timeout = 0) {
+        if (inserted == 0) {
+            id = -1;
+            return nullptr;
+        }
+
         if (timeout != 0) {
             std::unique_lock<std::mutex> lck(gmtx);
             if (cv.wait_for(lck, std::chrono::microseconds(timeout)) == std::cv_status::timeout) { // locking get

@@ -170,11 +170,10 @@ tk::gui::Cloud4f::onInit(tk::gui::Viewer *viewer){
 
 
 void 
-tk::gui::Cloud4f::updateData(tk::gui::Viewer *viewer){
-
+tk::gui::Cloud4f::updateData(tk::gui::Viewer *viewer)
+{
     tk::data::CloudData* cloud = (tk::data::CloudData*)data;
     points = cloud->points.cols();
-    this->tf = cloud->header.tf;
     glbuffer.setData(cloud->points.data(),cloud->points.size());
     print.str("");
     print<<(*cloud);

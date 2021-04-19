@@ -38,13 +38,15 @@ DataDrawable::draw(Viewer *viewer)
 {
     if (this->mDrwHasPool) {
         if(this->mPool->newData(this->mPoolLastData)) {
+            this->mPoolLastData = this->mPool->inserted;
+            
             int idx;
-
             // grab last inserted element
             this->data = (tk::data::SensorData *) this->mPool->get(idx);
             if (this->data != nullptr) {
-                this->mPoolLastData = this->data->header.messageID;
-                this->updateData(viewer);
+                
+                if (data->header.messageID >= this->mPool->inserted)
+                    this->updateData(viewer);                    
 
                 // release data
                 this->mPool->releaseGet(idx);
@@ -60,15 +62,6 @@ DataDrawable::draw(Viewer *viewer)
                 this->data->unlockRead();
             }
         } 
-        /*
-        else {
-            if (this->mNewPointer && this->mPointerMutex.try_lock()) {
-                this->updateData(viewer);
-                this->mNewPointer = false;
-                this->mPointerMutex.unlock();
-            }
-        } 
-        */
     }
 
     this->drawData(viewer);
