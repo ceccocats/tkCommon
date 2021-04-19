@@ -36,6 +36,23 @@ class Control : public tk::gui::Drawable{
             ImGui::Text("X: off");
             ImGui::Text("Y: start");
             ImGui::End();
+
+            ImGui::Begin("PID", NULL, ImGuiWindowFlags_NoScrollbar);
+            ImGui::SliderFloat("Velocity",&vel,0.0f,30.0f,"%.1f km/h",0.1f);
+            ImGui::SliderFloat("kp",&kp,-3.0f,3.0f,"%.1f",0.1f);
+            ImGui::SliderFloat("ki",&ki,-3.0f,3.0f,"%.1f",0.1f);
+            ImGui::SliderFloat("kd",&kd,-3.0f,3.0f,"%.1f",0.1f);
+
+            std::string text;
+            if(joystick){
+                text = "use velocity";
+            }else{
+                text = "use joystick";
+            }
+            if (ImGui::Button(text.c_str())){
+                joystick = !joystick;
+            }
+            ImGui::End();
         }
 
         float steer = 0;
@@ -48,6 +65,13 @@ class Control : public tk::gui::Drawable{
         float steerReq = 0;        
         float accReq     = 0;
         float brakeReq = 0;
+
+        float kp  = 1.0f;
+        float ki  = 1.0f;
+        float kd  = 1.0f;
+        float vel = 0.0f;
+
+        bool joystick = true;
 };
 
 bool gRun = true;
@@ -149,25 +173,31 @@ int main( int argc, char** argv){
         }
 
         if(active) {
-            int32_t steerReq = (-steer) * 18000;
-            carCtrl.setSteerPos(steerReq);
+
+            if(c->joystick){
+                int32_t steerReq = (-steer) * 18000;
+                carCtrl.setSteerPos(steerReq);
 
 
-            uint16_t accReq   = 0; 
-            uint16_t brakeReq = 0;             
+                uint16_t accReq   = 0; 
+                uint16_t brakeReq = 0;             
 
-            if(fabs(throttle) > 0.05) {
-                accReq   = throttle > 0 ? throttle*100 : 0;
-                brakeReq = throttle < 0 ? -throttle*6000 : 0;
+                if(fabs(throttle) > 0.05) {
+                    accReq   = throttle > 0 ? throttle*100 : 0;
+                    brakeReq = throttle < 0 ? -throttle*15000 : 0;
+                }
+
+                //std::cout<<"Req: "<<steerReq<<" "<<accReq<<" "<<brakeReq<<"\n";
+                c->steerReq = steerReq;
+                c->accReq = accReq;
+                c->brakeReq = brakeReq;
+
+                carCtrl.setAccPos(accReq); 
+                carCtrl.setBrakePos(brakeReq);
+            }else{
+                carCtrl.pid.setGain(c->kp,c->ki,c->kd);
+                carCtrl.setVel(c->vel);
             }
-
-            //std::cout<<"Req: "<<steerReq<<" "<<accReq<<" "<<brakeReq<<"\n";
-            c->steerReq = steerReq;
-            c->accReq = accReq;
-            c->brakeReq = brakeReq;
-
-            carCtrl.setAccPos(accReq); 
-            carCtrl.setBrakePos(brakeReq);
         }
         t.wait();
     }

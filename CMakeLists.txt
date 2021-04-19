@@ -93,6 +93,7 @@ add_library(tkCommon SHARED
     src/rt/Profiler.cpp
     ${data_gen}
     ${data} 
+    src/PID.cpp
 )
 target_link_libraries(tkCommon yaml-cpp matio dl)
 
