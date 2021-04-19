@@ -81,6 +81,15 @@ void drawCircle(tk::common::Vector3<float> pose, float r, int res, bool filled) 
     glEnd();
 }
 
+void drawLine(tk::common::Vector3<float> a, tk::common::Vector3<float> b, float w) {
+
+    glLineWidth(w);
+    glBegin(GL_LINES);
+    glVertex3f(a.x(), a.y(), a.z());
+    glVertex3f(b.x(), b.y(), b.z());
+    glEnd();
+}
+
 void drawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled) {
     if (!filled)
         glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
