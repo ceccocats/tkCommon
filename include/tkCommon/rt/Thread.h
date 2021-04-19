@@ -11,19 +11,25 @@ namespace tk { namespace rt {
 class Thread {
 
 private:
+    bool started;
     pthread_t   th;
 
 public:
 
-     Thread() {}
+     Thread() { started = false; }
     ~Thread() {}
 
     bool init(void *(*fun_ptr) (void *), void* args = nullptr) {
-        return pthread_create(&th, NULL, fun_ptr, args) == 0;
+        if(pthread_create(&th, NULL, fun_ptr, args) == 0) {
+            started = true;
+            return true;
+        }
+        return false;
     }
 
     void join() {
-        pthread_join(th, NULL);
+        if(started)
+            pthread_join(th, NULL);
     }
 
 };
