@@ -6,7 +6,7 @@ using namespace tk::communication;
 bool CarControl::init(tk::communication::CanInterface *soc) {
     this->soc = soc;
     run = true;
-    pid.init(1,0,0,-0.5,0.4);
+    pid.init(0.04,0,0,-0.4,0.3);
     pthread_create(&writeTh, NULL, writeCaller, (void*)this);
     pthread_create(&readTh, NULL, readCaller, (void*)this);
     return true;
@@ -31,11 +31,17 @@ void CarControl::writeLoop() {
     while(run) {
         if(velocity > -5) {
             pidTorque = pid.calculate(0.02,velocity-odom.speed.x());
-            if(pidTorque<0) pidTorque-=0.5;
-            if(pidTorque > 0)
+            if(velocity<0)
+                pidTorque -= 0.4;
+            pidTorque = clamp<float>(pidTorque, -1, 1);
+
+            if(pidTorque > 0) {
                 setAccPos(pidTorque*100);
-            else    
-                setBrakePos(pidTorque*-15000);
+                setBrakePos((-0.5)*-15000);
+            } else {    
+                setAccPos(0);
+                setBrakePos((-0.5+pidTorque)*-15000);
+            }
         }
         requestSteerPos();
         requestAccPos();

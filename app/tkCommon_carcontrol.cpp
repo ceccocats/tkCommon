@@ -40,10 +40,10 @@ class Control : public tk::gui::Drawable{
             ImGui::Begin("PID", NULL, ImGuiWindowFlags_NoScrollbar);
             ImGui::Text("Throttle %f", throttle);
             ImGui::Text("CurVel %f", curVel);
-            ImGui::SliderFloat("Velocity",&vel,-1.0f,30.0f,"%.1f km/h",0.1f);
-            ImGui::SliderFloat("kp",&kp,-3.0f,3.0f,"%.1f",0.1f);
-            ImGui::SliderFloat("ki",&ki,-3.0f,3.0f,"%.1f",0.1f);
-            ImGui::SliderFloat("kd",&kd,-3.0f,3.0f,"%.1f",0.1f);
+            ImGui::SliderFloat("Velocity",&vel,-1.0f,30.0f,"%.1f km/h");
+            ImGui::SliderFloat("kp",&kp,-3.0f,3.0f,"%.2f");
+            ImGui::SliderFloat("ki",&ki,-1.0f,1.0f,"%.4f");
+            ImGui::SliderFloat("kd",&kd,-1.0f,1.0f,"%.4f");
 
             std::string text;
             if(joystick){
@@ -68,7 +68,7 @@ class Control : public tk::gui::Drawable{
         float accReq     = 0;
         float brakeReq = 0;
 
-        float kp  = 1.0f;
+        float kp  = 0.04f;
         float ki  = 0.0f;
         float kd  = 0.0f;
         float vel = 0.0f;
