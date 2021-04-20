@@ -301,18 +301,32 @@ namespace tk { namespace data {
             sensor_msgs::PointCloud     tmp;
             sensor_msgs::convertPointCloud2ToPointCloud(msg, tmp);
 
-            // check if intensity is present
+            // check if features is present
             tk::math::Vec<float>* intensity = nullptr;
-            int i_channel = -1;
-            if (this->features.exists(FEATURES_I)) {
-                tk::math::Vec<float>* intensity = &features[FEATURES_I]; 
+            tk::math::Vec<float>* ring = nullptr;
+            tk::math::Vec<float>* angle = nullptr;
+            if (this->features.exists(FEATURES_I)) 
+                intensity   = &features[FEATURES_I]; 
+            if (this->features.exists(FEATURES_CHANNEL)) 
+                ring        = &features[FEATURES_CHANNEL]; 
+            if (this->features.exists(FEATURES_ANGLE_VAR)) 
+                angle       = &features[FEATURES_ANGLE_VAR]; 
+
+
+            int i_channel       = -1;
+            int ring_channel    = -1;
+            int ring_max        = 0;
+            if (intensity != nullptr || ring != nullptr) {
                 for (int i = 0; i < tmp.channels.size(); i++) {
-                    if (tmp.channels[i].name == "intensity") {
+                    if (intensity != nullptr && tmp.channels[i].name == "intensity") {
                         i_channel = i;
+                    }
+                    if (ring != nullptr && tmp.channels[i].name == "ring") {
+                        ring_channel    = i;
+                        ring_max        = *std::max_element(tmp.channels[ring_channel].values.begin(), tmp.channels[ring_channel].values.end());                      
                     }
                 }
             }
-
             // fill points
             resize(tmp.points.size());
             for(int i = 0 ; i < tmp.points.size(); i++) {
@@ -326,7 +340,11 @@ namespace tk { namespace data {
                 this->ranges(2, i) = std::acos(tmp.points[i].z / this->ranges(0, i));
 
                 if (intensity != nullptr && i_channel != -1)
-                    (*intensity)[i] = tmp.channels[i_channel].values[i];
+                    (*intensity)[i]     = tmp.channels[i_channel].values[i];
+                if (ring != nullptr && ring_channel != -1)
+                    (*ring)[i]          = std::abs(tmp.channels[ring_channel].values[i] - ring_max);
+                if (angle != nullptr)
+                    (*angle)[i]         = fmod((std::atan2(tmp.points[i].x, tmp.points[i].y) + M_PI_2) + M_PI*2, M_PI*2) - M_PI;
             }
         }
 #endif
