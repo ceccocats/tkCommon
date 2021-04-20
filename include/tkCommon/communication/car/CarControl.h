@@ -44,7 +44,7 @@ namespace tk { namespace communication {
 
         tk::common::PID pid;
         float pidTorque = 0;
-        float velocity = 0;
+        float velocity = -5;
 
         /**
          *  Init the sistem on a specified CAN socket
