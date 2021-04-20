@@ -344,7 +344,7 @@ namespace tk { namespace data {
                 if (ring != nullptr && ring_channel != -1)
                     (*ring)[i]          = std::abs(tmp.channels[ring_channel].values[i] - ring_max);
                 if (angle != nullptr)
-                    (*angle)[i]         = fmod((std::atan2(tmp.points[i].x, tmp.points[i].y) + M_PI_2) + M_PI*2, M_PI*2) - M_PI;
+                    (*angle)[i]         = fmod((std::atan2(tmp.points[i].x, tmp.points[i].y) + M_PI_2) + M_PI*2, M_PI*2);
             }
         }
 #endif
