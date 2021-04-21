@@ -28,7 +28,7 @@ SensorsManager::init(YAML::Node aConf, const std::string &aLogPath, const std::s
 
     // GUI
     if (mGui && tk::gui::Viewer::getInstance()->isRunning()) {
-        tk::gui::Viewer::getInstance()->add(new tk::gui::Grid());
+        //tk::gui::Viewer::getInstance()->add(new tk::gui::Grid());
         tk::gui::Viewer::getInstance()->add(new tk::gui::Axis());
     }
 
