@@ -6,7 +6,10 @@ using namespace tk::communication;
 bool CarControl::init(tk::communication::CanInterface *soc) {
     this->soc = soc;
     run = true;
-    pid.init(0.04,0,0,-0.4,0.3);
+
+    pidTorque.init(0,0,0,0,1);
+    pidBrake.init(0,0,0,0,1);
+
     pthread_create(&writeTh, NULL, writeCaller, (void*)this);
     pthread_create(&readTh, NULL, readCaller, (void*)this);
     return true;
@@ -25,11 +28,30 @@ void *CarControl::readCaller(void *args) {
     ((CarControl*) args)->readLoop();
 }
 
+void CarControl::computePIDs() {
+
+    float velocity = odom.speed.x();
+    torqueRequest = pidTorque.calculate(0.02,requestSpeed-velocity);
+    brakeRequest  = pidBrake.calculate(0.02,velocity-requestSpeed);
+
+    setBrakePos(brakeRequest*15000);
+    setAccPos(torqueRequest*100);
+
+    //maybe
+    /*if(velocity < 1.0f){
+        setBrakePos(0.6*15000);
+    }*/
+}
+
 void CarControl::writeLoop() {
     tk::rt::Task t;
     t.init(20000);
     while(run) {
-        if(velocity > -5) {
+
+        if(usePid)
+            computePIDs();
+
+        /*if(velocity > -5) {
             pidTorque = pid.calculate(0.02,velocity-odom.speed.x());
             if(velocity<0)
                 pidTorque -= 0.4;
@@ -42,7 +64,7 @@ void CarControl::writeLoop() {
                 setAccPos(0);
                 setBrakePos((-0.5+pidTorque)*-15000);
             }
-        }
+        }*/
         requestSteerPos();
         requestAccPos();
         requestBrakePos();
@@ -233,5 +255,5 @@ void CarControl::requestMotorId() {
 }
 
 void CarControl::setVel(float vel){
-    velocity = vel;
+    requestSpeed = vel;
 }

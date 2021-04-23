@@ -42,9 +42,13 @@ namespace tk { namespace communication {
         int brakePos = 0;                   /**< current brake value      */
         int accPos = 0;                     /**< current accel value      */
 
-        tk::common::PID pid;
-        float pidTorque = 0;
-        float velocity = -5;
+        tk::common::PID pidTorque;
+        tk::common::PID pidBrake;
+        float torqueRequest, brakeRequest;
+
+        bool usePid = false;
+
+        float requestSpeed = 0;
 
         /**
          *  Init the sistem on a specified CAN socket
@@ -116,6 +120,7 @@ namespace tk { namespace communication {
         void requestAccPos();
         void requestBrakePos();
         void requestMotorId();
+        void computePIDs();
     };
     
 }}
