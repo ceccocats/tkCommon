@@ -44,14 +44,42 @@ namespace tk { namespace communication {
 
         this->replayMode = true;
         pcap.initRecord(fileName, iface, filter);
+        recording = true;
         pcap.record();
+        recording = false;
     }
 
     std::string 
     Ethinterface::recordStat(){
 
-        pcap.recordStat(stat);
-        return std::string("##Recive ")+std::to_string(stat.ps_recv)+"##Drop: "+std::to_string(stat.ps_drop)+"##IfaceDrop: "+std::to_string(stat.ps_ifdrop);
+        if(recording){
+            pcap.recordStat(stat);
+            return std::string("##Recive ")+std::to_string(stat.ps_recv)+"##Drop: "+std::to_string(stat.ps_drop)+"##IfaceDrop: "+std::to_string(stat.ps_ifdrop);
+        }else{
+            return "";
+        }
+    }
+
+    u_int
+    Ethinterface::ifaceRecive(){
+        
+        if(recording){
+            pcap.recordStat(stat);
+            return stat.ps_recv;
+        }else{
+            return 0;
+        }
+    }
+
+    u_int
+    Ethinterface::ifaceDrop(){
+
+        if(recording){
+            pcap.recordStat(stat);
+            return stat.ps_drop + stat.ps_ifdrop;
+        }else{
+            return 0;
+        }
     }
 
     bool

@@ -62,6 +62,20 @@ namespace tk { namespace communication {
          */
         std::string recordStat();
 
+         /**
+         * Method that return the recive packets
+         * 
+         * @return          String with stat
+         */
+        u_int  ifaceRecive();
+
+         /**
+         * Method that return the drop packets
+         * 
+         * @return          String with stat
+         */
+        u_int  ifaceDrop();
+
 
 
 
@@ -76,10 +90,11 @@ namespace tk { namespace communication {
 
 
     private:
-        bool            replayMode;
-        PCAPHandler     pcap;
-        UDPSocket       socket;
+        bool        replayMode;
+        PCAPHandler pcap;
+        UDPSocket   socket;
 
-        pcap_stat       stat;
+        bool        recording = false;
+        pcap_stat   stat;
     };
 }}
