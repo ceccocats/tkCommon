@@ -5,6 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <map>
+#include <thread>
 #include <tkCommon/time.h>
 #include <tkCommon/exceptions.h>
 
@@ -14,6 +15,7 @@ class Profiler {
 
 private:
     static Profiler *instance;
+    std::mutex m;
 
 public:
     struct ProfileInfo_t {
@@ -28,7 +30,7 @@ public:
             std::cout<<"Avg: "<<avg<<" Min: "<<min<<" Max: "<< max<<" (us)\n";
         }
     };
-    std::map<std::string, ProfileInfo_t> infos;
+    std::map<std::string, std::map<std::thread::id,ProfileInfo_t>> infos;
 
      Profiler() {
     }
@@ -39,13 +41,20 @@ public:
         return &inst;
     }
 
-    void tic(std::string key) {
-        tic(&infos[key]);
+    void tic(const std::string &key) {
+        std::thread::id this_id = std::this_thread::get_id();
+        m.lock();
+        tic(&infos[key][this_id]);
+        m.unlock();
     }
-    void toc(std::string key) {
-        toc(&infos[key]);
+    void toc(const std::string &key) {
+        std::thread::id this_id = std::this_thread::get_id();
+        m.lock();
+        toc(&infos[key][this_id]);
+        m.unlock();
     }
 
+private:
     void tic(ProfileInfo_t *pi) {
         pi->startTs = getTimeStamp();          
     }
@@ -61,11 +70,29 @@ public:
         pi->avg = pi->sum / pi->count;
     }
 
+public:
     void print() {
         std::cout<<"Profiler:\n";
         for (auto& i : infos) {
+            ProfileInfo_t p;
+            bool first = true;
+            for(auto&j : i.second) {
+                p.sum += j.second.sum;
+                p.count += j.second.count;
+                if(first) {
+                    p.min = j.second.min;
+                    p.max = j.second.max;
+                    first = false;
+                }
+                if(j.second.min < p.min)
+                    p.min = j.second.min;
+                if(j.second.max > p.max)
+                    p.max = j.second.max;
+            }
+            p.avg = p.sum / p.count;
+
             std::cout<<i.first<<"   ";
-            i.second.print();
+            p.print();
         }
     }
 };
