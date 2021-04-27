@@ -14,21 +14,21 @@ TEST_CASE("Test tprof") {
         for(int i=0; i<100; i++) {
             #pragma omp task
             {
-            tkPROF_tic(lol)
+            tkPROF_tic(test_time)
             usleep(10000);
-            tkPROF_toc(lol)
+            tkPROF_toc(test_time)
             }
             #pragma omp task
             {
-            tkPROF_tic(lol)
+            tkPROF_tic(test_time)
             usleep(10000);
-            tkPROF_toc(lol)
+            tkPROF_toc(test_time)
             }
             #pragma omp task
             {
-            tkPROF_tic(lol)
+            tkPROF_tic(test_time)
             usleep(10000);
-            tkPROF_toc(lol)
+            tkPROF_toc(test_time)
             }
         }
 
