@@ -64,6 +64,7 @@ namespace tk { namespace common {
         }
         Map& operator=(const Map& s)
         {
+            // TODO: remove clear
             _map.clear();
             //_map = s._map;
             for(auto const& i: s._map) {

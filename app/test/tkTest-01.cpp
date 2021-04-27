@@ -52,6 +52,15 @@ TEST_CASE("Test mat class") {
         }
     }
 
+    SECTION("double free") {
+        mat.resize(1000, 1000);
+        mat.cpu.release();
+        mat.cpu.release();
+        mat.cpu.release();
+        mat.cpu.release();
+        mat.cpu.release();
+    }
+
 
     SECTION("serialize") {
         mat.resize(2, 3);
