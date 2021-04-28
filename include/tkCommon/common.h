@@ -206,6 +206,19 @@ namespace tk { namespace common {
     }
 
     /**
+     * Set configuration from YAML node
+     * @tparam T
+     * @param conf yaml node
+     * @param key configuration KEY
+     * @param defaultVal defalt value in case of no KEY found
+     * @return conf value
+     */
+    template<typename T>
+    inline void YAMLsetConf(YAML::Node &conf, std::string key, T val) {
+        conf[key] = val;
+    }
+
+    /**
      * @brief Read TF from yaml NODE, tf format [ x y z poll pitch yaw ] ( mt mt mt deg deg deg )
      * 
      * @param conf 
@@ -214,6 +227,10 @@ namespace tk { namespace common {
     inline std::vector<tk::common::Tfpose> YAMLreadTf(YAML::Node conf) {
 
         std::vector<tk::common::Tfpose> tf;
+        if(!conf) {
+            tf.push_back(tk::common::Tfpose::Identity());
+            return tf;
+        }
 
         int size = conf.size();
         if(!conf[0].IsSequence())
@@ -231,6 +248,7 @@ namespace tk { namespace common {
             tmp.clear();
         }
 
+        tkDBG("read tfs: "<<tf.size());
         return tf;
     }
 

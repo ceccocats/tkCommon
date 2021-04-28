@@ -1,4 +1,6 @@
-from _codeGen import genData
+import sys
+sys.path.insert(1, '../../../../scripts/gen/')
+from codeGen import genData
 
 className = "CanData_gen"
 DEPS = [ "#include <linux/can.h>", "#include <linux/can/raw.h>" ]
