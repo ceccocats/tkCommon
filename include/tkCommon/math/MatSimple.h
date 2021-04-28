@@ -90,6 +90,7 @@ struct MatSimple {
                 tkCUDA( cudaFree(data) );
             else
                 delete [] data;
+            data = nullptr;
         }
     }
 
@@ -108,7 +109,8 @@ struct MatSimple {
             if(CUDA) {
                 tkCUDA( cudaMemcpy(data, s.data, size * sizeof(T), cudaMemcpyDeviceToDevice) ); 
             } else {
-                tkCUDA( cudaMemcpy(data, s.data, size * sizeof(T), cudaMemcpyHostToHost) ); 
+                //tkCUDA( cudaMemcpy(data, s.data, size * sizeof(T), cudaMemcpyHostToHost) ); 
+                memcpy(data, s.data, size * sizeof(T)); 
             }
         }
         return *this;

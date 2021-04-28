@@ -17,7 +17,7 @@ TEST_CASE("Test cuda class") {
 
     SECTION("New to gpu") {
         int i = 0;
-        for(i = 0; i < 1000; i++)
+        for(i = 0; i < 100; i++)
         {
             memset((void*)matNew,i,1000000*sizeof(float));
             tkPROF_tic(New_to_GPU);
