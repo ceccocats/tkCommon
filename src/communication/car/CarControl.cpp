@@ -10,6 +10,8 @@ bool CarControl::init(tk::communication::CanInterface *soc) {
     pidTorque.init(0,0,0,0,1);
     pidBrake.init(0,0,0,0,1);
 
+    enable(false);
+
     pthread_create(&writeTh, NULL, writeCaller, (void*)this);
     pthread_create(&readTh, NULL, readCaller, (void*)this);
     return true;
@@ -19,6 +21,13 @@ void CarControl::close() {
     run = false;
     pthread_join(writeTh, NULL);
     pthread_join(readTh, NULL);
+
+    enable(true);
+    setBrakePos(brakeRequest*15000);
+    setAccPos(torqueRequest*100);
+    requestAccPos();
+    requestBrakePos();
+    enable(false);
 }
 
 void *CarControl::writeCaller(void *args) {
@@ -34,8 +43,8 @@ void CarControl::computePIDs() {
     torqueRequest = pidTorque.calculate(0.02,requestSpeed-velocity);
     brakeRequest  = pidBrake.calculate(0.02,velocity-requestSpeed);
 
-    setBrakePos(brakeRequest*15000);
-    setAccPos(torqueRequest*100);
+    setBrakePos(0);
+    setAccPos(0);
 
     //maybe
     /*if(velocity < 1.0f){
@@ -65,9 +74,12 @@ void CarControl::writeLoop() {
                 setBrakePos((-0.5+pidTorque)*-15000);
             }
         }*/
-        requestSteerPos();
-        requestAccPos();
-        requestBrakePos();
+
+        if(active){
+            requestSteerPos();
+            requestAccPos();
+            requestBrakePos();
+        }
         t.wait();
     }
 }
@@ -125,7 +137,6 @@ void CarControl::readLoop() {
 
     }
 }
-
 
 void CarControl::setSteerZero() {
     tk::data::CanData data;
@@ -192,13 +203,17 @@ void CarControl::setBrakePos(uint16_t pos) {
     soc->write(&data);
     return;
 }
-void CarControl::sendAccEnable(bool status) {
+void CarControl::enable(bool status) {
+    active = status;
     tk::data::CanData data;
     data.frame.can_dlc = 2;
     data.frame.can_id = ACC_RELE_ID;
     data.frame.data[0] = accECU;
     data.frame.data[1] = status;
     soc->write(&data);
+    if(!status){
+        sendGenericCmd("OFF");
+    }
 }
 
 void CarControl::sendOdomEnable(bool status) {

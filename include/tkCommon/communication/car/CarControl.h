@@ -34,7 +34,9 @@ namespace tk { namespace communication {
         // ecu ids
         uint8_t brakeECU = 3;
         uint8_t steerECU = 15;
-        uint8_t accECU = 6;
+        uint8_t accECU   = 6;
+
+        bool active = false;
 
     public:
         tk::data::OdomData odom; /**< current vehicle odometry */
@@ -99,7 +101,7 @@ namespace tk { namespace communication {
         /**
          *  Set Accel (and Brake?) enabled or not
          */
-        void sendAccEnable(bool status);
+        void enable(bool status);
         /**
          *  Set Odometry stream enabled or not
          */
@@ -113,6 +115,11 @@ namespace tk { namespace communication {
          * 
          */
         void setVel(float vel);
+
+        void steerAngle(float angle, uint16_t vel = 0){
+            float diff = angle/40.0;
+            setSteerPos(diff*18000,0,vel);
+        }
 
     private:
         // request info from the system

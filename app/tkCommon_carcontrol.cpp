@@ -50,6 +50,8 @@ class Control : public tk::gui::Drawable{
             ImGui::SliderFloat("kp",&kpBrake,-3.0f,3.0f,"%.2f");
             ImGui::SliderFloat("ki",&kiBrake,-1.0f,1.0f,"%.4f");
             ImGui::SliderFloat("kd",&kdBrake,-1.0f,1.0f,"%.4f");
+            ImGui::Text("Angle");
+            ImGui::SliderFloat("steer",&angle,-450.0,450.0,"%.4f");
 
             std::string text;
             if(joystick){
@@ -80,6 +82,8 @@ class Control : public tk::gui::Drawable{
         float kdBrake = 0.0f;
 
         float torque,brake;
+
+        float angle = 0;
 };
 
 bool gRun = true;
@@ -139,11 +143,11 @@ int main( int argc, char** argv){
 
         if(joy.getButtonPressed(BUTTON_BACK)) {
             std::cout<<"disable Acc\n";
-            carCtrl.sendAccEnable(false);
+            carCtrl.enable(false);
             active = false;
         } else if(joy.getButtonPressed(BUTTON_START)) {
             std::cout<<"enable Acc\n";
-            carCtrl.sendAccEnable(true);
+            carCtrl.enable(true);
             active = true;
         } else if(joy.getButtonPressed(BUTTON_A)) {
             std::cout<<"Set Steer Zero\n";
@@ -157,13 +161,13 @@ int main( int argc, char** argv){
             carCtrl.sendGenericCmd(cmd);
         } else if(joy.getButtonPressed(BUTTON_Y)) {
             std::cout<<"!!!! Engine !!!!\n";
-            carCtrl.sendAccEnable(true);
+            carCtrl.enable(true);
             usleep(1000);
             carCtrl.setBrakePos(2000);
             sleep(1);
             carCtrl.sendEngineStart();
             sleep(1);
-            carCtrl.sendAccEnable(false);
+            carCtrl.enable(false);
         }
 
         if(active) {
@@ -199,6 +203,8 @@ int main( int argc, char** argv){
                 carCtrl.setVel(c->vel);
                 c->brake = carCtrl.brakeRequest;
                 c->torque = carCtrl.torqueRequest;
+
+                carCtrl.steerAngle(c->angle);
             }
             c->curVel = carCtrl.odom.speed.x();
         }
