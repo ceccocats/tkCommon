@@ -59,6 +59,17 @@ TEST_CASE("Test mat class") {
         mat.cpu.release();
         mat.cpu.release();
         mat.cpu.release();
+
+        tk::math::Mat<float> m0;
+        m0.resize(1000,1000);
+
+        tk::math::Mat<float> m1;
+        m1.resize(1000,1000);
+        m0.bind(m1);
+
+        REQUIRE(m0.cpu.owned == true);    
+        REQUIRE(m1.cpu.owned == false);   
+        REQUIRE(m0.cpu.data == m1.cpu.data);     
     }
 
 

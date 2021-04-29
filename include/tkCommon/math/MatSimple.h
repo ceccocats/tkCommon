@@ -47,6 +47,16 @@ struct MatSimple {
     //    *this = m;
     //}
 
+    __host__
+    void bind(const MatSimple<T, CUDA>& s) {
+        release();
+        this->data = s.data;
+        rows = s.rows;
+        cols = s.cols;
+        size = maxSize = s.rows*s.cols;
+        owned = true;    
+    }
+
 
     __host__ __device__ T&  
     at(int r, int c) { 
