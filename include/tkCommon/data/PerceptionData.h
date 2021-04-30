@@ -73,7 +73,8 @@ class object {
     public:
         box   cam;
         box   world;
-        bool  confidence;
+        float  confidence;
+        float  score = 0.0f;
         Class cl;
         int sensorID = 0;
 };

@@ -13,19 +13,11 @@ class Lockable{
 
         mutable std::condition_variable CV;
         
-        mutable uint32_t    counter;
-        mutable uint32_t    nReader;
-        bool        writing;
+        mutable uint32_t    counter = 0;
+        mutable uint32_t    nReader = 0;
+        bool        writing = false;
         
     public:
-        Lockable() {
-            gMTX.unlock();
-            MTX.unlock();
-
-            counter     = 0;
-            nReader     = 0;
-            writing     = false;
-        }
 
         void lockWrite() {
             writing = true;
