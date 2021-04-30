@@ -218,3 +218,44 @@ def genData(className, VARS, DEPS = []):
 			cpp("")
 			cpp("\n}}")
 		cpp.close()
+
+
+def genConf(className, VARS):
+	print("[....] Generating CONF", className)
+	cpp = CppFile(className + ".h")
+	cpp("// this file is generated DO NOT DIRECTLY MODIFY")
+	cpp("#pragma once")
+	cpp("#include \"tkCommon/common.h\"")
+	cpp("")
+	cpp("namespace tk { namespace conf {\n")
+	with cpp.subs(ClassName=className):
+		with cpp.block("class $ClassName$", ";"):
+			cpp.label("public")
+			for v in VARS:
+				with cpp.subs(type=v["type"], name=v["name"]):
+					cpp("$type$ $name$;")
+			
+			cpp("")
+			with cpp.block("void init(YAML::Node conf)"):
+				for v in VARS:
+					with cpp.subs(type=v["type"], name=v["name"], default=v["default"]):
+						if("Tfpose" in v["type"]):
+							cpp("$name$ = tk::common::YAMLreadTf(conf[\"$name$\"])[0];")
+						else:
+							cpp("$name$ = tk::common::YAMLgetConf<$type$>(conf, \"$name$\", $default$);")
+
+			cpp("")
+			with cpp.block("YAML::Node getYAML()"):
+				cpp("YAML::Node conf;")
+				for v in VARS:
+					with cpp.subs(type=v["type"], name=v["name"], default=v["default"]):
+						if("Tfpose" in v["type"]):
+							cpp("tk::common::Vector3<float> $name$pos = tk::common::tf2pose($name$);")
+							cpp("tk::common::Vector3<float> $name$rot = tk::common::tf2rot($name$);")
+							cpp("tk::common::YAMLsetConf<std::vector<float>>(conf, \"$name$\", std::vector<float>{$name$pos.x(),$name$pos.y(),$name$pos.z(),$name$rot.x(),$name$rot.y(),$name$rot.z()});")
+						else:
+							cpp("tk::common::YAMLsetConf<$type$>(conf, \"$name$\", $name$);")
+				cpp("return conf;")
+				
+	cpp("")
+	cpp("\n}}")

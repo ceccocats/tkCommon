@@ -100,6 +100,13 @@ public:
 
 }}
 
-#define tkPROF_tic(name) tk::rt::Profiler::getInstance()->tic(#name);
-#define tkPROF_toc(name) tk::rt::Profiler::getInstance()->toc(#name);
-#define tkPROF_print     tk::rt::Profiler::getInstance()->print();
+#ifdef tkPROF_disable
+    #define tkPROF_tic(name) ;
+    #define tkPROF_toc(name) ;
+    #define tkPROF_print     ;
+
+#else
+    #define tkPROF_tic(name) tk::rt::Profiler::getInstance()->tic(#name);
+    #define tkPROF_toc(name) tk::rt::Profiler::getInstance()->toc(#name);
+    #define tkPROF_print     tk::rt::Profiler::getInstance()->print();
+#endif

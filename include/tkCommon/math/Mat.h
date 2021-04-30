@@ -79,6 +79,12 @@ public:
     //    init();
     //}
 
+    __host__ 
+    void bind(const Mat<T>& s) {
+        cpu.bind(s.cpu);
+        gpu.bind(s.gpu);
+    }
+
     template<typename OtherDerived>
     Mat<T>& operator=(const Eigen::MatrixBase <OtherDerived>& other) {
         cpu.resize(other.rows(), other.cols());
