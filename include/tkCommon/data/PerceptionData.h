@@ -76,6 +76,7 @@ class object {
         float  confidence;
         float  score = 0.0f;
         Class cl;
+        int id = -1;
         int sensorID = 0;
 };
 
