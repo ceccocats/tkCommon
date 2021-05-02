@@ -80,4 +80,6 @@ class object {
         int sensorID = 0;
 };
 
+class ObjectBuffer : public std::vector<object>, public tk::rt::Lockable {};
+
 }}
