@@ -25,6 +25,10 @@ namespace tk{ namespace data{
             if(this->T_type.id == tk::data::FLOAT){
                 this->header.type = tk::data::DataType::IMAGEF;
             }
+
+            this->width = 0;
+            this->height = 0;
+            this->channels = 0;
         }
 
         ImageDataX(const ImageDataX<T>& s)  : ImageData_gen<T>() {
@@ -36,34 +40,23 @@ namespace tk{ namespace data{
         }
 
         void init(){
-
-            //this->lockWrite();
-        	//tk::data::ImageData_gen<T>::init();
-            //this->unlockWrite();
-
+            
         }
         
         void init(int w, int h, int ch){
 
-            //this->try_lock();
-        	//tk::data::ImageData_gen<T>::init();
             this->width = w;
             this->height = h;
             this->channels = ch;
             this->data.resize(this->width*this->height*this->channels);
-            //this->unlockWrite();
-
         }
 
         ImageDataX<T>& operator=(ImageDataX<T>& s){
  
             if(s.width != this->width || s.height != this->height || s.channels != this->channels){
-                release();
                 init(s.width, s.height, s.channels);
             }
-            //s.lockRead();
             memcpy(this->data.data(), s.data.data(), this->width * this->height * this->channels * sizeof(T));
-            //s.unlockRead();
             return *this;
         }
 
@@ -79,12 +72,10 @@ namespace tk{ namespace data{
             if(empty())
                 return;
 
-            this->lockWrite();
             this->data.resize(0);
             this->width = 0;
             this->height = 0;
             this->channels = 0;
-            this->unlockWrite();
         }
 
         T* at(int row, int col){

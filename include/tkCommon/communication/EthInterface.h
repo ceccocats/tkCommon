@@ -2,6 +2,7 @@
 
 #include "tkCommon/communication/ethernet/PCAPHandler.h"
 #include "tkCommon/communication/ethernet/UDPSocket.h"
+#include "tkCommon/communication/ethernet/TCPSocket.h"
 
 namespace tk { namespace communication {
     class Ethinterface {
@@ -19,6 +20,15 @@ namespace tk { namespace communication {
          * @return          Success
          */
         bool initUDP(const int port, const std::string ip = "", time_t timeout_us = -1);
+
+        /**
+         * Method that create a recive socket
+         *
+         * @param port      TCP port
+         * @param ip        IP
+         * @return          Success
+         */
+        bool initTCP(const int port, const std::string ip, time_t timeout_us = -1);
 
         /**
          * Method that init pcap ethernet
@@ -41,6 +51,19 @@ namespace tk { namespace communication {
          * @return          Packet lenght
          */
         int read(uint8_t* buffer, timeStamp_t& stamp);
+
+
+
+        //Writing
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /**
+         * Method that send a packet (only TCP)
+         * @param buffer    Packet data
+         * @param length    Packet lenght
+         * @return          status
+         */
+        bool send(uint8_t* buffer, int length);
+
 
 
 
@@ -90,9 +113,11 @@ namespace tk { namespace communication {
 
 
     private:
-        bool        replayMode;
+        bool        replayMode, isUdp;
+
         PCAPHandler pcap;
-        UDPSocket   socket;
+        UDPSocket   udpSocket;
+        TCPSocket   tcpSocket;
 
         bool        recording = false;
         pcap_stat   stat;

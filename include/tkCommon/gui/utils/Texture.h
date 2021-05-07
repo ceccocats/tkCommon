@@ -149,7 +149,15 @@ void Texture<T>::release(){
 template <typename T>
 void Texture<T>::setData(T* data){
     use();
+    int step = width*channels*sizeof(T);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, (step & 3) ? 1 : 4);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, step/channels);
+
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, format, type, data);
+
+    //Reset to default
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
     unuse();
 }
 

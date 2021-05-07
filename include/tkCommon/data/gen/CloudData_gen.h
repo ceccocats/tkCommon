@@ -16,6 +16,7 @@ public:
     static const CloudData_gen::featureType_t FEATURES_NOISE;
     static const CloudData_gen::featureType_t FEATURES_SIGNAL_NOISE;
     static const CloudData_gen::featureType_t FEATURES_CHANNEL;
+    static const CloudData_gen::featureType_t FEATURES_CHANNEL_H;
     static const CloudData_gen::featureType_t FEATURES_R;
     static const CloudData_gen::featureType_t FEATURES_G;
     static const CloudData_gen::featureType_t FEATURES_B;
