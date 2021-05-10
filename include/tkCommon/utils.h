@@ -5,6 +5,7 @@
 #include <mutex>
 #include <sys/time.h>
 #include <unistd.h>
+#include <dirent.h>
 #include "yaml-cpp/yaml.h" 
 
 /**
@@ -174,4 +175,22 @@ inline std::vector<std::string> splitString(const std::string &s, char delim, in
             break;
     }
     return elems;
+}
+
+inline std::string searchFolderFile(std::string folder, std::string name){
+    std::string file = "";
+    struct dirent *dir;
+    DIR *d = opendir(folder.c_str());
+
+    if (d) {
+        while (((dir = readdir(d)) != NULL)) {
+            std::string fileN = dir->d_name;
+            if(fileN.find(name.c_str()) != std::string::npos){
+                file = fileN;
+                break;
+            }
+        }
+        closedir(d);
+    }
+    return file;
 }

@@ -9,8 +9,17 @@ namespace tk { namespace communication {
     bool
     Ethinterface::initUDP(const int port, const std::string ip, time_t timeout_us){
         
+        this->isUdp         = true;
         this->replayMode    = false;
-        return this->socket.initReceiver(port,ip, timeout_us);
+        return this->udpSocket.initReceiver(port,ip, timeout_us);
+    }
+
+    bool
+    Ethinterface::initTCP(const int port, const std::string ip, time_t timeout_us){
+        
+        this->isUdp         = false;
+        this->replayMode    = false;
+        return this->tcpSocket.initClient(port,ip, timeout_us != -1);
     }
 
     bool
@@ -30,10 +39,15 @@ namespace tk { namespace communication {
         }else{
 
             //Socket
-            int len = this->socket.receive(buffer,30000);
+            int len;
+            if(isUdp){
+                len = this->udpSocket.receive(buffer,30000);
+            }else{
+                len = this->tcpSocket.receive(buffer,30000); 
+            }
             stamp   = getTimeStamp();
 
-            tkASSERT(len != 30000)
+            //tkASSERT(len != 30000)
             return len;
 
         }
@@ -91,9 +105,19 @@ namespace tk { namespace communication {
             return this->pcap.close();
         }else{
 
-            //Socket
-            return this->socket.close();
+            if(isUdp)
+                this->udpSocket.close();
+            else
+                this->tcpSocket.close();
         }
+    }
+
+    bool 
+    Ethinterface::send(uint8_t* buffer, int length){
+        if(isUdp){
+            return false;
+        }
+        return tcpSocket.send(buffer,length);
     }
 
 
