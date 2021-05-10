@@ -10,7 +10,7 @@ class OdomData_gen : public SensorData
 public:
     static const DataType type;
     tk::math::Vec3<double> pose;
-    tk::math::Vec3<double> angle;
+    tk::math::Vec4<double> angle;
     tk::math::Vec3<double> speed;
     
     void init() override

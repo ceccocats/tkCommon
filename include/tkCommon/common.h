@@ -264,10 +264,21 @@ namespace tk { namespace common {
         return cam * c2w_conversion;
     }
 
-    inline tk::common::Tfpose tf2cam(tk::common::Tfpose tf) {
-        static tk::common::Tfpose w2c_conversion = odom2tf(0,0,0,M_PI_2,0,M_PI_2);
+    inline tk::common::Tfpose rs2tf(tk::common::Tfpose cam) {
+        tk::common::Tfpose c2w_conversion;
 
-        return tf * w2c_conversion;
+        c2w_conversion = cam * tk::common::odom2tf(0,0,0,0, M_PI_2, M_PI_2);
+        c2w_conversion = tk::common::odom2tf(0,0,0,M_PI_2,0,-M_PI_2) * c2w_conversion;
+
+        return c2w_conversion;
+    }
+
+    inline tk::common::Tfpose tf2cam(tk::common::Tfpose tf) {
+
+        static tk::common::Tfpose w2c_conversion2 = tk::common::odom2tf(0,0,0,0,-M_PI_2,M_PI_2);
+        static tk::common::Tfpose w2c_conversion = tk::common::odom2tf(0,0,0,-M_PI_2,0,-M_PI_2);
+
+        return w2c_conversion2 * tf * w2c_conversion;
     }
 
 }}
