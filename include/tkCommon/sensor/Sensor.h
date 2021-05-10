@@ -233,7 +233,6 @@ class Sensor {
         SensorStatus                        senStatus;  /**< Sensor status */
         LogManager                          *log;       /**< Log Manager reference */
         std::map<sensorKey, SensorPool_t*>  pool;       /**< data pool */  
-        std::vector<sensorKey>              avaibleTypes; /**< data types provided by the sensor */ 
         int                                 poolSize;
         bool                                usingPool;
         std::vector<tk::common::Tfpose>     tf;         /**< Sensor TF */
@@ -342,6 +341,9 @@ class Sensor {
         void loop(sensorKey key);
 
     public:
+        
+        std::vector<sensorKey>              avaibleTypes; /**< data types provided by the sensor */ 
+
         /**
          * @brief   Extract last or newest element from the pool, based on timeout parameter value
          *          passed. Must be called after start() method.
