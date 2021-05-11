@@ -12,6 +12,13 @@ namespace tk { namespace data {
     class OdomData : public OdomData_gen
     { 
     public:
+        OdomData(){};
+        OdomData(const tk::data::OdomData& s){
+            header.tf = s.header.tf;
+            pose = s.pose;
+            angle = s.angle;
+            speed = s.speed;
+        }
 #ifdef ROS_ENABLED
         void toRos(nav_msgs::Odometry &msg) {
             this->header.toRos(msg.header);

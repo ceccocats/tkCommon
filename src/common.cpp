@@ -29,6 +29,7 @@ namespace tk { namespace common {
 
     Tfpose odom2tf(float x, float y, float z, float qx, float qy, float qz, float qw) {
         Eigen::Quaternionf quat(qw, qx, qy, qz);
+        quat.normalize();
         Tfpose isometry = Eigen::Isometry3f::Identity();
         isometry.linear() = quat.toRotationMatrix();
         isometry.translation() = Eigen::Vector3f(x, y, z) ;
