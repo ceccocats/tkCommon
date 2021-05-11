@@ -151,7 +151,7 @@ void Texture<T>::setData(T* data){
     use();
     int step = width*channels*sizeof(T);
     glPixelStorei(GL_UNPACK_ALIGNMENT, (step & 3) ? 1 : 4);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, step/channels);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, step/(channels*sizeof(T)));
 
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, format, type, data);
 
@@ -179,7 +179,7 @@ void Texture<T>::generateTexture(GLenum format){
 
     int step = width*channels*sizeof(T);
     glPixelStorei(GL_UNPACK_ALIGNMENT, (step & 3) ? 1 : 4);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, step/channels);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, step/(channels*sizeof(T)));
 
     glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
 
