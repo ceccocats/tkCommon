@@ -12,12 +12,15 @@ namespace tk { namespace data {
     class OdomData : public OdomData_gen
     { 
     public:
+        enum angleMode {EULER, QUATERNION};
+        angleMode mode = EULER;
         OdomData(){};
         OdomData(const tk::data::OdomData& s){
             header.tf = s.header.tf;
             pose = s.pose;
             angle = s.angle;
             speed = s.speed;
+            mode = s.mode;
         }
 #ifdef ROS_ENABLED
         void toRos(nav_msgs::Odometry &msg) {
@@ -28,7 +31,15 @@ namespace tk { namespace data {
             msg.pose.pose.position.z    = this->pose.z();
 
             tf2::Quaternion q;
-            q.setRPY(this->angle.x(), this->angle.y(), this->angle.z());
+            if(mode == EULER){
+                q.setRPY(this->angle.x(), this->angle.y(), this->angle.z());
+            }
+            else{
+                q.setX(angle.x());
+                q.setY(angle.y());
+                q.setZ(angle.z());
+                q.setW(angle.w());
+            }
             q.normalize();
             msg.pose.pose.orientation   = tf2::toMsg(q);
 
@@ -52,6 +63,8 @@ namespace tk { namespace data {
             this->angle.x()  = rpy(0);
             this->angle.y()  = rpy(1);
             this->angle.z()  = rpy(2);
+
+            mode = EULER;
 
             this->speed.x() = std::sqrt(std::pow(msg.twist.twist.linear.x, 2) + std::pow(msg.twist.twist.linear.y, 2) + std::pow(msg.twist.twist.linear.z, 2)); 
         }
