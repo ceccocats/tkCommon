@@ -259,9 +259,17 @@ namespace tk { namespace common {
     }
 
     inline tk::common::Tfpose cam2tf(tk::common::Tfpose cam) {
-        static tk::common::Tfpose c2w_conversion = odom2tf(0,0,0,0,M_PI_2,-M_PI_2);
 
-        return cam * c2w_conversion;
+        static Eigen::Matrix4f c2w_conversion;
+
+        c2w_conversion << 0,  0,  1,  0,
+                        -1,  0,  0,  0,
+                        0, -1,  0,  0,
+                        0,  0,  0,  1;
+
+        tk::common::Tfpose tf;
+        tf.matrix() = c2w_conversion.transpose() * cam.matrix()*c2w_conversion;
+        return tf;
     }
 
     inline tk::common::Tfpose rs2tf(tk::common::Tfpose cam) {
