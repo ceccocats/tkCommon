@@ -268,7 +268,7 @@ namespace tk { namespace common {
                         0,  0,  0,  1;
 
         tk::common::Tfpose tf;
-        tf.matrix() = c2w_conversion.transpose() * cam.matrix()*c2w_conversion;
+        tf.matrix() = c2w_conversion * cam.matrix()*c2w_conversion.transpose();
         return tf;
     }
 
@@ -283,10 +283,21 @@ namespace tk { namespace common {
 
     inline tk::common::Tfpose tf2cam(tk::common::Tfpose tf) {
 
-        static tk::common::Tfpose w2c_conversion2 = tk::common::odom2tf(0,0,0,0,-M_PI_2,M_PI_2);
-        static tk::common::Tfpose w2c_conversion = tk::common::odom2tf(0,0,0,-M_PI_2,0,-M_PI_2);
+        static Eigen::Matrix4f c2w_conversion;
 
-        return w2c_conversion2 * tf * w2c_conversion;
+        c2w_conversion << 0,  0,  1,  0,
+                        -1,  0,  0,  0,
+                        0, -1,  0,  0,
+                        0,  0,  0,  1;
+
+        tk::common::Tfpose cam;
+        cam.matrix() = c2w_conversion.transpose() * tf.matrix()*c2w_conversion;
+        return cam;
+
+        //static tk::common::Tfpose w2c_conversion2 = tk::common::odom2tf(0,0,0,0,-M_PI_2,M_PI_2);
+        //static tk::common::Tfpose w2c_conversion = tk::common::odom2tf(0,0,0,-M_PI_2,0,-M_PI_2);
+//
+        //return w2c_conversion2 * tf * w2c_conversion;
     }
 
 }}
