@@ -35,8 +35,8 @@ namespace tk{ namespace data{
 
         float fx() {return k(0,0);}
         float fy() {return k(1,1);}
-        float cx() {return k(0,2);}
-        float cy() {return k(1,2);}
+        float cx() {return k(2,0);}
+        float cy() {return k(2,1);}
 
         /**
          * @brief       Method that load a calibartion file
