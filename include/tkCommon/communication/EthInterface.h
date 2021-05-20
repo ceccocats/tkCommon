@@ -5,6 +5,9 @@
 #include "tkCommon/communication/ethernet/TCPSocket.h"
 
 namespace tk { namespace communication {
+
+    static const int BUFFER_LENGTH = 30000;
+
     class Ethinterface {
     public:
         Ethinterface();

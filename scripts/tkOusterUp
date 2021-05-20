@@ -2,14 +2,14 @@
 
 ##################
 ipOutster="192.168.1.203"
-ipDest="192.168.1.61"
+ipDest="192.168.1.109"
 dev="eth0"
 ##################
 ## 512x10, 1024x10, 2048x10, 512x20, 1024x20
 config=2048x10
 ##################
 ## TIME_FROM_INTERNAL_OSC, TIME_FROM_SYNC_PULSE_IN, TIME_FROM_PTP_1588
-timestamp_mode=TIME_FROM_INTERNAL_OSC
+timestamp_mode=TIME_FROM_SYNC_PULSE_IN
 ##################
 ## ACTIVE_HIGH, ACTIVE_LOW
 sync_pulse_in_polarity=ACTIVE_HIGH
@@ -67,6 +67,9 @@ if [ $timestamp_mode == "TIME_FROM_SYNC_PULSE_IN" ]; then
 	check
 else
 	echo "set_config_param multipurpose_io_mode OFF" | nc $ipOutster 7501 -q 1
+	check
+	
+	echo "set_config_param nmea_leap_seconds 37" | nc $ipOutster 7501 -q 1
 	check
 fi
 

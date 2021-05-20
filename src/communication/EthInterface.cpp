@@ -41,9 +41,9 @@ namespace tk { namespace communication {
             //Socket
             int len;
             if(isUdp){
-                len = this->udpSocket.receive(buffer,30000);
+                len = this->udpSocket.receive(buffer,BUFFER_LENGTH);
             }else{
-                len = this->tcpSocket.receive(buffer,30000); 
+                len = this->tcpSocket.receive(buffer,BUFFER_LENGTH); 
             }
             stamp   = getTimeStamp();
 
