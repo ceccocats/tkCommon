@@ -33,6 +33,11 @@ namespace tk{ namespace data{
 
         }
 
+        float fx() {return k(0,0);}
+        float fy() {return k(1,1);}
+        float cx() {return k(2,0);}
+        float cy() {return k(2,1);}
+
         /**
          * @brief       Method that load a calibartion file
          * 
@@ -52,15 +57,24 @@ namespace tk{ namespace data{
 
             //std::vector<float> k_tmp = getYAMLconf<std::vector<float>>(conf, "K", std::vector<float>(9,0));
             std::vector<float> k_tmp = conf["K"]? conf["K"].as<std::vector<float>>(): std::vector<float>(9,0);
-            tkASSERT(k_tmp.size() == 9);
-            for(int i = 0; i < 3; i++) for(int j = 0; j < 3; j++)
-                    k[i*3+j] = k_tmp[i*3 + j];
-                    //k(i,j) = k_tmp[i*3 + j];
+            tkASSERT(k_tmp.size() == 9 || k_tmp.size() == 4);
+            if(k_tmp.size() == 9)
+                for(int i = 0; i < 3; i++) for(int j = 0; j < 3; j++)
+                        k[i*3+j] = k_tmp[i*3 + j];
+                        //k(i,j) = k_tmp[i*3 + j];
+            else if(k_tmp.size() == 4){
+                //for(int i = 0; i < 3; i++) for(int j = 0; j < 3; j++)
+                //        k[i*3+j] = i==j?1:0;
+                k[0] = k_tmp[0]; // 0,0
+                k[4] = k_tmp[1]; // 1,1
+                k[2] = k_tmp[2]; // 0,2
+                k[5] = k_tmp[3]; // 1,2
+            }
 
 
             std::vector<float> d_tmp = conf["D"]? conf["D"].as<std::vector<float>>(): std::vector<float>(5,0);
-            tkASSERT(d_tmp.size() >= 5)
-            for(int i = 0; i < 5; i++)
+            tkASSERT(d_tmp.size() >= 4)
+            for(int i = 0; i < d_tmp.size(); i++)
                 d[i] = d_tmp[i];
 
             std::vector<float> r_tmp = conf["R"]? conf["R"].as<std::vector<float>>(): std::vector<float>(9,0);

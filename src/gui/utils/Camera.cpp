@@ -108,12 +108,13 @@ void Camera::mouseWheel(float dx, float dy) {
     if(mouseOnGUI)
         return;
     
-    float tmpZoom = zoom - dy * 10.0f;
-    if (tmpZoom >= 0.0f) {
-        zoom = tmpZoom;
-        updateEye();
-        updateMatrices();
-    }
+    float tmpZoom = zoom - dy *( zoom * 0.1f );
+    if (tmpZoom < 0.0001f)
+        tmpZoom = 0.0001f;
+    zoom = tmpZoom;
+    updateEye();
+    updateMatrices();
+
 }
 
 glm::vec3 Camera::project(glm::vec3 obj) {
