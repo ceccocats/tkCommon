@@ -26,6 +26,7 @@ set(tkCommon_INCLUDE_DIRS
     ${FREETYPE_INCLUDE_DIRS}
     ${ROS_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
+    ${CMAKE_CURRENT_LIST_DIR}/../include/
 )
 
 set(tkCommon_LIBRARIES 
