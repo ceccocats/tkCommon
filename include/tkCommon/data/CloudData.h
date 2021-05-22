@@ -235,29 +235,59 @@ namespace tk { namespace data {
             //fields setup
             sensor_msgs::PointCloud2Modifier modifier(msg);
             modifier.setPointCloud2FieldsByString(1, "xyz");
-            msg.point_step = addPointField(msg, "intensity", 1, sensor_msgs::PointField::FLOAT32, msg.point_step);
-            msg.point_step = addPointField(msg, "ring",      1, sensor_msgs::PointField::UINT16,  msg.point_step);
-            msg.point_step = addPointField(msg, "time",      1, sensor_msgs::PointField::FLOAT32, msg.point_step);
+
+            bool hasI, hasC, hasT;
+            hasI = hasC = hasT = false;
+            if (features.exists(tk::data::CloudData_gen::FEATURES_I)) {
+                msg.point_step = addPointField(msg, "intensity", 1, sensor_msgs::PointField::FLOAT32, msg.point_step);
+                hasI = true;
+            }
+            if (features.exists(tk::data::CloudData_gen::FEATURES_CHANNEL)) {
+                msg.point_step = addPointField(msg, "ring",      1, sensor_msgs::PointField::UINT16,  msg.point_step);
+                hasC = true;
+            }
+            if (features.exists(tk::data::CloudData_gen::FEATURES_CHANNEL)) {
+                msg.point_step = addPointField(msg, "time",      1, sensor_msgs::PointField::FLOAT32, msg.point_step);
+                hasT = true;
+            }
             msg.row_step = msg.width * msg.point_step;
             msg.data.resize(msg.height * msg.row_step);
             
-            sensor_msgs::PointCloud2Iterator<float>    iter_x(msg, "x");
-            sensor_msgs::PointCloud2Iterator<float>    iter_y(msg, "y");
-            sensor_msgs::PointCloud2Iterator<float>    iter_z(msg, "z");
-            sensor_msgs::PointCloud2Iterator<float>    iter_intensity(msg, "intensity");
-            sensor_msgs::PointCloud2Iterator<uint16_t> iter_ring(msg, "ring");
-            sensor_msgs::PointCloud2Iterator<float>    iter_time(msg, "time");
-            tk::math::Vec<float> *fI = &features[tk::data::CloudData_gen::FEATURES_I];
-            tk::math::Vec<float> *fC = &features[tk::data::CloudData_gen::FEATURES_CHANNEL];
-            tk::math::Vec<float> *fT = &features[tk::data::CloudData_gen::FEATURES_TIME];
+            sensor_msgs::PointCloud2Iterator<float>     iter_x(msg, "x");
+            sensor_msgs::PointCloud2Iterator<float>     iter_y(msg, "y");
+            sensor_msgs::PointCloud2Iterator<float>     iter_z(msg, "z");
+            sensor_msgs::PointCloud2Iterator<float>     *iter_intensity, *iter_time;
+            sensor_msgs::PointCloud2Iterator<uint16_t>  *iter_ring;
+            tk::math::Vec<float>                        *fI, *fC, *fT;
+            if (hasI) {
+                iter_intensity  = new sensor_msgs::PointCloud2Iterator<float>(msg, "intensity");
+                fI              = &features[tk::data::CloudData_gen::FEATURES_I];
+            }
+            if (hasC) {
+                iter_ring       = new sensor_msgs::PointCloud2Iterator<uint16_t>(msg, "ring");
+                fC              = &features[tk::data::CloudData_gen::FEATURES_CHANNEL];
+            }
+            if (hasT) {
+                iter_time       = new sensor_msgs::PointCloud2Iterator<float>(msg, "time");
+                fT              = &features[tk::data::CloudData_gen::FEATURES_TIME];
+            }
 
             for(int i=0; i<size(); i++) {
                 *iter_x         = points(0,i);     ++iter_x; 
                 *iter_y         = points(1,i);     ++iter_y; 
                 *iter_z         = points(2,i);     ++iter_z; 
-                *iter_intensity = (*fI)[i]; ++iter_intensity; 
-                *iter_ring      = (*fC)[i]; ++iter_ring;  
-                *iter_time      = (*fT)[i]; ++iter_time;  
+                if (hasI) {
+                    **iter_intensity = (*fI)[i]; 
+                    ++(*iter_intensity); 
+                }
+                if (hasC) {
+                    **iter_ring      = (*fC)[i]; 
+                    ++(*iter_ring);
+                }   
+                if (hasT) {
+                    **iter_time      = (*fT)[i]; 
+                    ++(*iter_time);  
+                }
             }
 
         }
