@@ -277,6 +277,16 @@ Viewer::imguiDraw(){
         if (ImGui::Button(value.c_str())){
             drawables[imguiSelected]->enabled = ! drawables[imguiSelected]->enabled;
         }
+        ImGui::SameLine();
+
+        if(drawables[imguiSelected]->enableTf == true){
+            value = "Disable tf";
+        }else{
+            value = "Draw tf";
+        }
+        if (ImGui::Button(value.c_str())){
+            drawables[imguiSelected]->enableTf = ! drawables[imguiSelected]->enableTf;
+        }
     }
     ImGui::EndGroup();
     ImGui::End();
@@ -358,38 +368,36 @@ Viewer::draw() {
             drawable.second->drwModelView = modelview * glm::make_mat4x4(drawable.second->tf.matrix().data());
             drawable.second->draw(Viewer::instance);
         }
+        if(drawable.second->enableTf){
+            glPushMatrix();
+            glMultMatrixf(drawable.second->tf.matrix().data());
+            glLineWidth(2.5);
+            glBegin(GL_LINES);
+            glColor3f (1.0f,0.0f,0.0f);
+            glVertex3f(0.0f,0.0f,0.0f);
+            glVertex3f(1.0f,0.0f,0.0f);
+            glColor3f (0.0f,1.0f,0.0f);
+            glVertex3f(0.0f,0.0f,0.0f);
+            glVertex3f(0.0f,1.0f,0.0f);
+            glColor3f (0.0f,0.0f,1.0f);
+            glVertex3f(0.0f,0.0f,0.0f);
+            glVertex3f(0.0f,0.0f,1.0f);
+            glEnd();
+            glPopMatrix();
+        }
     }
     drawLogo();
 }
 
 void
-Viewer::drawLogo(){
-
-    int w=90, h=90, padding=20;
-    int w2=width/2, h2=height/2;
+Viewer::drawLogo(){    tfShader->close();
+    tfBuffer.release();
 
     verticesCube2D[0] = (float)(w2-padding)/w2;
     verticesCube2D[1] = (float)(-h2+padding)/h2;
 
-    verticesCube2D[5] = (float)(w2-w-padding)/w2;
-    verticesCube2D[6] = (float)(-h2+padding)/h2;
-
-    verticesCube2D[10] = (float)(w2-w-padding)/w2;
-    verticesCube2D[11] = (float)(-h2+h+padding)/h2;
-
-    verticesCube2D[15] = (float)(w2-padding)/w2;
-    verticesCube2D[16] = (float)(-h2+h+padding)/h2;
-
-    pos.setData(verticesCube2D.data(),20);
-	pos.setIndexVector(indicesCube2D.data(),6);
-
-    glm::mat4 view2D = glm::mat4(1.0f);
-    drwLogo->draw<uint8_t>(view2D,&logo,&pos,6);
-}
-
-void 
-Viewer::initDrawables() {
-
+    verticesCube2D[5] = (float)(w2-w-padding)/w2;    tfShader->close();
+    tfBuffer.release();
     if(newDrawables.size() > 0){
         for (auto const& drw : newDrawables){
             drw.second->onInit(Viewer::instance);

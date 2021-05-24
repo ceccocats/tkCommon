@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include "tkCommon/gui/shader/generic.h"
+#include "tkCommon/gui/shader/axisPlot.h"
 #include "tkCommon/gui/imgui/imgui.h"
 #include "tkCommon/gui/imgui/imgui_impl_glfw.h"
 #include "tkCommon/gui/imgui/imgui_impl_opengl3.h"
@@ -12,12 +13,13 @@ namespace tk{ namespace gui{
 	class Drawable {
 	
 	public:
-		bool enabled = true;
-		bool follow = false;
-
-		glm::mat4 drwModelView;
-
-		tk::common::Tfpose tf = tk::common::Tfpose::Identity();
+		bool enabled  = true;
+		bool follow   = false;
+		bool enableTf = false;
+		tk::gui::shader::generic*	shader;
+		std::string 				name = "no name";
+		glm::mat4 					drwModelView;
+		tk::common::Tfpose 			tf = tk::common::Tfpose::Identity();
 
 		/** init method */
 		virtual void onInit(tk::gui::Viewer *viewer) {}
@@ -29,7 +31,7 @@ namespace tk{ namespace gui{
 		virtual void draw(tk::gui::Viewer *viewer) {}
 
 		/** draw in imgui settings window */
-		virtual void imGuiSettings() {};
+		virtual void imGuiSettings() {}
 
 		/** draw in imgui infos window */
 		virtual void imGuiInfos() {}
@@ -41,10 +43,6 @@ namespace tk{ namespace gui{
 		virtual std::string toString(){
 			return name;
 		}
-
-	public:
-		tk::gui::shader::generic*	shader;
-		std::string name = "no name";
 	};
 }}
 #include "tkCommon/gui/Viewer.h"
