@@ -390,14 +390,33 @@ Viewer::draw() {
 }
 
 void
-Viewer::drawLogo(){    tfShader->close();
-    tfBuffer.release();
+Viewer::drawLogo(){
+
+    int w=90, h=90, padding=20;
+    int w2=width/2, h2=height/2;
 
     verticesCube2D[0] = (float)(w2-padding)/w2;
     verticesCube2D[1] = (float)(-h2+padding)/h2;
 
-    verticesCube2D[5] = (float)(w2-w-padding)/w2;    tfShader->close();
-    tfBuffer.release();
+    verticesCube2D[5] = (float)(w2-w-padding)/w2;
+    verticesCube2D[6] = (float)(-h2+padding)/h2;
+
+    verticesCube2D[10] = (float)(w2-w-padding)/w2;
+    verticesCube2D[11] = (float)(-h2+h+padding)/h2;
+
+    verticesCube2D[15] = (float)(w2-padding)/w2;
+    verticesCube2D[16] = (float)(-h2+h+padding)/h2;
+
+    pos.setData(verticesCube2D.data(),20);
+	pos.setIndexVector(indicesCube2D.data(),6);
+
+    glm::mat4 view2D = glm::mat4(1.0f);
+    drwLogo->draw<uint8_t>(view2D,&logo,&pos,6);
+}
+
+void 
+Viewer::initDrawables() {
+
     if(newDrawables.size() > 0){
         for (auto const& drw : newDrawables){
             drw.second->onInit(Viewer::instance);
