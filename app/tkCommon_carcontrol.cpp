@@ -13,12 +13,39 @@
 
 tk::gui::Viewer* 	viewer = tk::gui::Viewer::getInstance();
 
+tk::communication::CanInterface canSoc;
+tk::communication::CarControl carCtrl;
 class Control : public tk::gui::Drawable{
     public:
         Control() {}
         ~Control() {}
 
+        bool active = false;
+        bool setZero = false;
+        float steerReqDeg = 0;
+        float steerSpeed = 65536; 
+
         void draw(tk::gui::Viewer *viewer){
+            ImGui::Begin("Car control", NULL, ImGuiWindowFlags_NoScrollbar);
+            if(ImGui::Checkbox("ACTIVATE", &active)) {
+                std::cout<<"Set CAR state: "<<active<<"\n";
+                carCtrl.enable(active);
+            }
+            if(ImGui::Button("SET ZERO")) {
+                carCtrl.setSteerZero();
+            }
+            //if(ImGui::Button("RESET")) {
+            //    carCtrl.resetSteerMotor();
+            //}
+            ImGui::SliderFloat("Steer", &steerReqDeg, -30, +30);
+            ImGui::InputFloat("Steer_", &steerReqDeg, -30, +30);
+            ImGui::SliderFloat("SteerSpeed", &steerSpeed, 0, 65536);
+
+            ImGui::Text("steer pos: %d", carCtrl.steerPos);
+            ImGui::End();
+
+
+            /*
             ImGui::Begin("Car control", NULL, ImGuiWindowFlags_NoScrollbar);
             ImGui::Text("Steer: %f",steer);
             ImGui::Text("Throttle: %f",throttle);
@@ -63,8 +90,10 @@ class Control : public tk::gui::Drawable{
                 joystick = !joystick;
             }
             ImGui::End();
+            */
         }
 
+        /*
         int curSteer,curAcc,curBrake;
         float steerReq,accReq,brakeReq,steer,throttle;
         
@@ -84,6 +113,7 @@ class Control : public tk::gui::Drawable{
         float torque,brake;
 
         float angle = 0;
+        */
 };
 
 bool gRun = true;
@@ -101,28 +131,37 @@ int main( int argc, char** argv){
     std::string soc_file = cmd.addArg("interface", "can0", "can interface to read");
     float smoothSteer    = cmd.addFloatOpt("-lerp_steer", 0.02, "steer lerp value");
     float smoothThrottle = cmd.addFloatOpt("-lerp_throttle", 0.10, "throttle lerp value");
+    bool  queryEcus      = cmd.addBoolOpt("-query", "query all connected ECUS");
     cmd.parse();
+
+
+    
+    tkASSERT(canSoc.initSocket(soc_file));
+    carCtrl.init(&canSoc);
+    //carCtrl.sendOdomEnable(false);
+
+    if(queryEcus) {
+        usleep(100000);
+        carCtrl.requestMotorId();
+        return 0;
+    }
+
 
     Control* c = new Control();
     viewer->add(c);
     viewer->start();
     
-
+    /*
 	Joystick joy;
     tkASSERT(joy.init());
+    */
 
-    tk::communication::CanInterface canSoc;
-    tk::communication::CarControl carCtrl;
-    
-    tkASSERT(canSoc.initSocket(soc_file));
-    carCtrl.init(&canSoc);
-    carCtrl.sendOdomEnable(true);
-    
     tk::rt::Task t;
     t.init(50*1e3);
     float steer = 0, throttle = 0;
     bool active = false;
     while(gRun) {
+        /*
         // grab joystick
 		tk::common::Vector2<float> stickL;
         float triggerL, triggerR;
@@ -209,11 +248,18 @@ int main( int argc, char** argv){
             }
             c->curVel = carCtrl.odom.speed.x();
         }
+        */
+
+        if(c->active) {
+            carCtrl.steerAngle(c->steerReqDeg, c->steerSpeed);
+        }
+
         t.wait();
     }
     
+
+    viewer->join();
     carCtrl.close();
     canSoc.close();
-    viewer->join();
     return 0;
 }

@@ -33,7 +33,7 @@ namespace tk { namespace communication {
 
         // ecu ids
         uint8_t brakeECU = 3;
-        uint8_t steerECU = 15;
+        uint8_t steerECU = 16;
         uint8_t accECU   = 6;
 
         bool active = false;
@@ -117,11 +117,10 @@ namespace tk { namespace communication {
         void setVel(float vel);
 
         void steerAngle(float angle, uint16_t vel = 0){
-            float diff = angle/40.0;
-            setSteerPos(diff*18000,0,vel);
+            float diff = -angle/0.0015;
+            setSteerPos(diff,0,vel);
         }
         
-    private:
         // request info from the system
         void requestSteerPos();
         void requestAccPos();

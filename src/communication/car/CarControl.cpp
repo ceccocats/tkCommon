@@ -54,11 +54,11 @@ void CarControl::computePIDs() {
 
 void CarControl::writeLoop() {
     tk::rt::Task t;
-    t.init(20000);
+    t.init(50000);
     while(run) {
 
-        if(usePid)
-            computePIDs();
+        //if(usePid)
+        //    computePIDs();
 
         /*if(velocity > -5) {
             pidTorque = pid.calculate(0.02,velocity-odom.speed.x());
@@ -77,8 +77,11 @@ void CarControl::writeLoop() {
 
         if(active){
             requestSteerPos();
+            usleep(5000);
             requestAccPos();
+            usleep(5000);
             requestBrakePos();
+            usleep(5000);
         }
         t.wait();
     }
@@ -211,8 +214,10 @@ void CarControl::enable(bool status) {
     data.frame.data[0] = accECU;
     data.frame.data[1] = status;
     soc->write(&data);
+    usleep(100000);
     if(!status){
         sendGenericCmd("OFF");
+        usleep(100000);
     }
 }
 
