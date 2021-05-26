@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#include <tkCommon/terminalFormat.h>
+#include "tkCommon/common.h"
 
 namespace tk{ namespace communication {
 
@@ -32,9 +32,10 @@ namespace tk{ namespace communication {
          *
          * @param port          UDP port
          * @param ip            IP
+         * @param readTimeout   if we want 1 sec of reading timout
          * @return
          */
-        bool initClient(const int port, const std::string ip);
+        bool initClient(const int port, const std::string ip, bool readTimeout = false);
 
         /**
          * Method that read a packet

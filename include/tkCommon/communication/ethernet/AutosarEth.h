@@ -40,7 +40,7 @@ namespace tk { namespace communication {
             this->data = buffer + sizeof(AutosarHeader_t);
 
             if(buflen >= this->buflen) {
-                //clsMsg("msg id: " + hexId() + " len: " + std::to_string(len) + "\n");
+                //tkMSG("msg id: " + hexId() + " len: " + std::to_string(len) + "\n");
                 return true;
             } 
             return false;

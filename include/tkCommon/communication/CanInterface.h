@@ -37,14 +37,14 @@ namespace tk { namespace communication {
          * @param can_frame Packet data
          * @return          Packet lenght
          */
-        int read(tk::data::CanData_t *data);
+        int read(tk::data::CanData *data);
 
         /**
          * Write frem on socket, works only in online mode
          * @param frame
          * @return
          */
-        bool write (tk::data::CanData_t *data);
+        bool write (tk::data::CanData *data);
 
         //Recording
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

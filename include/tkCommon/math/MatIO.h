@@ -1,6 +1,9 @@
 #pragma once
+#include <utility>
+#include <type_traits>
 #include <matio.h>
 #include "tkCommon/common.h"
+#include "tkCommon/math/MatSimple.h"
 
 /** @if mat_devman
  * @brief Matlab MAT File information
@@ -28,7 +31,10 @@ struct _mat_t {
 
 namespace tk { namespace  math {
 
-template <typename Tp> struct matio_type;
+template <typename Tp> struct matio_type {
+    static const matio_types tid = MAT_T_UNKNOWN;   
+    static const matio_classes cid = MAT_C_EMPTY;   
+};
 template <> struct matio_type<int8_t>   { typedef int8_t type;    static const matio_types tid = MAT_T_INT8;   static const matio_classes cid = MAT_C_INT8;   };
 template <> struct matio_type<uint8_t>  { typedef uint8_t type;   static const matio_types tid = MAT_T_UINT8;  static const matio_classes cid = MAT_C_UINT8;  };
 template <> struct matio_type<int16_t>  { typedef int16_t type;   static const matio_types tid = MAT_T_INT16;  static const matio_classes cid = MAT_C_INT16;  };
@@ -41,6 +47,7 @@ template <> struct matio_type<float>    { typedef float type;     static const m
 template <> struct matio_type<double>   { typedef double type;    static const matio_types tid = MAT_T_DOUBLE; static const matio_classes cid = MAT_C_DOUBLE; };
 template <> struct matio_type<long double> { typedef double type; static const matio_types tid = MAT_T_DOUBLE; static const matio_classes cid = MAT_C_DOUBLE; };
 
+class MatDump;
 
 /**
     Mat file reader class
@@ -65,26 +72,26 @@ public:
 
         bool check(matvar_t *var, matio_types tid, int rank, bool unary = false) {
             if(var == NULL) {
-                clsErr("unable to read var is NULL");
+                tkERR("unable to read var is NULL");
                 return false;
             }
             if(var->data == NULL) {
-                clsErr("unable to read var->data is NULL");
+                tkERR("unable to read var->data is NULL");
                 return false;
             }
             if(var->data_type != tid) {
-                clsErr("Unable to read value in var " + std::string(var->name) +"\n");
-                clsErr("type check failed: " + std::to_string(var->data_type) + " != " + std::to_string(tid) + "\n");
+                tkERR("Unable to read value in var " + std::string(var->name) +"\n");
+                tkERR("type check failed: " + std::to_string(var->data_type) + " != " + std::to_string(tid) + "\n");
                 return false;
             }
             if(var->rank != rank) {
-                clsErr("Unable to read value in var " + std::string(var->name) +"\n");
-                clsErr("Rank missmatch " + std::to_string(var->rank) + " != " + std::to_string(rank) + "\n");
+                tkERR("Unable to read value in var " + std::string(var->name) +"\n");
+                tkERR("Rank missmatch " + std::to_string(var->rank) + " != " + std::to_string(rank) + "\n");
                 return false;
             }
             if(unary && (var->dims[0] != 1 || var->dims[1] != 1) ) {
-                clsErr("Unable to read value in var " + std::string(var->name) +"\n");
-                clsErr("Dims are not unary: (" + std::to_string(var->dims[0]) + ", " + std::to_string(var->dims[1]) +")\n");
+                tkERR("Unable to read value in var " + std::string(var->name) +"\n");
+                tkERR("Dims are not unary: (" + std::to_string(var->dims[0]) + ", " + std::to_string(var->dims[1]) +")\n");
                 return false;
             }
             return true;
@@ -231,12 +238,15 @@ public:
             return fieldMap[s];
         }
 
-        template <typename T>
-        bool get(T &val) {
+
+        template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool get(T &a);
+        template<class T, typename std::enable_if<!std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool get(T &a){
             matio_type<T> mat_type;
             if(!check(var, mat_type.tid, 2, true))
                 return false;
-            memcpy(&val, var->data, var->data_size);
+            memcpy(&a, var->data, var->data_size);
             return true;
         }
         template<typename T, int A, int B>
@@ -248,7 +258,20 @@ public:
             memcpy(mat.data(), var->data, mat.size()*var->data_size);
             return true;
         }
-        template<typename T>
+        template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool get(MatSimple<T,false> &mat);
+        template<class T, typename std::enable_if<!std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool get(MatSimple<T,false> &mat) {
+            matio_type<T> mat_type;
+            if(!check(var, mat_type.tid, 2))
+                return false;
+            mat.resize(var->dims[0], var->dims[1]);
+            memcpy(mat.data, var->data, mat.size*var->data_size);
+            return true;
+        }
+        template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool get(std::vector<T> &vec);
+        template<class T, typename std::enable_if<!std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
         bool get(std::vector<T> &vec) {
             matio_type<T> mat_type;
             if(!check(var, mat_type.tid, 2))
@@ -265,27 +288,65 @@ public:
             memcpy( (void*)vec.data(), var->data, vec.size()*var->data_size);
             return true;
         }
-   
+        template<typename T>
+        bool get(tk::common::Map<T> &map) {
+            for(int i=0; i<fields.size(); i++) {
+                map.add(fields[i]);
+                fieldMap[fields[i]].get(map[fields[i]]);
+            }
+            return true;
+        }
 
-        template <typename T>
-        bool set(std::string name, T &val) {
+
+        template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool set(std::string name, T &a);
+        template<class T, typename std::enable_if<!std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool set(std::string name, T &a) {
             matio_type<T> mat_type;
+            if(mat_type.tid == MAT_T_UNKNOWN) {
+                tkERR("could not serialize this type\n");
+                return false;
+            }
             release();
             size_t dim[2] = { 1, 1 }; // 1x1, single value
-            var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, &val, 0);
+            var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, &a, 0);
             return true;
-        }   
+        } 
         template<typename T, int A, int B>
         bool set(std::string name, Eigen::Matrix<T, A, B> &mat) {
             matio_type<T> mat_type;
+            if(mat_type.tid == MAT_T_UNKNOWN) {
+                tkERR("could not serialize this type\n");
+                return false;
+            }
             release();
             size_t dim[2] = { (size_t) mat.rows(), (size_t) mat.cols() }; 
             var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, mat.data(), 0);
             return true;
         }
-        template<typename T>
+        template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool set(std::string name, MatSimple<T,false> &mat);
+        template<class T, typename std::enable_if<!std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool set(std::string name, MatSimple<T,false> &mat) {
+            matio_type<T> mat_type;
+            if(mat_type.tid == MAT_T_UNKNOWN) {
+                tkERR("could not serialize this type\n");
+                return false;
+            }
+            release();
+            size_t dim[2] = { (size_t) mat.rows, (size_t) mat.cols }; 
+            var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, mat.data, 0);
+            return true;
+        }
+        template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
+        bool set(std::string name, std::vector<T> &vec);
+        template<class T, typename std::enable_if<!std::is_base_of<tk::math::MatDump, T>::value, int>::type = 0>
         bool set(std::string name, std::vector<T> &vec) {
             matio_type<T> mat_type;
+            if(mat_type.tid == MAT_T_UNKNOWN) {
+                tkERR("could not serialize this type\n");
+                return false;
+            }
             release();
             size_t dim[2] = { (size_t) vec.size(), 1 }; 
             var = Mat_VarCreate(name.c_str(), mat_type.cid, mat_type.tid, 2, dim, vec.data(), 0);
@@ -296,6 +357,14 @@ public:
             size_t dim[2] = { 1, (size_t) vec.size() }; 
             var = Mat_VarCreate(name.c_str(), MAT_C_CHAR, MAT_T_INT8, 2, dim, (void*)vec.data(), 0);
             return true;
+        }
+        template<typename T>
+        bool set(std::string name, tk::common::Map<T> &map) {
+            std::vector<tk::math::MatIO::var_t> vars(map.size());
+            for(int i=0; i<map.size(); i++) {
+                vars[i].set(map.keys()[i], *map.vals()[i]);
+            }
+            return setStruct(name, vars);
         }
 
         /**
@@ -308,7 +377,7 @@ public:
             const char *names[fields.size()];
             for(int i=0; i<fields.size(); i++) {
                 if(fields[i].var == NULL) {
-                    clsErr("provided NULL field while creating struct: " + name  + "\n");
+                    tkERR("provided NULL field while creating struct: " + name  + "\n");
                     return false;
                 }
                 names[i] = fields[i].var->name;
@@ -341,7 +410,7 @@ public:
             matvar_t *cells[fields.size()];
             for(int i=0; i<fields.size(); i++) {
                 if(fields[i].var == NULL) {
-                    clsErr("provided NULL field while creating struct: " + name  + "\n");
+                    tkERR("provided NULL field while creating struct: " + name  + "\n");
                     return false;
                 }
                 cells[i] = fields[i].var;
@@ -370,7 +439,7 @@ public:
         
         matfp = Mat_CreateVer(mat_dir.c_str(), NULL, MAT_FT_MAT5);
         if(matfp == NULL) {
-            clsErr("can't create file: " + mat_dir + "\n");
+            tkERR("can't create file: " + mat_dir + "\n");
             return false;
         }
         return true;
@@ -385,7 +454,7 @@ public:
 
         matfp = Mat_Open(mat_dir.c_str(), MAT_ACC_RDWR);
         if(matfp == NULL) {
-            clsErr("can't open file: " + mat_dir + "\n");
+            tkERR("can't open file: " + mat_dir + "\n");
             return false;
         }
 
@@ -422,13 +491,13 @@ public:
      */
     void stats() {
         if(matfp == NULL) {
-            clsWrn("Matfile not opened\n");
+            tkWRN("Matfile not opened\n");
             return;
         }
         tkASSERT(fposes.size() == fposesMap.size());
 
-        clsMsg(std::string(matfp->header) + "\n");
-        clsMsg("file: " + std::string(matfp->filename) + "  ( " 
+        tkMSG(std::string(matfp->header) + "\n");
+        tkMSG("file: " + std::string(matfp->filename) + "  ( " 
                + std::to_string(fposesMap.size()) + " vars )\n");
     }
 
@@ -482,6 +551,7 @@ public:
         if(var.empty())
             return false;
         Mat_VarWrite(matfp, var.getRawData(), MAT_COMPRESSION_NONE);
+        return true;
     }
 
     template<typename T>
@@ -512,13 +582,91 @@ public:
 class MatDump {
     public: 
 
-    virtual bool   toVar(std::string name, MatIO::var_t &var) {
+    bool toVar(std::string name, MatIO::var_t &var) {
         tkFATAL("Not implemented");
+        return false;
     }
-    virtual bool fromVar(MatIO::var_t &var) {
+    bool fromVar(MatIO::var_t &var) {
         tkFATAL("Not implemented");
+        return false;
     }
+
+    bool loadMat(std::string file, std::string name = "data") {
+        tk::math::MatIO mat;
+        if(mat.open(file)) {
+            tk::math::MatIO::var_t var;
+            mat.read(name, var);
+            bool ok = fromVar(var);
+            var.release();
+            mat.close();
+            return ok;
+        }
+        return false;
+    }
+
+    bool saveMat(std::string file, std::string name = "data") {
+        tk::math::MatIO mat;
+        if(mat.create(file)) {
+            tk::math::MatIO::var_t var;
+            bool ok = toVar(name, var);
+            ok = ok && mat.write(var);
+            std::string version_str = tk::common::tkVersionGit();
+            ok = ok && mat.write("tkversion", version_str);
+            std::string date_str = getTimeStampString();
+            ok = ok && mat.write("date", date_str);
+            var.release();
+            mat.close();
+            return ok;
+        }
+        return false;
+    }
+
 };
+
+// template specialization
+template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type>
+bool MatIO::var_t::get(T &m) {
+    return m.fromVar(*this);
+}
+template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type>
+bool MatIO::var_t::get(MatSimple<T,false> &mat) {
+    bool ok = true;
+    mat.resize(size(), 1);
+    for(int i = 0; i < size(); i++){
+        ok = ok && mat.data[i].fromVar((*this)[(*this)[i]]);
+    }
+    return ok;
+}
+template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type>
+bool MatIO::var_t::get(std::vector<T> &vec) {
+    bool ok = true;
+    vec.resize(size());
+    for(int i = 0; i < size(); i++){
+        ok = ok && vec[i].fromVar((*this)[(*this)[i]]);
+    }
+    return ok;
+}
+
+template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type>
+bool MatIO::var_t::set(std::string name, T &m) {
+    return m.toVar(name, *this);
+}
+template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type>
+bool MatIO::var_t::set(std::string name, MatSimple<T,false> &mat) {
+    std::vector<tk::math::MatIO::var_t> vars(mat.size);
+    for(int i=0; i<mat.size; i++) {
+        mat.data[i].toVar(name, vars[i]);
+    }
+    return setCells(name, vars);
+}
+template<class T, typename std::enable_if<std::is_base_of<tk::math::MatDump, T>::value, int>::type>
+bool MatIO::var_t::set(std::string name, std::vector<T> &vec) {
+    std::vector<tk::math::MatIO::var_t> vars(vec.size());
+    for(int i=0; i<vec.size(); i++) {
+        vec[i].toVar(name, vars[i]);
+    }
+    return setCells(name, vars);
+}
 
 
 }}

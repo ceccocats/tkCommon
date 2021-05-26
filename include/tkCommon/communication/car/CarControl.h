@@ -1,6 +1,7 @@
 #pragma once
 #include "tkCommon/communication/CanInterface.h"
-#include "tkCommon/data/VehicleData.h"
+#include "tkCommon/data/OdomData.h"
+#include "tkCommon/PID.h"
 
 namespace tk { namespace communication {
 
@@ -33,13 +34,23 @@ namespace tk { namespace communication {
         // ecu ids
         uint8_t brakeECU = 3;
         uint8_t steerECU = 15;
-        uint8_t accECU = 6;
+        uint8_t accECU   = 6;
+
+        bool active = false;
 
     public:
-        tk::data::VehicleData::odom_t odom; /**< current vehicle odometry */
+        tk::data::OdomData odom; /**< current vehicle odometry */
         int steerPos = 0;                   /**< current steer value      */
         int brakePos = 0;                   /**< current brake value      */
         int accPos = 0;                     /**< current accel value      */
+
+        tk::common::PID pidTorque;
+        tk::common::PID pidBrake;
+        float torqueRequest, brakeRequest;
+
+        bool usePid = false;
+
+        float requestSpeed = 0;
 
         /**
          *  Init the sistem on a specified CAN socket
@@ -90,23 +101,33 @@ namespace tk { namespace communication {
         /**
          *  Set Accel (and Brake?) enabled or not
          */
-        void sendAccEnable(bool status);
+        void enable(bool status);
         /**
          *  Set Odometry stream enabled or not
          */
         void sendOdomEnable(bool status);
-
         /**
          *  Simulate pression off engine start
          */
         void sendEngineStart();
+        /**
+         * Set vel
+         * 
+         */
+        void setVel(float vel);
 
+        void steerAngle(float angle, uint16_t vel = 0){
+            float diff = angle/40.0;
+            setSteerPos(diff*18000,0,vel);
+        }
+        
     private:
         // request info from the system
         void requestSteerPos();
         void requestAccPos();
         void requestBrakePos();
         void requestMotorId();
+        void computePIDs();
     };
     
 }}

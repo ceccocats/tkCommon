@@ -1,10 +1,113 @@
 #include "tkCommon/communication/serial/SerialPort.h"
-#include <fcntl.h>
-#include <errno.h>
-#include <termios.h>
-#include <unistd.h>
-#include <string.h>
 
+namespace tk { namespace communication {
+    bool 
+    SerialPort::init(const std::string& port, int baud)
+    {
+        // open port
+        try {
+            serialPort.Open(port);
+        } catch (LibSerial::OpenFailed e) {
+            tkERR("Bad file descriptor.\n");
+            return false;
+        }
+        //if(!serialPort.IsOpen())
+        //    return false;
+
+        // set baud
+        switch (baud)
+        {
+        case 9600:
+            serialPort.SetBaudRate(LibSerial::BaudRate::BAUD_9600);
+            break;
+        case 115200:
+            serialPort.SetBaudRate(LibSerial::BaudRate::BAUD_115200);
+            break;
+        case 921600:
+            serialPort.SetBaudRate(LibSerial::BaudRate::BAUD_921600);
+            break;
+        default:
+            return false;
+            break;
+        }
+        
+
+        // Set the number of data bits.
+        serialPort.SetCharacterSize(LibSerial::CharacterSize::CHAR_SIZE_8) ;
+
+        // Turn off hardware flow control.
+        serialPort.SetFlowControl(LibSerial::FlowControl::FLOW_CONTROL_NONE) ;
+
+        // Disable parity.
+        serialPort.SetParity(LibSerial::Parity::PARITY_NONE) ;
+        
+        // Set the number of stop bits.
+        serialPort.SetStopBits(LibSerial::StopBits::STOP_BITS_1) ;
+
+        // Wait for data to be available at the serial port.
+        //while(!serialPort.IsDataAvailable()) 
+        //{
+        //    usleep(1000) ;
+        //}
+
+        return true;
+    }
+
+    bool 
+    SerialPort::close()
+    {
+        serialPort.Close();
+
+        return true;
+    }
+
+    bool
+    SerialPort::readLine(std::string& msg, char terminator, timeStamp_t timeout)
+    {
+        try {
+            serialPort.ReadLine(msg, terminator, timeout);
+        } catch (const LibSerial::ReadTimeout&) {
+            tkWRN("Timeout.\n");
+            return false;
+        }
+        return true;
+    }
+
+    bool
+    SerialPort::read(std::string& msg, int size, timeStamp_t timeout)
+    {
+        try {
+            serialPort.Read(msg, size, timeout);
+        } catch (const LibSerial::ReadTimeout&) {
+            tkWRN("Timeout.\n");
+            return false;
+        }
+        return true;
+    }
+
+    bool 
+    SerialPort::readByte(uint8_t& byte, timeStamp_t timeout)
+    {
+        try {
+            serialPort.ReadByte(byte, timeout);
+        } catch (const LibSerial::ReadTimeout&) {
+            tkWRN("Timeout.\n");
+            return false;
+        }
+        return true;
+    }
+
+    bool
+    SerialPort::write(std::string &msg)
+    {
+        serialPort.Write(msg);
+        serialPort.DrainWriteBuffer();
+
+        return true;
+    }
+}}
+
+/*
 bool tk::sensors::SerialPort::init(std::string port) {
 
     this->port = port;
@@ -52,3 +155,4 @@ bool tk::sensors::SerialPort::readSoc(std::string &msg) {
     msg = std::string(line_buf);
     return true;
 }
+*/

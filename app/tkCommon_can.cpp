@@ -25,7 +25,7 @@ int main( int argc, char** argv){
     }
 
     tk::data::VehicleData veh;
-    tk::data::CanData_t data;
+    tk::data::CanData data;
     while(canSoc.read(&data)) {
         vehparser.parse(data, veh);
     }

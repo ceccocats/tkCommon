@@ -5,56 +5,86 @@
 #include "tkCommon/gui/Viewer.h"
 #include "tkCommon/math/quantile.h"
 #include "tkCommon/communication/car/CarControl.h"
+#include "tkCommon/rt/Task.h"
 
-class MyViewer : public tk::gui::Viewer {
+//viewer
+#include "tkCommon/gui/Viewer.h"
+#include "tkCommon/gui/drawables/Drawable.h"
+
+tk::gui::Viewer* 	viewer = tk::gui::Viewer::getInstance();
+
+class Control : public tk::gui::Drawable{
     public:
-    MyViewer() {}
-    ~MyViewer() {}
+        Control() {}
+        ~Control() {}
 
-    void init() {
-        tk::gui::Viewer::init();
-    }
+        void draw(tk::gui::Viewer *viewer){
+            ImGui::Begin("Car control", NULL, ImGuiWindowFlags_NoScrollbar);
+            ImGui::Text("Steer: %f",steer);
+            ImGui::Text("Throttle: %f",throttle);
+            ImGui::Text("\n");
+            ImGui::Text("steerReq: %f",steerReq);
+            ImGui::Text("accReq: %f",accReq);
+            ImGui::Text("brakeReq: %f",brakeReq);
+            ImGui::Text("\n");
+            ImGui::Text("enableSteer: %d (start/back)",curSteer);
+            ImGui::Text("enableAcc: %d",curAcc);
+            ImGui::Text("enableBrake: %d",curBrake);
+            ImGui::Text("\n");
+            ImGui::Text("A: steer zero");
+            ImGui::Text("B: motor reset");
+            ImGui::Text("X: off");
+            ImGui::Text("Y: start");
+            ImGui::End();
 
-    void draw() {
-        //tk::gui::Viewer::draw();
-        tkViewport2D(width, height);
+            ImGui::Begin("PIDs", NULL, ImGuiWindowFlags_NoScrollbar);
+            ImGui::Text("Velocity %f", curVel);
+            ImGui::SliderFloat("Request Velocity",&vel,-1.0f,30.0f,"%.1f km/h");
+            ImGui::Separator();
+            ImGui::Text("PID Request %f", torque);
+            ImGui::SliderFloat("kp",&kpTorque,-3.0f,3.0f,"%.2f");
+            ImGui::SliderFloat("ki",&kiTorque,-1.0f,1.0f,"%.4f");
+            ImGui::SliderFloat("kd",&kdTorque,-1.0f,1.0f,"%.4f");
+            ImGui::Separator();
+            ImGui::Text("PID Request %f", brake);
+            ImGui::SliderFloat("kp",&kpBrake,-3.0f,3.0f,"%.2f");
+            ImGui::SliderFloat("ki",&kiBrake,-1.0f,1.0f,"%.4f");
+            ImGui::SliderFloat("kd",&kdBrake,-1.0f,1.0f,"%.4f");
+            ImGui::Text("Angle");
+            ImGui::SliderFloat("steer",&angle,-450.0,450.0,"%.4f");
 
-        drawBar("steer", steer, 0.2);
-        drawBar("throttle", throttle, -0.2);
+            std::string text;
+            if(joystick){
+                text = "use velocity";
+            }else{
+                text = "use joystick";
+            }
+            if (ImGui::Button(text.c_str())){
+                joystick = !joystick;
+            }
+            ImGui::End();
+        }
 
-        std::string str = std::string("Back:  disable Acc\n")   +
-                                      "Start: enable Acc\n"     + 
-                                      "A:     set steer zero\n" +
-                                      "B:     reset steer\n"    +
-                                      "X:     disable steer\n";
-        tkDrawText(str, {-xLim+0.05f, yLim-0.1f, 0.01f}, {0.0f,0.0f,0.0f}, {0.05f, 0.05f, 0.05f});
+        int curSteer,curAcc,curBrake;
+        float steerReq,accReq,brakeReq,steer,throttle;
+        
+        float vel = 0.0f;
+        float curVel = 0.0f;
 
+        bool joystick = true;
 
-        std::string str2 = std::string("Steer Req:   ") + std::to_string(steerReq) + "\n" +
-                           std::string("Steer Resp:  ") + std::to_string(curSteer) + "\n" +
-                           std::string("Acc Req:   ") + std::to_string(accReq) + "\n" +
-                           std::string("Acc Resp:  ") + std::to_string(curAcc) + "\n" +
-                           std::string("Brk Req:   ") + std::to_string(brakeReq) + "\n" +
-                           std::string("Brk Resp:  ") + std::to_string(curBrake) + "\n";
-        tkDrawText(str2, {-xLim+0.05f, -0.4, 0.01f}, {0.0f,0.0f,0.0f}, {0.05f, 0.05f, 0.05f});
-    }
+        float kpTorque = 0.04f;
+        float kiTorque = 0.0f;
+        float kdTorque = 0.0f;
 
-    void drawBar(std::string name, float val, float y, float w = 0.8, float h = 0.1) {
-        char buf[256];
-        tkSetColor(tk::gui::color::WHITE);
-        sprintf(buf, "%s: %+4.3f", name.c_str(), val);
-        tkDrawText(buf, {-w,y+h,0}, {0,0,0}, {h,h,h});
-        tkDrawRectangle({0,y,0}, {w*2, h, 0}, false);
-        tkSetColor(tk::gui::color::RED);
-        tkDrawRectangle({val*w, y, 0}, {h,h,h}, true);
-    } 
+        float kpBrake = 0.04f;
+        float kiBrake = 0.0f;
+        float kdBrake = 0.0f;
 
-    float steer = 0, throttle = 0;
+        float torque,brake;
 
-    int steerReq = 0, curSteer = 0;
-    int accReq = 0, brakeReq = 0, curAcc = 0, curBrake = 0;
+        float angle = 0;
 };
-
 
 bool gRun = true;
 void signal_handler(int signal){
@@ -66,25 +96,16 @@ void signal_handler(int signal){
 int main( int argc, char** argv){
     std::signal(SIGINT, signal_handler);
     std::signal(SIGTERM, signal_handler);
-    
-    // useful
-    std::cout<<"Please set can before\n";
-    std::cout<<"sudo ip link set can0 down\n";
-    std::cout<<"sudo ip link set can0 type can bitrate 125000\n";
-    std::cout<<"sudo ip link set can0 up\n\n";
 
-    tk::common::CmdParser cmd(argv, "Can utils");
+    tk::common::CmdParser cmd(argv, "Car Control");
     std::string soc_file = cmd.addArg("interface", "can0", "can interface to read");
-    std::string dbc_file = cmd.addArg("dbc", "", "DBC can to parse");
     float smoothSteer    = cmd.addFloatOpt("-lerp_steer", 0.02, "steer lerp value");
     float smoothThrottle = cmd.addFloatOpt("-lerp_throttle", 0.10, "throttle lerp value");
     cmd.parse();
 
-    MyViewer viewer;
-    viewer.setWindowName("Car control");
-    viewer.initOnThread(false);
-    viewer.plotManger->addCirclePlot("odom", tk::gui::color::RED, 1000000, 0.5);
-    viewer.plotManger->set2d("odom",true);
+    Control* c = new Control();
+    viewer->add(c);
+    viewer->start();
     
 
 	Joystick joy;
@@ -95,9 +116,10 @@ int main( int argc, char** argv){
     
     tkASSERT(canSoc.initSocket(soc_file));
     carCtrl.init(&canSoc);
-    carCtrl.sendOdomEnable(false);
+    carCtrl.sendOdomEnable(true);
     
-    LoopRate rate(50*1e3);
+    tk::rt::Task t;
+    t.init(50*1e3);
     float steer = 0, throttle = 0;
     bool active = false;
     while(gRun) {
@@ -105,41 +127,28 @@ int main( int argc, char** argv){
 		tk::common::Vector2<float> stickL;
         float triggerL, triggerR;
         joy.update();
-		joy.getStickLeft(stickL.x,stickL.y);
+		joy.getStickLeft(stickL.x(),stickL.y());
 		joy.getTriggerLeft(triggerL);
 		joy.getTriggerRight(triggerR);
 
         // commands
-        steer    = tk::math::lerp(steer, stickL.x, smoothSteer);
-        throttle = /*-triggerL + triggerR;*/ tk::math::lerp(throttle, -triggerL + triggerR, smoothThrottle);
+        steer    = tk::math::lerp(steer, stickL.x(), smoothSteer);
+        throttle = tk::math::lerp(throttle, -triggerL + triggerR, smoothThrottle);
 
         // update viewer
-        viewer.steer = steer;
-        viewer.throttle = throttle;
-
-        std::cout<<"STATUS: "<<carCtrl.steerPos<<" "<<carCtrl.accPos<<" "<<carCtrl.brakePos<<"\n";
-        viewer.curSteer = carCtrl.steerPos;
-        viewer.curAcc = carCtrl.accPos;
-        viewer.curBrake = carCtrl.brakePos;
-        
-        tk::data::VehicleData::odom_t o = carCtrl.odom;
-        viewer.plotManger->addPoint("odom", tk::common::odom2tf(o.x, o.y, 0));
-        std::cout<<"ODOM: "<<o.x<<" "<<o.y<<" "<<o.yaw<<" "<<o.speed<<"\n";
-        
-        // ODOM LOG
-        {
-            static std::ofstream odom_os("odomlog_"+getTimeStampString()+".txt");
-            odom_os<<o.t<<" "<<o.x<<" "<<o.y<<" "<<o.yaw<<" "<<o.speed<<"\n";
-            odom_os.flush();
-        }
+        c->steer    = steer;
+        c->throttle = throttle;
+        c->curSteer = carCtrl.steerPos;
+        c->curAcc   = carCtrl.accPos;
+        c->curBrake = carCtrl.brakePos;
 
         if(joy.getButtonPressed(BUTTON_BACK)) {
             std::cout<<"disable Acc\n";
-            carCtrl.sendAccEnable(false);
+            carCtrl.enable(false);
             active = false;
         } else if(joy.getButtonPressed(BUTTON_START)) {
             std::cout<<"enable Acc\n";
-            carCtrl.sendAccEnable(true);
+            carCtrl.enable(true);
             active = true;
         } else if(joy.getButtonPressed(BUTTON_A)) {
             std::cout<<"Set Steer Zero\n";
@@ -153,41 +162,58 @@ int main( int argc, char** argv){
             carCtrl.sendGenericCmd(cmd);
         } else if(joy.getButtonPressed(BUTTON_Y)) {
             std::cout<<"!!!! Engine !!!!\n";
-            carCtrl.sendAccEnable(true);
+            carCtrl.enable(true);
             usleep(1000);
-            carCtrl.setBrakePos(8000);
+            carCtrl.setBrakePos(2000);
             sleep(1);
             carCtrl.sendEngineStart();
             sleep(1);
-            carCtrl.sendAccEnable(false);
+            carCtrl.enable(false);
         }
 
         if(active) {
-            int32_t steerReq = (-steer) * 18000;
-            carCtrl.setSteerPos(steerReq);
 
+            if(c->joystick){
+                carCtrl.usePid = false;
 
-            uint16_t accReq   = 0; 
-            uint16_t brakeReq = 0;             
+                int32_t steerReq = (-steer) * 18000;
+                carCtrl.setSteerPos(steerReq);
 
-            if(fabs(throttle) > 0.05) {
-                accReq   = throttle > 0 ? throttle*100 : 0;
-                brakeReq = throttle < 0 ? -throttle*15000 : 0;
+                uint16_t accReq   = 0; 
+                uint16_t brakeReq = 0;             
+
+                if(fabs(throttle) > 0.05) {
+                    accReq   = throttle > 0 ? throttle*100 : 0;
+                    brakeReq = throttle < 0 ? -throttle*15000 : 0;
+                }
+
+                c->steerReq = steerReq;
+                c->accReq   = accReq;
+                c->brakeReq = brakeReq;
+
+                carCtrl.setVel(-10);
+                carCtrl.setAccPos(accReq); 
+                carCtrl.setBrakePos(brakeReq);
+            }else{
+                carCtrl.usePid = true;
+
+                //Update kp ki kd
+                carCtrl.pidTorque.setGain(c->kpTorque,c->kiTorque,c->kdTorque);
+                carCtrl.pidBrake.setGain(c->kpBrake,c->kiBrake,c->kdBrake);
+
+                carCtrl.setVel(c->vel);
+                c->brake = carCtrl.brakeRequest;
+                c->torque = carCtrl.torqueRequest;
+
+                carCtrl.steerAngle(c->angle);
             }
-
-            std::cout<<"Req: "<<steerReq<<" "<<accReq<<" "<<brakeReq<<"\n";
-            viewer.steerReq = steerReq;
-            viewer.accReq = accReq;
-            viewer.brakeReq = brakeReq;
-
-            carCtrl.setAccPos(accReq); 
-            carCtrl.setBrakePos(brakeReq);
+            c->curVel = carCtrl.odom.speed.x();
         }
-        rate.wait(false);
+        t.wait();
     }
     
-    viewer.joinThread();
     carCtrl.close();
     canSoc.close();
+    viewer->join();
     return 0;
 }

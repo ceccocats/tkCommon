@@ -9,8 +9,17 @@ namespace tk { namespace communication {
     bool
     Ethinterface::initUDP(const int port, const std::string ip, time_t timeout_us){
         
+        this->isUdp         = true;
         this->replayMode    = false;
-        return this->socket.initReceiver(port,ip, timeout_us);
+        return this->udpSocket.initReceiver(port,ip, timeout_us);
+    }
+
+    bool
+    Ethinterface::initTCP(const int port, const std::string ip, time_t timeout_us){
+        
+        this->isUdp         = false;
+        this->replayMode    = false;
+        return this->tcpSocket.initClient(port,ip, timeout_us != -1);
     }
 
     bool
@@ -30,10 +39,15 @@ namespace tk { namespace communication {
         }else{
 
             //Socket
-            int len = this->socket.receive(buffer,20000);
+            int len;
+            if(isUdp){
+                len = this->udpSocket.receive(buffer,BUFFER_LENGTH);
+            }else{
+                len = this->tcpSocket.receive(buffer,BUFFER_LENGTH); 
+            }
             stamp   = getTimeStamp();
 
-            tkASSERT(len != 20000)
+            //tkASSERT(len != 30000)
             return len;
 
         }
@@ -44,14 +58,42 @@ namespace tk { namespace communication {
 
         this->replayMode = true;
         pcap.initRecord(fileName, iface, filter);
+        recording = true;
         pcap.record();
+        recording = false;
     }
 
     std::string 
     Ethinterface::recordStat(){
 
-        pcap.recordStat(stat);
-        return std::string("##Recive ")+std::to_string(stat.ps_recv)+"##Drop: "+std::to_string(stat.ps_drop)+"##IfaceDrop: "+std::to_string(stat.ps_ifdrop);
+        if(recording){
+            pcap.recordStat(stat);
+            return std::string("##Recive ")+std::to_string(stat.ps_recv)+"##Drop: "+std::to_string(stat.ps_drop)+"##IfaceDrop: "+std::to_string(stat.ps_ifdrop);
+        }else{
+            return "";
+        }
+    }
+
+    u_int
+    Ethinterface::ifaceRecive(){
+        
+        if(recording){
+            pcap.recordStat(stat);
+            return stat.ps_recv;
+        }else{
+            return 0;
+        }
+    }
+
+    u_int
+    Ethinterface::ifaceDrop(){
+
+        if(recording){
+            pcap.recordStat(stat);
+            return stat.ps_drop + stat.ps_ifdrop;
+        }else{
+            return 0;
+        }
     }
 
     bool
@@ -63,9 +105,19 @@ namespace tk { namespace communication {
             return this->pcap.close();
         }else{
 
-            //Socket
-            return this->socket.close();
+            if(isUdp)
+                this->udpSocket.close();
+            else
+                this->tcpSocket.close();
         }
+    }
+
+    bool 
+    Ethinterface::send(uint8_t* buffer, int length){
+        if(isUdp){
+            return false;
+        }
+        return tcpSocket.send(buffer,length);
     }
 
 

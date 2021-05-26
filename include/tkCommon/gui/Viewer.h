@@ -7,233 +7,140 @@
 #include <signal.h>
 #include <iostream>
 #include <fstream>
-#include "tkCommon/common.h"
-#include "tkCommon/gui/Camera3D.h"
-#include "tkCommon/gui/Color.h"
-#include "tkCommon/gui/lodepng.h"
+#include "tkCommon/gui/drawables/Drawable.h"
+#include "tkCommon/gui/shader/texture.h"
+#include "tkCommon/gui/utils/Camera.h"
 #include "tkCommon/gui/imgui/imgui.h"
 #include "tkCommon/gui/imgui/imgui_impl_glfw.h"
 #include "tkCommon/gui/imgui/imgui_impl_opengl3.h"
+#include "tkCommon/gui/implot/implot.h"
+#include "tkCommon/rt/Thread.h"
 
-#include <tkCommon/gui/Drawable.h>
+#define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
+#define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
 
-#include "tkCommon/gui/libdrawtext/drawtext.h"
-
-#include <tkCommon/terminalFormat.h>
 
 namespace tk { namespace gui {
-
-    class PlotManager;
 
     class Viewer {
 
     public:
-        Viewer();
         ~Viewer();
+        void start(bool useImGUI = true);
+        bool isRunning();
+        void stop();
+        void join();
+        void add(tk::gui::Drawable* obj);
 
-        struct object3D_t {
-            GLuint tex;
-            std::vector<Eigen::MatrixXf> triangles;
-            std::vector<tk::common::Vector3<float>> colors;
-        };
+        float getWidth();
+        float getHeight();
 
-        virtual void init();
-        virtual void draw();
-        virtual void drawSplash();
-        void run();
-
-
-        static void *threadCaller(void *args) {
-            Viewer *self = (Viewer*) args;
-            self->init();
-            self->init_mutex.unlock();
-            self->run();
-        }
-
-        void initOnThread(bool splashScreen = true) {
-            // enable splash screen
-            splash = splashScreen;
-
-            ts = getTimeStamp();
-
-            //clsSuc("start viz thread\n");
-            init_mutex.lock();
-            pthread_create(&thread, NULL, threadCaller, (void*)this);
-            init_mutex.lock();
-            //clsSuc("viz thread initted\n");
-            init_mutex.unlock();
-        }
-
-        void setSplash(bool splash) {
-            this->splash = splash;
-        }
-
-        void joinThread() {
-
-            while(getTimeStamp() - ts < splashTime){
-                usleep(100);
+        static Viewer* getInstance(){
+             if (Viewer::instance == nullptr) {
+                Viewer::instance = new Viewer();
             }
-
-            // disable splash screen
-            splash = false;
-
-            pthread_join(thread, NULL);
-            clsSuc("closed\n");
+            return Viewer::instance;
         }
 
-        void setSplashTime(float t) {
-            splashTime = t * 1000000;
+        glm::vec3 getLightPos();
+
+        void setBackground(tk::gui::Color_t col) {
+            background = col;
         }
-
-        void setIcon(std::string filename);
-        void setWindowName(std::string name);
-        void setBackground(tk::gui::Color_t c);
         
-        static int  tkLoadTexture(std::string filename, GLuint &tex);
-        static int  tkLoadOBJ(std::string filename, object3D_t &obj);
-        static void tkLoadLogo(std::string filename, std::vector<common::Vector3<float>> &logo);
+        static bool disabled;
+
+        Camera camera;
+
+
+        #define GLFW_SOURCE_KEYBORAD 0
+        #define GLFW_SOURCE_MOUSE 1
+        /**
+         * Add a mouse key callback
+         * void fun(key, action, source)
+         * key: id of key
+         * action: GLFW_PRESS, GLFW_RELEASE, GLFW_REPEAT
+         * source: GLFW_SOURCE_KEYBORAD, GLFW_SOURCE_MOUSE
+         */        
+        void addKeyCallback(void (*fun)(int,int,int));
+    
+        // user access callbacks
+        std::vector<void (*)(int,int,int)> user_key_callbacks;
+    
+    private:
         
-        static void tkSetColor(tk::gui::Color_t c, float alpha = -1);
-        static void tkApplyTf(tk::common::Tfpose tf);
-        static void tkDrawAxis(float s = 1.0);
-        static void tkDrawTriangle(tk::common::Vector3<float> a, tk::common::Vector3<float> b, tk::common::Vector3<float> c, bool filled = false);
-        static void tkDrawCircle(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = false);
-        static void tkDrawSphere(tk::common::Vector3<float> pose, float r, int res = 20, bool filled = true);
-        static void tkDrawCloud(Eigen::MatrixXf *data);
-        static void tkDrawCloudFeatures(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int idx, float maxval=1.0);
-        static void tkDrawCloudRGB(Eigen::MatrixXf *points, Eigen::MatrixXf *features, int r, int g, int b);
-        static void tkDrawArrow(tk::common::Vector3<float> pose, float yaw, float lenght, float radius = -1.0, int nbSubdivisions = 12);
-        static void tkDrawArrow(float length = 1.0, float radius = -1.0, int nbSubdivisions = 12);
-        static void tkDrawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
-        static void tkDrawRectangle(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled = true);
-        static void tkDrawLine(tk::common::Vector3<float> p0, tk::common::Vector3<float> p1);
-        static void tkDrawLine(std::vector<tk::common::Vector3<float>> poses);
-        static void tkDrawPoses(std::vector<tk::common::Vector3<float>> poses, tk::common::Vector3<float> size = tk::common::Vector3<float>{0.2, 0.2, 0.2});
-        static void tkDrawObject3D(object3D_t *obj, float size = 1.0, bool textured = false);
-        static void tkDrawTexture(GLuint tex, float sx, float sy);
-        static void tkDrawText(std::string text, tk::common::Vector3<float> pose,
-                           tk::common::Vector3<float> rot = tk::common::Vector3<float>{0.0, 0.0, 0.0},
-                           tk::common::Vector3<float> scale = tk::common::Vector3<float>{1.0, 1.0, 1.0});
-        static void tkRainbowColor(float hue, uint8_t &r, uint8_t &g, uint8_t &b);
-        static void tkSetRainbowColor(float hue);
-        static void tkDrawSpeedometer(tk::common::Vector2<float> pose, float speed, float radius);
+        Viewer();
+        void  init();
+        void  initDrawables();
 
-        // data 
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        static void tkDrawTf(std::string name, tk::common::Tfpose tf);
-        static void tkDrawLogo(std::string file, double scale);
-        //static void tkDrawRadarData(tk::data::RadarData *data);
+        static void* run(void* istance);
+        static void* fake_run(void* istance);
+        void  runloop();
 
-        //static void tkDrawImage(tk::data::ImageData<uint8_t>& image, GLuint texture);
-        static void tkSplitPanel(int count, float ratio, float xLim, int &num_cols, int &num_rows, float &w, float &h, float &x, float &y);
-        static void tkViewportImage(int width, int height, float xLim, float yLim, int im_id, float &im_width, float &im_height);
+        void  beforeDraw();
+        void  drawInfos();
+        void  drawSettings();
+        void  imguiDraw();
+        void  draw();
+        
+        void  follow();
+        void  close();
 
-		template<typename T, typename = std::enable_if<std::is_base_of<Drawable, T>::value>>
-        void insert(std::string name, T *data = nullptr){
-			buffer.insert<T>(name, data);
-		}
+        static Viewer *instance;
 
-		/// Returns the requested element
-		template<typename T, typename = std::enable_if<std::is_base_of<Drawable, T>::value>>
-		T* element(std::string name){
-			return (T*)buffer.map[name];
-		}
+        std::map<int,tk::gui::Drawable*> drawables;
+        std::map<int,tk::gui::Drawable*> newDrawables;
 
-		template<typename T, typename = std::enable_if<std::is_base_of<Drawable, T>::value>>
-		void update(std::string name, T *data){
-			buffer.update<T>(name, data);
-		}
+        tk::rt::Thread  glThread;
 
-		void add(std::string name, Drawable *data);
+        std::string windowName = "tkGUI";
+        Color_t     background = tk::gui::color::DARK_GRAY;
 
-		// data draw primitivies
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        int width = 800;
+        int height = 800;
+        double  dt = 1.0/60;
+        bool useImGUI;
+        int imguiSelected = -1;
+        bool running = false;
 
-		virtual void tkDrawTextureImage(unsigned int texture, int index);
+        glm::vec3   lightPos;
+        glm::mat4   modelview;
+        GLFWwindow *window;
+        const char *glsl_version = "#version 330";
 
-		virtual void tkDrawLineOnImage(std::vector<tk::common::Vector3<float>> &points, int index, tk::gui::Color_t color);
+        GLint total_mem_kb = 0;
+        GLint cur_avail_mem_kb = 0;
+        const int nUsage = 30;
+        const int nFPS = 30;
+        float gpuUsage[30]; 
+        float vizFPS[30];
+        bool gpu = false;
 
-		virtual void tkDrawLineOnImage(std::vector<tk::common::Vector2<float>> &points, int index, tk::gui::Color_t color);
+        //logo
+        tk::gui::Texture<uint8_t> logo;
+        tk::gui::Buffer<float> pos;
+        tk::gui::shader::texture* drwLogo;
+        std::vector<float> verticesCube2D = {
+            //positions				//texture cords
+            0.95f,-0.95f, 0.0f,   	1.0f, 1.0f,
+            0.7f, -0.95f, 0.0f,   	0.0f, 1.0f,
+            0.7f, -0.6f,  0.0f,   	0.0f, 0.0f,
+            0.95f,-0.6f,  0.0f,   	1.0f, 0.0f
+        };
+        std::vector<unsigned int> indicesCube2D = {  
+            0, 1, 2, // first triangle
+            0, 3, 2  // second triangle
+        };
+        void drawLogo();
 
-		virtual void tkDrawBoxOnImage(float x, float y, float w, float h, int index, tk::gui::Color_t color);
-
-		virtual void tkDrawRotatedBox3D(tk::common::Vector3<float> &pose, tk::common::Vector3<float> &size, tk::common::Vector3<float> &rot, tk::gui::Color_t color, float alpha = 255);
-
-		virtual void tkDrawPerceptionPyramid(tk::common::Vector3<float> &pose, float rotation, tk::gui::Color_t color, float alpha = 255);
-
-		virtual void tkDrawLidarCloud(Eigen::MatrixXf &points, int nPoints, Eigen::MatrixXf &intensity);
-
-        //static void tkDrawLiDARData(tk::data::LidarData *data);
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        static void tkViewport2D(int width, int height, int x=0, int y=0);
-
+        // glfw callbacks
         static void errorCallback(int error, const char* description);
         static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
-        bool isRunning() {return !glfwWindowShouldClose(window);};
-        void close() { glfwSetWindowShouldClose(window, true); }
-    
-        int                     width = 800, height = 800;
-        float                   aspectRatio = 1;
-        float                   xLim = 1.0; /**< 2d x coord screen limit (1.0 if quad) */  
-        float                   yLim = 1.0; /**< 2d y coord screen limit (fixed to 1.0) */
-
-        static Camera3D         mouseView;
-        static const int        MAX_KEYS = 1024;
-        static bool             keys[MAX_KEYS];
-        static std::vector<tk::gui::Color_t> colors;
-
-        static int image_count;
-        static int image_fullscreen;
-        static int image_width;
-        static int image_height;
-
-        bool drawLogo = true;
-        std::vector<tk::common::Vector3<float>> logo;
-
-        double dt = 1.0/30;
-
-        PlotManager *plotManger;
-
-        // tread for running viz in background
-        pthread_t thread;
-        std::mutex init_mutex;
-
-        // font
-        static int TK_FONT_SIZE;
-        std::string fontPath = "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf";
-        struct dtx_font *font;
-
-        // tex
-        GLuint                  hipertTex;
-
-		//std::vector<tk::gui::Drawable *> 	drawBuffer;
-		//std::vector<bool> 					drawFlags;
-
-		//std::map<std::string, Drawable*> drawBuffer;
-
-		DrawMap buffer;
-
-
-    private:
-        std::string             windowName;
-        std::string             icon_fname;
-        Color_t                 background = tk::gui::color::DARK_GRAY;
-        bool                    splash = false; // true if splash screen
-        timeStamp_t             ts;
-        float                   splashTime = 0;
-
-        GLFWwindow*             window;
-        static GLUquadric*      quadric;
-
-        const char*             glsl_version = "#version 130";
-
         static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
         static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
         static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
-
+        static void window_size_callback(GLFWwindow* window, int width, int height);
     };
 
 }}
-#include "tkCommon/gui/PlotManager.h"
+

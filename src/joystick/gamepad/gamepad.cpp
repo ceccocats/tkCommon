@@ -337,7 +337,7 @@ void GamepadSetRumble(GAMEPAD_DEVICE gamepad, float left, float right) {
 			play.code = STATE[gamepad].effect;
 			play.value = 0;
 
-			write(STATE[gamepad].fd, (const void*)&play, sizeof(play));
+			int err = write(STATE[gamepad].fd, (const void*)&play, sizeof(play));
 
 			/* delete the effect */
 			ioctl(STATE[gamepad].fd, EVIOCRMFF, STATE[gamepad].effect);
@@ -365,7 +365,7 @@ void GamepadSetRumble(GAMEPAD_DEVICE gamepad, float left, float right) {
 			play.code = STATE[gamepad].effect;
 			play.value = 1;
 
-			write(STATE[gamepad].fd, (const void*)&play, sizeof(play));
+			int err = write(STATE[gamepad].fd, (const void*)&play, sizeof(play));
 		}
 	}
 }

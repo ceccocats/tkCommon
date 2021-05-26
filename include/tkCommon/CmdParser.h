@@ -1,6 +1,5 @@
 #pragma once
 #include "tkCommon/common.h"
-#include <tkCommon/terminalFormat.h>
 
 namespace tk { namespace common {
 
@@ -23,7 +22,7 @@ namespace tk { namespace common {
         struct Arg {
             std::string name;
             std::string info;
-            std::string default_val;
+            std::vector<std::string> default_val;
             bool optional;
         };
         struct Opt {
@@ -63,6 +62,15 @@ namespace tk { namespace common {
          * @return
          */
         std::string addArg(std::string name, std::string default_val = "", std::string info = "");
+
+        /**
+         * Add list of argument, afterthis you cant declare any other args
+         * @param name
+         * @param default_val
+         * @param info
+         * @return
+         */
+        std::vector<std::string> addArgList(std::string name, std::vector<std::string> default_val = {""}, std::string info = "");
 
         /**
          * Add bolean option

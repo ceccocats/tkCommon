@@ -10,23 +10,23 @@ bool tk::communication::PCAPHandler::initReplay(const std::string fileName, cons
     char errbuff[PCAP_ERRBUF_SIZE];
     struct bpf_program fp;
 
-    clsMsg("opening: " + fileName + "\n");
+    tkMSG("opening: " + fileName + "\n");
     pcapFile = pcap_open_offline(fileName.c_str(), errbuff);
 
     if (!pcapFile){
-        clsErr(std::string{"error from pcap_open_live(): "}+std::string{errbuff}+"\n");
+        tkERR(std::string{"error from pcap_open_live(): "}+std::string{errbuff}+"\n");
         return false;
     }
 
     if(filter != "") {
 
         if (pcap_compile(pcapFile, &fp, filter.c_str(), 0, PCAP_NETMASK_UNKNOWN) == -1) {
-            clsErr(std::string{"couldn't parse filter "}+filter+":"+pcap_geterr(pcapFile)+"\n");
+            tkERR(std::string{"couldn't parse filter "}+filter+":"+pcap_geterr(pcapFile)+"\n");
             return false;
         }
 
         if (pcap_setfilter(pcapFile, &fp) == -1) {
-            clsErr(std::string{"couldn't install filter "}+filter+":"+pcap_geterr(pcapFile)+"\n");
+            tkERR(std::string{"couldn't install filter "}+filter+":"+pcap_geterr(pcapFile)+"\n");
             return false;
         }
     }
@@ -43,24 +43,24 @@ bool tk::communication::PCAPHandler::initRecord(const std::string fileName, cons
 
 
     if ((pcapFile = pcap_open_live(iface.c_str(), BUFSIZ, 0, 1000, errbuff)) == NULL) {
-        clsErr(std::string{"error from pcap_open_live(): "}+std::string{errbuff}+"\n");
+        tkERR(std::string{"error from pcap_open_live(): "}+std::string{errbuff}+"\n");
         return false;
     }
 
     if ((pcapDumper = pcap_dump_open(pcapFile, fileName.c_str())) == NULL) {
-        clsErr(std::string{"error from pcap_dump_open():: "}+pcap_geterr(pcapFile)+"\n");
+        tkERR(std::string{"error from pcap_dump_open():: "}+pcap_geterr(pcapFile)+"\n");
         return false;
     }
 
     if(filter != "") {
 
         if (pcap_compile(pcapFile, &fp, filter.c_str(), 0, PCAP_NETMASK_UNKNOWN) == -1) {
-            clsErr(std::string{"couldn't parse filter "}+filter+":"+pcap_geterr(pcapFile)+"\n");
+            tkERR(std::string{"couldn't parse filter "}+filter+":"+pcap_geterr(pcapFile)+"\n");
             return false;
         }
 
         if (pcap_setfilter(pcapFile, &fp) == -1) {
-            clsErr(std::string{"couldn't install filter "}+filter+":"+pcap_geterr(pcapFile)+"\n");
+            tkERR(std::string{"couldn't install filter "}+filter+":"+pcap_geterr(pcapFile)+"\n");
             return false;
         }
     }
@@ -86,21 +86,21 @@ void tk::communication::PCAPHandler::recordStat(struct pcap_stat& stat){
 int tk::communication::PCAPHandler::getPacket(uint8_t* buffer, timeStamp_t& stamp){
 
     if(!replayMode){
-        clsErr("you are in recorder mode.\n");
+        tkERR("you are in recorder mode.\n");
         return -1;
     }
 
     if (!pcapFile){
-        clsErr("pcap error.\n");
+        tkERR("pcap error.\n");
         return -1;
     }
 
     int len = parser.computeNextPacket(pcapFile,buffer,stamp);
 
-    if(len < 0){
-        clsWrn("Reading error.\n");
+    /*if(len < 0){
+        tkWRN("Reading error.\n");
         return -1;
-    }
+    }*/
 
     return len;
 }

@@ -1,6 +1,8 @@
 #include "tkCommon/CmdParser.h"
 #include "tkCommon/argh.h"
 
+#include "tkCommon/gui/Viewer.h"
+
 namespace tk { namespace common {
 
 CmdParser::CmdParser(char **argv, std::string info) {
@@ -10,6 +12,9 @@ CmdParser::CmdParser(char **argv, std::string info) {
 
     // add help opt
     addBoolOpt("-h", "print help");
+
+    // viewer opts
+    //tk::gui::Viewer::disabled = addBoolOpt("-noviz", "disable viewer output");
 }
 
 void CmdParser::setGeneralInfo(std::string info) {
@@ -18,15 +23,53 @@ void CmdParser::setGeneralInfo(std::string info) {
 
 std::string CmdParser::addArg(std::string name, std::string default_val, std::string info) {
     if(name.size() <= 1 || name[0] == '-') {
-        clsErr(std::string{"arguments should not start with '-', this is not valid: "}+name+"\n");
+        tkERR(std::string{"arguments should not start with '-', this is not valid: "}+name+"\n");
         exit(1);
+    }
+
+    // error if ArgList before
+    for(int i=0; i<args.size(); i++) {
+        if(args[i].default_val.size() > 1) {
+            tkERR("You cant add an Arg after an ArgList\n");
+            exit(1);      
+        }
     }
 
     argh::parser cmdl(argv_ptr, argv_mode);
     Arg a;
     a.name = name;
     a.info = info;
-    a.default_val = cmdl[args.size() + 1].empty() ? default_val : cmdl[args.size() + 1];
+    a.default_val.push_back(cmdl[args.size() + 1].empty() ? default_val : cmdl[args.size() + 1]);
+    a.optional = default_val.empty();
+    args.push_back(a);
+    return a.default_val[0];
+}
+
+std::vector<std::string> CmdParser::addArgList(std::string name, std::vector<std::string> default_val, std::string info) {
+    if(name.size() <= 1 || name[0] == '-') {
+        tkERR(std::string{"arguments should not start with '-', this is not valid: "}+name+"\n");
+        exit(1);
+    }
+    // error if ArgList before
+    for(int i=0; i<args.size(); i++) {
+        if(args[i].default_val.size() > 1) {
+            tkERR("You cant add an Arg after an ArgList\n");
+            exit(1);      
+        }
+    }
+
+    argh::parser cmdl(argv_ptr, argv_mode);
+    Arg a;
+    a.name = name;
+    a.info = info;
+    a.default_val = default_val;
+    for(int i=args.size() + 1, it = 0; i<cmdl.size(); i++, it++) {
+        std::string val = cmdl[i];
+        if(it < a.default_val.size() )
+            a.default_val[it] = val;
+        else
+            a.default_val.push_back(val);
+    }
     a.optional = default_val.empty();
     args.push_back(a);
     return a.default_val;
@@ -34,14 +77,14 @@ std::string CmdParser::addArg(std::string name, std::string default_val, std::st
 
 bool CmdParser::addBoolOpt(std::string opt, std::string info) {
     if(opt.size() <= 1 || opt[0] != '-') {
-        clsErr(std::string{"option must start with '-', this is not valid: "}+opt+"\n");
+        tkERR(std::string{"option must start with '-', this is not valid: "}+opt+"\n");
         exit(1);
     }
 
     argh::parser cmdl(argv_ptr, argv_mode);
 
     if(!cmdl(opt).str().empty()) {
-        clsErr(std::string{"you cant append values to boolean flag: "}+opt+"\n");
+        tkERR(std::string{"you cant append values to boolean flag: "}+opt+"\n");
         exit(-1);
     }
 
@@ -56,7 +99,7 @@ bool CmdParser::addBoolOpt(std::string opt, std::string info) {
 
 std::string CmdParser::addOpt(std::string opt, std::string default_val, std::string info) {
     if(opt.size() <= 1 || opt[0] != '-') {
-        clsErr(std::string{"option must start with '-', this is not valid: "}+opt+"\n");
+        tkERR(std::string{"option must start with '-', this is not valid: "}+opt+"\n");
         //std::cout<<"option must start with '-', this is not valid: "<<opt<<"\n";
         exit(1);
     }
@@ -91,7 +134,17 @@ void CmdParser::printUsage(std::string name) {
 
     std::cout << "Args:\n";
     for (int i = 0; i < args.size(); i++) {
-        std::string def_str = args[i].default_val;
+        std::string def_str;
+        int nargs = args[i].default_val.size();
+        if(nargs == 1) {
+            def_str = args[i].default_val[0];
+        } else {
+            def_str = "{";
+            for(int d=0; d<nargs; d++)
+                def_str = def_str + args[i].default_val[d] + (d < nargs-1 ? "," : ""); 
+            def_str += "}";
+        }
+
         if(def_str.size() > DEFAULTW)
             def_str = def_str.substr(def_str.size()-DEFAULTW,def_str.size());
         def_str = "[ " + def_str + " ]";
@@ -131,7 +184,7 @@ void CmdParser::parse() {
                 found = true;
         }
         if(!found) {
-            clsErr(std::string{"flag not valid: -"}+flag+"\n");
+            tkERR(std::string{"flag not valid: -"}+flag+"\n");
             //std::cout<<"ERROR: flag not valid: -"<<flag<<"\n";
             printUsage(cmdl[0]);
             exit(1);
@@ -140,7 +193,7 @@ void CmdParser::parse() {
 
     // print exec info if avaible
     if (!generalInfo.empty()) {
-        clsMsg(generalInfo+"\n");
+        tkMSG(generalInfo+"\n");
         //std::cout << generalInfo << "\n";
     }
 

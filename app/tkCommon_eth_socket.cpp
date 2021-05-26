@@ -1,6 +1,8 @@
 #include <iostream>
-#include <tkCommon/common.h>
 #include <csignal>
+#include <tkCommon/common.h>
+#include <tkCommon/log.h>
+#include <tkCommon/term_utils.h>
 #include <tkCommon/communication/ethernet/UDPSocket.h>
 
 
@@ -23,7 +25,7 @@ void reciverLoop(int port, std::string ip){
             return;
         }
 
-        tk::common::hex_dump(std::cout, buffer, num);
+        tk::term::hex_dump(std::cout, buffer, num);
     }
 
     socket.close();
@@ -44,9 +46,9 @@ void senderLoop(int port, std::string ip, int srcport){
         std::cout<<"Send: "<<buffer<<"\n";
         bool ok = socket.send(buffer,(int)strlen((const char *)buffer));
         if(ok)
-            std::cout<<tk::tformat::print("correctly sent\n", tk::tformat::green, tk::tformat::predefined, tk::tformat::bold);
+            tkMSG("correctly sent\n")
         else
-            std::cout<<tk::tformat::print("not sent\n", tk::tformat::red, tk::tformat::predefined, tk::tformat::bold);
+            tkWRN("not sent\n")
     }
 
     socket.close();

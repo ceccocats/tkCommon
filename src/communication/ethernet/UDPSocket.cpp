@@ -1,4 +1,5 @@
 #include "tkCommon/communication/ethernet/UDPSocket.h"
+#include "tkCommon/log.h"
 
 namespace tk { namespace communication {
     UDPSocket::UDPSocket() = default;
@@ -26,7 +27,7 @@ namespace tk { namespace communication {
         // open socket
         this->sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
         if (this->sock_fd < 0){
-            clsErr("error while opening socket.\n");
+            tkERR("error while opening socket.\n");
             perror("UDP error");
             return false;
         }
@@ -47,26 +48,26 @@ namespace tk { namespace communication {
                 int val = 1;
                 r = setsockopt(this->sock_fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
                 if (r < 0){
-                    clsErr("error while allowing multiple sockets.\n");
+                    tkERR("error while allowing multiple sockets.\n");
                     perror("UDP error");
                     return false;
                 }
-                clsSuc("multicast socket created.\n");
+                tkMSG("multicast socket created.\n");
             } else{
 
                 this->isMulti = false;
-                clsSuc("classic socket created.\n");
+                tkMSG("classic socket created.\n");
             }
         }else{
 
-            clsSuc("socket port created.\n");
+            tkMSG("socket port created.\n");
         }
 
 
         // Bind the socket with the sender address
         int r = bind(this->sock_fd, (const struct sockaddr *)&this->sock_addr,  sizeof(this->sock_addr));
         if (r < 0) {
-            clsErr("error while binding the socket.\n");
+            tkERR("error while binding the socket.\n");
             perror("UDP error");
             return false;
         }
@@ -94,7 +95,7 @@ namespace tk { namespace communication {
         // open socket
         this->sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
         if (this->sock_fd < 0){
-            clsErr("error while opening socket.\n");
+            tkERR("error while opening socket.\n");
             perror("socket error");
             return false;
         }
@@ -104,19 +105,19 @@ namespace tk { namespace communication {
             int val = 1;
             int r = setsockopt(this->sock_fd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val));
             if (r < 0){
-                clsErr("error while allowing multiple sockets.\n");
+                tkERR("error while allowing multiple sockets.\n");
                 perror("UDP error");
                 return false;
             }
 
-            clsMsg(std::string{"bind on port "}+std::to_string(srcport)+"\n");
+            tkMSG(std::string{"bind on port "}+std::to_string(srcport)+"\n");
             struct sockaddr_in srcaddr;
             memset(&srcaddr, 0, sizeof(srcaddr));
             srcaddr.sin_family = AF_INET;
             srcaddr.sin_addr.s_addr = htonl(INADDR_ANY);
             srcaddr.sin_port = htons(srcport);
             if (bind(sock_fd, (struct sockaddr *) &srcaddr, sizeof(srcaddr)) < 0) {
-                clsErr("error while setting socket.\n");
+                tkERR("error while setting socket.\n");
                 perror("bind");
             }
         }
@@ -128,27 +129,27 @@ namespace tk { namespace communication {
                 unsigned char ttl = 1;
                 int r = setsockopt(this->sock_fd, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, sizeof(ttl));
                 if (r < 0){
-                    clsErr("error while allowing multiple sockets.\n");
+                    tkERR("error while allowing multiple sockets.\n");
                     return false;
                 }
-                clsSuc("multicast socket created.\n");
+                tkMSG("multicast socket created.\n");
 
             } else if(isBroadcast(ip)) {
                 int broadcast= 1;
                 int r = setsockopt(this->sock_fd, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast));
                 if (r < 0){
-                    clsErr("error while setting broadcast\n");
+                    tkERR("error while setting broadcast\n");
                     return false;
                 }
-                clsSuc("broadcast socket created.\n");
+                tkMSG("broadcast socket created.\n");
 
             } else{
                 this->isMulti = false;
-                clsSuc("classic socket created.\n");
+                tkMSG("classic socket created.\n");
             }
         }else{
 
-            clsSuc("socket port created.\n");
+            tkMSG("socket port created.\n");
         }
 
         reciver = false;

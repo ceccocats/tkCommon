@@ -1,80 +1,85 @@
 #!/bin/bash
 
-if [ "$1" == "-h" ]; then
+##################
+ipOutster="192.168.1.203"
+ipDest="192.168.1.109"
+dev="eth0"
+##################
+## 512x10, 1024x10, 2048x10, 512x20, 1024x20
+config=2048x10
+##################
+## TIME_FROM_INTERNAL_OSC, TIME_FROM_SYNC_PULSE_IN, TIME_FROM_PTP_1588
+timestamp_mode=TIME_FROM_SYNC_PULSE_IN
+##################
+## ACTIVE_HIGH, ACTIVE_LOW
+sync_pulse_in_polarity=ACTIVE_HIGH
+nmea_in_polarity=ACTIVE_LOW
+##################
+## BAUD_9600, BAUD_115200
+nmea_baud_rate=BAUD_9600
+##################
 
-    printf "Usage: 512x10, 1024x10, 2048x10, 512x20, 1024x20(default)\n"
-	exit
+echo -e "\e[43mConnecting to LiDAR at $ipOutster and setting:\e[0m"
+echo -e "\e[43m\tDest: $ipDest on $dev\e[0m"
+echo -e "\e[43m\tConfig: $config\e[0m"
+echo -e "\e[43m\tTimestamp: $timestamp_mode\e[0m"
 
-fi
-config=1024x20
 
-if [ $# != "0" ]; then
-
-	if [ "$1" == "512x10" ]; then
-
-		config=512x10
+check() {
+	if [ $? != "0" ]; then
+		echo -e"\e[41mError\e[0m"
 	else
-
-		if [ "$1" == "1024x10" ]; then
-
-			config=1024x10
-		else
-
-			if [ "$1" == "2048x10" ]; then
-
-				config=2048x10
-			else
-
-				if [ "$1" == "512x20" ]; then
-
-					config=512x20
-				else
-
-					if [ "$1" == "1024x20" ]; then
-
-						config=1024x20
-					else
-						printf "Option $1 not recognize. Abort\n"
-						exit
-					fi
-				fi
-			fi
-		fi
+		echo -e "\e[42mDone\e[0m"
 	fi
-fi
+}
 
-#set destination ip (this pc)
-echo "set_config_param udp_ip $(hostname -I | cut -f 1 -d " ")" | nc 192.168.1.100 7501
+#Setting route
+sudo route add $ipOutster dev $dev
 
-if [ $? != "0" ]; then
-	echo -e"\e[41mError setting ip dest $(hostname -I | cut -f 1 -d " ")\e[0m"
-else
-	echo -e "\e[42mSet ip dest $(hostname -I | cut -f 1 -d " ") (this pc)\e[0m"
-fi
+#set destination ip
+echo "set_config_param udp_ip $ipDest" | nc $ipOutster 7501 -q 1
+check
+
+#set udp_port
+echo "set_config_param udp_port_lidar 7502" | nc $ipOutster 7501 -q 1
+check
+
+echo "set_config_param beta.bloom_reduction_enable true" | nc $ipOutster 7501 -q 1
+check
 
 #set lidar mode
-echo "set_config_param lidar_mode $config" | nc 192.168.1.100 7501
-if [ $? != "0" ]; then
-	echo -e "\e[41mError setting lidar mode\e[0m"
+echo "set_config_param lidar_mode $config" | nc $ipOutster 7501 -q 1
+check
+
+#set timestamp mode
+echo "set_config_param timestamp_mode $timestamp_mode" | nc $ipOutster 7501 -q 1
+check
+
+if [ $timestamp_mode == "TIME_FROM_SYNC_PULSE_IN" ]; then
+	echo -e "\e[43mSetting polarity and nmea baudrate...\e[0m"
+	echo "set_config_param sync_pulse_in_polarity $sync_pulse_in_polarity" | nc $ipOutster 7501 -q 1
+	check
+	echo "set_config_param nmea_baud_rate $nmea_baud_rate" | nc $ipOutster 7501 -q 1
+	check
+	echo "set_config_param nmea_in_polarity $nmea_in_polarity" | nc $ipOutster 7501 -q 1
+	check 
+	echo "set_config_param multipurpose_io_mode INPUT_NMEA_UART" | nc $ipOutster 7501 -q 1
+	check
 else
-	echo -e "\e[42mSet lidar mode\e[0m"
+	echo "set_config_param multipurpose_io_mode OFF" | nc $ipOutster 7501 -q 1
+	check
+	
+	echo "set_config_param nmea_leap_seconds 37" | nc $ipOutster 7501 -q 1
+	check
 fi
 
 #Save configs
-echo "write_config_txt" | nc 192.168.1.100 7501
-if [ $? != "0" ]; then
-	echo -e "\e[41mError saving configuration\e[0m"
-else
-	echo -e "\e[42mConfiguration saved for next reboots\e[0m"
-fi
+echo "write_config_txt" | nc $ipOutster 7501 -q 1
+check
 
 #start sensor
-echo "reinitialize" | nc 192.168.1.100 7501
-if [ $? != "0" ]; then
-	echo -e "\e[41mError starting sensor\e[0m"
-else
-	echo -e "\e[42mSensor start successfully. You must attend 10 seconds\e[0m"
-fi
+echo "reinitialize" | nc $ipOutster 7501 -q 1
+check
 
 
 

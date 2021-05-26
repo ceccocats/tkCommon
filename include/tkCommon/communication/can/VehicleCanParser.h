@@ -53,10 +53,11 @@ namespace tk { namespace communication {
         }
 
         //write data
-        veh->odom.x = veh->x;
-        veh->odom.y = veh->y;
-        veh->odom.yaw = -veh->carDirection +M_PI/2;
-        veh->odom.t = t;
+        veh->odom.pose.x() = veh->x;
+        veh->odom.pose.y() = veh->y;
+        veh->odom.angle.z() = -veh->carDirection +M_PI/2;
+        //veh->odom.tf.copyFrom(tk::common::odom2tf(veh->x, veh->y, -veh->carDirection +M_PI/2).matrix().data(), 4,4);
+        //veh->odom.header.stamp = t;
     }
 
 
@@ -103,7 +104,7 @@ namespace tk { namespace communication {
          * @param frame input can frame
          * @param vehData output vehicle data
          */
-        void parse(tk::data::CanData_t &frame, tk::data::VehicleData &vehData) {
+        void parse(tk::data::CanData &frame, tk::data::VehicleData &vehData) {
             
             if(msgs.count(frame.id()) == 0)
                 return;
@@ -148,7 +149,7 @@ namespace tk { namespace communication {
                     
                     //odometry calculation
                     if(vehData.Bspeed && vehData.Bsteer){
-                        vehicleCalculateOdometry(&vehData, frame.stamp);
+                        vehicleCalculateOdometry(&vehData, frame.header.stamp);
                         vehData.Bspeed = false;
                         vehData.Bsteer = false;
                     }
@@ -157,11 +158,11 @@ namespace tk { namespace communication {
                     vehData.Bsteer = true;
                 }      
                 else if(sig.getName() == "yawRate")             vehData.yawRate = val/180.0*M_PI;
-                else if(sig.getName() == "accelX")              vehData.accelX = val;
-                else if(sig.getName() == "accelY")              vehData.accelY = val;
+                else if(sig.getName() == "accelX")              vehData.accX = val;
+                else if(sig.getName() == "accelY")              vehData.accY = val;
                 else if(sig.getName() == "steerAngle")          vehData.steerAngle = val/180.0*M_PI;
                 else if(sig.getName() == "steerAngleRate")      vehData.steerAngleRate = val/180.0*M_PI;
-                else if(sig.getName() == "brakePedalSts")       vehData.brakePedalSts = val;
+                else if(sig.getName() == "brakePedalSts")       vehData.brakePedalStatus = val;
                 else if(sig.getName() == "brakeMasterPressure") vehData.brakeMasterPressure = val;
                 else if(sig.getName() == "gasPedal")            vehData.gasPedal = val;
                 else if(sig.getName() == "engineTorque")        vehData.engineTorque = val;
@@ -171,10 +172,10 @@ namespace tk { namespace communication {
                 else if(sig.getName() == "wheelFRspeed")        vehData.wheelFRspeed = val/3.6;
                 else if(sig.getName() == "wheelRLspeed")        vehData.wheelRLspeed = val/3.6;
                 else if(sig.getName() == "wheelRRspeed")        vehData.wheelRRspeed = val/3.6;
-                else if(sig.getName() == "wheelFLDir")          vehData.wheelFLDir = val;
-                else if(sig.getName() == "wheelFRDir")          vehData.wheelFRDir = val;
-                else if(sig.getName() == "wheelRLDir")          vehData.wheelRLDir = val;
-                else if(sig.getName() == "wheelRRDir")          vehData.wheelRRDir = val;   
+                else if(sig.getName() == "wheelFLDir")          vehData.wheelFLdir = val;
+                else if(sig.getName() == "wheelFRDir")          vehData.wheelFRdir = val;
+                else if(sig.getName() == "wheelRLDir")          vehData.wheelRLdir = val;
+                else if(sig.getName() == "wheelRRDir")          vehData.wheelRRdir = val;   
                 else if(sig.getName() == "sideSlip")            vehData.sideSlip = val;   
                 else if(sig.getName() == "tractionGrip")        vehData.tractionGrip = val;   
             }

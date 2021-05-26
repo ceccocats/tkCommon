@@ -2,8 +2,12 @@
 
 #include "tkCommon/communication/ethernet/PCAPHandler.h"
 #include "tkCommon/communication/ethernet/UDPSocket.h"
+#include "tkCommon/communication/ethernet/TCPSocket.h"
 
 namespace tk { namespace communication {
+
+    static const int BUFFER_LENGTH = 30000;
+
     class Ethinterface {
     public:
         Ethinterface();
@@ -19,6 +23,15 @@ namespace tk { namespace communication {
          * @return          Success
          */
         bool initUDP(const int port, const std::string ip = "", time_t timeout_us = -1);
+
+        /**
+         * Method that create a recive socket
+         *
+         * @param port      TCP port
+         * @param ip        IP
+         * @return          Success
+         */
+        bool initTCP(const int port, const std::string ip, time_t timeout_us = -1);
 
         /**
          * Method that init pcap ethernet
@@ -44,6 +57,19 @@ namespace tk { namespace communication {
 
 
 
+        //Writing
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /**
+         * Method that send a packet (only TCP)
+         * @param buffer    Packet data
+         * @param length    Packet lenght
+         * @return          status
+         */
+        bool send(uint8_t* buffer, int length);
+
+
+
+
 
         //Recording
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,6 +88,20 @@ namespace tk { namespace communication {
          */
         std::string recordStat();
 
+         /**
+         * Method that return the recive packets
+         * 
+         * @return          String with stat
+         */
+        u_int  ifaceRecive();
+
+         /**
+         * Method that return the drop packets
+         * 
+         * @return          String with stat
+         */
+        u_int  ifaceDrop();
+
 
 
 
@@ -76,10 +116,13 @@ namespace tk { namespace communication {
 
 
     private:
-        bool            replayMode;
-        PCAPHandler     pcap;
-        UDPSocket       socket;
+        bool        replayMode, isUdp;
 
-        pcap_stat       stat;
+        PCAPHandler pcap;
+        UDPSocket   udpSocket;
+        TCPSocket   tcpSocket;
+
+        bool        recording = false;
+        pcap_stat   stat;
     };
 }}

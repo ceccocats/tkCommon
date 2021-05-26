@@ -12,8 +12,6 @@
 #include <unistd.h>
 #include <string.h>
 
-#include <tkCommon/terminalFormat.h>
-
 namespace tk{ namespace communication {
 
     class UDPSocket{

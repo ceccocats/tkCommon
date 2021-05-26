@@ -1,4 +1,5 @@
 #include "tkCommon/CmdParser.h"
+#include "tkCommon/term_utils.h"
 #include <thread>
 #include <signal.h>
 
@@ -21,5 +22,13 @@ int main( int argc, char** argv){
     std::cout<<opt1<<"\n";
     std::cout<<opt2<<"\n";
     std::cout<<opt3<<"\n";
+
+    for(tk::term::Pbar i(0, "Example progress"); i<100; i++) {
+        usleep(5000);
+    }
+
+    for(tk::term::Pbar i; i<100; i++) {
+        usleep(5000);
+    }
     return 0;
 }

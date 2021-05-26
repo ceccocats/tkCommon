@@ -1,34 +1,35 @@
 #include <tkCommon/common.h>
 
+const char* tkCommon_PATH = TKPROJ_PATH;
+
 namespace tk { namespace common {
 
-    Tfpose odom2tf(float x, float y, float yaw) {
-        Eigen::Quaternionf quat =
-                Eigen::AngleAxisf(0, Eigen::Vector3f::UnitX())*
-                Eigen::AngleAxisf(0, Eigen::Vector3f::UnitY())*
-                Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ());
-        Tfpose isometry = Eigen::Isometry3f::Identity();
-        isometry.linear() = quat.toRotationMatrix();
-        isometry.translation() = Eigen::Vector3f(x, y, 0) ;
+    Tfpose odom2tf(float x, float y, float z, float roll, float pitch, float yaw) {
+        Eigen::MatrixXf t(4,4);
+        float A = std::cos (yaw),  B = sin (yaw),  C  = std::cos (pitch), D  = sin (pitch),
+              E = std::cos (roll), F = sin (roll), DE = D*E,         DF = D*F;
+
+        t (0, 0) = A*C;  t (0, 1) = A*DF - B*E;  t (0, 2) = B*F + A*DE;  t (0, 3) = x;
+        t (1, 0) = B*C;  t (1, 1) = A*E + B*DF;  t (1, 2) = B*DE - A*F;  t (1, 3) = y;
+        t (2, 0) = -D;   t (2, 1) = C*F;         t (2, 2) = C*E;         t (2, 3) = z;
+        t (3, 0) = 0;    t (3, 1) = 0;           t (3, 2) = 0;           t (3, 3) = 1;
+        
+        Tfpose isometry;
+        isometry.matrix() = t;
         return isometry;
+    }
+
+    Tfpose odom2tf(float x, float y, float yaw) {
+        return odom2tf(x,y,0,0,0,yaw);
     }
 
     Tfpose odom2tf(float x, float y, float z, float yaw) {
-        Eigen::Quaternionf quat =
-                Eigen::AngleAxisf(0, Eigen::Vector3f::UnitX())*
-                Eigen::AngleAxisf(0, Eigen::Vector3f::UnitY())*
-                Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ());
-        Tfpose isometry = Eigen::Isometry3f::Identity();
-        isometry.linear() = quat.toRotationMatrix();
-        isometry.translation() = Eigen::Vector3f(x, y, z) ;
-        return isometry;
+        return odom2tf(x,y,z,0,0,yaw);
     }
 
-    Tfpose odom2tf(float x, float y, float z, float roll, float pitch, float yaw) {
-        Eigen::Quaternionf quat =
-                Eigen::AngleAxisf(roll, Eigen::Vector3f::UnitX())*
-                Eigen::AngleAxisf(pitch, Eigen::Vector3f::UnitY())*
-                Eigen::AngleAxisf(yaw, Eigen::Vector3f::UnitZ());
+    Tfpose odom2tf(float x, float y, float z, float qx, float qy, float qz, float qw) {
+        Eigen::Quaternionf quat(qw, qx, qy, qz);
+        quat.normalize();
         Tfpose isometry = Eigen::Isometry3f::Identity();
         isometry.linear() = quat.toRotationMatrix();
         isometry.translation() = Eigen::Vector3f(x, y, z) ;
@@ -90,6 +91,42 @@ namespace tk { namespace common {
         if(is) state = state && readOdom(is, odom_out, odom_stamp);
         return state;
     }
+
+    template <typename T, int ROWS>
+    Eigen::Matrix<T, ROWS, 1> Interpolate_(const Eigen::Matrix<T, ROWS, 1>& v1,
+                                          const Eigen::Matrix<T, ROWS, 1>& v2, const double ratio) {
+        // Safety check sizes
+        tkASSERT(v1.size() == v2.size(), "Vectors v1 and v2 must be the same size")
+        
+        // Interpolate
+        // This is the numerically stable version, rather than  (p1 + (p2 - p1) * real_ratio)
+        return ((v1 * (1.0 - ratio)) + (v2 * ratio));
+    }
+
+    inline Eigen::Quaternionf Interpolate_(const Eigen::Quaternionf& q1,
+                                           const Eigen::Quaternionf& q2, const double ratio)
+    {
+        // Interpolate
+        return q1.slerp(ratio, q2);
+    }
+
+    Eigen::Isometry3f tfInterpolate(const Eigen::Isometry3f& t1,
+                                    const Eigen::Isometry3f& t2, const double ratio) {
+        // Safety check ratio
+        tkASSERT(ratio >= 0.0, "interpolation ratio not in 0-1 range: " + std::to_string(ratio));
+        tkASSERT(ratio <= 1.0, "interpolation ratio not in 0-1 range: " + std::to_string(ratio));
+        
+        // Interpolate
+        const Eigen::Vector3f v1 = t1.translation();
+        const Eigen::Quaternionf q1(t1.rotation());
+        const Eigen::Vector3f v2 = t2.translation();
+        const Eigen::Quaternionf q2(t2.rotation());
+        const Eigen::Vector3f vint = Interpolate_(v1, v2, ratio);
+        const Eigen::Quaternionf qint = Interpolate_(q1, q2, ratio);
+        const Eigen::Isometry3f tint = ((Eigen::Translation3f)vint) * qint;
+        return tint;
+    }
+
 
     Vector3<float> tf2pose(Tfpose tf) {
 
@@ -176,50 +213,6 @@ namespace tk { namespace common {
         return p;
     }
 
-    std::ostream& hex_dump(std::ostream& os, const void *buffer,
-                                  std::size_t bufsize, bool showPrintableChars) {
-        if (buffer == nullptr) {
-            return os;
-        }
-        auto oldFormat = os.flags();
-        auto oldFillChar = os.fill();
-        constexpr std::size_t maxline{8};
-        // create a place to store text version of string
-        char renderString[maxline+1];
-        char *rsptr{renderString};
-        // convenience cast
-        const unsigned char *buf{reinterpret_cast<const unsigned char *>(buffer)};
-
-        for (std::size_t linecount=maxline; bufsize; --bufsize, ++buf) {
-            os << std::setw(2) << std::setfill('0') << std::hex
-               << static_cast<unsigned>(*buf) << ' ';
-            *rsptr++ = std::isprint(*buf) ? *buf : '.';
-            if (--linecount == 0) {
-                *rsptr++ = '\0';  // terminate string
-                if (showPrintableChars) {
-                    os << " | " << renderString;
-                }
-                os << '\n';
-                rsptr = renderString;
-                linecount = std::min(maxline, bufsize);
-            }
-        }
-        // emit newline if we haven't already
-        if (rsptr != renderString) {
-            if (showPrintableChars) {
-                for (*rsptr++ = '\0'; rsptr != &renderString[maxline+1]; ++rsptr) {
-                    os << "   ";
-                }
-                os << " | " << renderString;
-            }
-            os << '\n';
-        }
-
-        os.fill(oldFillChar);
-        os.flags(oldFormat);
-        return os;
-    }
-
     tk::common::Tfpose planeCoeffs2tf(Eigen::VectorXf coeffs) {
         if(coeffs.size() != 4)
             return tk::common::Tfpose::Identity();
@@ -233,29 +226,24 @@ namespace tk { namespace common {
         tk::common::Vector3<double> rot;
         tk::common::Vector3<double> p0, p1;
 
-        p0.x = 0; p0.y = -50; p0.z = -(p0.x*a +p0.y*b +d)/c;
-        p1.x = 0; p1.y = +50; p1.z = -(p1.x*a +p1.y*b +d)/c;
-        rot.x = atan2(p0.z - p1.z, p0.y - p1.y);
-        if(rot.x != rot.x)
-            rot.x =0;
+        p0.x() = 0; p0.y() = -50; p0.z() = -(p0.x()*a +p0.y()*b +d)/c;
+        p1.x() = 0; p1.y() = +50; p1.z() = -(p1.x()*a +p1.y()*b +d)/c;
+        rot.x() = atan2(p0.z() - p1.z(), p0.y() - p1.y());
+        if(rot.x() != rot.x())
+            rot.x() =0;
 
-        p0.x = -50; p0.y = 0; p0.z = -(p0.x*a +p0.y*b +d)/c;
-        p1.x = +50; p1.y = 0; p1.z = -(p1.x*a +p1.y*b +d)/c;
-        rot.y = atan2(p0.z - p1.z, p0.x - p1.x);
-        if(rot.y != rot.y)
-            rot.y =0;
+        p0.x() = -50; p0.y() = 0; p0.z() = -(p0.x()*a +p0.y()*b +d)/c;
+        p1.x() = +50; p1.y() = 0; p1.z() = -(p1.x()*a +p1.y()*b +d)/c;
+        rot.y() = atan2(p0.z() - p1.z(), p0.x() - p1.x());
+        if(rot.y() != rot.y())
+            rot.y() =0;
 
-        rot.z =0;
+        rot.z() =0;
 
         double h = -d/c;
         if(h != h)
             h =0;
 
-        return tk::common::odom2tf(0, 0, h, rot.x, rot.y, rot.z);
+        return tk::common::odom2tf(0, 0, h, rot.x(), rot.y(), rot.z());
     }
 }}
-
-
-// declare GPSdata static member
-#include "tkCommon/data/GPSData.h"
-tk::common::GeodeticConverter tk::data::GPSData::geoConv;

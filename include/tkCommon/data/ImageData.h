@@ -1,149 +1,157 @@
 #pragma once
-#include <mutex>
-#include <tkCommon/common.h>
-#include "SensorData.h"
 
-namespace tk{namespace data{
+#include "tkCommon/data/gen/ImageData_gen.h"
+#include "tkCommon/gui/utils/CommonViewer.h"
 
-    template <class T>
-    class ImageData : public SensorData{
+#ifdef ROS_ENABLED
+#include <sensor_msgs/Image.h>
+#endif
 
-    public:
-        T*  data = nullptr;
-        int width = 0;
-        int height = 0;
-        int channels = 0;
-        std::mutex *mtx = nullptr; // mutex contructor is marked delete, so you cant copy the struct containing mutex
+namespace tk{ namespace data{
 
-        bool gen_tex = false;
-        unsigned int texture;
-        int index = 0;
+    template<class T>
+    class ImageDataX: public tk::data::ImageData_gen<T>{
+        public:
 
-        void init(){
-            SensorData::init();
-            header.name = sensorName::CAMDATA;
-        }
+        ImageDataX() : ImageData_gen<T>(){
+            this->data.useGPU();
 
-        void init(int w, int h, int ch){
-        	SensorData::init();
-
-            mtx->lock();
-            width = w;
-            height = h;
-            channels = ch;
-            data = new T[width*height*channels];
-            mtx->unlock();
-            header.name = sensorName::CAMDATA;
-        }
-
-        bool empty() {return channels == 0 || width == 0 || height == 0 || data == nullptr; }
-
-		bool checkDimension(SensorData *s){
-			auto *t = dynamic_cast<ImageData<T>*>(s);
-			if(t->width != width || t->height != height || t->channels != channels){
-				return false;
-			}
-        	return true;
-        }
-
-        ImageData<T>& operator=(const ImageData<T>& s){
-        	SensorData::operator=(s);
-			index = s.index;
-            //if(s.width != width || s.height != height || s.channels != channels){
-            //    release();
-            //    init(s.width, s.height, s.channels);
-            //}
-            mtx->lock();
-            memcpy(data, s.data, width * height * channels * sizeof(T));
-            mtx->unlock();
-
-            if(gen_tex == false){
-				texture = s.texture;
-				gen_tex = s.gen_tex;
+            if(this->T_type.id == tk::data::UINT8){
+                this->header.type = tk::data::DataType::IMAGEU8;
+            }
+            if(this->T_type.id == tk::data::UINT16){
+                this->header.type = tk::data::DataType::IMAGEU16;
+            }
+            if(this->T_type.id == tk::data::FLOAT){
+                this->header.type = tk::data::DataType::IMAGEF;
             }
 
+            this->width = 0;
+            this->height = 0;
+            this->channels = 0;
+        }
+
+        ImageDataX(const ImageDataX<T>& s)  : ImageData_gen<T>() {
+            ImageDataX();
+            this->width = s.width;
+            this->height = s.height;
+            this->channels = s.channels;
+            this->data = s.data;
+        }
+
+        void init(){
+            
+        }
+        
+        void init(int w, int h, int ch){
+
+            this->width = w;
+            this->height = h;
+            this->channels = ch;
+            this->data.resize(this->width*this->height*this->channels);
+        }
+
+        ImageDataX<T>& operator=(ImageDataX<T>& s){
+ 
+            if(s.width != this->width || s.height != this->height || s.channels != this->channels){
+                init(s.width, s.height, s.channels);
+            }
+            memcpy(this->data.data(), s.data.data(), this->width * this->height * this->channels * sizeof(T));
             return *this;
         }
+
+        ImageDataX<T>& operator=(const ImageData_gen<T>& s){
+ 
+            ImageData_gen<T>::operator=(s);
+            return *this;
+        }
+
+        bool empty() {return this->channels == 0 || this->width == 0 || this->height == 0 || this->data.size() == 0; }
 
         void release(){
             if(empty())
                 return;
 
-            mtx->lock();
-            T* tmp = data;
-            data = nullptr;
-            width = 0;
-            height = 0;
-            channels = 0;
-            delete [] tmp;
-            glDeleteTextures(1,&texture);
-            gen_tex = false;
-            mtx->unlock();
+            this->data.resize(0);
+            this->width = 0;
+            this->height = 0;
+            this->channels = 0;
         }
 
-        void toGL(){
-			if(empty()){
-				tk::tformat::printMsg("Viewer","Image empty\n");
-			}else{
-
-				//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-				glBindTexture(GL_TEXTURE_2D, texture);
-
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-				// Set texture clamping method
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-				if(this->channels == 4) {
-					glTexImage2D(GL_TEXTURE_2D,         // Type of texture
-								 0,                   // Pyramid level (for mip-mapping) - 0 is the top level
-								 GL_RGB,              // Internal colour format to convert to
-								 this->width,          // Image width  i.e. 640 for Kinect in standard mode
-								 this->height,          // Image height i.e. 480 for Kinect in standard mode
-								 0,                   // Border width in pixels (can either be 1 or 0)
-								 GL_RGBA,              // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
-								 GL_UNSIGNED_BYTE,    // Image data type
-								 this->data);        // The actual image data itself
-				}else if(this->channels == 3){
-					glTexImage2D(GL_TEXTURE_2D,         // Type of texture
-								 0,                   // Pyramid level (for mip-mapping) - 0 is the top level
-								 GL_RGB,              // Internal colour format to convert to
-								 this->width,          // Image width  i.e. 640 for Kinect in standard mode
-								 this->height,          // Image height i.e. 480 for Kinect in standard mode
-								 0,                   // Border width in pixels (can either be 1 or 0)
-								 GL_RGB,              // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
-								 GL_UNSIGNED_BYTE,    // Image data type
-								 this->data);        // The actual image data itself
-				}
-			}
-        };
-
-        ImageData() {
-            mtx = new std::mutex();
+        T* at(int row, int col){
+            return &this->data[(row*this->width + col) * this->channels];
         }
 
-        ~ImageData(){
-            release();
-            delete mtx;
+
+        bool fromVar(tk::math::MatIO::var_t &var) {
+            if(var.empty())
+                return false;
+            bool ok = tk::data::ImageData_gen<T>::fromVar(var["info"]);
+            tk::data::HeaderData tmp = this->header; // header will be overwrited by init
+            if(ok) {
+                init(this->width, this->height, this->channels);
+                this->header = tmp;
+                this->data.fromVar(var["data"]);
+            }
+            return ok;
+        }
+        bool toVar(std::string name, tk::math::MatIO::var_t &var) {
+            std::vector<tk::math::MatIO::var_t> structVars(2);
+            tk::data::ImageData_gen<T>::toVar("info", structVars[0]);
+            this->data.toVar("data", structVars[1]);
+            return var.setStruct(name, structVars);
         }
 
-		void draw2D(tk::gui::Viewer *viewer) {
-
-        	if(!gen_tex){
-				gen_tex = true;
-				glGenTextures(1, &texture);
-        	}
-			this->toGL();
-
-        	if(tk::gui::Viewer::image_width != this->width)
-				tk::gui::Viewer::image_width = this->width;
-			if(tk::gui::Viewer::image_height != this->height)
-				tk::gui::Viewer::image_height = this->height;
-
-			viewer->tkDrawTextureImage(texture, index);
+        void toKitty(const std::string& fileName){
+            tk::gui::common::writeImagePng(fileName,this->data.cpu.data,this->width,this->height,this->channels);
         }
+
+        void fromKitty(const std::string& fileName){
+            int height, width, channels;
+            uint8_t* image = tk::gui::common::loadImage(fileName, &width, &height, &channels);
+            init(width,height,channels);
+            memcpy(this->data.cpu.data, image, height*width*channels*sizeof(uint8_t));
+            free(image);
+        }
+
+
+#ifdef ROS_ENABLED
+        void toRos(sensor_msgs::Image &msg) {
+            this->header.toRos(msg.header);
+            msg.width  = this->width;
+            msg.height = this->height;
+            if(this->channels == 4)
+                msg.encoding = "rgba8";
+            if(this->channels == 3)
+                msg.encoding = "rgb8";
+            if(this->channels == 1)
+                msg.encoding = "mono8";
+
+            msg.step = this->width*this->channels*sizeof(T);
+            msg.data.resize(this->width * this->height * this->channels);
+            memcpy(msg.data.data(), this->data.cpu.data, this->width * this->height * this->channels * sizeof(T));                
+        }
+
+        void fromRos(sensor_msgs::Image &msg) {
+            this->header.fromRos(msg.header);
+            int width  = msg.width;
+            int height = msg.height;
+            
+            int channels = 0;
+            channels = msg.encoding == "rgba8"? 4 : channels;
+            channels = msg.encoding == "rgb8"? 3 : channels;
+            channels = msg.encoding == "mono8"? 1 : channels;
+            channels = msg.encoding == "32FC1"? 1 : channels;
+            tkASSERT(channels != 0, "image encoding not supported")
+            init(width, height, channels);
+            memcpy(this->data.cpu.data, msg.data.data(), width*height*channels*sizeof(T));
+        }
+#endif
 
     };
+
+typedef tk::data::ImageDataX<uint8_t>   ImageData;
+typedef tk::data::ImageDataX<float>     ImageDataF;
+typedef tk::data::ImageDataX<uint8_t>   ImageDataU8;
+typedef tk::data::ImageDataX<uint16_t>  ImageDataU16;
 }}
