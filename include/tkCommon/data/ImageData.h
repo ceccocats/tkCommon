@@ -117,7 +117,6 @@ namespace tk{ namespace data{
 
 #ifdef ROS_ENABLED
         void toRos(sensor_msgs::Image &msg) {
-            tkASSERT(sizeof(T) == sizeof(uint8_t))
             this->header.toRos(msg.header);
             msg.width  = this->width;
             msg.height = this->height;
@@ -134,18 +133,18 @@ namespace tk{ namespace data{
         }
 
         void fromRos(sensor_msgs::Image &msg) {
-            tkASSERT(sizeof(T) == sizeof(uint8_t))
             this->header.fromRos(msg.header);
-            this->header.type   = DataType::IMAGEU8; 
-
             int width  = msg.width;
             int height = msg.height;
+            
             int channels = 0;
             channels = msg.encoding == "rgba8"? 4 : channels;
             channels = msg.encoding == "rgb8"? 3 : channels;
             channels = msg.encoding == "mono8"? 1 : channels;
+            channels = msg.encoding == "32FC1"? 1 : channels;
+            tkASSERT(channels != 0, "image encoding not supported")
             init(width, height, channels);
-            memcpy(this->data.cpu.data, msg.data.data(), width*height*channels*sizeof(uint8_t));
+            memcpy(this->data.cpu.data, msg.data.data(), width*height*channels*sizeof(T));
         }
 #endif
 
