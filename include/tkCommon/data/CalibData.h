@@ -105,7 +105,7 @@ namespace tk{ namespace data{
             for(int i = 0; i < 9; i++) R[i] = r[i];
 
             tk::common::Vector3<float> pos = tk::common::tf2pose(tf);
-            tk::common::Vector3<float> rot = tk::common::tf2pose(tf);
+            tk::common::Vector3<float> rot = tk::common::tf2rot(tf);
 
             std::vector<float> tf_vec(6);
             tf_vec[0] = pos.x();
