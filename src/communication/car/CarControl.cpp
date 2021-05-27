@@ -132,7 +132,7 @@ void CarControl::readLoop() {
                 y =  __bswap_32(y);
                 vel =  __bswap_16(vel);               
                 odom.pose.y() = float(y)/2e4;
-                odom.speed.x() = vel;
+                odom.speed.x() = float(vel)*0.517/3.6;
                 odom.header.stamp = data.header.stamp;
             }
         }
@@ -230,6 +230,7 @@ void CarControl::sendOdomEnable(bool status) {
     soc->write(&data);
 
     // reset 
+    usleep(100000);
     data.frame.can_dlc = 0;
     data.frame.can_id = ODOM_RESET_ID;
     soc->write(&data);

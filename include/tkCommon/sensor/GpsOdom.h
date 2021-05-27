@@ -19,7 +19,7 @@ namespace tk{ namespace sensors{
 
         ~GpsOdom() {}
 
-        void update(tk::data::GpsData &data) {
+        void update(const tk::data::GpsData &data) {
             //std::cout<<data<<"\n";
 
             if(data.header.stamp == 0 || data.lat == 0 || data.lon == 0)
@@ -32,7 +32,7 @@ namespace tk{ namespace sensors{
 
             double x, y, z;
             geoConv.geodetic2Enu(data.lat, data.lon, data.heigth, &x, &y, &z);
-            odom = tk::common::odom2tf(x, y, z, 0, 0, 0);
+            odom.translation() = tk::common::odom2tf(x, y, z, 0, 0, 0).translation();
 
             //std::cout<<tk::common::tf2pose(odom)<<" "<<tk::common::tf2rot(odom)<<"\n";
         }
