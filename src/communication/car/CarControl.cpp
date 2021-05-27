@@ -7,9 +7,6 @@ bool CarControl::init(tk::communication::CanInterface *soc) {
     this->soc = soc;
     run = true;
 
-    pidTorque.init(0,0,0,0,1);
-    pidBrake.init(0,0,0,0,1);
-
     enable(false);
 
     pthread_create(&writeTh, NULL, writeCaller, (void*)this);
@@ -21,12 +18,6 @@ void CarControl::close() {
     run = false;
     pthread_join(writeTh, NULL);
     pthread_join(readTh, NULL);
-
-    enable(true);
-    setBrakePos(brakeRequest*15000);
-    setAccPos(torqueRequest*100);
-    requestAccPos();
-    requestBrakePos();
     enable(false);
 }
 
@@ -37,51 +28,17 @@ void *CarControl::readCaller(void *args) {
     ((CarControl*) args)->readLoop();
 }
 
-void CarControl::computePIDs() {
-
-    float velocity = odom.speed.x();
-    torqueRequest = pidTorque.calculate(0.02,requestSpeed-velocity);
-    brakeRequest  = pidBrake.calculate(0.02,velocity-requestSpeed);
-
-    setBrakePos(0);
-    setAccPos(0);
-
-    //maybe
-    /*if(velocity < 1.0f){
-        setBrakePos(0.6*15000);
-    }*/
-}
-
 void CarControl::writeLoop() {
     tk::rt::Task t;
     t.init(50000);
     while(run) {
-
-        //if(usePid)
-        //    computePIDs();
-
-        /*if(velocity > -5) {
-            pidTorque = pid.calculate(0.02,velocity-odom.speed.x());
-            if(velocity<0)
-                pidTorque -= 0.4;
-            pidTorque = clamp<float>(pidTorque, -1, 1);
-
-            if(pidTorque > 0) {
-                setAccPos(pidTorque*100);
-                setBrakePos((-0.5)*-15000);
-            } else {    
-                setAccPos(0);
-                setBrakePos((-0.5+pidTorque)*-15000);
-            }
-        }*/
-
         if(active){
             requestSteerPos();
-            usleep(5000);
+            usleep(2000);
             requestAccPos();
-            usleep(5000);
+            usleep(2000);
             requestBrakePos();
-            usleep(5000);
+            usleep(2000);
         }
         t.wait();
     }
@@ -206,6 +163,12 @@ void CarControl::setBrakePos(uint16_t pos) {
     soc->write(&data);
     return;
 }
+
+void CarControl::setSteerAngle(float angle, uint16_t vel){
+    float diff = -angle/0.0015;
+    setSteerPos(diff,0,vel);
+}
+
 void CarControl::enable(bool status) {
     active = status;
     tk::data::CanData data;
@@ -275,6 +238,3 @@ void CarControl::requestMotorId() {
     soc->write(&data);
 }
 
-void CarControl::setVel(float vel){
-    requestSpeed = vel;
-}

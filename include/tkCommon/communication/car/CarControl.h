@@ -44,14 +44,6 @@ namespace tk { namespace communication {
         int brakePos = 0;                   /**< current brake value      */
         int accPos = 0;                     /**< current accel value      */
 
-        tk::common::PID pidTorque;
-        tk::common::PID pidBrake;
-        float torqueRequest, brakeRequest;
-
-        bool usePid = false;
-
-        float requestSpeed = 0;
-
         /**
          *  Init the sistem on a specified CAN socket
          *  it start 2 thread to read and write can messages
@@ -83,7 +75,7 @@ namespace tk { namespace communication {
         void sendGenericCmd(std::string cmd);
         /**
          *  Send a steer position command to the motor
-         *  from -18000 to +18000 on maserati (it deoends on the steering weel)
+         *  from -22000 to +22000 on maserati (it deoends on the steering weel)
          */
         void setSteerPos(int32_t pos, uint8_t acc = 0, uint16_t vel = 0);
         /**
@@ -98,10 +90,17 @@ namespace tk { namespace communication {
          *  max 20000 step for 30 mm  
          */
         void setBrakePos(uint16_t pos);
+
+        /** 
+         * Set steer angle (deg) (Negative: Sx)
+         */
+        void setSteerAngle(float angle, uint16_t vel = 0);
+
         /**
-         *  Set Accel (and Brake?) enabled or not
+         *  Enable actuation
          */
         void enable(bool status);
+        
         /**
          *  Set Odometry stream enabled or not
          */
@@ -110,17 +109,11 @@ namespace tk { namespace communication {
          *  Simulate pression off engine start
          */
         void sendEngineStart();
+
+
         /**
-         * Set vel
-         * 
-         */
-        void setVel(float vel);
-
-        void steerAngle(float angle, uint16_t vel = 0){
-            float diff = -angle/0.0015;
-            setSteerPos(diff,0,vel);
-        }
-
+         * Send request to send ID to each ECUs
+         */ 
         void requestMotorId();
 
 private:        
