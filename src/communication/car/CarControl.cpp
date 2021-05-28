@@ -43,7 +43,7 @@ void CarControl::writeLoop() {
             usleep(sleep_us);
             setBrakePos(actBrake);
             usleep(sleep_us);
-            setSteerPos(actSteer);
+            setSteerAngle(actSteer);
             usleep(sleep_us);
             
             requestSteerPos();

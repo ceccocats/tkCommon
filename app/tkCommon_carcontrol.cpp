@@ -82,7 +82,9 @@ class Control : public tk::gui::Drawable{
                 double act = pid.calculate(dt, speedReq - carCtrl.odom.speed.x());
 
                 float preBrake = 0.40;
-                if(speedReq < 0)
+                if(speedReq < 0 && carCtrl.odom.speed.x() < 1)
+                    preBrake = 0.6;
+                if(speedReq < 0 && carCtrl.odom.speed.x() <= 0.01)
                     preBrake = 0.7;
                 if(act < 0) {
                     brakeReq = preBrake - (act);
@@ -91,11 +93,10 @@ class Control : public tk::gui::Drawable{
                     throttleReq = act;
                     brakeReq = preBrake;
                 }
-
-                carCtrl.setTargetSteer(steerReqDeg);
-                carCtrl.setTargetBrake(brakeReq);
-                carCtrl.setTargetThrottle(throttleReq);
             }
+            carCtrl.setTargetSteer(steerReqDeg);
+            carCtrl.setTargetBrake(brakeReq);
+            carCtrl.setTargetThrottle(throttleReq);
 
             ImGui::NewLine();
             if(ImGui::Checkbox("ODOM ENABLE", &odomActive)) {
