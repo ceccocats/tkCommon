@@ -1,5 +1,6 @@
 #include "tkCommon/communication/car/CarControl.h"
 #include "tkCommon/rt/Task.h"
+#include "tkCommon/math/quantile.h"
 
 using namespace tk::communication;
 
@@ -31,14 +32,26 @@ void *CarControl::readCaller(void *args) {
 void CarControl::writeLoop() {
     tk::rt::Task t;
     t.init(50000);
+    int sleep_us = 1000;
     while(run) {
         if(active){
+            actThrottle = tk::math::lerp<float>(actThrottle, targetThrottle, 0.1);
+            actBrake = tk::math::lerp<float>(actBrake, targetBrake, 0.1);
+            actSteer = targetSteer; //tk::math::lerp<float>(actSteer, targetSteer, 0.1);
+
+            setAccPos(actThrottle);
+            usleep(sleep_us);
+            setBrakePos(actBrake);
+            usleep(sleep_us);
+            setSteerPos(actSteer);
+            usleep(sleep_us);
+            
             requestSteerPos();
-            usleep(2000);
+            usleep(sleep_us);
             requestAccPos();
-            usleep(2000);
+            usleep(sleep_us);
             requestBrakePos();
-            usleep(2000);
+            usleep(sleep_us);
         }
         t.wait();
     }
@@ -141,7 +154,9 @@ void CarControl::setSteerPos(int32_t pos, uint8_t acc, uint16_t vel) {
     soc->write(&data);
     return;
 }
-void CarControl::setAccPos(uint16_t pos) {
+void CarControl::setAccPos(float val) {
+    // is no gas, 100 is full gas
+    uint16_t pos  = val * 100;
     pos = __bswap_16(pos);
 
     tk::data::CanData data;
@@ -152,7 +167,9 @@ void CarControl::setAccPos(uint16_t pos) {
     soc->write(&data);
     return;
 }
-void CarControl::setBrakePos(uint16_t pos) {
+void CarControl::setBrakePos(float val) {
+    // 0 is no brake, 20000 is full brake
+    uint16_t pos = val * 15000; 
     pos = __bswap_16(pos);
 
     tk::data::CanData data;
@@ -164,12 +181,19 @@ void CarControl::setBrakePos(uint16_t pos) {
     return;
 }
 
-void CarControl::setSteerAngle(float angle, uint16_t vel){
+void CarControl::setSteerAngle(float angle){
     float diff = -angle/0.0015;
-    setSteerPos(diff,0,vel);
+    setSteerPos(diff,0,65535);
 }
 
 void CarControl::enable(bool status) {
+    targetSteer = 0;
+    targetThrottle = 0;
+    targetBrake = 0;
+    actSteer = 0;
+    actThrottle = 0;
+    actBrake = 0;
+
     active = status;
     tk::data::CanData data;
     data.frame.can_dlc = 2;

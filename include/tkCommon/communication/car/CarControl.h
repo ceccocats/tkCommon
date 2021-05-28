@@ -38,11 +38,26 @@ namespace tk { namespace communication {
 
         bool active = false;
 
+        float targetBrake = 0;      /**< requested target val */ 
+        float targetThrottle = 0;   /**< requested target val */ 
+        float targetSteer = 0;      /**< requested target val */     
+        float actBrake = 0;         /**< currently actuation val */ 
+        float actThrottle = 0;      /**< currently actuation val */ 
+        float actSteer = 0;         /**< currently actuation val */     
+
+
+        static void *writeCaller(void *args);
+        static void *readCaller(void *args);
+
+        void writeLoop();
+        void readLoop();
+
     public:
         tk::data::OdomData odom; /**< current vehicle odometry */
-        int steerPos = 0;                   /**< current steer value      */
-        int brakePos = 0;                   /**< current brake value      */
-        int accPos = 0;                     /**< current accel value      */
+        int steerPos = 0;                   /**< current steer value read by ECU */
+        int brakePos = 0;                   /**< current brake value read by ECU */
+        int accPos = 0;                     /**< current accel value read by ECU */
+
 
         /**
          *  Init the sistem on a specified CAN socket
@@ -53,12 +68,6 @@ namespace tk { namespace communication {
          *  Stop and close the system
          */ 
         void close();
-
-        static void *writeCaller(void *args);
-        static void *readCaller(void *args);
-
-        void writeLoop();
-        void readLoop();
 
         /**
          * Set the current position of the steer as Zero
@@ -73,28 +82,6 @@ namespace tk { namespace communication {
          *  ex: "OFF" will torn off the motor, ask SpinItalia if you need other commands
          */
         void sendGenericCmd(std::string cmd);
-        /**
-         *  Send a steer position command to the motor
-         *  from -22000 to +22000 on maserati (it deoends on the steering weel)
-         */
-        void setSteerPos(int32_t pos, uint8_t acc = 0, uint16_t vel = 0);
-        /**
-         *  Send a gas position command to the motor
-         *  0 is no gas, 100 is full gas
-         */
-        void setAccPos(uint16_t pos);
-        /**
-         *  Send a brake position command to the motor
-         *  0 is no brake, 20000 is full brake
-         *  4000 step for 6 mm
-         *  max 20000 step for 30 mm  
-         */
-        void setBrakePos(uint16_t pos);
-
-        /** 
-         * Set steer angle (deg) (Negative: Sx)
-         */
-        void setSteerAngle(float angle, uint16_t vel = 0);
 
         /**
          *  Enable actuation
@@ -110,11 +97,24 @@ namespace tk { namespace communication {
          */
         void sendEngineStart();
 
-
         /**
          * Send request to send ID to each ECUs
          */ 
         void requestMotorId();
+
+        /** target steer angle DEG */
+        void setTargetSteer(float val)    { targetSteer = clamp<float>(val, -30, 30); }
+        /** target Brake 0-1 */
+        void setTargetBrake(float val)    { targetBrake = clamp<float>(val, 0, 1); }
+        /** target Throttle 0-1 */
+        void setTargetThrottle(float val) { targetThrottle = clamp<float>(val, 0, 1); }
+
+        /** get last actuation */
+        float getActSteer() { return actSteer; }
+        /** get last actuation */
+        float getActThrottle() { return actThrottle; }
+        /** get last actuation */
+        float getActBrake() { return actBrake; }
 
 private:        
         // request info from the system
@@ -122,6 +122,28 @@ private:
         void requestAccPos();
         void requestBrakePos();
         void computePIDs();
+
+        /**
+         *  Send a steer position command to the motor
+         *  from -22000 to +22000 on maserati (it deoends on the steering weel)
+         */
+        void setSteerPos(int32_t pos, uint8_t acc = 0, uint16_t vel = 0);
+
+        /**
+         *  Send a gas position command to the motor
+         *  0 - 1 
+         */
+        void setAccPos(float val);
+        /**
+         *  Send a brake position command to the motor
+         *  0 - 1
+         */
+        void setBrakePos(float val);
+
+        /** 
+         * Set steer angle (deg) (Negative: Sx)
+         */
+        void setSteerAngle(float angle);
     };
     
 }}
