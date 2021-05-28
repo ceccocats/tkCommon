@@ -107,6 +107,7 @@ int main( int argc, char** argv){
     viewer->add(c);
     viewer->start();
     
+
 	Joystick joy;
     tkASSERT(joy.init());
 

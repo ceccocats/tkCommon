@@ -120,7 +120,7 @@ namespace tk { namespace communication {
             float diff = angle/40.0;
             setSteerPos(diff*18000,0,vel);
         }
-
+        
     private:
         // request info from the system
         void requestSteerPos();
