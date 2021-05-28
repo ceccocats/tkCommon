@@ -1,3 +1,5 @@
+#ifdef TKCUDA_ENABLED
+
 #include "tkCommon/catch2/catch.hpp"
 #include "tkCommon/common.h"
 #include "tkCommon/math/Mat.h"
@@ -60,3 +62,5 @@ TEST_CASE("Test cuda class") {
         tkPROF_print
     }
 }
+
+#endif
