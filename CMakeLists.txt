@@ -13,12 +13,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 #-------------------------------------------------------------------------------
 # CUDA
 #-------------------------------------------------------------------------------
-#find_package(CUDA 9.0 QUIET)
-#include_directories(${CUDA_INCLUDE_DIRS})
-#set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} --expt-relaxed-constexpr)
-#if(CUDA_FOUND)
-#    add_definitions(-DTKCUDA_ENABLED)
-#endif()
+find_package(CUDA 9.0 QUIET)
+include_directories(${CUDA_INCLUDE_DIRS})
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} --expt-relaxed-constexpr)
+if(CUDA_FOUND)
+    add_definitions(-DTKCUDA_ENABLED)
+endif()
 
 #-------------------------------------------------------------------------------
 # External Libraries
