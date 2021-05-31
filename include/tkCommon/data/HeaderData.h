@@ -29,7 +29,8 @@ namespace tk { namespace data {
         ODOM        = 15,
         IMAGEU8     = 16,
         IMAGEU16    = 17,
-        IMAGEF      = 18
+        IMAGEF      = 18,
+        SONAR       = 19
     };
 
     static const char* ToStr (const DataType& type)
