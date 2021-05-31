@@ -24,6 +24,8 @@ class CarControlInterface : public tk::gui::Drawable{
         bool manual = false;
         int recivedInputRequestN = 0;
 
+        bool enableBrake = true, enableThrottle = true, enableSteer = true;
+
     public:
         CarControlInterface(tk::communication::CarControl *carCtrl) {
             this->carCtrl = carCtrl;
@@ -59,6 +61,10 @@ class CarControlInterface : public tk::gui::Drawable{
                 std::cout<<"Set ODOM state: "<<odomActive<<"\n";
                 carCtrl->sendOdomEnable(odomActive);
             }
+            ImGui::Checkbox("ENABLE steer", &enableSteer);
+            ImGui::Checkbox("ENABLE throttle", &enableThrottle);
+            ImGui::Checkbox("ENABLE brake", &enableBrake);
+
 
             // status
             ImGui::Text("Speed: %lf kmh", carCtrl->odom.speed.x()*3.6);
@@ -139,9 +145,11 @@ class CarControlInterface : public tk::gui::Drawable{
                         brakeReq = preBrake;
                     }
                 }
-                carCtrl->setTargetSteer(steerReqDeg);
-                carCtrl->setTargetBrake(brakeReq);
-                carCtrl->setTargetThrottle(throttleReq);
+
+
+                carCtrl->setTargetSteer(enableSteer * steerReqDeg);
+                carCtrl->setTargetBrake(enableBrake * brakeReq);
+                carCtrl->setTargetThrottle(enableThrottle * throttleReq);
             }
 
        }
