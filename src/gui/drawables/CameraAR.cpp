@@ -80,7 +80,7 @@ tk::gui::CameraAR::draw(tk::gui::Viewer *viewer) {
         glLoadIdentity();
 
         // Apply projection
-        glMultMatrixf(glm::value_ptr(camera.projection));
+        //glMultMatrixf(glm::value_ptr(camera.projection));
 
         // Apply ModelView
         lockWrite();
@@ -91,8 +91,8 @@ tk::gui::CameraAR::draw(tk::gui::Viewer *viewer) {
         camera.modelView = glm::make_mat4((float*)view_fixed.matrix().data());
         unlockWrite();
 
-        glm::mat4 m_view = camera.modelView;
-        glMultMatrixf(glm::value_ptr(m_view));
+        glm::mat4 m_view = camera.projection * camera.modelView;
+        //glMultMatrixf(glm::value_ptr(m_view));
 
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -100,7 +100,8 @@ tk::gui::CameraAR::draw(tk::gui::Viewer *viewer) {
         for (auto const& drawable : drawables){
             if(drawable->enabled){
                 glPushMatrix();
-                glMultMatrixf(drawable->tf.matrix().data());
+                //glMultMatrixf(drawable->tf.matrix().data());
+                drawable->drwModelView = m_view;
                 drawable->draw(viewer);
                 glPopMatrix();
             }
@@ -112,8 +113,8 @@ tk::gui::CameraAR::draw(tk::gui::Viewer *viewer) {
     glPopMatrix();
 
     ImGui::Begin(name.c_str(), NULL, ImGuiWindowFlags_NoScrollbar);
-    ImGui::SetWindowSize(name.c_str(), ImVec2(viewer->getWidth(), viewer->getHeight()));
-    ImGui::SetWindowPos(name.c_str(), ImVec2(0,0));
+    //ImGui::SetWindowSize(name.c_str(), ImVec2(viewer->getWidth(), viewer->getHeight()));
+    //ImGui::SetWindowPos(name.c_str(), ImVec2(0,0));
     float imgX = ImGui::GetWindowSize().x-20;
     //int imgY = ImGui::GetWindowSize().y-35;
     //float imgX = textures[i]->width;

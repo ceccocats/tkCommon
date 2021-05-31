@@ -90,6 +90,55 @@ namespace tk{ namespace data{
             return true;
         }
 
+        void save(std::string file){
+
+            std::vector<float> K(4);
+            K[0] = fx();
+            K[1] = fy();
+            K[2] = cx();
+            K[3] = cy();
+
+            std::vector<float> D(5);
+            for(int i = 0; i < 5; i++) D[i] = d[i];
+            
+            std::vector<float> R(9);
+            for(int i = 0; i < 9; i++) R[i] = r[i];
+
+            tk::common::Vector3<float> pos = tk::common::tf2pose(tf);
+            tk::common::Vector3<float> rot = tk::common::tf2rot(tf);
+
+            std::vector<float> tf_vec(6);
+            tf_vec[0] = pos.x();
+            tf_vec[1] = pos.y();
+            tf_vec[2] = pos.z();
+            tf_vec[3] = rot.x() * 180.0f / M_PI;
+            tf_vec[4] = rot.y() * 180.0f / M_PI;
+            tf_vec[5] = rot.z() * 180.0f / M_PI;
+
+            YAML::Emitter out;
+            out << YAML::BeginMap;
+            out << YAML::Key << "K";
+            out << YAML::Value << YAML::Flow << K;
+            out << YAML::Key << "D";
+            out << YAML::Value << YAML::Flow << D;
+            out << YAML::Key << "R";
+            out << YAML::Value << YAML::Flow << R;
+            out << YAML::Key << "tf";
+            out << YAML::Value << YAML::Flow << tf_vec;
+            out << YAML::Key << "width";
+            out << YAML::Value << w;
+            out << YAML::Key << "height";
+            out << YAML::Value << h;
+            out << YAML::EndMap;
+
+            std::ofstream fout(file);
+
+            fout<<out.c_str();
+
+            fout.close();
+
+        }
+
         void world2cam(tk::common::Tfpose &tf, tk::math::Mat<float> &point, tk::math::Mat<float> &dst){
             Eigen::Matrix3f fix;
 
