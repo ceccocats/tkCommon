@@ -22,6 +22,7 @@ class CarControlInterface : public tk::gui::Drawable{
         bool odomActive = true;
 
         bool manual = false;
+        int recivedInputRequestN = 0;
 
     public:
         CarControlInterface(tk::communication::CarControl *carCtrl) {
@@ -32,6 +33,7 @@ class CarControlInterface : public tk::gui::Drawable{
 
         void setInput(float steerDeg, float speedKMH) {
             if(!manual) {
+                recivedInputRequestN++;
                 steerReqDeg = steerDeg;
                 speedReqKMH = speedKMH;
                 speedReq = speedReqKMH/3.6;
@@ -111,6 +113,7 @@ class CarControlInterface : public tk::gui::Drawable{
             else {
                 speedControl = true;
                 ImGui::Text("Getting act from code");
+                ImGui::Text("requests: %d", recivedInputRequestN);
             }
             ImGui::End();
 
