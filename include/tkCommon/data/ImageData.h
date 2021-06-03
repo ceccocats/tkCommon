@@ -52,7 +52,8 @@ namespace tk{ namespace data{
         }
 
         ImageDataX<T>& operator=(ImageDataX<T>& s){
- 
+
+            SensorData::operator=(s);
             if(s.width != this->width || s.height != this->height || s.channels != this->channels){
                 init(s.width, s.height, s.channels);
             }

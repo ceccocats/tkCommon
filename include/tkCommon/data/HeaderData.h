@@ -54,6 +54,7 @@ namespace tk { namespace data {
             case DataType::ACTUATION:   return "actuation";
             case DataType::DEPTH:       return "depth";
             case DataType::ODOM:        return "odom";
+            case DataType::SONAR:       return "sonar";
             default:                    return "???";
                 
         }

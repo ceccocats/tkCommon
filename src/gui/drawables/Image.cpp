@@ -138,19 +138,19 @@ tk::gui::Image::imGuiInfos(){
 
 void 
 tk::gui::Image::onClose(){
-    if(textureType == 0){
-        tk::gui::Texture<uint8_t>* textU8 = (tk::gui::Texture<uint8_t>*)texture;
-        textU8->release();
-    }
-    if(textureType == 1){
-        tk::gui::Texture<uint16_t>* textU16 = (tk::gui::Texture<uint16_t>*)texture;
-        textU16->release();
-    }
-    if(textureType == 2){
-        tk::gui::Texture<float>* textF = (tk::gui::Texture<float>*)texture;
-        textF->release();
-    }
     if(texture != nullptr){
+        if(textureType == 0){
+            tk::gui::Texture<uint8_t>* textU8 = (tk::gui::Texture<uint8_t>*)texture;
+            textU8->release();
+        }
+        if(textureType == 1){
+            tk::gui::Texture<uint16_t>* textU16 = (tk::gui::Texture<uint16_t>*)texture;
+            textU16->release();
+        }
+        if(textureType == 2){
+            tk::gui::Texture<float>* textF = (tk::gui::Texture<float>*)texture;
+            textF->release();
+        }
         delete texture;
     }
 }

@@ -144,14 +144,6 @@ VARS = [ {"name":"type",        "type":"static const DataType", "default": "Data
          {"name":"channels",    "type":"uint32_t", "default": "0"}]
 genData(className, VARS, DEPS)
 
-className = "SonarData_gen"
-DEPS = ["#include \"tkCommon/data/gen/ImageData_gen.h\"" ]
-VARS = [ {"name":"type",        "type":"static const DataType", "default": "DataType::SONAR"},
-         {"name":"image",       "type":"tk::data::ImageData_gen<float>"},
-         {"name":"azimuth",     "type":"tk::math::Vec<float>"},
-         {"name":"resolution",  "type":"float", "default": "0"}]
-genData(className, VARS, DEPS)
-
 className = "RadarData_gen"
 DEPS = ["#include \"tkCommon/data/CloudData.h\"\n"]
 VARS = [ {"name":"type",        "type":"static const DataType", "default": "DataType::RADAR"},
@@ -202,4 +194,13 @@ VARS = [ {"name":"type",        "type":"static const DataType", "default": "Data
          {"name":"color",       "type":"tk::data::ImageData", "init": "color.init()"},
          {"name":"depth",       "type":"tk::data::ImageDataX<uint16_t>", "init": "depth.init()"}
         ]
+genData(className, VARS, DEPS)
+
+className = "SonarData_gen"
+DEPS = ["#include \"tkCommon/data/ImageData.h\"" ]
+VARS = [ {"name":"type",        "type":"static const DataType", "default": "DataType::SONAR"},
+         {"name":"azimuth",     "type":"tk::math::Vec<float>"},
+         {"name":"resolution",  "type":"float",                 "default": "0"},
+         {"name":"bits",        "type":"int",                   "default": "0"},
+         {"name":"image",       "type":"tk::data::ImageDataF",  "init": "image.init()"}]
 genData(className, VARS, DEPS)

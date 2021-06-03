@@ -19,3 +19,4 @@
 #include <tkCommon/gui/drawables/PolyLine.h>
 #include <tkCommon/gui/drawables/ReplayInfo.h>
 #include <tkCommon/gui/drawables/Mesh.h>
+#include <tkCommon/gui/drawables/Sonar.h>
