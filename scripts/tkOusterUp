@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ##################
-ipOutster="192.168.1.203"
+ipOutster="192.168.1.204"
 ipDest="192.168.1.109"
 dev="eth0"
 ##################
@@ -40,8 +40,12 @@ sudo route add $ipOutster dev $dev
 echo "set_config_param udp_ip $ipDest" | nc $ipOutster 7501 -q 1
 check
 
-#set udp_port
+#set udp_port lidar
 echo "set_config_param udp_port_lidar 7502" | nc $ipOutster 7501 -q 1
+check
+
+#set udp_port imu
+echo "set_config_param udp_port_imu 7503" | nc $ipOutster 7501 -q 1
 check
 
 echo "set_config_param beta.bloom_reduction_enable true" | nc $ipOutster 7501 -q 1
@@ -80,7 +84,3 @@ check
 #start sensor
 echo "reinitialize" | nc $ipOutster 7501 -q 1
 check
-
-
-
-
