@@ -12,6 +12,7 @@ namespace tk{ namespace gui{
 
             int nPos;
             int lastPos;
+            static const int MAX_POSES = 40;
             std::vector<tk::gui::shader::circle*> circles;
 
             tk::common::GeodeticConverter geoConv;

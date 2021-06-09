@@ -27,12 +27,11 @@ class Control : public tk::gui::Drawable{
         bool active = false;
         bool setZero = false;
         float steerReqDeg = 0;
-        float steerSpeed = 65536; 
 
         float brakeReq = 0;
         float throttleReq = 0;
         float speedReqKMH = 0;
-        float speedReq = 0;
+        float speedReq = -1;
 
         bool speedControl = false;
         bool odomActive = true;
@@ -51,7 +50,6 @@ class Control : public tk::gui::Drawable{
             //}
             ImGui::SliderFloat("Steer", &steerReqDeg, -30, +30);
             ImGui::InputFloat("Steer_", &steerReqDeg, -30, +30);
-            ImGui::SliderFloat("SteerSpeed", &steerSpeed, 0, 65536);
             ImGui::Text("steer pos: %d", carCtrl.steerPos);
 
             ImGui::NewLine();
@@ -64,10 +62,16 @@ class Control : public tk::gui::Drawable{
             } else {
                 ImGui::SliderFloat("Speed kmh", &speedReqKMH, -1, 40);
                 speedReq = speedReqKMH/3.6;
-                ImGui::ProgressBar(throttleReq, ImVec2(0.0f, 0.0f));
+                ImVec4 ca = {0.1f,0.9f,0.1f,1.0f};
+                ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ca);
+                ImGui::ProgressBar(carCtrl.getActThrottle(), ImVec2(0.0f, 0.0f));
+                ImGui::PopStyleColor();
                 ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
                 ImGui::Text("Throttle");
-                ImGui::ProgressBar(brakeReq, ImVec2(0.0f, 0.0f));
+                ca = {0.9f,0.1f,0.1f,1.0f};
+                ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ca);
+                ImGui::ProgressBar(carCtrl.getActBrake(), ImVec2(0.0f, 0.0f));
+                ImGui::PopStyleColor();
                 ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
                 ImGui::Text("Brake");
                 
@@ -78,7 +82,9 @@ class Control : public tk::gui::Drawable{
                 double act = pid.calculate(dt, speedReq - carCtrl.odom.speed.x());
 
                 float preBrake = 0.40;
-                if(speedReq < 0)
+                if(speedReq < 0 && carCtrl.odom.speed.x() < 1)
+                    preBrake = 0.6;
+                if(speedReq < 0 && carCtrl.odom.speed.x() <= 0.01)
                     preBrake = 0.7;
                 if(act < 0) {
                     brakeReq = preBrake - (act);
@@ -88,6 +94,9 @@ class Control : public tk::gui::Drawable{
                     brakeReq = preBrake;
                 }
             }
+            carCtrl.setTargetSteer(steerReqDeg);
+            carCtrl.setTargetBrake(brakeReq);
+            carCtrl.setTargetThrottle(throttleReq);
 
             ImGui::NewLine();
             if(ImGui::Checkbox("ODOM ENABLE", &odomActive)) {
@@ -113,8 +122,6 @@ int main( int argc, char** argv){
 
     tk::common::CmdParser cmd(argv, "Car Control");
     std::string soc_file = cmd.addArg("interface", "can0", "can interface to read");
-    float smoothSteer    = cmd.addFloatOpt("-lerp_steer", 0.02, "steer lerp value");
-    float smoothThrottle = cmd.addFloatOpt("-lerp_throttle", 0.10, "throttle lerp value");
     bool  queryEcus      = cmd.addBoolOpt("-query", "query all connected ECUS");
     cmd.parse();
 
@@ -137,25 +144,6 @@ int main( int argc, char** argv){
     viewer->add(c);
     viewer->start();
     
-    /*
-	Joystick joy;
-    tkASSERT(joy.init());
-    */
-
-    tk::rt::Task t;
-    t.init(50*1e3);
-    float steer = 0, throttle = 0;
-    bool active = false;
-    while(gRun) {
-        if(c->active) {
-            carCtrl.setSteerAngle(c->steerReqDeg, c->steerSpeed);
-            carCtrl.setBrakePos(c->brakeReq*15000);
-            carCtrl.setAccPos(c->throttleReq*100);
-        }
-        t.wait();
-    }
-    
-
     viewer->join();
     carCtrl.close();
     canSoc.close();

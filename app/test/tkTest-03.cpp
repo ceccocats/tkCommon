@@ -3,7 +3,6 @@
 #include "tkCommon/math/Mat.h"
 #include "tkCommon/math/MatIO.h"
 #include "tkCommon/math/Vec.h"
-#include <cuda.h>
 #include "tkCommon/rt/Profiler.h"
 
 TEST_CASE("Test tprof") {
