@@ -1,14 +1,17 @@
-# find roscpp
-find_package(roscpp QUIET)
-find_package(rosbag QUIET)
+# FindROS
+include(CMakeFindDependencyMacro)
+find_dependency(roscpp)
+find_dependency(rosbag)
+find_dependency(sensor_msgs)
 
-if (roscpp_FOUND)
-    set(ROS_INCLUDE_DIRS ${roscpp_INCLUDE_DIRS} ${rosbag_INCLUDE_DIRS})
-    set(ROS_LIBRARIES ${roscpp_LIBRARIES} ${rosbag_LIBRARIES})
-    message("-- Found ROS") #${ROS_INCLUDE_DIRS} 
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DROS_ENABLED")
+if (roscpp_FOUND AND rosbag_FOUND AND sensor_msgs_FOUND)
+    set(ROS_INCLUDE_DIRS ${roscpp_INCLUDE_DIRS} ${rosbag_INCLUDE_DIRS} ${sensor_msgs_INCLUDE_DIRS})
+    set(ROS_LIBRARIES ${roscpp_LIBRARIES} ${rosbag_LIBRARIES} ${sensor_msgs_LIBRARIES})
+    message("-- Found ROS")
     set(ROS_FOUND true)
 else()  
+    #set(ROS_INCLUDE_DIRS "")
+    #set(ROS_LIBRARIES "")
     message("-- ROS NOT FOUND")
     set(ROS_FOUND false)
 endif() 
