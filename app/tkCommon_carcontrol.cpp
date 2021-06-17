@@ -29,23 +29,10 @@ int main( int argc, char** argv){
 
     tk::common::CmdParser cmd(argv, "Car Control");
     std::string soc_file = cmd.addArg("interface", "can0", "can interface to read");
-    bool  queryEcus      = cmd.addBoolOpt("-query", "query all connected ECUS");
     cmd.parse();
 
-
-    
     tkASSERT(canSoc.initSocket(soc_file));
     carCtrl.init(&canSoc);
-
-    if(queryEcus) {
-        carCtrl.sendOdomEnable(false);
-        usleep(100000);
-        carCtrl.requestMotorId();
-        return 0;
-    }
-    carCtrl.sendOdomEnable(true);
-    carCtrl.sendOdomEnable(true);
-    carCtrl.sendOdomEnable(true);
 
     tk::communication::CarControlInterface *carInter = new tk::communication::CarControlInterface(&carCtrl);
     viewer->add(carInter);

@@ -45,17 +45,25 @@ class CarControlInterface : public tk::gui::Drawable{
 
         void draw(tk::gui::Viewer *viewer){
             ImGui::Begin("Car control", NULL, ImGuiWindowFlags_NoScrollbar);
-            if(ImGui::Checkbox("ACTIVATE", &active)) {
-                tkMSG("Set CAR state: "<<active);
-                carCtrl->enable(active);
+            if(ImGui::Button("ENGINE START")) {
+                tkMSG("Send engine button");
+                carCtrl->sendEngineStart();
             }
-            if(ImGui::Button("SET ZERO")) {
+            if(ImGui::Button("QUERY ECUs")) {
+                tkMSG("Send query");
+                carCtrl->requestMotorId();
+            }
+            if(ImGui::Button("STEER SET ZERO")) {
                 tkMSG("Set Steer ZERO");
                 carCtrl->setSteerZero();
             }
-            if(ImGui::Button("RESET")) {
+            if(ImGui::Button("STEER RESET")) {
                 tkMSG("Reset steer");
                 carCtrl->resetSteerMotor();
+            }
+            if(ImGui::Checkbox("ACTIVATE", &active)) {
+                tkMSG("Set CAR state: "<<active);
+                carCtrl->enable(active);
             }
             if(ImGui::Checkbox("ODOM ENABLE", &odomActive)) {
                 std::cout<<"Set ODOM state: "<<odomActive<<"\n";
@@ -73,6 +81,14 @@ class CarControlInterface : public tk::gui::Drawable{
             ImGui::SliderFloat("SteerAct", &steer_act, -30, +30);
             ImGui::PopItemFlag();
             ImGui::Text("Steer pos read: %d", carCtrl->steerPos);
+            // steer params
+            int sAcc = carCtrl->getSteerAcc();
+            int sVel = carCtrl->getSteerVel();
+            ImGui::InputInt("Param: Steer Acc", &sAcc);
+            ImGui::InputInt("Param: Steer Vel", &sVel); 
+            carCtrl->setSteerParams(sAcc, sVel);
+            ImGui::NewLine();
+
             ImVec4 ca = {0.1f,0.9f,0.1f,1.0f};
             ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ca);
             ImGui::ProgressBar(carCtrl->getActThrottle(), ImVec2(0.0f, 0.0f));
