@@ -185,7 +185,7 @@ void CarControl::setBrakePos(float val) {
 
 void CarControl::setSteerAngle(float angle){
     float diff = -angle/0.0015;
-    setSteerPos(diff,steerAcc,steerVel);
+    setSteerPos(diff + steerOffset,steerAcc,steerVel);
 }
 
 void CarControl::enable(bool status) {
@@ -212,16 +212,17 @@ void CarControl::enable(bool status) {
 
 void CarControl::sendOdomEnable(bool status) {
     tk::data::CanData data;
+
+    // reset 
+    data.frame.can_dlc = 0;
+    data.frame.can_id = ODOM_RESET_ID;
+    soc->write(&data);
+    usleep(100000);
+
     data.frame.can_dlc = 2;
     data.frame.can_id = SET_ACTIVE_ID;
     data.frame.data[0] = accECU;
     data.frame.data[1] = status;
-    soc->write(&data);
-
-    // reset 
-    usleep(100000);
-    data.frame.can_dlc = 0;
-    data.frame.can_id = ODOM_RESET_ID;
     soc->write(&data);
 }
 

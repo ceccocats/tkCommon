@@ -45,6 +45,7 @@ namespace tk { namespace communication {
         float actThrottle = 0;      /**< currently actuation val */ 
         float actSteer = 0;         /**< currently actuation val */     
 
+        int steerOffset = 0;   /** STEER position OFFSET distance from auto ZERO */
         uint8_t steerAcc = 0;  /** ACC   param steer motor */
         uint16_t steerVel = 0; /** SPEED param steer motor */  
 
@@ -107,9 +108,14 @@ namespace tk { namespace communication {
         /**
          * set steer parameters
          */
-        void setSteerParams(int acc, int vel)  { steerAcc = clamp<int>(acc, 0, 255); steerVel = clamp<int>(vel, 0, 1000); }
-        uint8_t getSteerAcc()  { return steerAcc; }
-        uint16_t getSteerVel()  { return steerVel; }
+        void setSteerParams(int offset, int acc, int vel)  {
+            steerOffset = clamp<int>(offset, -2000, 2000);
+            steerAcc = clamp<int>(acc, 0, 255); 
+            steerVel = clamp<int>(vel, 0, 1000); 
+        }
+        int getSteerOffset()    { return steerOffset; }
+        uint8_t getSteerAcc()   { return steerAcc;    }
+        uint16_t getSteerVel()  { return steerVel;    }
 
         /** target steer angle DEG */
         void setTargetSteer(float val)    { targetSteer = clamp<float>(val, -30, 30); }

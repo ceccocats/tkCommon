@@ -53,10 +53,10 @@ class CarControlInterface : public tk::gui::Drawable{
                 tkMSG("Send query");
                 carCtrl->requestMotorId();
             }
-            if(ImGui::Button("STEER SET ZERO")) {
-                tkMSG("Set Steer ZERO");
-                carCtrl->setSteerZero();
-            }
+            //if(ImGui::Button("STEER SET ZERO")) {
+            //    tkMSG("Set Steer ZERO");
+            //    carCtrl->setSteerZero();
+            //}
             if(ImGui::Button("STEER RESET")) {
                 tkMSG("Reset steer");
                 carCtrl->resetSteerMotor();
@@ -82,11 +82,13 @@ class CarControlInterface : public tk::gui::Drawable{
             ImGui::PopItemFlag();
             ImGui::Text("Steer pos read: %d", carCtrl->steerPos);
             // steer params
+            int sOff = carCtrl->getSteerOffset();
             int sAcc = carCtrl->getSteerAcc();
             int sVel = carCtrl->getSteerVel();
+            ImGui::InputInt("Param: Steer Offset", &sOff);
             ImGui::InputInt("Param: Steer Acc", &sAcc);
             ImGui::InputInt("Param: Steer Vel", &sVel); 
-            carCtrl->setSteerParams(sAcc, sVel);
+            carCtrl->setSteerParams(sOff, sAcc, sVel);
             ImGui::NewLine();
 
             ImVec4 ca = {0.1f,0.9f,0.1f,1.0f};

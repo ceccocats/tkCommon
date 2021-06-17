@@ -33,12 +33,15 @@ int main( int argc, char** argv){
 
     tkASSERT(canSoc.initSocket(soc_file));
     carCtrl.init(&canSoc);
+    carCtrl.sendOdomEnable(true);
+    //carCtrl.setSteerParams(0,0,0);
 
     tk::communication::CarControlInterface *carInter = new tk::communication::CarControlInterface(&carCtrl);
     viewer->add(carInter);
     viewer->start();
     
     viewer->join();
+    carCtrl.sendOdomEnable(false);
     carCtrl.close();
     canSoc.close();
     return 0;
