@@ -5,7 +5,7 @@ tk::gui::Gps::Gps(const std::string& name, int nPos, tk::gui::Color_t color){
     this->nPos    = nPos;
     this->lastPos = -1;
     this->name    = name;
-    circles.resize(nPos);
+    circles.resize(MAX_POSES);
 }
 
 tk::gui::Gps::Gps(tk::data::GpsData* gps, const std::string& name, int nPos, tk::gui::Color_t color) :Gps(name,nPos,color){
@@ -20,6 +20,7 @@ void
 tk::gui::Gps::onInit(tk::gui::Viewer *viewer){
     for(int i = 0; i < circles.size(); i++){
         circles[i] = new tk::gui::shader::circle();
+        circles[i]->makeCircle(0,0,0,0);  
     }
 }
 
@@ -58,7 +59,7 @@ void
 tk::gui::Gps::imGuiSettings(){
     ImGui::ColorEdit4("Color", color.color);
     ImGui::SliderFloat("Size",&lineSize,1.0f,20.0f,"%.1f");
-    ImGui::SliderInt("Last poses gps",&nPos,1,40);
+    ImGui::SliderInt("Last poses gps",&nPos,1,MAX_POSES);
 }
 
 void 

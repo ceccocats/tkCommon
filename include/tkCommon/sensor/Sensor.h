@@ -390,8 +390,13 @@ class Sensor {
                 tkWRN("No free elemnt in the pool.\n");
             }
 
+            if(data)
+                postGrab(data);
+
             return (data != nullptr)?true:false;
         }
+
+        virtual void postGrab(const tk::data::SensorData *data){}
 
         /**
          * @brief   Release grabbed element from the pool, must be called after a grab().

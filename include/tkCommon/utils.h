@@ -6,6 +6,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <sys/stat.h>
 #include "yaml-cpp/yaml.h" 
 
 /**
@@ -177,7 +178,7 @@ inline std::vector<std::string> splitString(const std::string &s, char delim, in
     return elems;
 }
 
-inline std::string searchFolderFile(std::string folder, std::string name){
+inline std::string searchFolderFile(const std::string& folder, const std::string& name){
     std::string file = "";
     struct dirent *dir;
     DIR *d = opendir(folder.c_str());
@@ -193,4 +194,9 @@ inline std::string searchFolderFile(std::string folder, std::string name){
         closedir(d);
     }
     return file;
+}
+
+inline bool fileExist(const std::string& name) {
+  struct stat buffer;   
+  return (stat (name.c_str(), &buffer) == 0); 
 }
