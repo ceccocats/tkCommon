@@ -9,8 +9,9 @@ elseif( IS_DIRECTORY $ENV{HOME}/nvidia/nvidia_sdk/DRIVE_Software_10.0_Linux_OS_D
 elseif( IS_DIRECTORY $ENV{HOME}/drive-t186ref-linux/include/)
     set(DriveWorks_DIR $ENV{HOME}/drive-t186ref-linux/include/)
     set(DriveWorks_FOUND True)
-endif ()
-if( DriveWorks_FOUND )
+endif()
+
+if(DriveWorks_FOUND)
     if(IS_DIRECTORY /usr/local/driveworks/)
         # get driwework path
         execute_process(
@@ -20,9 +21,9 @@ if( DriveWorks_FOUND )
 
         string(STRIP ${DW_PATH} DW_PATH)
         message("-- Found Driveworks: ${DW_PATH}")
-        set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
-        set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -DVIBRANTE")
-        set(DriveWorks_FOUND True)
+        #set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR})
+        add_definitions(-DVIBRANTE)
+        #set(DriveWorks_FOUND True)
         set(DriveWorks_INCLUDE_DIRS
             /usr/local/cuda/targets/${CMAKE_SYSTEM_PROCESSOR}-linux/include/
             #/usr/local/driveworks/include/
@@ -43,22 +44,21 @@ if( DriveWorks_FOUND )
         # get DriveWork version
         get_directory_property(MYDEFS COMPILE_DEFINITIONS)
         if((MYDEFS MATCHES "^DW_VERSION_MAJOR=" OR MYDEFS MATCHES ";DW_VERSION_MAJOR=") AND
-        (MYDEFS MATCHES "^DW_VERSION_MINOR=" OR MYDEFS MATCHES ";DW_VERSION_MINOR="))
+           (MYDEFS MATCHES "^DW_VERSION_MINOR=" OR MYDEFS MATCHES ";DW_VERSION_MINOR="))
             MESSAGE("-- DW_VERSION defined")
         else()
             # You can define your OS here if desired
             if (DW_PATH MATCHES ".*2\.2.*")
-                add_definitions(-DDW_VERSION_MAJOR=2)
-                add_definitions(-DDW_VERSION_MINOR=2)
+                set(DW_VERSION_MAJOR 2)
+                set(DW_VERSION_MINOR 2)
                 message("-- Driveworks VERSION: 2.2")
             elseif(DW_PATH MATCHES ".*2\.0.*")
-                add_definitions(-DDW_VERSION_MAJOR=2)
-                add_definitions(-DDW_VERSION_MINOR=0)
+                set(DW_VERSION_MAJOR 2)
+                set(DW_VERSION_MINOR 0)
                 message("-- Driveworks VERSION: 2.0")
             else()
                 message(FATAL_ERROR "Driveworks VERISON not supported")
             endif()
-
         endif()
     else()
         set(DriveWorks_FOUND False)
@@ -67,7 +67,7 @@ endif()
 
 
 if(NOT DriveWorks_FOUND)
-	message(WARNING "-- Driveworks NOT FOUND")
+	message("-- Driveworks NOT FOUND")
 endif()
 
 
