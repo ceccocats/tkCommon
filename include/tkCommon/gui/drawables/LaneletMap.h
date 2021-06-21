@@ -26,8 +26,8 @@ namespace gui {
 
 class LaneletMap : public Drawable {
 public:
-     LaneletMap(YAML::Node aConf, const std::string& aName = "Lanelet2_map");
      LaneletMap(const std::string& aConfPath, const std::string& aName = "Lanelet2_map");
+    ~LaneletMap() = default;
 
     void onInit(tk::gui::Viewer *viewer);
     void beforeDraw(tk::gui::Viewer *viewer) final;

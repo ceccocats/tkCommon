@@ -2,17 +2,19 @@
 
 using namespace tk::gui;
 
-LaneletMap::LaneletMap(YAML::Node aConf, const std::string& aName)
+LaneletMap::LaneletMap(const std::string& aConfPath, const std::string& aName)
 {
-    name              = aName;
-    mMapPath          = tk::common::YAMLgetConf<std::string>(aConf, "file", "lanelet.osm");
-    mOriginLat        = tk::common::YAMLgetConf<double>(aConf, "lat", 0.0f);
-    mOriginLon        = tk::common::YAMLgetConf<double>(aConf, "lon", 0.0f);
-    mUpdate           = false;
-    mShowBuilding     = true;
-    mShowRoad         = true;
-    mShowGreenland    = true;
-    mShowParking      = true;
+    YAML::Node conf     = YAML::LoadFile(aConfPath);
+    name                = aName;
+    std::string local_p = tk::common::YAMLgetConf<std::string>(conf, "file", "lanelet.osm");
+    mMapPath            = aConfPath.substr(0, aConfPath.find_last_of('/')) + "/" + local_p;
+    mOriginLat          = tk::common::YAMLgetConf<double>(conf, "lat", 0.0f);
+    mOriginLon          = tk::common::YAMLgetConf<double>(conf, "lon", 0.0f);
+    mUpdate             = false;
+    mShowBuilding       = true;
+    mShowRoad           = true;
+    mShowGreenland      = true;
+    mShowParking        = true;
     mBuildingColor.set((uint8_t) 145, (uint8_t) 145, (uint8_t) 145, (uint8_t) 255);
     mGrennlandColor.set((uint8_t) 0, (uint8_t) 134, (uint8_t) 24, (uint8_t) 255);
     mParkingColor.set((uint8_t) 0, (uint8_t) 117, (uint8_t) 138, (uint8_t) 255);
@@ -20,10 +22,6 @@ LaneletMap::LaneletMap(YAML::Node aConf, const std::string& aName)
     mLineColor.set(1.0f, 1.0f, 1.0f, 1.0f);
 
     mInitted = true;
-}
-
-LaneletMap::LaneletMap(const std::string& aConfPath, const std::string& aName) : LaneletMap(YAML::LoadFile(aConfPath), aName)
-{
 }
 
 void

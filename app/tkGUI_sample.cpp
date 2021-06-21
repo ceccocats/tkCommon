@@ -130,7 +130,7 @@ void* th_lanelet_path(void* ptrpath) {
 	YAML::Node  conf 			= YAML::LoadFile(std::string(tkCommon_PATH) + "data/lanelet.osm.yaml");
     float lat         		    = tk::common::YAMLgetConf<float>(conf, "lat", 40.0);
     float lon       	      	= tk::common::YAMLgetConf<float>(conf, "lon", 10.0);
-    std::string laneletMapPath 	= tk::common::YAMLgetConf<std::string>(conf, "file", "lanelet.osm");
+    std::string laneletMapPath 	= std::string(tkCommon_PATH) + "data/" + tk::common::YAMLgetConf<std::string>(conf, "file", "lanelet.osm");
 
     // load lanelet map
     lanelet::projection::UtmProjector projector(lanelet::Origin({lat, lon}));  // we will go into details later
