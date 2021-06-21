@@ -121,12 +121,77 @@ void* th_imu(void* ptrimu){
 	}
 }
 
+#ifdef LANELET_ENABLED
+tk::gui::LaneletPath *path;
+
+void* th_lanelet_path(void* ptrpath) {
+	tk::gui::LaneletPath *path = (tk::gui::LaneletPath*)ptrpath;
+
+	YAML::Node  conf 			= YAML::LoadFile(std::string(tkCommon_PATH) + "data/lanelet.osm.yaml");
+    float lat         		    = tk::common::YAMLgetConf<float>(conf, "lat", 40.0);
+    float lon       	      	= tk::common::YAMLgetConf<float>(conf, "lon", 10.0);
+    std::string laneletMapPath 	= tk::common::YAMLgetConf<std::string>(conf, "file", "lanelet.osm");
+
+    // load lanelet map
+    lanelet::projection::UtmProjector projector(lanelet::Origin({lat, lon}));  // we will go into details later
+    auto map = lanelet::load(laneletMapPath, projector);
+
+    // create routing graph
+    auto trafficRules = lanelet::traffic_rules::TrafficRulesFactory::create(lanelet::Locations::Germany, lanelet::Participants::Vehicle);
+    auto routingGraph = lanelet::routing::RoutingGraph::build(*map, *trafficRules);
+
+ 	// get map boundary
+	tk::math::Vec2f mapMin, mapMax, mapSize, pA, pB;
+    mapMin.x() = mapMin.y() = std::numeric_limits<float>::max();
+    mapMax.x() = mapMax.y() = std::numeric_limits<float>::min();
+    for (const auto& point : map->pointLayer) {
+        if (point.x() < mapMin.x()) mapMin.x() = point.x();
+        if (point.y() < mapMin.y()) mapMin.y() = point.y();
+        if (point.x() > mapMax.x()) mapMax.x() = point.x();
+        if (point.y() > mapMax.y()) mapMax.y() = point.y();
+    }
+    mapSize.x() = mapMax.x() - mapMin.x();
+    mapSize.y() = mapMax.y() - mapMin.y();
+
+	srand (static_cast <unsigned> (time(0)));
+	while(viewer->isRunning()) {
+		// generate random A point
+		pA.x() = mapMin.x() + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(mapSize.x())));
+		pA.y() = mapMin.y() + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(mapSize.y())));
+		auto A = map->laneletLayer.nearest(lanelet::BasicPoint2d(pA.x(), pA.y()), 1);
+
+		// generate random B point
+		pB.x() = mapMin.x() + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(mapSize.x())));
+		pB.y() = mapMin.y() + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(mapSize.y())));
+		auto B = map->laneletLayer.nearest(lanelet::BasicPoint2d(pB.x(), pB.y()), 1);
+
+		if (A[0].id() == B[0].id())
+			continue;
+
+		// get path
+		lanelet::Optional<lanelet::routing::Route> route = routingGraph->getRoute(A[0], B[0], 0);
+		if (!route) 
+			continue;
+			
+		// get shorter path 
+		lanelet::routing::LaneletPath shortestPath = route->shortestPath();
+		assert(!shortestPath.empty());
+
+		// update gui
+		path->updateRef(&shortestPath);
+
+		sleep(2);
+	}
+}
+#endif
+
 void key_listener(int key, int action, int source) {
 	//std::cout<<"KEY: "<<key<<" action: "<<action<<" source: "<<source<<"\n";
 }
 
 int main(int argc, char* argv[]){
 	tk::common::CmdParser cmd(argv, "tkGUI_test");
+	bool draw_lanelet = cmd.addBoolOpt("-lanelet", "Add lanelet drawables.");
     cmd.parse();
 
 	//Data
@@ -146,28 +211,50 @@ int main(int argc, char* argv[]){
 	viewer->addKeyCallback(key_listener);
 
 	//Viewer insert
-	viewer->add(new tk::gui::Grid());
+	if (!draw_lanelet) {
+		viewer->add(new tk::gui::Grid());
+		viewer->add(new tk::gui::Cloud4f(&cloud,"tornado"));
+		viewer->add(new tk::gui::Gps(&gps));
+		viewer->add(new tk::gui::Imu(&imu));
+		viewer->add(plt);
+		viewer->add(text);
+	}
 	viewer->add(new tk::gui::Axis());
 	viewer->add(new tk::gui::Mesh(std::string(tkCommon_PATH) + "data/levante.obj"));
-	viewer->add(new tk::gui::Cloud4f(&cloud,"tornado"));
-	viewer->add(new tk::gui::Gps(&gps));
-	viewer->add(new tk::gui::Imu(&imu));
-	viewer->add(plt);
-	viewer->add(text);
+#ifdef LANELET_ENABLED
+	if (draw_lanelet) {
+		path = new tk::gui::LaneletPath();
 
-	tk::rt::Thread th1,th2,th3,th4;
+		viewer->add(new tk::gui::LaneletMap(std::string(tkCommon_PATH) + "data/lanelet.osm.yaml"));
+		viewer->add(path);
+	}
+#endif
 
-    th1.init(th_cloud, (void*)&cloud);
-	th2.init(th_gps, (void*)&gps);
-	th3.init(th_plt, (void*)plt);
-	th4.init(th_imu, (void*)&imu);
+	tk::rt::Thread th1,th2,th3,th4,th5;
+
+	if (!draw_lanelet) {
+		th1.init(th_cloud, (void*)&cloud);
+		th2.init(th_gps, (void*)&gps);
+		th3.init(th_plt, (void*)plt);
+		th4.init(th_imu, (void*)&imu);
+	}
+#ifdef LANELET_ENABLED
+	if (draw_lanelet)
+		th5.init(th_lanelet_path, (void*) path);
+#endif
 
 	viewer->join();
 
-	th1.join();
-	th2.join();
-	th3.join();
-	th4.join();
+	if (!draw_lanelet) {
+		th1.join();
+		th2.join();
+		th3.join();
+		th4.join();
+	}
+#ifdef LANELET_ENABLED
+	if (draw_lanelet)
+		th5.join();
+#endif
 
 	return 0;
 }

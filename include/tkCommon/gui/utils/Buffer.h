@@ -56,7 +56,7 @@ class Buffer
          * 
          * @return  if EBO is setted
          */
-        bool hasEBO();
+        bool hasEBO() const;
 
         /**
          * Method for set data in GL_ARRAY_BUFFER
@@ -81,27 +81,27 @@ class Buffer
          * 
          * @param std::vector<vertexAttribs_t>&  vector contains vertex attributes pointer
          */
-        void setVertexAttribs(std::vector<vertexAttribs_t>& vertexAttribs);
+        void setVertexAttribs(std::vector<vertexAttribs_t>& vertexAttribs) const;
 
         /**
          * use method for get size of last setData
          */
-        int size();
+        int size() const;
 
         /**
          * empty method
          */
-        bool empty();
+        bool empty() const;
 
         /**
          * use method for set GL_ARRAY_BUFFER in shader
          */
-        void use();
+        void use() const;
 
         /**
          * unuse method for unset GL_ARRAY_BUFFER in shader
          */
-        void unuse();
+        void unuse() const;
 
         /**
          * release data method
@@ -111,17 +111,17 @@ class Buffer
 
 
 template <typename T>
-void Buffer<T>::use(){
+void Buffer<T>::use() const {
     glBindVertexArray(VAO);
 }
 
 template <typename T>
-void Buffer<T>::unuse(){
+void Buffer<T>::unuse() const {
     glBindVertexArray(0);
 }
 
 template <typename T>
-int Buffer<T>::size(){
+int Buffer<T>::size() const {
     return lastSize;
 }
 
@@ -133,12 +133,12 @@ void Buffer<T>::release(){
 }
 
 template <typename T>
-bool Buffer<T>::hasEBO(){
+bool Buffer<T>::hasEBO() const {
     return initEBO;
 }
 
 template <typename T>
-bool Buffer<T>::empty(){
+bool Buffer<T>::empty() const {
     return _size == 0;
 }
 
@@ -181,7 +181,7 @@ void Buffer<T>::setIndexVector(unsigned int* data, int lenght){
 }
 
 template <typename T>
-void Buffer<T>::setVertexAttribs(std::vector<vertexAttribs_t>& vertexAttribs){
+void Buffer<T>::setVertexAttribs(std::vector<vertexAttribs_t>& vertexAttribs) const {
     
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
