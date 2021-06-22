@@ -1,12 +1,12 @@
 #!/bin/bash
 
 ##################
-ipOutster="192.168.1.203"
+ipOutster="192.168.1.204"
 ipDest="192.168.1.255"
-dev="eth0"
+dev="eth1"
 ##################
 ## 512x10, 1024x10, 2048x10, 512x20, 1024x20
-config=1024x10
+config=1024x20
 ##################
 ## TIME_FROM_INTERNAL_OSC, TIME_FROM_SYNC_PULSE_IN, TIME_FROM_PTP_1588
 timestamp_mode=TIME_FROM_INTERNAL_OSC
