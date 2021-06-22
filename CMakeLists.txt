@@ -29,6 +29,7 @@ find_package(glfw3 3 REQUIRED)
 find_package(Freetype REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(ROS QUIET)
+find_package(PCL 1.8 QUIET COMPONENTS common)
 
 #-------------------------------------------------------------------------------
 # Generate Data Headers
@@ -77,11 +78,13 @@ target_link_libraries(common
     matio 
     dl 
     ${ROS_LIBRARIES}
+    ${PCL_LIBRARIES}
 )
 target_include_directories(common PUBLIC 
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include> 
     ${ROS_INCLUDE_DIRS}
+    ${PCL_INCLUDE_DIRS}
 )
 if (CUDAToolkit_FOUND)
     target_link_libraries(common CUDA::cudart CUDA::cuda_driver)
@@ -90,6 +93,9 @@ if (CUDAToolkit_FOUND)
 endif()
 if(ROS_FOUND)
     target_compile_options(common PUBLIC -DROS_ENABLED)
+endif()
+if(PCL_FOUND)
+    target_compile_options(common PUBLIC -DPCL_ENABLED)
 endif()
 add_library(${PROJECT_NAME}::common ALIAS common)
 
