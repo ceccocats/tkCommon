@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 11 CACHE STRING "The C++ standard to use")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/tkConf.cmake OPTIONAL)
+#include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/tkConf.cmake OPTIONAL)
 
 #-------------------------------------------------------------------------------
 # CUDA
@@ -28,8 +28,10 @@ find_package(GLEW REQUIRED)
 find_package(glfw3 3 REQUIRED)
 find_package(Freetype REQUIRED)
 find_package(yaml-cpp REQUIRED)
+find_package(GeographicLib REQUIRED)
 find_package(ROS QUIET)
 find_package(PCL 1.8 QUIET COMPONENTS common)
+find_package(lanelet2 QUIET)
 
 #-------------------------------------------------------------------------------
 # Generate Data Headers
@@ -67,6 +69,7 @@ add_library(common SHARED
     src/version.cpp
     src/CmdParser.cpp 
     src/rt/Profiler.cpp
+    src/projection/Projector.cpp
     src/PID.cpp
     ${data_gen}
     ${data} 
@@ -77,14 +80,19 @@ target_link_libraries(common
     ${YAML_CPP_LIBRARIES}
     matio 
     dl 
+    ${GeographicLib_LIBRARIES}
     ${ROS_LIBRARIES}
     ${PCL_LIBRARIES}
+    ${lanelet2_LIBRARIES}
+    
 )
 target_include_directories(common PUBLIC 
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include> 
+    ${GeographicLib_INCLUDE_DIRS}
     ${ROS_INCLUDE_DIRS}
     ${PCL_INCLUDE_DIRS}
+    ${lanelet2_INCLUDE_DIRS}
 )
 if (CUDAToolkit_FOUND)
     target_link_libraries(common CUDA::cudart CUDA::cuda_driver)
@@ -96,6 +104,10 @@ if(ROS_FOUND)
 endif()
 if(PCL_FOUND)
     target_compile_options(common PUBLIC -DPCL_ENABLED)
+endif()
+if(lanelet2_FOUND)
+    target_compile_options(common PUBLIC -DLANELET_ENABLED)
+    target_compile_features(common PUBLIC cxx_std_14)
 endif()
 add_library(${PROJECT_NAME}::common ALIAS common)
 

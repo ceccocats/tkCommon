@@ -11,5 +11,7 @@ find_dependency(Freetype)
 find_dependency(yaml-cpp)
 find_dependency(CUDAToolkit)
 find_dependency(PCL)
+find_dependency(GeographicLib)
+find_dependency(lanelet2)
 
 include("${CMAKE_CURRENT_LIST_DIR}/tkCommonTargets.cmake")

@@ -251,7 +251,7 @@ namespace tk { namespace data {
                 msg.point_step = addPointField(msg, "ring",      1, sensor_msgs::PointField::UINT16,  msg.point_step);
                 hasC = true;
             }
-            if (features.exists(tk::data::CloudData_gen::FEATURES_CHANNEL)) {
+            if (features.exists(tk::data::CloudData_gen::FEATURES_TIME)) {
                 msg.point_step = addPointField(msg, "time",      1, sensor_msgs::PointField::FLOAT32, msg.point_step);
                 hasT = true;
             }
