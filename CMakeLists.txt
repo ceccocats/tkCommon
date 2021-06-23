@@ -30,7 +30,10 @@ find_package(Freetype REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(GeographicLib REQUIRED)
 find_package(ROS QUIET)
+find_package(PCL 1.8 QUIET COMPONENTS common)
 find_package(lanelet2 QUIET)
+find_package(PkgConfig)
+pkg_check_modules(SERIAL QUIET libserial=1.0.0)
 
 #-------------------------------------------------------------------------------
 # Generate Data Headers
@@ -80,16 +83,11 @@ target_link_libraries(common
     matio 
     dl 
     ${GeographicLib_LIBRARIES}
-    ${ROS_LIBRARIES}
-    ${lanelet2_LIBRARIES}
-    
 )
 target_include_directories(common PUBLIC 
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include> 
     ${GeographicLib_INCLUDE_DIRS}
-    ${ROS_INCLUDE_DIRS}
-    ${lanelet2_INCLUDE_DIRS}
 )
 if (CUDAToolkit_FOUND)
     target_link_libraries(common CUDA::cudart CUDA::cuda_driver)
@@ -97,11 +95,25 @@ if (CUDAToolkit_FOUND)
     set_property(TARGET common PROPERTY CUDA_SEPARABLE_COMPILATION ON) 
 endif()
 if(ROS_FOUND)
+    target_include_directories(common PUBLIC ${ROS_INCLUDE_DIRS}) 
+    target_link_libraries(common ${ROS_LIBRARIES})
     target_compile_options(common PUBLIC -DROS_ENABLED)
 endif()
+if(PCL_FOUND)
+    target_include_directories(common PUBLIC ${PCL_INCLUDE_DIRS}) 
+    target_link_libraries(common ${PCL_LIBRARIES})
+    target_compile_options(common PUBLIC -DPCL_ENABLED)
+endif()
 if(lanelet2_FOUND)
+    target_include_directories(common PUBLIC ${lanelet2_INCLUDE_DIRS})
+    target_link_libraries(common ${lanelet2_LIBRARIES})
     target_compile_options(common PUBLIC -DLANELET_ENABLED)
     target_compile_features(common PUBLIC cxx_std_14)
+endif()
+if(SERIAL_FOUND)
+    target_include_directories(common PUBLIC ${SERIAL_INCLUDE_DIRS}) 
+    target_link_libraries(common ${SERIAL_LIBRARIES})
+    target_compile_options(common PUBLIC -DSERIAL_ENABLED)
 endif()
 add_library(${PROJECT_NAME}::common ALIAS common)
 

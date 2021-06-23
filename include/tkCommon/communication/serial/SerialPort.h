@@ -1,6 +1,9 @@
 #pragma once
 
+#ifdef SERIAL_ENABLED
 #include <libserial/SerialPort.h>
+#endif
+
 #include "tkCommon/time.h"
 #include "tkCommon/log.h"
 
@@ -9,11 +12,14 @@ namespace tk{ namespace communication{
 
     class SerialPort {
     private:
+#ifdef SERIAL_ENABLED
         LibSerial::SerialPort serialPort;
-
+#else 
+        int soc;
+#endif
     public:
-        SerialPort() {};
-        ~SerialPort() {};
+         SerialPort() = default;
+        ~SerialPort() = default;
 
         /**
          * @brief 
@@ -69,9 +75,9 @@ namespace tk{ namespace communication{
          *
          * @return true if open and active
          */  
-        bool isOpen() { return serialPort.IsOpen(); }
+        bool isOpen();
 
-        bool isDataAvailable() { return serialPort.IsDataAvailable(); }
+        bool isDataAvailable();
     };
     
 }}
