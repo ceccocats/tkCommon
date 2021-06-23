@@ -35,7 +35,10 @@ void CarControl::writeLoop() {
     int sleep_us = 1000;
     while(run) {
         if(active){
-            actThrottle = targetThrottle; //tk::math::lerp<float>(actThrottle, targetThrottle, 0.1);
+            if(actThrottle < targetThrottle)
+                actThrottle = tk::math::lerp<float>(actThrottle, targetThrottle, 0.01);
+            else 
+                actThrottle = tk::math::lerp<float>(actThrottle, targetThrottle, 0.1);                
             actBrake = tk::math::lerp<float>(actBrake, targetBrake, 0.1);
             actSteer = tk::math::lerp<float>(actSteer, targetSteer, 0.1);
 
