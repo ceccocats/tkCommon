@@ -122,48 +122,22 @@ SerialPort::isDataAvailable() {
 bool 
 SerialPort::init(const std::string& port, int baud)
 {
-    soc = open(port.c_str(), O_RDWR | O_NOCTTY | O_SYNC);
-
-    bool tty_status = soc >= 0;
-
-    if(!tty_status) {
-        tkERR("Can't open Serial port: "<<port);
-        return false;
-    }
-
-    return true;
+    tkWRN("Not implemented for unix socket, please install libserial v1.0.0");
+    return false;
 }
 
 bool 
 SerialPort::close()
 {
-    int err = ::close(soc);
-    if(err == -1) {
-        tkERR(strerror(errno));
-        return false;
-    } 
-    return true;
+    tkWRN("Not implemented for unix socket, please install libserial v1.0.0");
+    return false;
 }
 
 bool
 SerialPort::readLine(std::string& msg, char terminator, timeStamp_t timeout)
 {
-    msg.clear();
-    char c = 0;
-    timeStamp_t initial_time = getTimeStamp();
-    timeStamp_t dt = 0;
-    for(int i = 0; c != terminator && dt < timeout ; i++) {    
-        int rd = ::read(soc, &c, 1);
-        if(rd < 0) {
-            tkERR("Error while reading.");
-            return false;
-        }
-        msg.append(std::string(c)); 
-        dt = getTimeStamp() - initial_time;
-    }
-    //line_buf[i] = '\0'; 
-
-    return true;
+    tkWRN("Not implemented for unix socket, please install libserial v1.0.0");
+    return false;
 }
 
 bool
