@@ -1,6 +1,7 @@
 #include "tkCommon/communication/car/CarControl.h"
 #include "tkCommon/gui/drawables/Drawable.h"
 #include "tkCommon/gui/imgui/imgui_internal.h"
+#include "tkCommon/rt/Task.h"
 
 namespace tk { namespace communication {
 
@@ -141,36 +142,49 @@ class CarControlInterface : public tk::gui::Drawable{
             }
             ImGui::End();
 
-
-
-            if(active) {
-                if(speedControl) {
-                    static timeStamp_t lastTS = getTimeStamp();
-                    timeStamp_t thisTS = getTimeStamp();
-                    double dt = double(thisTS - lastTS)/1000000.0;
-                    lastTS = thisTS;
-                    double act = pid.calculate(dt, speedReq - carCtrl->odom.speed.x());
-                    float preBrake = 0.40;
-                    if(speedReq < 0 && carCtrl->odom.speed.x() < 1)
-                        preBrake = 0.6;
-                    if(speedReq < 0 && carCtrl->odom.speed.x() <= 0.01)
-                        preBrake = 0.7;
-                    if(act < 0) {
-                        brakeReq = preBrake - (act);
-                        throttleReq = 0;
-                    } else {
-                        throttleReq = act;
-                        brakeReq = preBrake;
-                    }
-                }
-
-
-                carCtrl->setTargetSteer(enableSteer * steerReqDeg);
-                carCtrl->setTargetBrake(enableBrake * brakeReq);
-                carCtrl->setTargetThrottle(enableThrottle * throttleReq);
-            }
-
        }
+
+
+        static void* runThread(void*data) {
+            CarControlInterface *self = (CarControlInterface *)data;
+            self->run();
+        }
+
+        void run() {
+            tkWRN("Start car control interface");
+            tk::rt::Task t;
+            t.init(30000);
+            while (true) {
+
+                if(active) {
+                    if(speedControl) {
+                        static timeStamp_t lastTS = getTimeStamp();
+                        timeStamp_t thisTS = getTimeStamp();
+                        double dt = double(thisTS - lastTS)/1000000.0;
+                        lastTS = thisTS;
+                        double act = pid.calculate(dt, speedReq - carCtrl->odom.speed.x());
+                        float preBrake = 0.40;
+                        if(speedReq < 0 && carCtrl->odom.speed.x() < 1)
+                            preBrake = 0.6;
+                        if(speedReq < 0 && carCtrl->odom.speed.x() <= 0.01)
+                            preBrake = 0.7;
+                        if(act < 0) {
+                            brakeReq = preBrake - (act);
+                            throttleReq = 0;
+                        } else {
+                            throttleReq = act;
+                            brakeReq = preBrake;
+                        }
+                    }
+
+
+                    carCtrl->setTargetSteer(enableSteer * steerReqDeg);
+                    carCtrl->setTargetBrake(enableBrake * brakeReq);
+                    carCtrl->setTargetThrottle(enableThrottle * throttleReq);
+                }
+                t.wait();
+            }
+        }
         
 };
 
