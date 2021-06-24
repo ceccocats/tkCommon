@@ -1,8 +1,10 @@
 # FindROS
 include(CMakeFindDependencyMacro)
-find_dependency(roscpp)
-find_dependency(rosbag)
-find_dependency(sensor_msgs)
+if ($ENV{ROS_VERSION} EQUAL 1)
+    find_dependency(roscpp)
+    find_dependency(rosbag)
+    find_dependency(sensor_msgs)
+endif()
 
 if (roscpp_FOUND AND rosbag_FOUND AND sensor_msgs_FOUND)
     set(ROS_INCLUDE_DIRS ${roscpp_INCLUDE_DIRS} ${rosbag_INCLUDE_DIRS} ${sensor_msgs_INCLUDE_DIRS})
