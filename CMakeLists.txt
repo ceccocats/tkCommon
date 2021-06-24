@@ -29,7 +29,7 @@ find_package(glfw3 3 REQUIRED)
 find_package(Freetype REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(ROS QUIET)
-find_package(ROS2)
+find_package(rclcpp)
 
 #-------------------------------------------------------------------------------
 # Generate Data Headers
