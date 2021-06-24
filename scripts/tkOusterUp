@@ -83,4 +83,8 @@ check
 
 #start sensor
 echo "reinitialize" | nc $ipOutster 7501 -q 1
+<<<<<<< HEAD
 check
+=======
+check
+>>>>>>> f1382883c625b16661e150c1902e5faa20f2e454

@@ -35,12 +35,18 @@ void CarControl::writeLoop() {
     int sleep_us = 1000;
     while(run) {
         if(active){
+<<<<<<< HEAD
             if(actThrottle < targetThrottle)
                 actThrottle = tk::math::lerp<float>(actThrottle, targetThrottle, 0.01);
             else 
                 actThrottle = tk::math::lerp<float>(actThrottle, targetThrottle, 0.1);                
             actBrake = tk::math::lerp<float>(actBrake, targetBrake, 0.1);
             actSteer = tk::math::lerp<float>(actSteer, targetSteer, 0.1);
+=======
+            actThrottle = tk::math::lerp<float>(actThrottle, targetThrottle, 0.1);
+            actBrake = tk::math::lerp<float>(actBrake, targetBrake, 0.1);
+            actSteer = targetSteer; //tk::math::lerp<float>(actSteer, targetSteer, 0.1);
+>>>>>>> f1382883c625b16661e150c1902e5faa20f2e454
 
             setAccPos(actThrottle);
             usleep(sleep_us);
@@ -217,6 +223,7 @@ void CarControl::sendOdomEnable(bool status) {
     tk::data::CanData data;
 
     // reset 
+    usleep(100000);
     data.frame.can_dlc = 0;
     data.frame.can_id = ODOM_RESET_ID;
     soc->write(&data);
