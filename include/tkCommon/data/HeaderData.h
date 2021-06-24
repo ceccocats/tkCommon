@@ -6,6 +6,9 @@
 #ifdef ROS_ENABLED
 #include <std_msgs/Header.h>
 #endif
+#ifdef ROS2_ENABLED
+#include <std_msgs/msg/header.hpp>
+#endif
 
 namespace tk { namespace data {
 

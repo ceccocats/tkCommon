@@ -6,6 +6,9 @@
 #ifdef ROS_ENABLED
 #include <sensor_msgs/Image.h>
 #endif
+#ifdef ROS2_ENABLED
+#include <sensor_msgs/msg/image.hpp>
+#endif
 
 namespace tk{ namespace data{
 

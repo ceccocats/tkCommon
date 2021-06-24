@@ -29,6 +29,7 @@ find_package(glfw3 3 REQUIRED)
 find_package(Freetype REQUIRED)
 find_package(yaml-cpp REQUIRED)
 find_package(ROS QUIET)
+find_package(ROS2)
 
 #-------------------------------------------------------------------------------
 # Generate Data Headers
@@ -90,6 +91,9 @@ if (CUDAToolkit_FOUND)
 endif()
 if(ROS_FOUND)
     target_compile_options(common PUBLIC -DROS_ENABLED)
+endif()
+if(rclcpp_FOUND)
+    target_compile_options(common PUBLIC -DROS2_ENABLED)
 endif()
 add_library(${PROJECT_NAME}::common ALIAS common)
 

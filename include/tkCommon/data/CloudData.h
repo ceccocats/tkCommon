@@ -8,6 +8,13 @@
 #include <sensor_msgs/point_cloud_conversion.h>
 #endif
 
+#ifdef ROS2_ENABLED
+#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <sensor_msgs/point_cloud2_iterator.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
+#include <sensor_msgs/point_cloud_conversion.hpp>
+#endif
+
 namespace tk { namespace data {
 
     class CloudData : public CloudData_gen{

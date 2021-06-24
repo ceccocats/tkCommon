@@ -4,6 +4,10 @@
 #ifdef ROS_ENABLED
 #include <sensor_msgs/NavSatFix.h>
 #endif
+#ifdef ROS2_ENABLED
+#include <sensor_msgs/msg/nav_sat_fix.hpp>
+#endif
+
 
 namespace tk { namespace data {
 
