@@ -28,8 +28,13 @@ find_package(GLEW REQUIRED)
 find_package(glfw3 3 REQUIRED)
 find_package(Freetype REQUIRED)
 find_package(yaml-cpp REQUIRED)
+find_package(GeographicLib REQUIRED)
 find_package(ROS QUIET)
 find_package(ROS2 QUIET)
+find_package(PCL 1.8 QUIET COMPONENTS common)
+find_package(lanelet2 QUIET)
+find_package(PkgConfig)
+pkg_check_modules(SERIAL QUIET libserial=1.0.0)
 
 #-------------------------------------------------------------------------------
 # Generate Data Headers
@@ -67,6 +72,7 @@ add_library(common SHARED
     src/version.cpp
     src/CmdParser.cpp 
     src/rt/Profiler.cpp
+    src/projection/Projector.cpp
     src/PID.cpp
     ${data_gen}
     ${data} 
@@ -77,14 +83,22 @@ target_link_libraries(common
     ${YAML_CPP_LIBRARIES}
     matio 
     dl 
+<<<<<<< HEAD
     ${ROS_LIBRARIES}
     ${ROS2_LIBRARIES}
+=======
+    ${GeographicLib_LIBRARIES}
+>>>>>>> master
 )
 target_include_directories(common PUBLIC 
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include> 
+<<<<<<< HEAD
     ${ROS_INCLUDE_DIRS}
     ${ROS2_INCLUDE_DIRS}
+=======
+    ${GeographicLib_INCLUDE_DIRS}
+>>>>>>> master
 )
 if (CUDAToolkit_FOUND)
     target_link_libraries(common CUDA::cudart CUDA::cuda_driver)
@@ -92,9 +106,27 @@ if (CUDAToolkit_FOUND)
     set_property(TARGET common PROPERTY CUDA_SEPARABLE_COMPILATION ON) 
 endif()
 if(ROS_FOUND)
+    target_include_directories(common PUBLIC ${ROS_INCLUDE_DIRS}) 
+    target_link_libraries(common ${ROS_LIBRARIES})
     target_compile_options(common PUBLIC -DROS_ENABLED)
 elseif(ROS2_FOUND)
     target_compile_options(common PUBLIC -DROS2_ENABLED)
+endif()
+if(PCL_FOUND)
+    target_include_directories(common PUBLIC ${PCL_INCLUDE_DIRS}) 
+    target_link_libraries(common ${PCL_LIBRARIES})
+    target_compile_options(common PUBLIC -DPCL_ENABLED)
+endif()
+if(lanelet2_FOUND)
+    target_include_directories(common PUBLIC ${lanelet2_INCLUDE_DIRS})
+    target_link_libraries(common ${lanelet2_LIBRARIES})
+    target_compile_options(common PUBLIC -DLANELET_ENABLED)
+    target_compile_features(common PUBLIC cxx_std_14)
+endif()
+if(SERIAL_FOUND)
+    target_include_directories(common PUBLIC ${SERIAL_INCLUDE_DIRS}) 
+    target_link_libraries(common ${SERIAL_LIBRARIES})
+    target_compile_options(common PUBLIC -DSERIAL_ENABLED)
 endif()
 add_library(${PROJECT_NAME}::common ALIAS common)
 

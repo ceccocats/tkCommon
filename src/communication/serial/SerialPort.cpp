@@ -1,112 +1,179 @@
 #include "tkCommon/communication/serial/SerialPort.h"
 
-namespace tk { namespace communication {
-    bool 
-    SerialPort::init(const std::string& port, int baud)
-    {
-        // open port
-        try {
-            serialPort.Open(port);
-        } catch (LibSerial::OpenFailed e) {
-            tkERR("Bad file descriptor.\n");
-            return false;
-        }
-        //if(!serialPort.IsOpen())
-        //    return false;
+using namespace tk::communication;
 
-        // set baud
-        switch (baud)
-        {
-        case 9600:
-            serialPort.SetBaudRate(LibSerial::BaudRate::BAUD_9600);
-            break;
-        case 115200:
-            serialPort.SetBaudRate(LibSerial::BaudRate::BAUD_115200);
-            break;
-        case 921600:
-            serialPort.SetBaudRate(LibSerial::BaudRate::BAUD_921600);
-            break;
-        default:
-            return false;
-            break;
-        }
-        
-
-        // Set the number of data bits.
-        serialPort.SetCharacterSize(LibSerial::CharacterSize::CHAR_SIZE_8) ;
-
-        // Turn off hardware flow control.
-        serialPort.SetFlowControl(LibSerial::FlowControl::FLOW_CONTROL_NONE) ;
-
-        // Disable parity.
-        serialPort.SetParity(LibSerial::Parity::PARITY_NONE) ;
-        
-        // Set the number of stop bits.
-        serialPort.SetStopBits(LibSerial::StopBits::STOP_BITS_1) ;
-
-        // Wait for data to be available at the serial port.
-        //while(!serialPort.IsDataAvailable()) 
-        //{
-        //    usleep(1000) ;
-        //}
-
-        return true;
+#ifdef SERIAL_ENABLED
+bool 
+SerialPort::init(const std::string& port, int baud)
+{
+    // open port
+    try {
+        serialPort.Open(port);
+    } catch (LibSerial::OpenFailed e) {
+        tkERR("Bad file descriptor.\n");
+        return false;
     }
+    //if(!serialPort.IsOpen())
+    //    return false;
 
-    bool 
-    SerialPort::close()
+    // set baud
+    switch (baud)
     {
-        serialPort.Close();
-
-        return true;
+    case 9600:
+        serialPort.SetBaudRate(LibSerial::BaudRate::BAUD_9600);
+        break;
+    case 115200:
+        serialPort.SetBaudRate(LibSerial::BaudRate::BAUD_115200);
+        break;
+    case 921600:
+        serialPort.SetBaudRate(LibSerial::BaudRate::BAUD_921600);
+        break;
+    default:
+        return false;
+        break;
     }
+    
 
-    bool
-    SerialPort::readLine(std::string& msg, char terminator, timeStamp_t timeout)
-    {
-        try {
-            serialPort.ReadLine(msg, terminator, timeout);
-        } catch (const LibSerial::ReadTimeout&) {
-            tkWRN("Timeout.\n");
-            return false;
-        }
-        return true;
+    // Set the number of data bits.
+    serialPort.SetCharacterSize(LibSerial::CharacterSize::CHAR_SIZE_8) ;
+
+    // Turn off hardware flow control.
+    serialPort.SetFlowControl(LibSerial::FlowControl::FLOW_CONTROL_NONE) ;
+
+    // Disable parity.
+    serialPort.SetParity(LibSerial::Parity::PARITY_NONE) ;
+    
+    // Set the number of stop bits.
+    serialPort.SetStopBits(LibSerial::StopBits::STOP_BITS_1) ;
+
+    // Wait for data to be available at the serial port.
+    //while(!serialPort.IsDataAvailable()) 
+    //{
+    //    usleep(1000) ;
+    //}
+
+    return true;
+}
+
+bool 
+SerialPort::close()
+{
+    serialPort.Close();
+
+    return true;
+}
+
+bool
+SerialPort::readLine(std::string& msg, char terminator, timeStamp_t timeout)
+{
+    try {
+        serialPort.ReadLine(msg, terminator, timeout);
+    } catch (const LibSerial::ReadTimeout&) {
+        tkWRN("Timeout.\n");
+        return false;
     }
+    return true;
+}
 
-    bool
-    SerialPort::read(std::string& msg, int size, timeStamp_t timeout)
-    {
-        try {
-            serialPort.Read(msg, size, timeout);
-        } catch (const LibSerial::ReadTimeout&) {
-            tkWRN("Timeout.\n");
-            return false;
-        }
-        return true;
+bool
+SerialPort::read(std::string& msg, int size, timeStamp_t timeout)
+{
+    try {
+        serialPort.Read(msg, size, timeout);
+    } catch (const LibSerial::ReadTimeout&) {
+        tkWRN("Timeout.\n");
+        return false;
     }
+    return true;
+}
 
-    bool 
-    SerialPort::readByte(uint8_t& byte, timeStamp_t timeout)
-    {
-        try {
-            serialPort.ReadByte(byte, timeout);
-        } catch (const LibSerial::ReadTimeout&) {
-            tkWRN("Timeout.\n");
-            return false;
-        }
-        return true;
+bool 
+SerialPort::readByte(uint8_t& byte, timeStamp_t timeout)
+{
+    try {
+        serialPort.ReadByte(byte, timeout);
+    } catch (const LibSerial::ReadTimeout&) {
+        tkWRN("Timeout.\n");
+        return false;
     }
+    return true;
+}
 
-    bool
-    SerialPort::write(std::string &msg)
-    {
-        serialPort.Write(msg);
-        serialPort.DrainWriteBuffer();
+bool
+SerialPort::write(std::string &msg)
+{
+    serialPort.Write(msg);
+    serialPort.DrainWriteBuffer();
 
-        return true;
-    }
-}}
+    return true;
+}
 
+bool 
+SerialPort::isOpen() 
+{ 
+    return serialPort.IsOpen(); 
+}
+
+bool 
+SerialPort::isDataAvailable() { 
+    return serialPort.IsDataAvailable(); 
+}
+#else
+bool 
+SerialPort::init(const std::string& port, int baud)
+{
+    tkWRN("Not implemented for unix socket, please install libserial v1.0.0");
+    return false;
+}
+
+bool 
+SerialPort::close()
+{
+    tkWRN("Not implemented for unix socket, please install libserial v1.0.0");
+    return false;
+}
+
+bool
+SerialPort::readLine(std::string& msg, char terminator, timeStamp_t timeout)
+{
+    tkWRN("Not implemented for unix socket, please install libserial v1.0.0");
+    return false;
+}
+
+bool
+SerialPort::read(std::string& msg, int size, timeStamp_t timeout)
+{
+    tkWRN("Not implemented for unix socket, please install libserial v1.0.0");
+    return false;
+}
+
+bool 
+SerialPort::readByte(uint8_t& byte, timeStamp_t timeout)
+{
+    tkWRN("Not implemented for unix socket, please install libserial v1.0.0");
+    return false;
+}
+
+bool
+SerialPort::write(std::string &msg)
+{
+    tkWRN("Not implemented for unix socket, please install libserial v1.0.0");
+    return false;
+}
+
+bool 
+SerialPort::isOpen() 
+{ 
+    tkWRN("Not implemented for unix socket, please install libserial v1.0.0");
+    return false;
+}
+
+bool 
+SerialPort::isDataAvailable() { 
+    tkWRN("Not implemented for unix socket, please install libserial v1.0.0");
+    return false;
+}
+#endif
 /*
 bool tk::sensors::SerialPort::init(std::string port) {
 
