@@ -43,6 +43,17 @@ namespace tk{ namespace gui{
 		virtual std::string toString(){
 			return name;
 		}
+
+		/** return true if the viewer should free this drawable **/
+		bool doFree() {
+			return true;
+		} 
+	};
+
+	class DrawableUnManaged : public Drawable {
+		bool doFree() {
+			return false;
+		} 
 	};
 }}
 #include "tkCommon/gui/Viewer.h"

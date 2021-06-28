@@ -454,7 +454,8 @@ void
 Viewer::close() { 
     for (auto const& drawable : drawables){
         drawable.second->onClose();
-        delete drawable.second;
+        if(drawable.second->doFree())
+            delete drawable.second;
     }   
     drwLogo->close();
     logo.release();

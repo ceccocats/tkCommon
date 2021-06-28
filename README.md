@@ -5,7 +5,9 @@
 sudo apt-get install libgles2-mesa-dev # NOT on aarch64
 sudo apt install git build-essential cmake rsync libeigen3-dev libglew-dev libglfw3-dev freeglut3-dev libfreetype6-dev libyaml-cpp-dev libpcap-dev libmatio-dev libgeographic-dev libpugixml-dev
 
-# optional: cuda, ros
+# optional: 
+- cuda
+- ROS melodic with this packages: ros-melodic-desktop ros-melodic-tf2-geometry-msgs ros-melodic-ackermann-msgs
 ```
 #### compile
 ```

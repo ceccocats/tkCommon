@@ -12,21 +12,10 @@
 #include "tkCommon/gui/drawables/Drawable.h"
 
 tk::gui::Viewer* 	viewer = tk::gui::Viewer::getInstance();
-
 tk::communication::CanInterface canSoc;
 tk::communication::CarControl carCtrl;
 
-bool gRun = true;
-void signal_handler(int signal){
-    gRun = false;
-    std::cerr<<"\nRequest closing..\n";
-}
-
-
 int main( int argc, char** argv){
-    std::signal(SIGINT, signal_handler);
-    std::signal(SIGTERM, signal_handler);
-
     tk::common::CmdParser cmd(argv, "Car Control");
     std::string soc_file = cmd.addArg("interface", "can0", "can interface to read");
     cmd.parse();
@@ -36,11 +25,23 @@ int main( int argc, char** argv){
     carCtrl.sendOdomEnable(true);
     //carCtrl.setSteerParams(0,0,0);
 
-    tk::communication::CarControlInterface *carInter = new tk::communication::CarControlInterface(&carCtrl);
-    viewer->add(carInter);
+    tk::communication::CarControlInterface carInter;
+    carInter.init(&carCtrl);
+
+    /*
+    // To set actuation
+    tk::data::ActuationData act;
+    act.speed = 2.0; // m/s
+    act.steerAngle = 0 // rad
+    carInter.setInput(act)
+    */
+
+    viewer->add(&carInter);
     viewer->start();
     
     viewer->join();
+    
+    carInter.close();
     carCtrl.sendOdomEnable(false);
     carCtrl.close();
     canSoc.close();

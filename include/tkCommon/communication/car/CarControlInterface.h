@@ -1,3 +1,4 @@
+#include "tkCommon/data/ActuationData.h"
 #include "tkCommon/communication/car/CarControl.h"
 #include "tkCommon/gui/drawables/Drawable.h"
 #include "tkCommon/gui/imgui/imgui_internal.h"
@@ -5,9 +6,11 @@
 
 namespace tk { namespace communication {
 
-class CarControlInterface : public tk::gui::Drawable{
+class CarControlInterface : public tk::gui::DrawableUnManaged {
     private:
         tk::communication::CarControl *carCtrl;
+        tk::rt::Thread tUpdateLoop;   
+
         tk::common::PID pid;
 
         bool active = false;
@@ -27,12 +30,33 @@ class CarControlInterface : public tk::gui::Drawable{
 
         bool enableBrake = true, enableThrottle = true, enableSteer = true;
 
+        bool running = true;
+
     public:
-        CarControlInterface(tk::communication::CarControl *carCtrl) {
-            this->carCtrl = carCtrl;
-            pid.init(0.2, 0, 0, -1.0, 1.0);
+        CarControlInterface() {
         }
         ~CarControlInterface() {}
+
+        bool init(tk::communication::CarControl *carCtrl) {
+            this->carCtrl = carCtrl;
+            pid.init(0.2, 0, 0, -1.0, 1.0);
+            running = true;
+            tUpdateLoop.init(CarControlInterface::runThread, this);
+        }
+
+        bool close() {
+            running = false;
+            tUpdateLoop.join();
+        }
+
+        void setInput(tk::data::ActuationData &act) {
+            if(!manual) {
+                recivedInputRequestN++;
+                steerReqDeg = act.steerAngle / 180.0 *M_PI;
+                speedReqKMH = act.speed*3.6;
+                speedReq = act.speed;
+            }
+        }
 
         void setInput(float steerDeg, float speedKMH) {
             if(!manual) {
@@ -154,7 +178,7 @@ class CarControlInterface : public tk::gui::Drawable{
             tkWRN("Start car control interface");
             tk::rt::Task t;
             t.init(30000);
-            while (true) {
+            while (running) {
 
                 if(active) {
                     if(speedControl) {
