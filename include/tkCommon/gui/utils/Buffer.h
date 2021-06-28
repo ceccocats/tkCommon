@@ -94,6 +94,11 @@ class Buffer
         bool empty() const;
 
         /**
+         * empty method
+         */
+        bool empty();
+
+        /**
          * use method for set GL_ARRAY_BUFFER in shader
          */
         void use() const;

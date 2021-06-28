@@ -67,7 +67,7 @@ endif()
 
 
 if(NOT DriveWorks_FOUND)
-	message(WARNING "-- Driveworks NOT FOUND")
+	message("-- Driveworks NOT FOUND")
 endif()
 
 

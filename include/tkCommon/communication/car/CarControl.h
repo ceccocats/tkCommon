@@ -45,6 +45,9 @@ namespace tk { namespace communication {
         float actThrottle = 0;      /**< currently actuation val */ 
         float actSteer = 0;         /**< currently actuation val */     
 
+        int steerOffset = 0;   /** STEER position OFFSET distance from auto ZERO */
+        uint8_t steerAcc = 0;  /** ACC   param steer motor */
+        uint16_t steerVel = 0; /** SPEED param steer motor */  
 
         static void *writeCaller(void *args);
         static void *readCaller(void *args);
@@ -102,6 +105,18 @@ namespace tk { namespace communication {
          */ 
         void requestMotorId();
 
+        /**
+         * set steer parameters
+         */
+        void setSteerParams(int offset, int acc, int vel)  {
+            steerOffset = clamp<int>(offset, -2000, 2000);
+            steerAcc = clamp<int>(acc, 0, 255); 
+            steerVel = clamp<int>(vel, 0, 1000); 
+        }
+        int getSteerOffset()    { return steerOffset; }
+        uint8_t getSteerAcc()   { return steerAcc;    }
+        uint16_t getSteerVel()  { return steerVel;    }
+
         /** target steer angle DEG */
         void setTargetSteer(float val)    { targetSteer = clamp<float>(val, -30, 30); }
         /** target Brake 0-1 */
@@ -116,7 +131,7 @@ namespace tk { namespace communication {
         /** get last actuation */
         float getActBrake() { return actBrake; }
 
-private:        
+private:   
         // request info from the system
         void requestSteerPos();
         void requestAccPos();
@@ -125,7 +140,10 @@ private:
 
         /**
          *  Send a steer position command to the motor
-         *  from -22000 to +22000 on maserati (it deoends on the steering weel)
+         *  from -22000 to +22000 on maserati (it depends on the steering weel)
+         *  acc: 0 - 255
+         *  vel: 0 - 1000
+         *  !!! WARNING for performace issue ACC and VEL should be setted only once, passing 0 keep the setting
          */
         void setSteerPos(int32_t pos, uint8_t acc = 0, uint16_t vel = 0);
 
