@@ -132,6 +132,8 @@ namespace tk { namespace communication {
         float getActBrake() { return actBrake; }
 
 private:   
+        std::mutex cmd_lock;
+
         // request info from the system
         void requestSteerPos();
         void requestAccPos();

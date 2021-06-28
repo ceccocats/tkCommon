@@ -45,13 +45,13 @@ namespace tk{ namespace gui{
 		}
 
 		/** return true if the viewer should free this drawable **/
-		bool doFree() {
+		virtual bool doFree() {
 			return true;
 		} 
 	};
 
 	class DrawableUnManaged : public Drawable {
-		bool doFree() {
+		virtual bool doFree() {
 			return false;
 		} 
 	};

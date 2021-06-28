@@ -20,7 +20,7 @@ class CarControlInterface : public tk::gui::DrawableUnManaged {
         float brakeReq = 0;
         float throttleReq = 0;
         float speedReqKMH = 0;
-        float speedReq = -1;
+        float speedReq = 0;
 
         bool speedControl = false;
         bool odomActive = true;
@@ -41,6 +41,12 @@ class CarControlInterface : public tk::gui::DrawableUnManaged {
             this->carCtrl = carCtrl;
             pid.init(0.2, 0, 0, -1.0, 1.0);
             running = true;
+
+            steerReqDeg = 0;
+            brakeReq = 0;
+            throttleReq = 0;
+            speedReqKMH = speedReq = -1;
+
             tUpdateLoop.init(CarControlInterface::runThread, this);
         }
 
@@ -67,6 +73,11 @@ class CarControlInterface : public tk::gui::DrawableUnManaged {
             }
         }
 
+        void setActive(bool active) {
+            this->active = active;
+            tkMSG("Set CAR state: "<<this->active);
+            carCtrl->enable(this->active);
+        }
 
         void draw(tk::gui::Viewer *viewer){
             ImGui::Begin("Car control", NULL, ImGuiWindowFlags_NoScrollbar);
@@ -162,6 +173,8 @@ class CarControlInterface : public tk::gui::DrawableUnManaged {
             else {
                 speedControl = true;
                 ImGui::Text("Getting act from code");
+                ImGui::Text("Requested Speed: %f", speedReqKMH);
+                ImGui::Text("Requested Steer: %f", steerReqDeg);
                 ImGui::Text("requests: %d", recivedInputRequestN);
             }
             ImGui::End();

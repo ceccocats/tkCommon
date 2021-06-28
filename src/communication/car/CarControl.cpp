@@ -35,13 +35,15 @@ void CarControl::writeLoop() {
     int sleep_us = 1000;
     while(run) {
         if(active){
+            cmd_lock.lock();
             if(actThrottle < targetThrottle)
                 actThrottle = tk::math::lerp<float>(actThrottle, targetThrottle, 0.01);
             else 
                 actThrottle = tk::math::lerp<float>(actThrottle, targetThrottle, 0.1);                
             actBrake = tk::math::lerp<float>(actBrake, targetBrake, 0.1);
             actSteer = tk::math::lerp<float>(actSteer, targetSteer, 0.1);
-
+            cmd_lock.unlock();
+            
             setAccPos(actThrottle);
             usleep(sleep_us);
             setBrakePos(actBrake);
@@ -192,6 +194,7 @@ void CarControl::setSteerAngle(float angle){
 }
 
 void CarControl::enable(bool status) {
+    cmd_lock.lock();
     targetSteer = 0;
     targetThrottle = 0;
     targetBrake = 0;
@@ -211,6 +214,7 @@ void CarControl::enable(bool status) {
         sendGenericCmd("OFF");
         usleep(100000);
     }
+    cmd_lock.unlock();
 }
 
 void CarControl::sendOdomEnable(bool status) {
