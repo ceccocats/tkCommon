@@ -127,24 +127,19 @@ tk::gui::LaneletPath *path;
 void* th_lanelet_path(void* ptrpath) {
 	tk::gui::LaneletPath *path = (tk::gui::LaneletPath*)ptrpath;
 
-	YAML::Node  conf 			= YAML::LoadFile(std::string(tkCommon_PATH) + "data/lanelet.osm.yaml");
-    float lat         		    = tk::common::YAMLgetConf<float>(conf, "lat", 40.0);
-    float lon       	      	= tk::common::YAMLgetConf<float>(conf, "lon", 10.0);
-    std::string laneletMapPath 	= std::string(tkCommon_PATH) + "data/" + tk::common::YAMLgetConf<std::string>(conf, "file", "lanelet.osm");
-
-    // load lanelet map
-    lanelet::projection::UtmProjector projector(lanelet::Origin({lat, lon}));  // we will go into details later
-    auto map = lanelet::load(laneletMapPath, projector);
+	// load lanelet map
+	tk::common::Lanelet	lanelet;
+	lanelet.init(std::string(tkCommon_PATH) + "data/lanelet.osm.yaml");
 
     // create routing graph
     auto trafficRules = lanelet::traffic_rules::TrafficRulesFactory::create(lanelet::Locations::Germany, lanelet::Participants::Vehicle);
-    auto routingGraph = lanelet::routing::RoutingGraph::build(*map, *trafficRules);
+    auto routingGraph = lanelet::routing::RoutingGraph::build(*lanelet.mMap, *trafficRules);
 
  	// get map boundary
 	tk::math::Vec2f mapMin, mapMax, mapSize, pA, pB;
     mapMin.x() = mapMin.y() = std::numeric_limits<float>::max();
     mapMax.x() = mapMax.y() = std::numeric_limits<float>::min();
-    for (const auto& point : map->pointLayer) {
+    for (const auto& point : lanelet.mMap->pointLayer) {
         if (point.x() < mapMin.x()) mapMin.x() = point.x();
         if (point.y() < mapMin.y()) mapMin.y() = point.y();
         if (point.x() > mapMax.x()) mapMax.x() = point.x();
@@ -158,12 +153,12 @@ void* th_lanelet_path(void* ptrpath) {
 		// generate random A point
 		pA.x() = mapMin.x() + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(mapSize.x())));
 		pA.y() = mapMin.y() + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(mapSize.y())));
-		auto A = map->laneletLayer.nearest(lanelet::BasicPoint2d(pA.x(), pA.y()), 1);
+		auto A = lanelet.mMap->laneletLayer.nearest(lanelet::BasicPoint2d(pA.x(), pA.y()), 1);
 
 		// generate random B point
 		pB.x() = mapMin.x() + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(mapSize.x())));
 		pB.y() = mapMin.y() + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(mapSize.y())));
-		auto B = map->laneletLayer.nearest(lanelet::BasicPoint2d(pB.x(), pB.y()), 1);
+		auto B = lanelet.mMap->laneletLayer.nearest(lanelet::BasicPoint2d(pB.x(), pB.y()), 1);
 
 		if (A[0].id() == B[0].id())
 			continue;

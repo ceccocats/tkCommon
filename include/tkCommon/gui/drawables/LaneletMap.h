@@ -1,25 +1,10 @@
 #pragma once
 
-#ifdef LANELET_ENABLED
-#include <lanelet2_core/LaneletMap.h>
-#include <lanelet2_core/geometry/Area.h>
-#include <lanelet2_core/geometry/Lanelet.h>
-#include <lanelet2_core/primitives/Area.h>
-#include <lanelet2_core/primitives/Lanelet.h>
-#include <lanelet2_core/primitives/LineString.h>
-#include <lanelet2_core/primitives/Point.h>
-#include <lanelet2_core/primitives/Polygon.h>
-#include <lanelet2_core/utility/Units.h>
-#include <lanelet2_io/Io.h>
-#include <lanelet2_io/io_handlers/Factory.h>
-#include <lanelet2_io/io_handlers/Writer.h>
-#include <lanelet2_projection/UTM.h>
-#endif
-
 #include "tkCommon/gui/drawables/Drawable.h"
 #include "tkCommon/gui/shader/simpleMesh.h"
 #include "tkCommon/gui/utils/SimpleMesh.h"
 #include "tkCommon/gui/utils/PerlinNoise.h"
+#include "tkCommon/lanelet/Lanelet.h"
 
 namespace tk { 
 namespace gui {
@@ -36,10 +21,9 @@ public:
     void imGuiInfos() final;
     void onClose() final;
 private:
-    std::string mMapPath;
-    std::string mConfPath;
-    double      mOriginLat, mOriginLon;
-    tk::math::Vec2f mMapMin, mMapMax, mMapSize;
+    std::string             mConfPath;
+    tk::common::Lanelet     mLanelet;
+    tk::math::Vec2f         mMapMin, mMapMax, mMapSize;
 
     bool    mUpdate;
     bool    mInitted = false;

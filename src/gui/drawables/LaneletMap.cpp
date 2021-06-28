@@ -4,12 +4,8 @@ using namespace tk::gui;
 
 LaneletMap::LaneletMap(const std::string& aConfPath, const std::string& aName)
 {
-    YAML::Node conf     = YAML::LoadFile(aConfPath);
     name                = aName;
-    std::string local_p = tk::common::YAMLgetConf<std::string>(conf, "file", "lanelet.osm");
-    mMapPath            = aConfPath.substr(0, aConfPath.find_last_of('/')) + "/" + local_p;
-    mOriginLat          = tk::common::YAMLgetConf<double>(conf, "lat", 0.0f);
-    mOriginLon          = tk::common::YAMLgetConf<double>(conf, "lon", 0.0f);
+    mConfPath           = aConfPath;
     mUpdate             = false;
     mShowBuilding       = true;
     mShowRoad           = true;
@@ -21,6 +17,7 @@ LaneletMap::LaneletMap(const std::string& aConfPath, const std::string& aName)
     mRoadColor.set((uint8_t) 50, (uint8_t) 50, (uint8_t) 50, (uint8_t) 255);
     mLineColor.set(1.0f, 1.0f, 1.0f, 1.0f);
 
+    
     mInitted = true;
 }
 
@@ -28,10 +25,9 @@ void
 LaneletMap::onInit(Viewer *viewer)
 {
 #ifdef LANELET_ENABLED
-    lanelet::projection::UtmProjector projector(lanelet::Origin({mOriginLat, mOriginLon})); 
-    auto map = lanelet::load(mMapPath, projector);
+    mLanelet.init(mConfPath);
 
-    if (map == nullptr || map->empty()) {
+    if (mLanelet.mMap == nullptr || mLanelet.mMap->empty()) {
         tkERR("Empty map.\n");
         return;
     }
@@ -42,7 +38,7 @@ LaneletMap::onInit(Viewer *viewer)
     // get map boundary
     mMapMin.x() = mMapMin.y() = std::numeric_limits<float>::max();
     mMapMax.x() = mMapMax.y() = std::numeric_limits<float>::min();
-    for (const auto& point : map->pointLayer) {
+    for (const auto& point : mLanelet.mMap->pointLayer) {
         if (point.x() < mMapMin.x()) mMapMin.x() = point.x();
         if (point.y() < mMapMin.y()) mMapMin.y() = point.y();
         if (point.x() > mMapMax.x()) mMapMax.x() = point.x();
@@ -52,7 +48,7 @@ LaneletMap::onInit(Viewer *viewer)
     mMapSize.y() = mMapMax.y() - mMapMin.y();
 
     // generate area mesh
-    for(const auto& area : map->areaLayer) {
+    for(const auto& area : mLanelet.mMap->areaLayer) {
         if (area.attribute(lanelet::AttributeName::Subtype) == "building") {
             mBuildingMesh.push_back(createBuilding(area, true));
         }
@@ -65,7 +61,7 @@ LaneletMap::onInit(Viewer *viewer)
     }
 
     // generate road mesh
-    for(const auto& lane : map->laneletLayer) {
+    for(const auto& lane : mLanelet.mMap->laneletLayer) {
         auto right = lane.rightBound3d();
         if (right.attribute(lanelet::AttributeName::Subtype) == "solid") 
             mLineMesh.push_back(createLine(right));
@@ -107,7 +103,7 @@ LaneletMap::onInit(Viewer *viewer)
 #else
     tkWRN("You need to install lanelet2 to use this drawable.")
    
-    shader  = tk::gui::shader::simpleMesh::getInstance();
+    shader              = tk::gui::shader::simpleMesh::getInstance();
     mShowBuilding       = false;
     mShowRoad           = false;
     mShowGreenland      = false;
