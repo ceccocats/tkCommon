@@ -78,6 +78,7 @@ class object {
         Class cl;
         int id = -1;
         int sensorID = 0;
+        timeStamp_t ts;
 };
 
 class ObjectBuffer : public std::vector<object>, public tk::rt::Lockable {};
