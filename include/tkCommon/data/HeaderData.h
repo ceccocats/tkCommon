@@ -144,5 +144,19 @@ namespace tk { namespace data {
             this->name       = msg.frame_id;
         }
 #endif
+#ifdef ROS2_ENABLED
+        void toRos(std_msgs::msg::Header &msg) {
+            msg.stamp.sec      = this->stamp / 1e6;
+            msg.stamp.nanosec  = this->stamp * 1e3 - msg.stamp.nanosec;
+            //msg.seq          = this.messageID;
+            msg.frame_id       = this->name;
+        }
+
+        void fromRos(std_msgs::msg::Header &msg) {
+            this->stamp      = msg.stamp.nanosec / 1e3;    
+            //this->messageID  = msg.seq;
+            this->name       = msg.frame_id;
+        }
+#endif
     };
 }}

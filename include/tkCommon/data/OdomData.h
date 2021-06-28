@@ -74,6 +74,55 @@ namespace tk { namespace data {
             this->speed.x() = std::sqrt(std::pow(msg.twist.twist.linear.x, 2) + std::pow(msg.twist.twist.linear.y, 2) + std::pow(msg.twist.twist.linear.z, 2)); 
         }
 #endif
+#ifdef ROS2_ENABLED
+        void toRos(nav_msgs::msg::Odometry &msg) {
+            this->header.toRos(msg.header);
+
+            msg.pose.pose.position.x    = this->pose.x();
+            msg.pose.pose.position.y    = this->pose.y();
+            msg.pose.pose.position.z    = this->pose.z();
+
+            tf2::Quaternion q;
+            if(mode == EULER){
+                q.setRPY(this->angle.x(), this->angle.y(), this->angle.z());
+            }
+            else{
+                q.setX(angle.x());
+                q.setY(angle.y());
+                q.setZ(angle.z());
+                q.setW(angle.w());
+            }
+            q.normalize();
+            msg.pose.pose.orientation   = tf2::toMsg(q);
+
+            msg.twist.twist.linear.x    = speed.x();
+        }
+
+        void fromRos(nav_msgs::msg::Odometry &msg) {
+            this->header.fromRos(msg.header);
+
+            this->pose.x()  = msg.pose.pose.position.x;
+            this->pose.y()  = msg.pose.pose.position.y;
+            this->pose.z()  = msg.pose.pose.position.z;
+
+            Eigen::Quaterniond q;
+            q.w()       = msg.pose.pose.orientation.w;
+            q.x()       = msg.pose.pose.orientation.x;
+            q.y()       = msg.pose.pose.orientation.y;
+            q.z()       = msg.pose.pose.orientation.z;
+            auto rpy    = q.toRotationMatrix().eulerAngles(0, 1, 2);
+
+            this->angle.x()  = rpy(0);
+            this->angle.y()  = rpy(1);
+            this->angle.z()  = rpy(2);
+
+            mode = EULER;
+
+            this->speed.x() = std::sqrt(std::pow(msg.twist.twist.linear.x, 2) + std::pow(msg.twist.twist.linear.y, 2) + std::pow(msg.twist.twist.linear.z, 2)); 
+        }
+#endif
+
+
     };
 
 
