@@ -83,22 +83,12 @@ target_link_libraries(common
     ${YAML_CPP_LIBRARIES}
     matio 
     dl 
-<<<<<<< HEAD
-    ${ROS_LIBRARIES}
-    ${ROS2_LIBRARIES}
-=======
     ${GeographicLib_LIBRARIES}
->>>>>>> master
 )
 target_include_directories(common PUBLIC 
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include> 
-<<<<<<< HEAD
-    ${ROS_INCLUDE_DIRS}
-    ${ROS2_INCLUDE_DIRS}
-=======
     ${GeographicLib_INCLUDE_DIRS}
->>>>>>> master
 )
 if (CUDAToolkit_FOUND)
     target_link_libraries(common CUDA::cudart CUDA::cuda_driver)
@@ -110,6 +100,8 @@ if(ROS_FOUND)
     target_link_libraries(common ${ROS_LIBRARIES})
     target_compile_options(common PUBLIC -DROS_ENABLED)
 elseif(ROS2_FOUND)
+    target_include_directories(common PUBLIC ${ROS2_INCLUDE_DIRS}) 
+    target_link_libraries(common ${ROS2_LIBRARIES})
     target_compile_options(common PUBLIC -DROS2_ENABLED)
 endif()
 if(PCL_FOUND)
