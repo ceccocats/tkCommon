@@ -15,11 +15,6 @@
 #include <sensor_msgs/point_cloud_conversion.hpp>
 #endif
 
-#ifdef PCL_ENABLED
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
-#endif
-
 namespace tk { namespace data {
 
     class CloudData : public CloudData_gen{
@@ -258,7 +253,7 @@ namespace tk { namespace data {
                 msg.point_step = addPointField(msg, "ring",      1, sensor_msgs::PointField::UINT16,  msg.point_step);
                 hasC = true;
             }
-            if (features.exists(tk::data::CloudData_gen::FEATURES_TIME)) {
+            if (features.exists(tk::data::CloudData_gen::FEATURES_CHANNEL)) {
                 msg.point_step = addPointField(msg, "time",      1, sensor_msgs::PointField::FLOAT32, msg.point_step);
                 hasT = true;
             }
@@ -584,42 +579,5 @@ namespace tk { namespace data {
             }
         }
 #endif
-#ifdef PCL_ENABLED
-        void toPcl(pcl::PointCloud<pcl::PointXYZI>::Ptr &aPclCloud) {
-            aPclCloud.reset(new pcl::PointCloud<pcl::PointXYZI>());
-            aPclCloud->resize(this->size());
-            
-            bool hasI = false;
-            tk::math::Vec<float>* intensity = nullptr;
-            if (features.exists(tk::data::CloudData_gen::FEATURES_I)) {
-                intensity   = &this->features[tk::data::CloudData::FEATURES_I];
-                hasI        = true;
-            }
-
-            for(int i=0; i<aPclCloud->size(); ++i) {
-                aPclCloud->points[i].x = this->points(0, i);
-                aPclCloud->points[i].y = this->points(1, i);
-                aPclCloud->points[i].z = this->points(2, i);
-                if (hasI)
-                    aPclCloud->points[i].intensity = (*intensity)[i];
-            }
-        }
-
-        void fromPcl(const pcl::PointCloud<pcl::PointXYZI>::Ptr aPclCloud) {
-            this->init();
-            this->resize(aPclCloud->size());
-            this->addFeature(tk::data::CloudData::FEATURES_I);
-            auto *intensity = &this->features[tk::data::CloudData::FEATURES_I];
-            
-            for(int i=0; i<aPclCloud->size(); ++i) {
-                this->points(0, i) = aPclCloud->points[i].x;
-                this->points(1, i) = aPclCloud->points[i].y;
-                this->points(2, i) = aPclCloud->points[i].z;
-                this->points(3, i) = 1;
-                (*intensity)[i]         = aPclCloud->points[i].intensity;
-            }
-        }
-#endif
-
     };
 }}

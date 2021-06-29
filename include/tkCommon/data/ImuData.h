@@ -7,6 +7,8 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #endif
 #ifdef ROS2_ENABLED
+#include "tkCommon/data/HeaderData.h"
+
 #include <std_msgs/msg/header.hpp>
 #include <sensor_msgs/msg/imu.hpp>
 #include <tf2/LinearMath/Quaternion.h>
