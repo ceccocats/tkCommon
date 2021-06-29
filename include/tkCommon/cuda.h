@@ -10,6 +10,11 @@
         if (err != cudaSuccess) {
             tkERR(cudaGetErrorString( err )<<"\n");
             tkERR("file: "<<file<<":"<<line<<"\n");
+            
+            if(err == cudaErrorUnknown){
+                tkERR("Maybe compiled with wrong sm architecture");
+            }
+
             throw std::runtime_error("cudaError");
         }
     }
