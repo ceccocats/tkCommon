@@ -275,7 +275,7 @@ install(EXPORT ${PROJECT_NAME}Targets NAMESPACE ${PROJECT_NAME}::
     DESTINATION "share/${PROJECT_NAME}/cmake/"
 )
 
-include(tkExportConfig)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/tkExportConfig.cmake)
 export_config(${PROJECT_NAME})
 
 # install the configuration file
