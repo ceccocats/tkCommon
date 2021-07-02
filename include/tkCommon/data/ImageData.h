@@ -4,10 +4,12 @@
 #include "tkCommon/gui/utils/CommonViewer.h"
 
 #ifdef ROS_ENABLED
+#if ROS_VERSION == 1
 #include <sensor_msgs/Image.h>
 #endif
-#ifdef ROS2_ENABLED
+#if ROS_VERSION == 2
 #include <sensor_msgs/msg/image.hpp>
+#endif
 #endif
 
 namespace tk{ namespace data{
@@ -119,39 +121,12 @@ namespace tk{ namespace data{
 
 
 #ifdef ROS_ENABLED
+#if ROS_VERSION == 1
         void toRos(sensor_msgs::Image &msg) {
-            this->header.toRos(msg.header);
-            msg.width  = this->width;
-            msg.height = this->height;
-            if(this->channels == 4)
-                msg.encoding = "rgba8";
-            if(this->channels == 3)
-                msg.encoding = "rgb8";
-            if(this->channels == 1)
-                msg.encoding = "mono8";
-
-            msg.step = this->width*this->channels*sizeof(T);
-            msg.data.resize(this->width * this->height * this->channels);
-            memcpy(msg.data.data(), this->data.cpu.data, this->width * this->height * this->channels * sizeof(T));                
-        }
-
-        void fromRos(sensor_msgs::Image &msg) {
-            this->header.fromRos(msg.header);
-            int width  = msg.width;
-            int height = msg.height;
-            
-            int channels = 0;
-            channels = msg.encoding == "rgba8"? 4 : channels;
-            channels = msg.encoding == "rgb8"? 3 : channels;
-            channels = msg.encoding == "mono8"? 1 : channels;
-            channels = msg.encoding == "32FC1"? 1 : channels;
-            tkASSERT(channels != 0, "image encoding not supported")
-            init(width, height, channels);
-            memcpy(this->data.cpu.data, msg.data.data(), width*height*channels*sizeof(T));
-        }
 #endif
-#ifdef ROS2_ENABLED
+#if ROS_VERSION == 2
         void toRos(sensor_msgs::msg::Image &msg) {
+#endif
             this->header.toRos(msg.header);
             msg.width  = this->width;
             msg.height = this->height;
@@ -167,7 +142,12 @@ namespace tk{ namespace data{
             memcpy(msg.data.data(), this->data.cpu.data, this->width * this->height * this->channels * sizeof(T));                
         }
 
+#if ROS_VERSION == 1
+        void fromRos(sensor_msgs::Image &msg) {
+#endif
+#if ROS_VERSION == 2
         void fromRos(sensor_msgs::msg::Image &msg) {
+#endif
             this->header.fromRos(msg.header);
             int width  = msg.width;
             int height = msg.height;
