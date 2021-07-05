@@ -1,11 +1,26 @@
 #pragma once
 #include "tkCommon/data/gen/CloudData_gen.h"
 
-#ifdef ROS_ENABLED
+#ifdef TKROS_ENABLED
+
+#if TKROS_VERSION == 1
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/point_cloud2_iterator.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/point_cloud_conversion.h>
+#endif
+#if TKROS_VERSION == 2
+#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <sensor_msgs/point_cloud2_iterator.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
+#include <sensor_msgs/point_cloud_conversion.hpp>
+#endif
+
+#endif
+
+#ifdef PCL_ENABLED
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
 #endif
 
 #ifdef PCL_ENABLED
@@ -189,49 +204,25 @@ namespace tk { namespace data {
             }
         }
 
-#ifdef ROS_ENABLED
-        void toRos(sensor_msgs::LaserScan &msg) {
-            this->header.toRos(msg.header);
-            
-            /*
-            float max_range, min_range, max_angle, min_angle, angle_increment;
+#ifdef TKROS_ENABLED
 
-            msg.ranges.resize(size());
-            msg.intensities.resize(size());
-            for (int i = 0; i < size(); i++) {
-                msg.ranges[i] = this->ranges(0, 1);
-            }
-            */
+#if TKROS_VERSION == 1
+        void toRos(sensor_msgs::LaserScan &msg) {
+#endif
+#if TKROS_VERSION == 2
+        void toRos(sensor_msgs::msg::LaserScan &msg) {
+#endif
+            this->header.toRos(msg.header);
             tkWRN("Not implemented.\n");
         }
 
+#if TKROS_VERSION == 1
         void toRos(sensor_msgs::PointCloud2 &msg) {
+#endif
+#if TKROS_VERSION == 2
+        void toRos(sensor_msgs::msg::PointCloud2 &msg) {
+#endif
             this->header.toRos(msg.header);
-            /*
-            sensor_msgs::PointCloud tmp;
-            tk::math::Vec<float>*   intensity = nullptr;
-            if (this->features.exists(FEATURES_I))
-                tk::math::Vec<float>* intensity = &features[FEATURES_I];
-
-            // fill points
-            tmp.points.resize(size());
-            if (intensity != nullptr) {
-                tmp.channels.resize(1);
-                tmp.channels[0].name = "intensity";
-            }
-            for(int i = 0 ; i < size(); i++) {
-                tmp.points[i].x = this->points(0, i); 
-                tmp.points[i].y = this->points(1, i); 
-                tmp.points[i].z = this->points(2, i); 
-
-                if (intensity != nullptr)
-                    tmp.channels[0].values[i] = (*intensity)[i];
-            }
-
-            // convert
-            sensor_msgs::convertPointCloudToPointCloud2(tmp, msg);
-            */
-
             msg.width  = size();
             msg.height = 1;
             msg.is_bigendian = false;
@@ -244,15 +235,31 @@ namespace tk { namespace data {
             bool hasI, hasC, hasT;
             hasI = hasC = hasT = false;
             if (features.exists(tk::data::CloudData_gen::FEATURES_I)) {
+#if TKROS_VERSION == 1
                 msg.point_step = addPointField(msg, "intensity", 1, sensor_msgs::PointField::FLOAT32, msg.point_step);
+#endif
+#if TKROS_VERSION == 2
+                msg.point_step = addPointField(msg, "intensity", 1, sensor_msgs::msg::PointField::FLOAT32, msg.point_step);
+#endif          
                 hasI = true;
             }
             if (features.exists(tk::data::CloudData_gen::FEATURES_CHANNEL)) {
-                msg.point_step = addPointField(msg, "ring",      1, sensor_msgs::PointField::UINT16,  msg.point_step);
+#if TKROS_VERSION == 1
+                msg.point_step = addPointField(msg, "ring", 1, sensor_msgs::PointField::UINT16, msg.point_step);
+#endif
+#if TKROS_VERSION == 2
+                msg.point_step = addPointField(msg, "ring",      1, sensor_msgs::msg::PointField::UINT16,  msg.point_step);
+#endif
                 hasC = true;
             }
             if (features.exists(tk::data::CloudData_gen::FEATURES_TIME)) {
+
+#if TKROS_VERSION == 1
                 msg.point_step = addPointField(msg, "time",      1, sensor_msgs::PointField::FLOAT32, msg.point_step);
+#endif
+#if TKROS_VERSION == 2
+                msg.point_step = addPointField(msg, "time",      1, sensor_msgs::msg::PointField::FLOAT32, msg.point_step);
+#endif
                 hasT = true;
             }
             msg.row_step = msg.width * msg.point_step;
@@ -297,7 +304,12 @@ namespace tk { namespace data {
 
         }
 
+#if TKROS_VERSION == 1
         void fromRos(sensor_msgs::LaserScan &msg) {
+#endif
+#if TKROS_VERSION == 2
+        void fromRos(sensor_msgs::msg::LaserScan &msg) {
+#endif
             this->header.fromRos(msg.header);
             this->header.type   = DataType::CLOUD; 
             
@@ -328,12 +340,20 @@ namespace tk { namespace data {
             }
         }
 
+#if TKROS_VERSION == 1
         void fromRos(sensor_msgs::PointCloud2 &msg) {
+            //convert
+            sensor_msgs::PointCloud     tmp;
+#endif
+#if TKROS_VERSION == 2
+        void fromRos(sensor_msgs::msg::PointCloud2 &msg) {
+            //convert
+            sensor_msgs::msg::PointCloud     tmp;
+#endif
             this->header.fromRos(msg.header);
             this->header.type   = DataType::CLOUD; 
 
             // convert
-            sensor_msgs::PointCloud     tmp;
             sensor_msgs::convertPointCloud2ToPointCloud(msg, tmp);
 
             // check if features is present
@@ -420,6 +440,5 @@ namespace tk { namespace data {
             }
         }
 #endif
-
     };
 }}

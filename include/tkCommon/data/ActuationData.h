@@ -1,7 +1,7 @@
 #pragma once
 #include "tkCommon/data/gen/ActuationData_gen.h"
 
-#ifdef ROS_ENABLED
+#ifdef TKROS_ENABLED
 #include "ackermann_msgs/AckermannDriveStamped.h"
 #endif
 
@@ -9,7 +9,7 @@ namespace tk { namespace data {
 
     class ActuationData : public ActuationData_gen{
         
-#ifdef ROS_ENABLED
+#ifdef TKROS_ENABLED
         void toRos(ackermann_msgs::AckermannDriveStamped &msg) {
             this->header.toRos(msg.header);
             msg.drive.steering_angle = steerAngle;
