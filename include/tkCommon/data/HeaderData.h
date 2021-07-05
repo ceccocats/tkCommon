@@ -4,7 +4,12 @@
 #include "tkCommon/math/MatIO.h"
 
 #ifdef ROS_ENABLED
+#if ROS_VERSION == 1
 #include <std_msgs/Header.h>
+#endif
+#if ROS_VERSION == 2
+#include <std_msgs/msg/header.hpp>
+#endif
 #endif
 
 namespace tk { namespace data {
@@ -128,16 +133,29 @@ namespace tk { namespace data {
         }
 
 #ifdef ROS_ENABLED
+#if ROS_VERSION == 1
         void toRos(std_msgs::Header &msg) {
+            msg.seq          = this->messageID;
             msg.stamp.sec    = this->stamp / 1e6;
             msg.stamp.nsec   = (this->stamp - msg.stamp.sec*1e6) * 1e3;
-            msg.seq          = this->messageID;
+#endif
+#if ROS_VERSION == 2
+        void toRos(std_msgs::msg::Header &msg) {
+            msg.stamp.sec    = this->stamp / 1e6;
+            msg.stamp.nanosec  = (this->stamp - msg.stamp.sec*1e6) * 1e3;
+#endif
             msg.frame_id     = this->name;
         }
 
+#if ROS_VERSION == 1
         void fromRos(std_msgs::Header &msg) {
-            this->stamp      = msg.stamp.toNSec() / 1e3;    
             this->messageID  = msg.seq;
+            this->stamp      = msg.stamp.toNSec() / 1e3;
+#endif
+#if ROS_VERSION == 2
+        void fromRos(std_msgs::msg::Header &msg) {
+            this->stamp      = msg.stamp.nanosec / 1e3;
+#endif
             this->name       = msg.frame_id;
         }
 #endif

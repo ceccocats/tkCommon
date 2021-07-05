@@ -2,10 +2,20 @@
 #include "tkCommon/data/gen/CloudData_gen.h"
 
 #ifdef ROS_ENABLED
+
+#if ROS_VERSION == 1
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/point_cloud2_iterator.h>
 #include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/point_cloud_conversion.h>
+#endif
+#if ROS_VERSION == 2
+#include <sensor_msgs/msg/point_cloud2.hpp>
+#include <sensor_msgs/point_cloud2_iterator.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
+#include <sensor_msgs/point_cloud_conversion.hpp>
+#endif
+
 #endif
 
 #ifdef PCL_ENABLED
@@ -190,7 +200,13 @@ namespace tk { namespace data {
         }
 
 #ifdef ROS_ENABLED
+
+#if ROS_VERSION == 1
         void toRos(sensor_msgs::LaserScan &msg) {
+#endif
+#if ROS_VERSION == 2
+        void toRos(sensor_msgs::msg::LaserScan &msg) {
+#endif
             this->header.toRos(msg.header);
             
             /*
@@ -205,7 +221,12 @@ namespace tk { namespace data {
             tkWRN("Not implemented.\n");
         }
 
+#if ROS_VERSION == 1
         void toRos(sensor_msgs::PointCloud2 &msg) {
+#endif
+#if ROS_VERSION == 2
+        void toRos(sensor_msgs::msg::PointCloud2 &msg) {
+#endif
             this->header.toRos(msg.header);
             /*
             sensor_msgs::PointCloud tmp;
@@ -244,15 +265,30 @@ namespace tk { namespace data {
             bool hasI, hasC, hasT;
             hasI = hasC = hasT = false;
             if (features.exists(tk::data::CloudData_gen::FEATURES_I)) {
+#if ROS_VERSION == 1
                 msg.point_step = addPointField(msg, "intensity", 1, sensor_msgs::PointField::FLOAT32, msg.point_step);
+#endif
+#if ROS_VERSION == 2
+                msg.point_step = addPointField(msg, "intensity", 1, sensor_msgs::msg::PointField::FLOAT32, msg.point_step);
+#endif          
                 hasI = true;
             }
             if (features.exists(tk::data::CloudData_gen::FEATURES_CHANNEL)) {
-                msg.point_step = addPointField(msg, "ring",      1, sensor_msgs::PointField::UINT16,  msg.point_step);
+#if ROS_VERSION == 1
+                msg.point_step = addPointField(msg, "ring", 1, sensor_msgs::PointField::UINT16, msg.point_step);
+#endif
+#if ROS_VERSION == 2
+                msg.point_step = addPointField(msg, "ring",      1, sensor_msgs::msg::PointField::UINT16,  msg.point_step);
+#endif
                 hasC = true;
             }
             if (features.exists(tk::data::CloudData_gen::FEATURES_TIME)) {
+#if ROS_VERSION == 1
                 msg.point_step = addPointField(msg, "time",      1, sensor_msgs::PointField::FLOAT32, msg.point_step);
+#endif
+#if ROS_VERSION == 2
+                msg.point_step = addPointField(msg, "time",      1, sensor_msgs::msg::PointField::FLOAT32, msg.point_step);
+#endif
                 hasT = true;
             }
             msg.row_step = msg.width * msg.point_step;
@@ -297,7 +333,12 @@ namespace tk { namespace data {
 
         }
 
+#if ROS_VERSION == 1
         void fromRos(sensor_msgs::LaserScan &msg) {
+#endif
+#if ROS_VERSION == 2
+        void fromRos(sensor_msgs::msg::LaserScan &msg) {
+#endif
             this->header.fromRos(msg.header);
             this->header.type   = DataType::CLOUD; 
             
@@ -328,12 +369,20 @@ namespace tk { namespace data {
             }
         }
 
+#if ROS_VERSION == 1
         void fromRos(sensor_msgs::PointCloud2 &msg) {
+            //convert
+            sensor_msgs::PointCloud     tmp;
+#endif
+#if ROS_VERSION == 2
+        void fromRos(sensor_msgs::msg::PointCloud2 &msg) {
+            //convert
+            sensor_msgs::msg::PointCloud     tmp;
+#endif
             this->header.fromRos(msg.header);
             this->header.type   = DataType::CLOUD; 
 
             // convert
-            sensor_msgs::PointCloud     tmp;
             sensor_msgs::convertPointCloud2ToPointCloud(msg, tmp);
 
             // check if features is present
@@ -384,6 +433,7 @@ namespace tk { namespace data {
         }
 #endif
 
+
 #ifdef PCL_ENABLED
         void toPcl(pcl::PointCloud<pcl::PointXYZI>::Ptr &aPclCloud) {
             aPclCloud.reset(new pcl::PointCloud<pcl::PointXYZI>());
@@ -420,6 +470,5 @@ namespace tk { namespace data {
             }
         }
 #endif
-
     };
 }}

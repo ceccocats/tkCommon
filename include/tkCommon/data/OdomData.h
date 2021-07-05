@@ -2,9 +2,16 @@
 #include "tkCommon/data/gen/OdomData_gen.h"
 
 #ifdef ROS_ENABLED
+#if ROS_VERSION == 1
 #include <nav_msgs/Odometry.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#endif
+#if ROS_VERSION == 2
+#include <nav_msgs/msg/odometry.hpp>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#endif
 #endif
 
 namespace tk { namespace data {
@@ -23,7 +30,12 @@ namespace tk { namespace data {
             mode = s.mode;
         }
 #ifdef ROS_ENABLED
+#if ROS_VERSION == 1
         void toRos(nav_msgs::Odometry &msg) {
+#endif
+#if ROS_VERSION == 2
+        void toRos(nav_msgs::msg::Odometry &msg) {
+#endif
             this->header.toRos(msg.header);
 
             msg.pose.pose.position.x    = this->pose.x();
@@ -46,7 +58,12 @@ namespace tk { namespace data {
             msg.twist.twist.linear.x    = speed.x();
         }
 
+#if ROS_VERSION == 1
         void fromRos(nav_msgs::Odometry &msg) {
+#endif
+#if ROS_VERSION == 2
+        void fromRos(nav_msgs::msg::Odometry &msg) {
+#endif
             this->header.fromRos(msg.header);
 
             this->pose.x()  = msg.pose.pose.position.x;
@@ -70,6 +87,4 @@ namespace tk { namespace data {
         }
 #endif
     };
-
-
 }}
