@@ -27,6 +27,7 @@ elseif (rclcpp_FOUND AND
     sensor_msgs_FOUND AND
     nav_msgs_FOUND AND
     tf2_msgs_FOUND AND
+    ackermann_msgs_FOUND AND
     ament_cmake_FOUND# AND
     #rosidl_typesupport_cpp_FOUND
 )
