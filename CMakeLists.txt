@@ -6,7 +6,7 @@ project(tkCommon VERSION 1.0
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_STANDARD 14 CACHE STRING "The C++ standard to use")
+set(CMAKE_CXX_STANDARD 11 CACHE STRING "The C++ standard to use")
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -98,6 +98,7 @@ if(ROS_FOUND)
     target_include_directories(common PUBLIC ${ROS_INCLUDE_DIRS}) 
     target_link_libraries(common ${ROS_LIBRARIES})
     target_compile_options(common PUBLIC -DROS_ENABLED -DROS_VERSION=${ROS_VERSION})
+    target_compile_features(common PUBLIC cxx_std_14)
 endif()
 if(PCL_FOUND)
     target_include_directories(common PUBLIC ${PCL_INCLUDE_DIRS}) 
@@ -270,7 +271,7 @@ install(EXPORT ${PROJECT_NAME}Targets NAMESPACE ${PROJECT_NAME}::
     DESTINATION "share/${PROJECT_NAME}/cmake/"
 )
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/tkExportConfig.cmake)
+include(tkExportConfig)
 export_config(${PROJECT_NAME})
 
 # install the configuration file

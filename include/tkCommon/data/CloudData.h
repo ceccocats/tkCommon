@@ -17,6 +17,12 @@
 #endif
 
 #endif
+
+#ifdef PCL_ENABLED
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#endif
+
 namespace tk { namespace data {
 
     class CloudData : public CloudData_gen{
@@ -276,7 +282,7 @@ namespace tk { namespace data {
 #endif
                 hasC = true;
             }
-            if (features.exists(tk::data::CloudData_gen::FEATURES_CHANNEL)) {
+            if (features.exists(tk::data::CloudData_gen::FEATURES_TIME)) {
 #if ROS_VERSION == 1
                 msg.point_step = addPointField(msg, "time",      1, sensor_msgs::PointField::FLOAT32, msg.point_step);
 #endif
@@ -423,6 +429,44 @@ namespace tk { namespace data {
                     (*ring)[i]          = std::abs(tmp.channels[ring_channel].values[i] - ring_max);
                 if (angle != nullptr)
                     (*angle)[i]         = fmod((std::atan2(tmp.points[i].x, tmp.points[i].y) + M_PI_2) + M_PI*2, M_PI*2);
+            }
+        }
+#endif
+
+
+#ifdef PCL_ENABLED
+        void toPcl(pcl::PointCloud<pcl::PointXYZI>::Ptr &aPclCloud) {
+            aPclCloud.reset(new pcl::PointCloud<pcl::PointXYZI>());
+            aPclCloud->resize(this->size());
+            
+            bool hasI = false;
+            tk::math::Vec<float>* intensity = nullptr;
+            if (features.exists(tk::data::CloudData_gen::FEATURES_I)) {
+                intensity   = &this->features[tk::data::CloudData::FEATURES_I];
+                hasI        = true;
+            }
+
+            for(int i=0; i<aPclCloud->size(); ++i) {
+                aPclCloud->points[i].x = this->points(0, i);
+                aPclCloud->points[i].y = this->points(1, i);
+                aPclCloud->points[i].z = this->points(2, i);
+                if (hasI)
+                    aPclCloud->points[i].intensity = (*intensity)[i];
+            }
+        }
+
+        void fromPcl(const pcl::PointCloud<pcl::PointXYZI>::Ptr aPclCloud) {
+            this->init();
+            this->resize(aPclCloud->size());
+            this->addFeature(tk::data::CloudData::FEATURES_I);
+            auto *intensity = &this->features[tk::data::CloudData::FEATURES_I];
+            
+            for(int i=0; i<aPclCloud->size(); ++i) {
+                this->points(0, i) = aPclCloud->points[i].x;
+                this->points(1, i) = aPclCloud->points[i].y;
+                this->points(2, i) = aPclCloud->points[i].z;
+                this->points(3, i) = 1;
+                (*intensity)[i]         = aPclCloud->points[i].intensity;
             }
         }
 #endif
