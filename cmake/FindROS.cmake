@@ -13,6 +13,7 @@ elseif (ROS_VERSION EQUAL 2)
     find_dependency(sensor_msgs)
     find_dependency(nav_msgs)
     find_dependency(tf2_msgs)
+    find_dependency(ackermann_msgs)
     #find_dependency(rosidl_typesupport_cpp)
 endif()
 
@@ -26,6 +27,7 @@ elseif (rclcpp_FOUND AND
     sensor_msgs_FOUND AND
     nav_msgs_FOUND AND
     tf2_msgs_FOUND AND
+    ackermann_msgs_FOUND AND
     ament_cmake_FOUND# AND
     #rosidl_typesupport_cpp_FOUND
 )
@@ -34,6 +36,7 @@ elseif (rclcpp_FOUND AND
         ${sensor_msgs_INCLUDE_DIRS}
         ${nav_msgs_INCLUDE_DIRS}
         ${tf2_msgs_INCLUDE_DIRS}
+        ${ackermann_msgs_INCLUDE_DIRS}
         ${ament_cmake_INCLUDE_DIRS}
         #${rosidl_typesupport_cpp_INCLUDE_DIRS}
     )
@@ -42,6 +45,7 @@ elseif (rclcpp_FOUND AND
         ${sensor_msgs_LIBRARIES}
         ${nav_msgs_LIBRARIES}
         ${tf2_msgs_LIBRARIES}
+        ${ackermann_msgs_LIBRARIES}
         ${ament_cmake_LIBRARIES}
         #${rosidl_typesupport_cpp_LIBRARIES}
     )
