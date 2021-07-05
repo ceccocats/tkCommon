@@ -2,7 +2,7 @@
 ## Build
 #### install deps
 ```
-# cmake from source
+# => cmake (from source)
 cmake >= 3.18: https://cmake.org/download/
 
 # => from apt:
@@ -14,9 +14,9 @@ sudo apt-get install libglew-dev libglfw3-dev freeglut3-dev libfreetype6-dev lib
 # misc
 sudo apt-get install libeigen3-dev libyaml-cpp-dev libpcap-dev libmatio-dev libgeographic-dev libpugixml-dev libudev-dev python3-dev 
 
-# optional: 
+# => optional: 
 - cuda
-- ROS melodic with this packages: ros-melodic-desktop ros-melodic-tf2-geometry-msgs ros-melodic-ackermann-msgs
+- ROS melodic with this packages: ros-melodic-base ros-melodic-tf* ros-melodic-pcl-conversions ros-melodic-ackermann-msgs
 - LibSerial: https://github.com/FisherTiger95/libserial
 - Lanelet2: https://github.com/FisherTiger95/lanelet2_standalone
 ```
