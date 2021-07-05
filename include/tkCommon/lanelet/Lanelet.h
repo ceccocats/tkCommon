@@ -29,6 +29,8 @@ namespace tk { namespace common {
          Lanelet() = default;
         ~Lanelet() = default;
 
+    #ifdef LANELET_ENABLED
+
         bool init(const std::string &aConfPath) {
             YAML::Node conf     = YAML::LoadFile(aConfPath);
             
@@ -44,5 +46,11 @@ namespace tk { namespace common {
         lanelet::LaneletMapUPtr mMap;
         double mOriginLat, mOriginLon;
         lanelet::projection::UtmProjector *mProjector;
+    #else
+        bool init(const std::string &aConfPath) {
+            tkERR("You need to compile with lanelet2");
+            return false;    
+        }
+    #endif
     };
 }}

@@ -191,7 +191,7 @@ add_library(communication SHARED
     src/communication/serial/SerialPort.cpp
     src/communication/car/CarControl.cpp
 )
-target_link_libraries(communication tkCommon::common pcap serial)
+target_link_libraries(communication tkCommon::common pcap)
 add_library(${PROJECT_NAME}::communication ALIAS communication)
 
 #-------------------------------------------------------------------------------
