@@ -1,0 +1,52 @@
+build:bionic:
+    image: ubuntu:bionic
+    tags:
+      - tk
+      
+    script:
+        - export DEBIAN_FRONTEND=noninteractive
+        - apt-get update        
+        - apt-get install -y wget tar lsb-core
+        - apt-get install -y libgles2-mesa-dev # NOT on aarch64
+        - apt-get install -y git build-essential rsync libeigen3-dev libglew-dev libglfw3-dev freeglut3-dev libfreetype6-dev libyaml-cpp-dev libpcap-dev libmatio-dev libgeographic-dev libpugixml-dev libudev-dev python3-dev libglm-dev
+
+        # ros install
+        - sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+        - apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+        - apt update
+        - apt install -y ros-melodic-ros-base
+        - apt install -y ros-melodic-tf* ros-melodic-pcl-conversions ros-melodic-ackermann-msgs
+        - . /opt/ros/melodic/setup.sh
+
+        # cmake 
+        - wget https://github.com/Kitware/CMake/releases/download/v3.19.8/cmake-3.19.8-Linux-x86_64.tar.gz
+        - tar -xf cmake-3.19.8-Linux-x86_64.tar.gz -C / --strip-components=1
+
+        # tkCommon build
+        - rm -rf build/
+        - mkdir build; cd build; 
+        - cmake .. 
+        - make -j4
+
+build:cuda102:
+    image: nvidia/cuda:10.2-cudnn7-devel-ubuntu18.04 
+    tags:
+      - tk
+      
+    script:
+        - export DEBIAN_FRONTEND=noninteractive
+        - apt-get update        
+        - apt-get install -y wget tar lsb-core
+        - apt-get install -y libgles2-mesa-dev # NOT on aarch64
+        - apt-get install -y git build-essential rsync libeigen3-dev libglew-dev libglfw3-dev freeglut3-dev libfreetype6-dev libyaml-cpp-dev libpcap-dev libmatio-dev libgeographic-dev libpugixml-dev libudev-dev python3-dev libglm-dev
+        
+        # cmake 
+        - wget https://github.com/Kitware/CMake/releases/download/v3.19.8/cmake-3.19.8-Linux-x86_64.tar.gz
+        - tar -xf cmake-3.19.8-Linux-x86_64.tar.gz -C / --strip-components=1
+        
+        # tkCommon build
+        - rm -rf build/
+        - mkdir build; cd build; 
+        - cmake .. 
+        - make -j4
+
