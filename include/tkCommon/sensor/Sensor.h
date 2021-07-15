@@ -115,6 +115,8 @@ class SensorInfo{
         std::map<sensorKey, int> dataArrived;    /**< incremental counter */
         int             triggerLine;
         bool            synched;        /**< tell if the sensor is synced with the log */
+        int             width;
+        int             height;
         //tk::data::DataType type;      /**< type of the sensor, used for visualization */
 
         /**
@@ -128,6 +130,8 @@ class SensorInfo{
             synched         = false;
             //type            = tk::data::DataType::NOT_SPEC;
             triggerLine     = -1;
+            width           = 0;
+            height          = 0;
         }
 
         void operator=(SensorInfo i) noexcept {
@@ -138,6 +142,8 @@ class SensorInfo{
             this->synched           = i.synched;
             //this->type              = i.type;
             this->triggerLine       = i.triggerLine;
+            this->width             = i.width;
+            this->height            = i.height;
         }
 };
 
