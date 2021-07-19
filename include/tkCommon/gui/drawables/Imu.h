@@ -38,6 +38,7 @@ namespace tk{ namespace gui{
             timeStamp_t prec = 0;
             ScrollingBuffer accX, accY, accZ;
             ScrollingBuffer roll, pitch, yaw;
+            ScrollingBuffer angVelX, angVelY, angVelZ;
 
         public:
             Imu(const std::string& name = "imu", float delta_ts = 10.0f);

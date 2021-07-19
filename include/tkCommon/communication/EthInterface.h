@@ -31,7 +31,7 @@ namespace tk { namespace communication {
          * @param ip        IP
          * @return          Success
          */
-        bool initTCP(const int port, const std::string ip, time_t timeout_us = -1);
+        bool initTCP(const int port, const std::string ip, bool timeout = false);
 
         /**
          * Method that init pcap ethernet
