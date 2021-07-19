@@ -2,6 +2,7 @@
 #include <tkCommon/common.h>
 #include <tkCommon/log.h>
 #include <csignal>
+#include <thread>
 #include <tkCommon/communication/EthInterface.h>
 
 
@@ -15,29 +16,25 @@ void replayLoop(std::string file, int port, std::string filter,std::string ip){
     sender.initSender(port,ip);
     uint8_t buffer[2000];
     int count = 0;
-    timeStamp_t prec = 0, now;
-
+    timeStamp_t first = 0, now;
+    std::chrono::system_clock::time_point startpt;
     while(gRun){      
 
         int n = iface.read(buffer,now);
+        if(first == 0) {
+            first = now;
+            startpt = std::chrono::system_clock::now();
+        }
 
         if(n == -1){
-            gRun = false;
+            //gRun = false;
             continue;
         }
 
         sender.send(buffer,n);
 
-        if(prec != 0){
-
-            if(now > prec){
-                
-                timeStamp_t sleep_for = (now-prec);
-                usleep(sleep_for);
-            }
-        }
-
-        prec = now;
+        std::chrono::microseconds inc_chrono {now - first};
+        std::this_thread::sleep_until(startpt + inc_chrono);
 
         count++;
         if(count%500 == 0){
