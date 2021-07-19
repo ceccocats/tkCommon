@@ -1,12 +1,14 @@
-#include <tkCommon/lanelet/Lanelet.h>
-
 #include <tkCommon/common.h>
+
+#include <tkCommon/lanelet/Lanelet.h>
 
 YAML::Node  conf;
 std::string laneletConfPath, laneletMapPath, laneletMapFixedPath;
 float       lat, lon;
 bool        debug;
 int         merged;
+
+#ifdef LANELET_ENABLED
 void
 createLanelet(lanelet::LineString3d ls, lanelet::LaneletMap *map, float width = 1.0f, float merge_distance = 0.4f)
 {
@@ -83,6 +85,7 @@ createLanelet(lanelet::LineString3d ls, lanelet::LaneletMap *map, float width = 
 
     map->add(lanelet1);
 }
+#endif
 
 int
 main (int argc, char *argv[])
@@ -96,6 +99,8 @@ main (int argc, char *argv[])
     // get conf from YAML
     tk::common::Lanelet lanelet;
     lanelet.init(laneletConfPath);
+
+    #ifdef LANELET_ENABLED
 
     // load lanelet map
     // http://www.dirsig.org/docs/new/coordinates.html
@@ -262,5 +267,6 @@ main (int argc, char *argv[])
         lanelet::write("lanelet_fixed_junction.osm", tmpJunction, *lanelet.mProjector);
     }
 
+    #endif
     return 0;
 }
