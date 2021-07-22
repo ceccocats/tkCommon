@@ -97,7 +97,10 @@ struct MatSimple {
     void release() {
         if(!owned && data != nullptr) {
             if(CUDA)
-                tkCUDA( cudaFree(data) );
+                if(!integrated_memory)
+                        tkCUDA( cudaFree(data) );
+                    else
+                        tkCUDA( cudaFreeHost(data) );
             else
                 delete [] data;
             data = nullptr;
