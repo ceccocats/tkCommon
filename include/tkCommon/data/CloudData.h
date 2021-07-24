@@ -358,27 +358,39 @@ namespace tk { namespace data {
 
             // check if features is present
             tk::math::Vec<float>* intensity = nullptr;
-            tk::math::Vec<float>* ring = nullptr;
-            tk::math::Vec<float>* angle = nullptr;
+            tk::math::Vec<float>* ring      = nullptr;
+            tk::math::Vec<float>* angle     = nullptr;
+            tk::math::Vec<float>* noise     = nullptr;
+            tk::math::Vec<float>* time      = nullptr;
             if (this->features.exists(FEATURES_I)) 
                 intensity   = &features[FEATURES_I]; 
             if (this->features.exists(FEATURES_CHANNEL)) 
                 ring        = &features[FEATURES_CHANNEL]; 
             if (this->features.exists(FEATURES_ANGLE_VAR)) 
                 angle       = &features[FEATURES_ANGLE_VAR]; 
+            if (this->features.exists(FEATURES_NOISE)) 
+                noise       = &features[FEATURES_NOISE];
+            if (this->features.exists(FEATURES_TIME)) 
+                time        = &features[FEATURES_TIME];
 
 
             int i_channel       = -1;
             int ring_channel    = -1;
-            int ring_max        = 0;
+            int noise_channel   = -1;
+            int time_channel    = -1;
             if (intensity != nullptr || ring != nullptr) {
                 for (int i = 0; i < tmp.channels.size(); i++) {
                     if (intensity != nullptr && tmp.channels[i].name == "intensity") {
                         i_channel = i;
                     }
                     if (ring != nullptr && tmp.channels[i].name == "ring") {
-                        ring_channel    = i;
-                        ring_max        = *std::max_element(tmp.channels[ring_channel].values.begin(), tmp.channels[ring_channel].values.end());                      
+                        ring_channel    = i;                    
+                    }
+                    if (noise != nullptr && tmp.channels[i].name == "noise") {
+                        noise_channel   = i;               
+                    }
+                    if (time != nullptr && tmp.channels[i].name == "time") {
+                        time_channel    = i;               
                     }
                 }
             }
@@ -397,9 +409,13 @@ namespace tk { namespace data {
                 if (intensity != nullptr && i_channel != -1)
                     (*intensity)[i]     = tmp.channels[i_channel].values[i];
                 if (ring != nullptr && ring_channel != -1)
-                    (*ring)[i]          = std::abs(tmp.channels[ring_channel].values[i] - ring_max);
+                    (*ring)[i]          = tmp.channels[ring_channel].values[i];
                 if (angle != nullptr)
                     (*angle)[i]         = fmod((std::atan2(tmp.points[i].x, tmp.points[i].y) + M_PI_2) + M_PI*2, M_PI*2);
+                if (noise != nullptr && noise_channel != -1)
+                    (*noise)[i]         = tmp.channels[noise_channel].values[i];
+                if (time != nullptr && time_channel != -1)
+                    (*time)[i]          = tmp.channels[time_channel].values[i];
             }
         }
 #endif
