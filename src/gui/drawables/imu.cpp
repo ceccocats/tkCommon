@@ -25,6 +25,10 @@ tk::gui::Imu::updateData(tk::gui::Viewer *viewer){
     accY.AddPoint(t, imu->acc.y());
     accZ.AddPoint(t, imu->acc.z());
 
+    angVelX.AddPoint(t, imu->angleVel.x());
+    angVelY.AddPoint(t, imu->angleVel.y());
+    angVelZ.AddPoint(t, imu->angleVel.z());
+
     roll.AddPoint(t, imu->angle.x());
     pitch.AddPoint(t, imu->angle.y());
     yaw.AddPoint(t, imu->angle.z());
@@ -50,6 +54,7 @@ tk::gui::Imu::imGuiInfos() {
         ImPlot::PlotLine("accZ", &accZ.Data[0].x, &accZ.Data[0].y, accZ.Data.size(), accZ.Offset, 2*sizeof(float));
         ImPlot::EndPlot();
     }
+    
     ImPlot::SetNextPlotLimitsX(t - delta_ts, t, ImGuiCond_Always);
     ImPlot::SetNextPlotLimitsY(-M_PI, +M_PI);
     if (ImPlot::BeginPlot("##Scrolling1", NULL, NULL, ImVec2(-1,150), 0, rt_axis | ImPlotAxisFlags_Time, rt_axis)) {
@@ -57,6 +62,16 @@ tk::gui::Imu::imGuiInfos() {
         ImPlot::PlotLine("roll", &roll.Data[0].x, &roll.Data[0].y, roll.Data.size(), roll.Offset, 2*sizeof(float));
         ImPlot::PlotLine("pitch", &pitch.Data[0].x, &pitch.Data[0].y, pitch.Data.size(), pitch.Offset, 2*sizeof(float));
         ImPlot::PlotLine("yaw", &yaw.Data[0].x, &yaw.Data[0].y, yaw.Data.size(), yaw.Offset, 2*sizeof(float));
+        ImPlot::EndPlot();
+    }
+
+    ImPlot::SetNextPlotLimitsX(t - delta_ts, t, ImGuiCond_Always);
+    ImPlot::SetNextPlotLimitsY(-M_PI, +M_PI);
+    if (ImPlot::BeginPlot("##Scrolling2", NULL, NULL, ImVec2(-1,150), 0, rt_axis | ImPlotAxisFlags_Time, rt_axis)) {
+        //ImPlot::FitNextPlotAxes(false, true, false, false);
+        ImPlot::PlotLine("angVelX", &angVelX.Data[0].x, &angVelX.Data[0].y, angVelX.Data.size(), angVelX.Offset, 2*sizeof(float));
+        ImPlot::PlotLine("angVelY", &angVelY.Data[0].x, &angVelY.Data[0].y, angVelY.Data.size(), angVelY.Offset, 2*sizeof(float));
+        ImPlot::PlotLine("angVelZ", &angVelZ.Data[0].x, &angVelZ.Data[0].y, angVelZ.Data.size(), angVelZ.Offset, 2*sizeof(float));
         ImPlot::EndPlot();
     }
     ImGui::Text("%s",print.str().c_str());
