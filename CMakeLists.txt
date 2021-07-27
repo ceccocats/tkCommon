@@ -1,64 +1,44 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.15)
+cmake_minimum_required(VERSION 3.18...3.19)
 
-PROJECT(tkCommon)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC")
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+project(tkCommon VERSION 1.0
+                 DESCRIPTION "tkCommon project"
+                 LANGUAGES CXX)
+
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_STANDARD 11 CACHE STRING "The C++ standard to use")
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/tkConf.cmake OPTIONAL)
-
-# project specific flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
-
 
 #-------------------------------------------------------------------------------
 # CUDA
 #-------------------------------------------------------------------------------
-find_package(CUDA 9.0 QUIET)
-include_directories(${CUDA_INCLUDE_DIRS})
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} --expt-relaxed-constexpr)
-if(CUDA_FOUND)
-    add_definitions(-DTKCUDA_ENABLED)
-endif()
+find_package(CUDAToolkit QUIET)
 
 #-------------------------------------------------------------------------------
 # External Libraries
 #-------------------------------------------------------------------------------
+find_package(OpenMP REQUIRED)
 find_package(Eigen3 REQUIRED)
-include_directories(${EIGEN3_INCLUDE_DIR})
-message("-- Eigen: " ${EIGEN3_INCLUDE_DIR})
-
 find_package(OpenGL REQUIRED)
-include_directories(${OPENGL_INCLUDE_DIR})
-
+find_package(GLUT REQUIRED)
 find_package(GLEW REQUIRED)
-include_directories(${GLEW_INCLUDE_DIRS})
 find_package(glfw3 3 REQUIRED)
-find_library(GLFW3_LIBRARY NAMES glfw3 glfw)
-
 find_package(Freetype REQUIRED)
-include_directories(${FREETYPE_INCLUDE_DIRS})
-
+find_package(yaml-cpp REQUIRED)
+find_package(GeographicLib REQUIRED)
 find_package(ROS QUIET)
-include_directories(${ROS_INCLUDE_DIRS})
-
-set(GUI_LIBS
-    ${OPENGL_gl_LIBRARY}
-    ${OPENGL_glu_LIBRARY}
-    ${GLEW_LIBRARIES}
-    ${GLFW3_LIBRARY}
-    glut
-    ${FREETYPE_LIBRARIES}
-    Xxf86vm
-    X11
-    gcc_s
-    gcc
-)
+find_package(PCL 1.8 QUIET COMPONENTS common)
+find_package(lanelet2 QUIET)
+find_package(PkgConfig)
+pkg_check_modules(SERIAL QUIET libserial=1.0.0)
 
 #-------------------------------------------------------------------------------
 # Generate Data Headers
 #-------------------------------------------------------------------------------
-add_custom_command(OUTPUT 
-        ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/GpsData_gen.h
+add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/GpsData_gen.h
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/data/gen/_genDataHeaders.py
     COMMAND python3 _genDataHeaders.py)
@@ -66,44 +46,104 @@ add_custom_target(tkdataheaders_gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/
 
 #-------------------------------------------------------------------------------
 # Generate shaders colorsmaps
-#-----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/shader/colormaps/*
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/shader/glsl/pointcloudFrag
     COMMAND python3 _colormapsGen.py)
-    add_custom_target(tkshaderpointcloud_gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/shader/colormaps/*)
+add_custom_target(tkshaderpointcloud_gen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/shader/colormaps/*)
 
 #-------------------------------------------------------------------------------
 # Generate Drawables include
-#-----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawables/*
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawables
     COMMAND python3 _drawables.py)
-    add_custom_target(tkdrawablesgen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawables/*)
+add_custom_target(tkdrawablesgen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawables/*)
 
 #-------------------------------------------------------------------------------
-# Build Libraries
+# tkCommon library
 #-------------------------------------------------------------------------------
-file(GLOB data_gen  "include/tkCommon/data/gen/*.cpp")
-file(GLOB data      "include/tkCommon/data/*.cpp")
-add_library(tkCommon SHARED
+file(GLOB data_gen  include/tkCommon/data/gen/*.cpp)
+file(GLOB data      include/tkCommon/data/*.cpp)
+add_library(common SHARED
     src/common.cpp
     src/log.cpp
     src/version.cpp
     src/CmdParser.cpp 
     src/rt/Profiler.cpp
+    src/projection/Projector.cpp
+    src/PID.cpp
     ${data_gen}
     ${data} 
-    src/PID.cpp
 )
-target_link_libraries(tkCommon yaml-cpp matio dl)
+target_link_libraries(common 
+    OpenMP::OpenMP_CXX 
+    Eigen3::Eigen
+    ${YAML_CPP_LIBRARIES}
+    matio 
+    dl 
+    ${GeographicLib_LIBRARIES}
+)
+target_include_directories(common PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include> 
+    ${GeographicLib_INCLUDE_DIRS}
+)
+if (CUDAToolkit_FOUND)
+    target_link_libraries(common CUDA::cudart CUDA::cuda_driver)
+    target_compile_options(common PUBLIC -DTKCUDA_ENABLED)
+    set_property(TARGET common PROPERTY CUDA_SEPARABLE_COMPILATION ON) 
+endif()
+if(ROS_FOUND)
+    target_include_directories(common PUBLIC ${ROS_INCLUDE_DIRS}) 
+    target_link_libraries(common ${ROS_LIBRARIES})
+    target_compile_options(common PUBLIC -DTKROS_ENABLED -DTKROS_VERSION=${ROS_VERSION})
+    target_compile_features(common PUBLIC cxx_std_14)
+endif()
+if(PCL_FOUND)
+    target_include_directories(common PUBLIC ${PCL_INCLUDE_DIRS}) 
+    target_link_libraries(common ${PCL_LIBRARIES})
+    target_compile_options(common PUBLIC -DPCL_ENABLED)
+endif()
+if(lanelet2_FOUND)
+    target_include_directories(common PUBLIC ${lanelet2_INCLUDE_DIRS})
+    target_link_libraries(common ${lanelet2_LIBRARIES})
+    target_compile_options(common PUBLIC -DLANELET_ENABLED)
+    target_compile_features(common PUBLIC cxx_std_14)
+endif()
+if(SERIAL_FOUND)
+    target_include_directories(common PUBLIC ${SERIAL_INCLUDE_DIRS}) 
+    target_link_libraries(common ${SERIAL_LIBRARIES})
+    target_compile_options(common PUBLIC -DSERIAL_ENABLED)
+endif()
+if(PCL_FOUND)
+    target_include_directories(common PUBLIC ${PCL_INCLUDE_DIRS}) 
+    target_link_libraries(common ${PCL_LIBRARIES})
+    target_compile_options(common PUBLIC -DPCL_ENABLED)
+endif()
+if(lanelet2_FOUND)
+    target_include_directories(common PUBLIC ${lanelet2_INCLUDE_DIRS})
+    target_link_libraries(common ${lanelet2_LIBRARIES})
+    target_compile_options(common PUBLIC -DLANELET_ENABLED)
+    target_compile_features(common PUBLIC cxx_std_14)
+endif()
+if(SERIAL_FOUND)
+    target_include_directories(common PUBLIC ${SERIAL_INCLUDE_DIRS}) 
+    target_link_libraries(common ${SERIAL_LIBRARIES})
+    target_compile_options(common PUBLIC -DSERIAL_ENABLED)
+endif()
+add_library(${PROJECT_NAME}::common ALIAS common)
 
-file(GLOB gui_utils "src/gui/utils/*.cpp")
-file(GLOB imgui     "src/gui/imgui/*.cpp")
-file(GLOB implot    "src/gui/implot/*.cpp")
-file(GLOB drawables "src/gui/drawables/*.cpp")
-file(GLOB shader    "src/gui/shader/*.cpp")
+#-------------------------------------------------------------------------------
+# tkGUI library
+#-------------------------------------------------------------------------------
+file(GLOB gui_utils src/gui/utils/*.cpp)
+file(GLOB imgui     src/gui/imgui/*.cpp)
+file(GLOB implot    src/gui/implot/*.cpp)
+file(GLOB drawables src/gui/drawables/*.cpp)
+file(GLOB shader    src/gui/shader/*.cpp)
 
-add_library(tkGUI SHARED
+add_library(gui SHARED
     src/gui/Viewer.cpp
     ${drawables}
     ${gui_utils}  
@@ -111,15 +151,37 @@ add_library(tkGUI SHARED
     ${implot}
     ${shader}
 )
-target_link_libraries(tkGUI ${CUDA_LIBRARIES} ${GUI_LIBS} tkCommon)
+target_link_libraries(gui 
+    OpenGL::GL
+    GLUT::GLUT
+    Freetype::Freetype
+    GLEW::GLEW
+    glfw
+    #Xxf86vm
+    #X11
+    #gcc_s
+    #gcc 
+    tkCommon::common
+)
+add_library(${PROJECT_NAME}::gui ALIAS gui)
 
-add_library(tkMath SHARED 
+#-------------------------------------------------------------------------------
+# tkMath library
+#-------------------------------------------------------------------------------
+add_library(math SHARED 
     src/math/CSpline.cpp 
     src/math/CSpline2D.cpp 
     src/math/CSpline3D.cpp
 )
+target_link_libraries(math 
+    tkCommon::common
+)
+add_library(${PROJECT_NAME}::math ALIAS math)
 
-add_library(tkCommunication SHARED
+#-------------------------------------------------------------------------------
+# tkCommunication library
+#-------------------------------------------------------------------------------
+add_library(communication SHARED
     src/communication/ethernet/UDPSocket.cpp
     src/communication/ethernet/TCPSocket.cpp
     src/communication/ethernet/PCAPHandler.cpp
@@ -129,22 +191,35 @@ add_library(tkCommunication SHARED
     src/communication/serial/SerialPort.cpp
     src/communication/car/CarControl.cpp
 )
-target_link_libraries(tkCommunication tkCommon pcap serial)
+target_link_libraries(communication tkCommon::common pcap)
+add_library(${PROJECT_NAME}::communication ALIAS communication)
 
-add_library(tkJoystick SHARED 
+#-------------------------------------------------------------------------------
+# tkJoystick library
+#-------------------------------------------------------------------------------
+add_library(joystick SHARED 
     src/joystick/Joystick.cpp
     src/joystick/gamepad/gamepad.cpp
 )
-target_link_libraries(tkJoystick udev)
+target_link_libraries(joystick udev)
+target_include_directories(joystick PUBLIC 
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include> 
+)
+add_library(${PROJECT_NAME}::joystick ALIAS joystick)
 
-add_library(tkSensor SHARED
+#-------------------------------------------------------------------------------
+# tkSensor library
+#-------------------------------------------------------------------------------
+add_library(sensor SHARED
     src/sensor/Sensor.cpp
     src/sensor/SensorManager.cpp
     src/sensor/LogManager.cpp    
 )
-target_link_libraries(tkSensor
-    tkCommon tkGUI tkCommunication tkMath ${GUI_LIBS} ${CUDA_LIBRARIES}    
+target_link_libraries(sensor
+    tkCommon::common tkCommon::gui tkCommon::communication tkCommon::math 
 )
+add_library(${PROJECT_NAME}::sensor ALIAS sensor)
 
 #-------------------------------------------------------------------------------
 # GIT version autoupdate
@@ -165,9 +240,8 @@ endif()
 # copy only if it is changed (this solves useless recompiles)
 add_custom_target(tkversiongit COMMAND rsync --checksum tkversion_git.tmp tkversion_git.h)
 add_dependencies(tkversiongit tkversiongit_tmp)
-add_dependencies(tkCommon tkversiongit tkdataheaders_gen)
-add_dependencies(tkGUI tkversiongit tkdataheaders_gen tkshaderpointcloud_gen tkdrawablesgen)
-
+add_dependencies(common tkversiongit tkdataheaders_gen)
+add_dependencies(gui tkversiongit tkdataheaders_gen tkshaderpointcloud_gen tkdrawablesgen)
 
 #-------------------------------------------------------------------------------
 # Build apps
@@ -179,39 +253,46 @@ foreach(cpp ${tkpackage_APPScpp})
 endforeach()
 foreach(app ${tkpackage_APPS})
     add_executable(${app} "app/${app}.cpp")
-    target_link_libraries(${app} tkCommon tkGUI tkCommunication tkMath tkJoystick tkSensor ${GUI_LIBS} ${CUDA_LIBRARIES})
+    target_link_libraries(${app} tkCommon::common tkCommon::gui tkCommon::communication tkCommon::math tkCommon::sensor tkCommon::joystick)
 endforeach()
-
-if(CUDA_FOUND)
-    cuda_add_executable(tkCommon_eigen_cuda app/tkCommon_eigen_cuda.cu)
-    target_link_libraries(tkCommon_eigen_cuda tkCommon tkGUI tkCommunication tkMath tkJoystick ${GUI_LIBS} ${CUDA_LIBRARIES})
-endif()
-
-#-------------------------------------------------------------------------------
-# Build tests
-#-------------------------------------------------------------------------------
-file(GLOB tkpackage_TESTScpp "app/test/*.cpp")
-add_executable(tkCommon_test "${tkpackage_TESTScpp}")
-target_link_libraries(tkCommon_test tkCommon tkGUI tkCommunication tkMath tkJoystick ${GUI_LIBS} ${CUDA_LIBRARIES})
-
 
 #-------------------------------------------------------------------------------
 # Install
 #-------------------------------------------------------------------------------
-install(TARGETS ${tkpackage_APPS} DESTINATION bin)
-install(TARGETS tkCommon tkGUI tkCommunication tkMath tkJoystick DESTINATION lib)
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts/" # source directory
-        DESTINATION "bin/"
+install(TARGETS ${tkpackage_APPS} 
+    DESTINATION "bin/"
 )
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" # source directory
-        DESTINATION "include/"
+install(TARGETS common gui communication math joystick sensor
+    DESTINATION "lib/"
+    EXPORT ${PROJECT_NAME}Targets
 )
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" # source directory
-        DESTINATION "share/tkCommon/cmake/" # target directory
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/scripts/" 
+    DESTINATION "bin/"
 )
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/data/" # source directory
-        DESTINATION "share/tkCommon/data"
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/" 
+    DESTINATION "include/"
+)
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/cmake/" 
+    DESTINATION "share/${PROJECT_NAME}/cmake/" 
+)
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/data/" 
+    DESTINATION "share/${PROJECT_NAME}/data"
 )
 
+#-------------------------------------------------------------------------------
+# Export Configuration
+#-------------------------------------------------------------------------------
+install(EXPORT ${PROJECT_NAME}Targets NAMESPACE ${PROJECT_NAME}::
+    FILE ${PROJECT_NAME}Targets.cmake
+    DESTINATION "share/${PROJECT_NAME}/cmake/"
+)
 
+include(tkExportConfig)
+export_config(${PROJECT_NAME})
 
+# install the configuration file
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    DESTINATION "share/${PROJECT_NAME}/cmake/"
+)

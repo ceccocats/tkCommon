@@ -103,6 +103,9 @@ public:
 
     T& x() { return this->mData[0]; }
     T& y() { return this->mData[1]; }
+
+    T x() const { return this->mData[0]; }
+    T y() const { return this->mData[1]; }
 };
 
 template<class T>
@@ -124,6 +127,10 @@ public:
     T& x() { return this->mData[0]; }
     T& y() { return this->mData[1]; }
     T& z() { return this->mData[2]; }
+
+    T x() const { return this->mData[0]; }
+    T y() const { return this->mData[1]; }
+    T z() const { return this->mData[2]; }
 };
 
 template<class T>
@@ -147,6 +154,11 @@ public:
     T& y() { return this->mData[1]; }
     T& z() { return this->mData[2]; }
     T& w() { return this->mData[3]; }
+
+    T x() const { return this->mData[0]; }
+    T y() const { return this->mData[1]; }
+    T z() const { return this->mData[2]; }
+    T w() const { return this->mData[3]; }
 };
 
 

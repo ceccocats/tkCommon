@@ -30,8 +30,9 @@ int main( int argc, char** argv){
     tk::common::CmdParser cmd(argv, "RT task test");
     cmd.parse();
 
-    tk::rt::Thread th;
+    tk::rt::Thread th("task", 0);
     th.init(task, NULL);
+    th.printInfo();
     sleep(1);
     gRun = false;
     th.join();

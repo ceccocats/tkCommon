@@ -2,10 +2,23 @@
 ## Build
 #### install deps
 ```
-sudo apt-get install libgles2-mesa-dev # NOT on aarch64
-sudo apt install git build-essential cmake rsync libeigen3-dev libglew-dev libglfw3-dev freeglut3-dev libfreetype6-dev libyaml-cpp-dev libpcap-dev libmatio-dev
+# => cmake (from source)
+cmake >= 3.18: https://cmake.org/download/
 
-# optional: cuda, ros
+# => from apt:
+# basic stuff to build
+sudo apt-get install git build-essential  
+# graphics
+sudo apt-get install libgles2-mesa-dev    # NOT on aarch64
+sudo apt-get install libglew-dev libglfw3-dev freeglut3-dev libfreetype6-dev libglm-dev
+# misc
+sudo apt-get install libeigen3-dev libyaml-cpp-dev libpcap-dev libmatio-dev libgeographic-dev libpugixml-dev libudev-dev python3-dev 
+
+# => optional: 
+- cuda
+- ROS melodic with this packages: ros-melodic-base ros-melodic-tf* ros-melodic-pcl-conversions ros-melodic-ackermann-msgs
+- LibSerial: https://github.com/FisherTiger95/libserial
+- Lanelet2: https://github.com/FisherTiger95/lanelet2_standalone
 ```
 #### compile
 ```

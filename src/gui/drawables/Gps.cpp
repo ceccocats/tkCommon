@@ -1,75 +1,95 @@
 #include "tkCommon/gui/drawables/Gps.h"
 
-tk::gui::Gps::Gps(const std::string& name, int nPos, tk::gui::Color_t color){
+using namespace tk::gui;
+
+Gps::Gps(const std::string& name, tk::projection::ProjectionType prj_type, int nPos, tk::gui::Color_t color)
+{
     this->color   = color;  
     this->nPos    = nPos;
     this->lastPos = -1;
     this->name    = name;
-    circles.resize(nPos);
+    circles.resize(MAX_POSES);
+
+    switch (prj_type) {
+    case tk::projection::ProjectionType::UTM:
+        {
+            proj = new tk::projection::UtmProjector();
+        }
+        break;
+    default:
+        {
+            tkWRN("Unsupported projection");
+        }
+        break;
+    }
 }
 
-tk::gui::Gps::Gps(tk::data::GpsData* gps, const std::string& name, int nPos, tk::gui::Color_t color) :Gps(name,nPos,color){
+Gps::Gps(tk::data::GpsData* gps, const std::string& name, tk::projection::ProjectionType prj_type, int nPos, tk::gui::Color_t color) :Gps(name,prj_type,nPos,color)
+{
     this->data     = gps;  
 }
 
-tk::gui::Gps::~Gps(){
-
-}
-
 void 
-tk::gui::Gps::onInit(tk::gui::Viewer *viewer){
+Gps::onInit(tk::gui::Viewer *viewer)
+{
     for(int i = 0; i < circles.size(); i++){
         circles[i] = new tk::gui::shader::circle();
+        circles[i]->makeCircle(0,0,0,0);  
     }
 }
 
 void 
-tk::gui::Gps::updateData(tk::gui::Viewer *viewer){
+Gps::updateData(tk::gui::Viewer *viewer)
+{
+    auto gps = dynamic_cast<tk::data::GpsData*>(data);
 
-    tk::data::GpsData* gps = (tk::data::GpsData*)data;
-
-    this->tf = gps->header.tf;
-    if(!geoConv.isInitialised() && gps->sats > 3 && gps->lat!=0 && gps->lon!=0 && gps->heigth!=0) {
-        geoConv.initialiseReference(gps->lat,gps->lon,gps->heigth);
-    }
-    
     print.str("");
     print<<(*gps);
-    if (geoConv.isInitialised())
-        geoConv.geodetic2Enu(gps->lat,gps->lon,gps->heigth,&x, &y, &z);
-    z = 0.0f; //non using z
 
-    if (geoConv.isInitialised()){
-        lastPos = (lastPos+1) % nPos;
-        circles[lastPos]->makeCircle(x,y,z,gps->cov(0, 0));  
-    } 
+    this->tf = gps->header.tf;
+
+    if (!proj->hasReference())
+        proj->init(gps->lat, gps->lon, gps->heigth);
+
+    // get projected values    
+    tk::math::Vec3d point = proj->forward(gps->lat, gps->lon, gps->heigth);
+
+    // apply message tf
+    //this->tf = tk::common::odom2tf(point.x(), point.y(), point.z(), 0.0).matrix() * gps->header.tf.matrix();
+
+    lastPos = (lastPos+1) % nPos;
+    circles[lastPos]->makeCircle(point.x(), point.y(), point.z(), gps->cov(0, 0));
 }
 
 void 
-tk::gui::Gps::drawData(tk::gui::Viewer *viewer){
-    if (geoConv.isInitialised()){
-        for(int i = 0; i < nPos; i++){
-            circles[i]->draw(drwModelView,color,lineSize);
-        }   	
-    }
+Gps::drawData(tk::gui::Viewer *viewer){
+    for(int i = 0; i < nPos; i++)
+        circles[i]->draw(drwModelView,color,lineSize);
 }
 
 void 
-tk::gui::Gps::imGuiSettings(){
+Gps::imGuiSettings(){
     ImGui::ColorEdit4("Color", color.color);
     ImGui::SliderFloat("Size",&lineSize,1.0f,20.0f,"%.1f");
-    ImGui::SliderInt("Last poses gps",&nPos,1,40);
+    ImGui::SliderInt("Last poses gps",&nPos,1,MAX_POSES);
 }
 
 void 
-tk::gui::Gps::imGuiInfos(){
+Gps::imGuiInfos(){
     ImGui::Text("%s",print.str().c_str());
 }
 
 void 
-tk::gui::Gps::onClose(){
+Gps::onClose(){
     for(int i = 0; i < circles.size(); i++){
         circles[i]->close();
         delete circles[i];
     }
+}
+
+void 
+Gps::setOrigin(double aOriginLat, double aOriginLon, double aOriginEle)
+{
+    if (!proj->hasReference())
+        proj->init(aOriginLat, aOriginLon, aOriginEle);
 }

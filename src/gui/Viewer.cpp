@@ -138,10 +138,15 @@ Viewer::init() {
     ImPlot::GetStyle().AntiAliasedLines = true;
 
     // OpenGL confs
+    glEnable(GL_MULTISAMPLE);
     glEnable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+    // culling 
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
 
     // set window size
     glfwGetFramebufferSize(window, &width, &height);
@@ -169,12 +174,11 @@ Viewer::init() {
     }
 
     // lights
-    lightPos = glm::vec3(0.0f, 0.0f, 20.0f);
+    lightPos = glm::vec3(0.0f, 0.0f, 100.0f);
 
-    tkMSG  (   std::string{"OPENGL running on: "} + 
-                std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))) + " -- " +
-                std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))) + "\n"
-            );
+    tkMSG(std::string{"OPENGL running on: "} + 
+          std::string(reinterpret_cast<const char*>(glGetString(GL_VERSION))) + " -- " +
+          std::string(reinterpret_cast<const char*>(glGetString(GL_RENDERER))) + "\n");
 
     //tkLogo
     int height, width;
@@ -345,7 +349,7 @@ Viewer::drawInfos(){
 void 
 Viewer::drawSettings(){
     if(imguiSelected == -1){
-        ImGui::SliderFloat3("Light position",&lightPos[0],-100.0f,100.0f);
+        ImGui::SliderFloat3("Light position",&lightPos[0],0.0f,500.0f);
     }else{
         drawables[imguiSelected]->imGuiSettings();
     }
@@ -450,7 +454,8 @@ void
 Viewer::close() { 
     for (auto const& drawable : drawables){
         drawable.second->onClose();
-        delete drawable.second;
+        if(drawable.second->doFree())
+            delete drawable.second;
     }   
     drwLogo->close();
     logo.release();

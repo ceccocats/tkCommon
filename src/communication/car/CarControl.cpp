@@ -35,10 +35,15 @@ void CarControl::writeLoop() {
     int sleep_us = 1000;
     while(run) {
         if(active){
-            actThrottle = tk::math::lerp<float>(actThrottle, targetThrottle, 0.1);
+            cmd_lock.lock();
+            if(actThrottle < targetThrottle)
+                actThrottle = tk::math::lerp<float>(actThrottle, targetThrottle, 0.01);
+            else 
+                actThrottle = tk::math::lerp<float>(actThrottle, targetThrottle, 0.1);                
             actBrake = tk::math::lerp<float>(actBrake, targetBrake, 0.1);
-            actSteer = targetSteer; //tk::math::lerp<float>(actSteer, targetSteer, 0.1);
-
+            actSteer = tk::math::lerp<float>(actSteer, targetSteer, 0.1);
+            cmd_lock.unlock();
+            
             setAccPos(actThrottle);
             usleep(sleep_us);
             setBrakePos(actBrake);
@@ -60,7 +65,8 @@ void CarControl::readLoop() {
 
     tk::data::CanData data;
     while(run) {
-        soc->read(&data);
+        if(!soc->read(&data))
+            continue;
     
         if(data.id() == GET_HW_ID+1) {
             uint8_t ecuId = data.frame.data[0];
@@ -121,8 +127,9 @@ void CarControl::setSteerZero() {
 }
 void CarControl::resetSteerMotor() {
     tk::data::CanData data;
-    data.frame.can_dlc = 0;
+    data.frame.can_dlc = 1;
     data.frame.can_id = RESET_ERR_STEERING_ID;
+    data.frame.data[0] = steerECU;
     soc->write(&data);
     return;
 }
@@ -183,10 +190,11 @@ void CarControl::setBrakePos(float val) {
 
 void CarControl::setSteerAngle(float angle){
     float diff = -angle/0.0015;
-    setSteerPos(diff,0,65535);
+    setSteerPos(diff + steerOffset,steerAcc,steerVel);
 }
 
 void CarControl::enable(bool status) {
+    cmd_lock.lock();
     targetSteer = 0;
     targetThrottle = 0;
     targetBrake = 0;
@@ -206,20 +214,23 @@ void CarControl::enable(bool status) {
         sendGenericCmd("OFF");
         usleep(100000);
     }
+    cmd_lock.unlock();
 }
 
 void CarControl::sendOdomEnable(bool status) {
     tk::data::CanData data;
-    data.frame.can_dlc = 2;
-    data.frame.can_id = SET_ACTIVE_ID;
-    data.frame.data[0] = accECU;
-    data.frame.data[1] = status;
-    soc->write(&data);
 
     // reset 
     usleep(100000);
     data.frame.can_dlc = 0;
     data.frame.can_id = ODOM_RESET_ID;
+    soc->write(&data);
+    usleep(100000);
+
+    data.frame.can_dlc = 2;
+    data.frame.can_id = SET_ACTIVE_ID;
+    data.frame.data[0] = accECU;
+    data.frame.data[1] = status;
     soc->write(&data);
 }
 
