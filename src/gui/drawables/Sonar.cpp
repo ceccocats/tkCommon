@@ -38,6 +38,15 @@ tk::gui::Sonar::updateData(tk::gui::Viewer *viewer){
         texture->init(sonar->image.width, sonar->image.height, sonar->image.channels);
     }
     texture->setData(sonar->image.data.data());
+
+    //Imu
+    if(prec == 0)
+        prec = sonar->header.stamp;
+    t += float(sonar->header.stamp - prec) * 1e-6;
+    prec = sonar->header.stamp;
+    roll.AddPoint(t, sonar->roll);
+    pitch.AddPoint(t, sonar->pitch);
+    yaw.AddPoint(t, sonar->yaw);
 }
 
 void 
@@ -62,6 +71,16 @@ tk::gui::Sonar::drawData(tk::gui::Viewer *viewer){
 void 
 tk::gui::Sonar::imGuiInfos(){
     ImGui::Text("%s\n\n",print.str().c_str());
+
+    static ImPlotAxisFlags rt_axis = ImPlotAxisFlags_NoTickLabels;
+    ImPlot::SetNextPlotLimitsX(t - delta_ts, t, ImGuiCond_Always);
+    ImPlot::SetNextPlotLimitsY(-M_PI, +M_PI);
+    if (ImPlot::BeginPlot("##Scrolling0", NULL, NULL, ImVec2(-1,150), 0, rt_axis | ImPlotAxisFlags_Time, rt_axis)) {
+        ImPlot::PlotLine("roll", &roll.Data[0].x, &roll.Data[0].y, roll.Data.size(), roll.Offset, 2*sizeof(float));
+        ImPlot::PlotLine("pitch", &pitch.Data[0].x, &pitch.Data[0].y, pitch.Data.size(), pitch.Offset, 2*sizeof(float));
+        ImPlot::PlotLine("yaw", &yaw.Data[0].x, &yaw.Data[0].y, yaw.Data.size(), yaw.Offset, 2*sizeof(float));
+        ImPlot::EndPlot();
+    }
 }
 
 void 

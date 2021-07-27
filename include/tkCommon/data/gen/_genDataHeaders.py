@@ -202,5 +202,9 @@ VARS = [ {"name":"type",        "type":"static const DataType", "default": "Data
          {"name":"azimuth",     "type":"tk::math::Vec<float>"},
          {"name":"resolution",  "type":"float",                 "default": "0"},
          {"name":"bits",        "type":"int",                   "default": "0"},
-         {"name":"image",       "type":"tk::data::ImageDataF",  "init": "image.init()"}]
+         {"name":"image",       "type":"tk::data::ImageDataF",  "init": "image.init()"},
+         {"name":"raw",         "type":"tk::data::ImageDataF",  "init": "image.init()"},
+         {"name":"roll",        "type":"double",                "default": "0"},
+         {"name":"pitch",       "type":"double",                "default": "0"},
+         {"name":"yaw",         "type":"double",                "default": "0"}]
 genData(className, VARS, DEPS)

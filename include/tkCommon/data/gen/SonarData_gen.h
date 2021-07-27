@@ -13,6 +13,10 @@ public:
     float resolution;
     int bits;
     tk::data::ImageDataF image;
+    tk::data::ImageDataF raw;
+    double roll;
+    double pitch;
+    double yaw;
     
     void init() override
     {
@@ -21,6 +25,10 @@ public:
         resolution = 0;
         bits = 0;
         image.init();
+        image.init();
+        roll = 0;
+        pitch = 0;
+        yaw = 0;
     }
     SonarData_gen& operator=(const SonarData_gen& s)
     {
@@ -29,6 +37,10 @@ public:
         resolution = s.resolution;
         bits = s.bits;
         image = s.image;
+        raw = s.raw;
+        roll = s.roll;
+        pitch = s.pitch;
+        yaw = s.yaw;
         return *this;
     }
     friend std::ostream& operator<<(std::ostream& os, SonarData_gen& s)
@@ -41,16 +53,24 @@ public:
         os<<"	resolution: "<<s.resolution<<std::endl;
         os<<"	bits: "<<s.bits<<std::endl;
         os<<"	image: "<<s.image<<std::endl;
+        os<<"	raw: "<<s.raw<<std::endl;
+        os<<"	roll: "<<s.roll<<std::endl;
+        os<<"	pitch: "<<s.pitch<<std::endl;
+        os<<"	yaw: "<<s.yaw<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)
     {
-        std::vector<tk::math::MatIO::var_t> structVars(5);
+        std::vector<tk::math::MatIO::var_t> structVars(9);
         structVars[0].set("header", header);
         structVars[1].set("azimuth", azimuth);
         structVars[2].set("resolution", resolution);
         structVars[3].set("bits", bits);
         structVars[4].set("image", image);
+        structVars[5].set("raw", raw);
+        structVars[6].set("roll", roll);
+        structVars[7].set("pitch", pitch);
+        structVars[8].set("yaw", yaw);
         return var.setStruct(name, structVars);
     }
     bool fromVar(tk::math::MatIO::var_t &var)
@@ -61,6 +81,10 @@ public:
         var["resolution"].get(resolution);
         var["bits"].get(bits);
         var["image"].get(image);
+        var["raw"].get(raw);
+        var["roll"].get(roll);
+        var["pitch"].get(pitch);
+        var["yaw"].get(yaw);
         return true;
     }
 };

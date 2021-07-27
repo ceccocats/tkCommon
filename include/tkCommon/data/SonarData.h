@@ -8,20 +8,20 @@ namespace tk{ namespace data{
     class SonarData : public SonarData_gen{
         public:
 
-        void init(int w, int h, float resolution){
+        void init(int w, int h_i, int h_r, float resolution){
             SonarData_gen::init();
-            resize(w,h,resolution);
+            resize(w,h_i,h_r,resolution);
         }
 
-        void resize(int w, int h, float resolution){
-            this->image.init(w,h,1);
+        void resize(int w, int h_i, int h_r, float resolution){
+            this->raw.init(w,h_r,1);
+            this->image.init(w,h_i,1);
             this->azimuth.resize(w,1);
             this->resolution = resolution;
         }
 
         SonarData& operator=(const SonarData& s) {
             SonarData_gen::operator=(s);
-
             return *this;
         }
 
