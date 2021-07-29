@@ -24,9 +24,11 @@ void CarControl::close() {
 
 void *CarControl::writeCaller(void *args) {
     ((CarControl*) args)->writeLoop();
+    pthread_exit(NULL);
 }
 void *CarControl::readCaller(void *args) {
     ((CarControl*) args)->readLoop();
+    pthread_exit(NULL);
 }
 
 void CarControl::writeLoop() {

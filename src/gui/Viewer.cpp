@@ -58,6 +58,7 @@ Viewer::run(void* istance){
     viewer->init();
 
     viewer->runloop();
+    pthread_exit(NULL);
 }
 
 void* 

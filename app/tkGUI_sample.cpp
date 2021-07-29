@@ -31,6 +31,8 @@ void* th_gps(void* gpsptr){
 		gps->unlockWrite();
 		t.wait();
 	}
+
+    pthread_exit(NULL);
 }
 
 
@@ -73,6 +75,9 @@ void* th_cloud(void* cloudptr){
 
 		t.wait();
 	}
+
+
+    pthread_exit(NULL);
 }
 
 
@@ -93,6 +98,9 @@ void* th_plt(void* ptrplt){
 		plt->addPoint(pose);
 		t.wait();
 	}
+
+
+    pthread_exit(NULL);
 }
 
 
@@ -119,6 +127,7 @@ void* th_imu(void* ptrimu){
 
 		t.wait();
 	}
+    pthread_exit(NULL);
 }
 
 #ifdef LANELET_ENABLED
@@ -177,6 +186,8 @@ void* th_lanelet_path(void* ptrpath) {
 
 		sleep(2);
 	}
+
+    pthread_exit(NULL);
 }
 #endif
 
