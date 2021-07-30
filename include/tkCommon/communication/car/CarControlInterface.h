@@ -48,11 +48,13 @@ class CarControlInterface : public tk::gui::DrawableUnManaged {
             speedReqKMH = speedReq = -1;
 
             tUpdateLoop.init(CarControlInterface::runThread, this);
+            return true;
         }
 
         bool close() {
             running = false;
             tUpdateLoop.join();
+            return true;
         }
 
         void setInput(tk::data::ActuationData &act) {
@@ -185,6 +187,7 @@ class CarControlInterface : public tk::gui::DrawableUnManaged {
         static void* runThread(void*data) {
             CarControlInterface *self = (CarControlInterface *)data;
             self->run();
+            pthread_exit(NULL);
         }
 
         void run() {

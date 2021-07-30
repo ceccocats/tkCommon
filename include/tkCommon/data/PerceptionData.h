@@ -49,6 +49,7 @@ class box{
             this->pose = b.pose;
             this->size = b.size;
             this->rot = b.rot;
+            return *this;
         }
 };
 

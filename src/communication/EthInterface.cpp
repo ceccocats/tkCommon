@@ -110,6 +110,7 @@ namespace tk { namespace communication {
             else
                 this->tcpSocket.close();
         }
+        return true;
     }
 
     bool 

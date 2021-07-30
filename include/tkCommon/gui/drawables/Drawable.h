@@ -14,8 +14,8 @@ namespace tk{ namespace gui{
 	
 	public:
 		bool enabled  = true;
-		bool follow   = false;
-		bool enableTf = false;
+		int  follow   = 0;     // 0 not follow, 1 follow pose, 2 follow pose+angle
+ 		bool enableTf = false;
 		tk::gui::shader::generic*	shader;
 		std::string 				name = "no name";
 		glm::mat4 					drwModelView;
