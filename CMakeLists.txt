@@ -257,6 +257,13 @@ foreach(app ${tkpackage_APPS})
 endforeach()
 
 #-------------------------------------------------------------------------------
+# Build tests
+#-------------------------------------------------------------------------------
+file(GLOB tkpackage_TESTScpp "app/test/*.cpp")
+add_executable(tkCommon_test "${tkpackage_TESTScpp}")
+target_link_libraries(tkCommon_test tkCommon::common tkCommon::gui tkCommon::communication tkCommon::math tkCommon::sensor tkCommon::joystick)
+
+#-------------------------------------------------------------------------------
 # Install
 #-------------------------------------------------------------------------------
 install(TARGETS ${tkpackage_APPS} 

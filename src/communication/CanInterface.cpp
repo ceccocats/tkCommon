@@ -6,6 +6,7 @@
 
 #include <linux/can.h>
 #include <linux/can/raw.h>
+#include <linux/sockios.h>
 
 namespace tk { namespace communication {
 

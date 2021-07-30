@@ -42,7 +42,8 @@ class Camera
     void updateMatrices();
     void setViewPort(int x, int y, int width, int height);
     void setCenter(tk::common::Vector3<float> p);
-    
+    void setAngle(tk::common::Vector3<float> p);
+
     // util functons
     glm::vec3 project(glm::vec3 obj);
     glm::vec3 unprojectPlane(glm::vec2 obj);

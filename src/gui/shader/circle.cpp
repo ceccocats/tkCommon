@@ -83,4 +83,5 @@ bool
 tk::gui::shader::circle::close(){
     linesGlBuf.release();
     linesShader->close();
+    return true;
 }

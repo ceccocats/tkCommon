@@ -23,6 +23,7 @@ void *task(void *data) {
         t.wait();
     }
     t.printStats();
+    pthread_exit(NULL);
 }
 
 int main( int argc, char** argv){
