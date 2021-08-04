@@ -259,6 +259,19 @@ Sensor::loop(sensorKey key)
             
             bool ok = read(data);
 
+            // compute FPS
+            if(!it->second->lastStamps.empty()) {
+                it->second->lastStamps[it->second->lastStampsIdx] = data->header.stamp;
+                it->second->lastStampsIdx = (it->second->lastStampsIdx+1) % it->second->lastStamps.size();
+                float diff_sum = 0;
+                for(int i=0; i<it->second->lastStamps.size()-1; i++) {
+                    int id0 = (it->second->lastStampsIdx + i) % it->second->lastStamps.size();
+                    int id1 = (it->second->lastStampsIdx + i+1) % it->second->lastStamps.size();
+                    diff_sum += float(it->second->lastStamps[id1] - it->second->lastStamps[id0])/1000000;
+                }
+                data->header.fps = 1.0 / (diff_sum/(it->second->lastStamps.size()-1));
+            }
+
             if (it->second->empty == true && ok == true) {
                 it->second->empty = false;
             }
