@@ -60,7 +60,7 @@ class CarControlInterface : public tk::gui::DrawableUnManaged {
         void setInput(tk::data::ActuationData &act) {
             if(!manual) {
                 recivedInputRequestN++;
-                steerReqDeg = act.steerAngle / 180.0 *M_PI;
+                steerReqDeg = act.steerAngle*180.0/M_PI;
                 speedReqKMH = act.speed*3.6;
                 speedReq = act.speed;
             }
