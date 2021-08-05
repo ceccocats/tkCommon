@@ -11,7 +11,16 @@
 
 namespace tk { namespace data {
 
-    class ActuationData : public ActuationData_gen{
+    class ActuationData : public ActuationData_gen
+    {
+    public:
+        ActuationData(){};
+        ActuationData(tk::data::ActuationData& s){
+            header.tf = s.header.tf;
+            steerAngle = s.steerAngle;
+            accel = s.accel;
+            speed = s.speed;
+        }
         
 #ifdef TKROS_ENABLED
 #if TKROS_VERSION == 1
@@ -21,9 +30,9 @@ namespace tk { namespace data {
 #endif
         {
             this->header.toRos(msg.header);
-            msg.drive.steering_angle = steerAngle;
-            msg.drive.acceleration = accel;
-            msg.drive.speed = speed;
+            msg.drive.steering_angle = this->steerAngle;
+            msg.drive.acceleration = this->accel;
+            msg.drive.speed = this->speed;
         }
 
 #if TKROS_VERSION == 1
@@ -33,10 +42,10 @@ namespace tk { namespace data {
 #endif
         {
             this->header.fromRos(msg.header);
-            this->header.type   = DataType::IMU; 
-            steerAngle = msg.drive.steering_angle;
-            accel = msg.drive.acceleration;
-            speed = msg.drive.speed;
+            this->header.type   = DataType::IMU;
+            this->steerAngle = msg.drive.steering_angle;
+            this->accel = msg.drive.acceleration;
+            this->speed = msg.drive.speed;
         }
 #endif        
     };
