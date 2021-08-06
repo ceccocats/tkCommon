@@ -134,13 +134,13 @@ namespace tk { namespace data {
 
 #ifdef TKROS_ENABLED
 #if TKROS_VERSION == 1
-        void toRos(std_msgs::Header &msg) {
+        void toRos(std_msgs::Header &msg) const {
             msg.seq          = this->messageID;
             msg.stamp.sec    = this->stamp / 1e6;
             msg.stamp.nsec   = (this->stamp - msg.stamp.sec*1e6) * 1e3;
 #endif
 #if TKROS_VERSION == 2
-        void toRos(std_msgs::msg::Header &msg) {
+        void toRos(std_msgs::msg::Header &msg) const {
             msg.stamp.sec    = this->stamp / 1e6;
             msg.stamp.nanosec  = (this->stamp - msg.stamp.sec*1e6) * 1e3;
 #endif
