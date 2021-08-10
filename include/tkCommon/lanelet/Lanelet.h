@@ -41,6 +41,7 @@ namespace tk { namespace common {
             
             mProjector          = new lanelet::projection::UtmProjector(lanelet::Origin({mOriginLat, mOriginLon}));
             mMap                = lanelet::load(map_p, *mProjector);
+            return true;
         }
 
         lanelet::LaneletMapUPtr mMap;

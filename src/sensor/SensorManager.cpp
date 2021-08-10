@@ -57,6 +57,7 @@ SensorsManager::close()
     
     //if (Clock::get().synchronized())
     //    Clock::get().stop();
+    return true;
 }
 
 void 

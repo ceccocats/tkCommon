@@ -33,6 +33,7 @@ namespace tk{ namespace common{
 				this->points = d.points;
 				this->height = d.height;
 				this->base_z = d.base_z;
+				return *this;
 			}
 	};
 

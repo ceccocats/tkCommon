@@ -58,6 +58,7 @@ Viewer::run(void* istance){
     viewer->init();
 
     viewer->runloop();
+    pthread_exit(NULL);
 }
 
 void* 
@@ -66,6 +67,7 @@ Viewer::fake_run(void* istance){
     while (viewer->isRunning()) {
         sleep(100);
     }
+    pthread_exit(NULL);
 }
 
 float 
@@ -218,16 +220,19 @@ Viewer::imguiDraw(){
 
         if(drawables[i]->enabled == false){
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 1.0f, 1.0f, 0.4f));
-            drawables[i]->follow = false;
+            drawables[i]->follow = 0;
         }
         
-        if(drawables[i]->follow == true)
+        if(drawables[i]->follow == 1)
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 1.0f, 0.5f, 1.0f));
+        if(drawables[i]->follow == 2)
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 1.0f, 1.0f, 1.0f));
     
+
         if(ImGui::Selectable(selectName.c_str(), imguiSelected == i))
             imguiSelected = i;
         
-        if(drawables[i]->enabled == false || drawables[i]->follow == true)
+        if(drawables[i]->enabled == false || drawables[i]->follow > 0)
             ImGui::PopStyleColor();
 
     }
@@ -263,13 +268,15 @@ Viewer::imguiDraw(){
     if(imguiSelected != -1){
 
         std::string value;
-        if(drawables[imguiSelected]->follow == true){
+        if(drawables[imguiSelected]->follow == 2){
             value = "Unfollow";
-        }else{
+        } else if(drawables[imguiSelected]->follow == 1){
+            value = "Follow Angle";
+        } else {
             value = "Follow";
         }
         if (ImGui::Button(value.c_str())){
-            drawables[imguiSelected]->follow = ! drawables[imguiSelected]->follow;
+            drawables[imguiSelected]->follow = (drawables[imguiSelected]->follow+1) %3;
         }
         ImGui::SameLine();
 
@@ -436,7 +443,7 @@ Viewer::follow() {
     tk::common::Vector3<float> center;
     int n = 0;
     for (auto const& drawable : drawables){
-        if(drawable.second->follow){
+        if(drawable.second->follow > 0){
             center += tk::common::tf2pose(drawable.second->tf);
             n++;
         }
@@ -447,6 +454,22 @@ Viewer::follow() {
         center.y() /= n;
         center.z() /= n;
         camera.setCenter(center);
+    }
+
+    tk::common::Vector3<float> angle;
+    n = 0;
+    for (auto const& drawable : drawables){
+        if(drawable.second->follow > 1){
+            angle += tk::common::tf2rot(drawable.second->tf);
+            n++;
+        }
+    }
+
+    if(n > 0){
+        angle.x() /= n;
+        angle.y() /= n;
+        angle.z() /= n;
+        camera.setAngle(angle);
     }
 }
 

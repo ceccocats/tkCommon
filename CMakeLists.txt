@@ -116,22 +116,6 @@ if(SERIAL_FOUND)
     target_link_libraries(common ${SERIAL_LIBRARIES})
     target_compile_options(common PUBLIC -DSERIAL_ENABLED)
 endif()
-if(PCL_FOUND)
-    target_include_directories(common PUBLIC ${PCL_INCLUDE_DIRS}) 
-    target_link_libraries(common ${PCL_LIBRARIES})
-    target_compile_options(common PUBLIC -DPCL_ENABLED)
-endif()
-if(lanelet2_FOUND)
-    target_include_directories(common PUBLIC ${lanelet2_INCLUDE_DIRS})
-    target_link_libraries(common ${lanelet2_LIBRARIES})
-    target_compile_options(common PUBLIC -DLANELET_ENABLED)
-    target_compile_features(common PUBLIC cxx_std_14)
-endif()
-if(SERIAL_FOUND)
-    target_include_directories(common PUBLIC ${SERIAL_INCLUDE_DIRS}) 
-    target_link_libraries(common ${SERIAL_LIBRARIES})
-    target_compile_options(common PUBLIC -DSERIAL_ENABLED)
-endif()
 add_library(${PROJECT_NAME}::common ALIAS common)
 
 #-------------------------------------------------------------------------------
@@ -255,6 +239,13 @@ foreach(app ${tkpackage_APPS})
     add_executable(${app} "app/${app}.cpp")
     target_link_libraries(${app} tkCommon::common tkCommon::gui tkCommon::communication tkCommon::math tkCommon::sensor tkCommon::joystick)
 endforeach()
+
+#-------------------------------------------------------------------------------
+# Build tests
+#-------------------------------------------------------------------------------
+file(GLOB tkpackage_TESTScpp "app/test/*.cpp")
+add_executable(tkCommon_test "${tkpackage_TESTScpp}")
+target_link_libraries(tkCommon_test tkCommon::common tkCommon::gui tkCommon::communication tkCommon::math tkCommon::sensor tkCommon::joystick)
 
 #-------------------------------------------------------------------------------
 # Install

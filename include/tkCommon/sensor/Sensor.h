@@ -103,6 +103,9 @@ struct SensorPool_t {
     int                 size;
     bool                empty;
     tk::gui::DataDrawable   *drw;
+    
+    std::vector<timeStamp_t> lastStamps; /**< vector of last N timestamps (used to compute FPS) */
+    int lastStampsIdx = 0;
 };
 
 typedef std::pair<tk::data::DataType, int> sensorKey;
@@ -300,6 +303,7 @@ class Sensor {
             sPool->empty    = true;
             sPool->size     = poolSize;
             sPool->drw      = nullptr;
+            sPool->lastStamps = std::vector<timeStamp_t>(4);
             sPool->pool.init<T>(sPool->size);
 
             int idx;

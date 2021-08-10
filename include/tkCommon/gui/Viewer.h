@@ -128,7 +128,7 @@ namespace tk { namespace gui {
             0.95f,-0.6f,  0.0f,   	1.0f, 0.0f
         };
         std::vector<unsigned int> indicesCube2D = {  
-            0, 1, 2, // first triangle
+            2, 1, 0, // first triangle
             0, 3, 2  // second triangle
         };
         void drawLogo();
