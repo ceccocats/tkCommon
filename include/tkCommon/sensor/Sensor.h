@@ -395,7 +395,7 @@ class Sensor {
 
             // error handling
             if (idx == -1) {
-                tkWRN("Timeout.\n");
+                //tkWRN("Timeout.\n");
             } else if (idx == -2) {
                 tkWRN("No free elemnt in the pool.\n");
             }
