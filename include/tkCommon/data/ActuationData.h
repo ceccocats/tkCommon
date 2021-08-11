@@ -34,7 +34,7 @@ namespace tk { namespace data {
 #endif
             {
                 this->header.fromRos(msg.header);
-                this->header.type   = DataType::IMU; 
+                this->header.type   = DataType::ACTUATION; 
                 steerAngle = msg.drive.steering_angle;
                 accel = msg.drive.acceleration;
                 speed = msg.drive.speed;
