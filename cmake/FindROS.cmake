@@ -49,11 +49,9 @@ set(ROS_LIBRARIES
     ${tf2_msgs_LIBRARIES}
     ${ackermann_msgs_LIBRARIES}
 )
-if (ROS_VERSION EQUAL 1)
-    message("-- ROS FOUND")
-elseif(ROS_VERSION EQUAL 2)
-    message("-- ROS2 FOUND")
-endif()
+
+message("-- ROS2 FOUND")
 set(ROS_FOUND true)
+
 unset(ROS_TEMP_INCLUDE_DIRS)
 unset(ROS_TEMP_LIBRARIES)
