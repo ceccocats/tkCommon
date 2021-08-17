@@ -49,6 +49,7 @@ elseif (rclcpp_FOUND AND
         ${ament_cmake_LIBRARIES}
         #${rosidl_typesupport_cpp_LIBRARIES}
     )
+    list(REMOVE_DUPLICATES ROS_LIBRARIES) # faster compile
     message("-- Found ROS2")
     set(ROS_FOUND true)
 else()  
