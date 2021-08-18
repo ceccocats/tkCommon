@@ -18,6 +18,7 @@ if (ROS_VERSION EQUAL 1)
     )
 elseif (ROS_VERSION EQUAL 2)
     message("-- Search ROS2")
+    set(AMENT_CMAKE_UNINSTALL_TARGET OFF) # solve multiple uninstall target issue on dashing
     find_dependency(rclcpp)
     find_dependency(ament_cmake)
     #find_dependency(rosidl_typesupport_cpp)
