@@ -49,6 +49,7 @@ set(ROS_LIBRARIES
     ${tf2_msgs_LIBRARIES}
     ${ackermann_msgs_LIBRARIES}
 )
+list(REMOVE_DUPLICATES ROS_LIBRARIES) # faster compile
 
 message("-- ROS2 FOUND")
 set(ROS_FOUND true)
