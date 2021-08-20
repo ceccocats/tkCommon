@@ -88,6 +88,7 @@ namespace tk { namespace communication {
             for(auto m : msgs) {
                 printMsg(m.first);
             }
+            return true;
         }
 
         void printMsg(int id) {

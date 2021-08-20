@@ -18,6 +18,9 @@ class Lockable{
         bool        writing = false;
         
     public:
+         Lockable() {}
+        ~Lockable() {}
+         Lockable(const Lockable &lk) {}
 
         void lockWrite() {
             writing = true;

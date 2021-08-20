@@ -48,17 +48,19 @@ class CarControlInterface : public tk::gui::DrawableUnManaged {
             speedReqKMH = speedReq = -1;
 
             tUpdateLoop.init(CarControlInterface::runThread, this);
+            return true;
         }
 
         bool close() {
             running = false;
             tUpdateLoop.join();
+            return true;
         }
 
         void setInput(tk::data::ActuationData &act) {
             if(!manual) {
                 recivedInputRequestN++;
-                steerReqDeg = act.steerAngle / 180.0 *M_PI;
+                steerReqDeg = act.steerAngle*180.0/M_PI;
                 speedReqKMH = act.speed*3.6;
                 speedReq = act.speed;
             }
@@ -185,6 +187,7 @@ class CarControlInterface : public tk::gui::DrawableUnManaged {
         static void* runThread(void*data) {
             CarControlInterface *self = (CarControlInterface *)data;
             self->run();
+            pthread_exit(NULL);
         }
 
         void run() {

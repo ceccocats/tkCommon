@@ -54,6 +54,15 @@ void Camera::setCenter(tk::common::Vector3<float> p) {
     center.z = tk::math::lerp<float>(center.z, p.z(), 0.1);
 }
 
+void Camera::setAngle(tk::common::Vector3<float> p) {
+    float targetYaw = p.z();
+    while (fabs(targetYaw - angles[0]) > M_PI/2) {
+        targetYaw += targetYaw > angles[0] ? -M_PI : M_PI; 
+    }
+    angles[0] = tk::math::lerp<float>(angles[0], targetYaw, 0.1);
+    // TODO: other angles
+}
+
 
 void Camera::mouseDown(int button, float x, float y) {
     if(mouseOnGUI)

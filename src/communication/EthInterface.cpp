@@ -15,11 +15,11 @@ namespace tk { namespace communication {
     }
 
     bool
-    Ethinterface::initTCP(const int port, const std::string ip, time_t timeout_us){
+    Ethinterface::initTCP(const int port, const std::string ip, bool timeout){
         
         this->isUdp         = false;
         this->replayMode    = false;
-        return this->tcpSocket.initClient(port,ip, timeout_us != -1);
+        return this->tcpSocket.initClient(port,ip, timeout);
     }
 
     bool
@@ -110,6 +110,7 @@ namespace tk { namespace communication {
             else
                 this->tcpSocket.close();
         }
+        return true;
     }
 
     bool 

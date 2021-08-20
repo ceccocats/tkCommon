@@ -30,8 +30,8 @@ namespace tk{namespace sensors{
 
 		// To implement
 		virtual bool init(int index, std::string file ) = 0;
-		virtual bool initRecorder( std::string file, std::string outputFormat ) {tkWRN("Recorder not provided");}
-		virtual bool closeRecorder() {  }
+		virtual bool initRecorder( std::string file, std::string outputFormat ) { tkWRN("Recorder not provided"); return false; }
+		virtual bool closeRecorder() { return false; }
 		virtual bool close() = 0;
 
 		virtual bool readFrame( tk::data::ImageData &image ) = 0;

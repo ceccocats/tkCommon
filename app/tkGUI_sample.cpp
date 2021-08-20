@@ -8,6 +8,7 @@
 #include "tkCommon/rt/Task.h"
 
 tk::gui::Viewer* 	viewer = tk::gui::Viewer::getInstance();
+tk::gui::Mesh *mesh;
 
 void* th_gps(void* gpsptr){
 
@@ -31,6 +32,8 @@ void* th_gps(void* gpsptr){
 		gps->unlockWrite();
 		t.wait();
 	}
+
+    pthread_exit(NULL);
 }
 
 
@@ -73,6 +76,9 @@ void* th_cloud(void* cloudptr){
 
 		t.wait();
 	}
+
+
+    pthread_exit(NULL);
 }
 
 
@@ -88,11 +94,17 @@ void* th_plt(void* ptrplt){
 	while(viewer->isRunning()){
 		pose.matrix()(0,3) = sin(a)*r;
 		pose.matrix()(1,3) = cos(a)*r;
-		r+=0.01;
-		a+=0.001;
+		r+=0.001;
+		a+=0.01;
 		plt->addPoint(pose);
+
+		// move mesh
+		//mesh->tf = tk::common::odom2tf(pose.matrix()(0,3), pose.matrix()(1,3), a);
 		t.wait();
 	}
+
+
+    pthread_exit(NULL);
 }
 
 
@@ -119,6 +131,7 @@ void* th_imu(void* ptrimu){
 
 		t.wait();
 	}
+    pthread_exit(NULL);
 }
 
 #ifdef LANELET_ENABLED
@@ -177,6 +190,8 @@ void* th_lanelet_path(void* ptrpath) {
 
 		sleep(2);
 	}
+
+    pthread_exit(NULL);
 }
 #endif
 
@@ -215,7 +230,10 @@ int main(int argc, char* argv[]){
 		viewer->add(text);
 	}
 	viewer->add(new tk::gui::Axis());
-	viewer->add(new tk::gui::Mesh(std::string(tkCommon_PATH) + "data/levante.obj"));
+
+	mesh = new tk::gui::Mesh(std::string(tkCommon_PATH) + "data/levante.obj");
+	viewer->add(mesh);
+	
 #ifdef LANELET_ENABLED
 	if (draw_lanelet) {
 		path = new tk::gui::LaneletPath();
