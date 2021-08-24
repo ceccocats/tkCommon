@@ -13,6 +13,9 @@ public:
     double lat;
     double lon;
     double heigth;
+    double speed_hor;
+    double speed_ver;
+    double heading;
     int quality;
     int sats;
     int age;
@@ -28,6 +31,9 @@ public:
         lat = 0;
         lon = 0;
         heigth = 0;
+        speed_hor = 0;
+        speed_ver = 0;
+        heading = 0;
         quality = 0;
         sats = 0;
         age = 0;
@@ -41,6 +47,9 @@ public:
         lat = s.lat;
         lon = s.lon;
         heigth = s.heigth;
+        speed_hor = s.speed_hor;
+        speed_ver = s.speed_ver;
+        heading = s.heading;
         quality = s.quality;
         sats = s.sats;
         age = s.age;
@@ -59,6 +68,9 @@ public:
         os<<"	lat: "<<s.lat<<std::endl;
         os<<"	lon: "<<s.lon<<std::endl;
         os<<"	heigth: "<<s.heigth<<std::endl;
+        os<<"	speed_hor: "<<s.speed_hor<<std::endl;
+        os<<"	speed_ver: "<<s.speed_ver<<std::endl;
+        os<<"	heading: "<<s.heading<<std::endl;
         os<<"	quality: "<<s.quality<<std::endl;
         os<<"	sats: "<<s.sats<<std::endl;
         os<<"	age: "<<s.age<<std::endl;
@@ -69,18 +81,21 @@ public:
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)
     {
-        std::vector<tk::math::MatIO::var_t> structVars(11);
+        std::vector<tk::math::MatIO::var_t> structVars(14);
         structVars[0].set("header", header);
         structVars[1].set("utcStamp", utcStamp);
         structVars[2].set("lat", lat);
         structVars[3].set("lon", lon);
         structVars[4].set("heigth", heigth);
-        structVars[5].set("quality", quality);
-        structVars[6].set("sats", sats);
-        structVars[7].set("age", age);
-        structVars[8].set("cov", cov);
-        structVars[9].set("pressure", pressure);
-        structVars[10].set("temp", temp);
+        structVars[5].set("speed_hor", speed_hor);
+        structVars[6].set("speed_ver", speed_ver);
+        structVars[7].set("heading", heading);
+        structVars[8].set("quality", quality);
+        structVars[9].set("sats", sats);
+        structVars[10].set("age", age);
+        structVars[11].set("cov", cov);
+        structVars[12].set("pressure", pressure);
+        structVars[13].set("temp", temp);
         return var.setStruct(name, structVars);
     }
     bool fromVar(tk::math::MatIO::var_t &var)
@@ -91,6 +106,9 @@ public:
         var["lat"].get(lat);
         var["lon"].get(lon);
         var["heigth"].get(heigth);
+        var["speed_hor"].get(speed_hor);
+        var["speed_ver"].get(speed_ver);
+        var["heading"].get(heading);
         var["quality"].get(quality);
         var["sats"].get(sats);
         var["age"].get(age);
