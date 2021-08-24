@@ -49,25 +49,27 @@ LaneletMap::onInit(Viewer *viewer)
 
     // generate area mesh
     for(const auto& area : mLanelet.mMap->areaLayer) {
-        if (area.attribute(lanelet::AttributeName::Subtype) == "building") {
-            mBuildingMesh.push_back(createBuilding(area, true));
-        }
-        if (area.attribute(lanelet::AttributeName::Subtype) == "vegetation") {
-            mGreenlandMesh.push_back(createBuilding(area, false));
-        }
-        if (area.attribute(lanelet::AttributeName::Subtype) == "parking") {
-            mParkingMesh.push_back(createBuilding(area, false));
+        if (area.hasAttribute(lanelet::AttributeName::Subtype)) {
+            if (area.attribute(lanelet::AttributeName::Subtype) == "building") {
+                mBuildingMesh.push_back(createBuilding(area, true));
+            }
+            if (area.attribute(lanelet::AttributeName::Subtype) == "vegetation") {
+                mGreenlandMesh.push_back(createBuilding(area, false));
+            }
+            if (area.attribute(lanelet::AttributeName::Subtype) == "parking") {
+                mParkingMesh.push_back(createBuilding(area, false));
+            }
         }
     }
 
     // generate road mesh
     for(const auto& lane : mLanelet.mMap->laneletLayer) {
         auto right = lane.rightBound3d();
-        if (right.attribute(lanelet::AttributeName::Subtype) == "solid") 
+        if (right.hasAttribute(lanelet::AttributeName::Subtype) && right.attribute(lanelet::AttributeName::Subtype) == "solid") 
             mLineMesh.push_back(createLine(right));
         
         auto left = lane.leftBound3d();
-        if (left.attribute(lanelet::AttributeName::Subtype) == "solid") 
+        if (left.hasAttribute(lanelet::AttributeName::Subtype) && left.attribute(lanelet::AttributeName::Subtype) == "solid") 
             mLineMesh.push_back(createLine(left));
 
         mRoadMesh.push_back(createRoad(lane));
