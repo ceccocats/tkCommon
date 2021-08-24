@@ -31,15 +31,18 @@ namespace tk { namespace data {
             msg.linear_acceleration.x   = this->acc.x();
             msg.linear_acceleration.y   = this->acc.y();
             msg.linear_acceleration.z   = this->acc.z();
+            memcpy(msg.linear_acceleration_covariance.data(), this->covAcc.data(), sizeof(float)*3*3);
 
             msg.angular_velocity.x  = this->angleVel.x();
             msg.angular_velocity.y  = this->angleVel.y();
             msg.angular_velocity.z  = this->angleVel.z();
+            memcpy(msg.angular_velocity_covariance.data(), this->covAngleVel.data(), sizeof(float)*3*3);
             
             tf2::Quaternion q;
             q.setRPY(this->angle.x(), this->angle.y(), this->angle.z());
             q.normalize();
             msg.orientation = tf2::toMsg(q);
+            memcpy(msg.orientation_covariance.data(), this->covAngle.data(), sizeof(float)*3*3);
         }
 
 #if TKROS_VERSION == 1
@@ -54,10 +57,12 @@ namespace tk { namespace data {
             this->acc.x()   = msg.linear_acceleration.x;
             this->acc.y()   = msg.linear_acceleration.y;
             this->acc.z()   = msg.linear_acceleration.z; 
+            memcpy(this->covAcc.data(), msg.linear_acceleration_covariance.data(), sizeof(float)*3*3);
 
             this->angleVel.x()  = msg.angular_velocity.x;
             this->angleVel.y()  = msg.angular_velocity.y;
             this->angleVel.z()  = msg.angular_velocity.z;
+            memcpy(this->covAngleVel.data(), msg.angular_velocity_covariance.data(), sizeof(float)*3*3);
 
             Eigen::Quaterniond q;
             q.w()       = msg.orientation.w;
@@ -69,7 +74,9 @@ namespace tk { namespace data {
             this->angle.x() = rpy(0);
             this->angle.y() = rpy(1);
             this->angle.z() = rpy(2);
+            memcpy(this->covAngle.data(), msg.orientation_covariance.data(), sizeof(float)*3*3);
         }
+
 #endif
     };
 }}
