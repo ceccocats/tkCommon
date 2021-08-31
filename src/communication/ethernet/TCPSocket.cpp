@@ -4,7 +4,7 @@ bool
 tk::communication::TCPSocket::initClient(const int port, const std::string ip, bool readTimeout){
 
     //ret client
-    this->sock_client = 1;
+    this->tcp_type = 1;
 
     //Set socket struct
     memset(&this->sock_addr, 0, sizeof(this->sock_addr));
@@ -45,36 +45,57 @@ tk::communication::TCPSocket::initClient(const int port, const std::string ip, b
 bool 
 tk::communication::TCPSocket::initServer(const int port){
     
-    std::cout<<"i'm sorry\n";
-    return false;
-    //TODO: check and implemet
-
-    /*this->sock_client = 1;
-    bool ret = initClient(port,"");
-    if(!ret){
+    int len;
+  
+    // socket create and verification
+    server_fd = ::socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd == -1) {
+        tkERR("socket creation failed...\n");
         return false;
     }
-
-    struct sockaddr client;
-    memset(&client, 0, sizeof(client));
-
-    clsWrn("Server attending connection..\n")
-
-    this->sock_client = ::accept(this->sock_fd, (struct sockaddr *)&client, (socklen_t*)sizeof(client));
-    if(this->sock_client < 0){
-        clsErr("error while connecting to the socket.\n");
-        perror("TCP error");
+    else
+        printf("Socket successfully created..\n");
+    bzero(&server_addr, sizeof(server_addr));
+  
+    // assign IP, PORT
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    server_addr.sin_port = htons(port);
+  
+    // Binding newly created socket to given IP and verification
+    if ((::bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr))) != 0) {
+        tkERR("socket bind failed...\n");
+        return false;    
+    }
+    else
+        tkDBG("Socket successfully binded..\n");
+  
+    // Now server is ready to listen and verification
+    if ((::listen(server_fd, 5)) != 0) {
+        tkERR("Listen failed...\n");
         return false;
     }
-
-    clsWrn(std::string{"Server accept connection from "}+client.sa_data+"\n")
-    return true;    */
+    else
+        tkDBG("Server listening..\n");
+    len = sizeof(sock_addr);
+  
+    // Accept the data packet from client and verification
+    sock_fd = ::accept(server_fd, (struct sockaddr*)&sock_addr, (socklen_t*) &len);
+    if (sock_fd < 0) {
+        tkERR("server acccept failed...\n");
+        return false;
+    }
+    else
+        tkMSG("server acccept the client...\n");
+  
+    this->tcp_type = 2;
+    return true;   
 }
 
 int 
 tk::communication::TCPSocket::receive(uint8_t* buffer, int length){
 
-    if(this->sock_client == 1)
+    if(this->tcp_type == 1 || this->tcp_type == 2)
         return ::read(this->sock_fd, buffer, length);
     
     return 0;
@@ -84,7 +105,7 @@ tk::communication::TCPSocket::receive(uint8_t* buffer, int length){
 bool 
 tk::communication::TCPSocket::send(uint8_t* buffer, int length){
 
-    if(this->sock_client == 1)
+    if(this->tcp_type == 1 || this->tcp_type == 2)
         return ::send(this->sock_fd, buffer, length, 0) > 0;
 
     return false;
@@ -94,9 +115,11 @@ tk::communication::TCPSocket::send(uint8_t* buffer, int length){
 bool 
 tk::communication::TCPSocket::close(){
 
-    if(this->sock_client == 1)
+    if(this->tcp_type == 1 || this->tcp_type == 2)
         return ::close(this->sock_fd) > 0;
     
+    if(this->tcp_type == 2)
+        return ::close(this->server_fd) > 0;
     return false;
 
 }
