@@ -51,10 +51,22 @@ tk::communication::TCPSocket::initServer(const int port){
     server_fd = ::socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd == -1) {
         tkERR("socket creation failed...\n");
+        perror("error");
         return false;
     }
     else
-        printf("Socket successfully created..\n");
+        tkMSG("Socket successfully created..\n");
+
+    {
+        const int       optVal = 1;
+        const socklen_t optLen = sizeof(optVal);
+        int rtn = setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, (void*) &optVal, optLen);
+        if(rtn == -1) {
+            perror("error");
+        }
+    }
+
+
     bzero(&server_addr, sizeof(server_addr));
   
     // assign IP, PORT
@@ -65,6 +77,7 @@ tk::communication::TCPSocket::initServer(const int port){
     // Binding newly created socket to given IP and verification
     if ((::bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr))) != 0) {
         tkERR("socket bind failed...\n");
+        perror("error");
         return false;    
     }
     else
@@ -73,6 +86,7 @@ tk::communication::TCPSocket::initServer(const int port){
     // Now server is ready to listen and verification
     if ((::listen(server_fd, 5)) != 0) {
         tkERR("Listen failed...\n");
+        perror("error");
         return false;
     }
     else
@@ -83,6 +97,7 @@ tk::communication::TCPSocket::initServer(const int port){
     sock_fd = ::accept(server_fd, (struct sockaddr*)&sock_addr, (socklen_t*) &len);
     if (sock_fd < 0) {
         tkERR("server acccept failed...\n");
+        perror("error");
         return false;
     }
     else
@@ -112,14 +127,42 @@ tk::communication::TCPSocket::send(uint8_t* buffer, int length){
 
 }
 
+int getSO_ERROR(int fd) {
+   int err = 1;
+   socklen_t len = sizeof err;
+   if (-1 == getsockopt(fd, SOL_SOCKET, SO_ERROR, (char *)&err, &len))
+      perror("getSO_ERROR");
+   if (err)
+      errno = err;              // set errno to the socket SO_ERROR
+   return err;
+}
+
+bool closeSocket(int fd) {      // *not* the Windows closesocket()
+   if (fd >= 0) {
+      getSO_ERROR(fd); // first clear any errors, which can cause close to fail
+      if (shutdown(fd, SHUT_RDWR) < 0) // secondly, terminate the 'reliable' delivery
+         if (errno != ENOTCONN && errno != EINVAL) // SGI causes EINVAL
+            perror("shutdown");
+      if (close(fd) < 0) // finally call close()
+         perror("close");
+      else 
+         return true;
+      return false;
+   }
+}
+
 bool 
 tk::communication::TCPSocket::close(){
-
-    if(this->tcp_type == 1 || this->tcp_type == 2)
-        return ::close(this->sock_fd) > 0;
+    bool ok = true;
+    if(this->tcp_type == 1 || this->tcp_type == 2) {
+        tkDBG("close client");
+        ok = ok && closeSocket(this->sock_fd);
+    }
     
-    if(this->tcp_type == 2)
-        return ::close(this->server_fd) > 0;
-    return false;
+    if(this->tcp_type == 2) {
+        tkDBG("close server");
+        ok = ok && closeSocket(this->server_fd);
+    }
+    return ok;
 
 }
