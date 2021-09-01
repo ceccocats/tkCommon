@@ -13,13 +13,14 @@ public:
     double lat;
     double lon;
     double heigth;
-    double speed_hor;
-    double speed_ver;
-    double heading;
+    tk::math::Vec3<double> speed;
+    tk::math::Vec3<double> angle;
     int quality;
     int sats;
     int age;
     tk::math::Mat3d cov;
+    tk::math::Mat3d covSpeed;
+    tk::math::Mat3d covAngle;
     double pressure;
     double temp;
     
@@ -31,9 +32,6 @@ public:
         lat = 0;
         lon = 0;
         heigth = 0;
-        speed_hor = 0;
-        speed_ver = 0;
-        heading = 0;
         quality = 0;
         sats = 0;
         age = 0;
@@ -47,13 +45,14 @@ public:
         lat = s.lat;
         lon = s.lon;
         heigth = s.heigth;
-        speed_hor = s.speed_hor;
-        speed_ver = s.speed_ver;
-        heading = s.heading;
+        speed = s.speed;
+        angle = s.angle;
         quality = s.quality;
         sats = s.sats;
         age = s.age;
         cov = s.cov;
+        covSpeed = s.covSpeed;
+        covAngle = s.covAngle;
         pressure = s.pressure;
         temp = s.temp;
         return *this;
@@ -68,34 +67,36 @@ public:
         os<<"	lat: "<<s.lat<<std::endl;
         os<<"	lon: "<<s.lon<<std::endl;
         os<<"	heigth: "<<s.heigth<<std::endl;
-        os<<"	speed_hor: "<<s.speed_hor<<std::endl;
-        os<<"	speed_ver: "<<s.speed_ver<<std::endl;
-        os<<"	heading: "<<s.heading<<std::endl;
+        os<<"	speed: "<<s.speed<<std::endl;
+        os<<"	angle: "<<s.angle<<std::endl;
         os<<"	quality: "<<s.quality<<std::endl;
         os<<"	sats: "<<s.sats<<std::endl;
         os<<"	age: "<<s.age<<std::endl;
         os<<"	cov: "<<s.cov<<std::endl;
+        os<<"	covSpeed: "<<s.covSpeed<<std::endl;
+        os<<"	covAngle: "<<s.covAngle<<std::endl;
         os<<"	pressure: "<<s.pressure<<std::endl;
         os<<"	temp: "<<s.temp<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)
     {
-        std::vector<tk::math::MatIO::var_t> structVars(14);
+        std::vector<tk::math::MatIO::var_t> structVars(15);
         structVars[0].set("header", header);
         structVars[1].set("utcStamp", utcStamp);
         structVars[2].set("lat", lat);
         structVars[3].set("lon", lon);
         structVars[4].set("heigth", heigth);
-        structVars[5].set("speed_hor", speed_hor);
-        structVars[6].set("speed_ver", speed_ver);
-        structVars[7].set("heading", heading);
-        structVars[8].set("quality", quality);
-        structVars[9].set("sats", sats);
-        structVars[10].set("age", age);
-        structVars[11].set("cov", cov);
-        structVars[12].set("pressure", pressure);
-        structVars[13].set("temp", temp);
+        structVars[5].set("speed", speed);
+        structVars[6].set("angle", angle);
+        structVars[7].set("quality", quality);
+        structVars[8].set("sats", sats);
+        structVars[9].set("age", age);
+        structVars[10].set("cov", cov);
+        structVars[11].set("covSpeed", covSpeed);
+        structVars[12].set("covAngle", covAngle);
+        structVars[13].set("pressure", pressure);
+        structVars[14].set("temp", temp);
         return var.setStruct(name, structVars);
     }
     bool fromVar(tk::math::MatIO::var_t &var)
@@ -106,13 +107,14 @@ public:
         var["lat"].get(lat);
         var["lon"].get(lon);
         var["heigth"].get(heigth);
-        var["speed_hor"].get(speed_hor);
-        var["speed_ver"].get(speed_ver);
-        var["heading"].get(heading);
+        var["speed"].get(speed);
+        var["angle"].get(angle);
         var["quality"].get(quality);
         var["sats"].get(sats);
         var["age"].get(age);
         var["cov"].get(cov);
+        var["covSpeed"].get(covSpeed);
+        var["covAngle"].get(covAngle);
         var["pressure"].get(pressure);
         var["temp"].get(temp);
         return true;
