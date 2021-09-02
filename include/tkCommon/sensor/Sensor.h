@@ -104,6 +104,7 @@ struct SensorPool_t {
     bool                empty;
     tk::gui::DataDrawable   *drw;
     
+    tk::data::HeaderData header;
     std::vector<timeStamp_t> lastStamps; /**< vector of last N timestamps (used to compute FPS) */
     int lastStampsIdx = 0;
 };
@@ -120,6 +121,7 @@ class SensorInfo{
         bool            synched;        /**< tell if the sensor is synced with the log */
         int             width;
         int             height;
+        int             channels;
         //tk::data::DataType type;      /**< type of the sensor, used for visualization */
 
         /**
@@ -306,14 +308,19 @@ class Sensor {
             sPool->lastStamps = std::vector<timeStamp_t>(4);
             sPool->pool.init<T>(sPool->size);
 
+            // setup common header
+            sPool->header.name       = info.name + "_" + tk::data::ToStr(T::type) + "_" + std::to_string(sensorID);
+            sPool->header.type       = T::type;
+            sPool->header.sensorID   = sensorID;
+            sPool->header.tf         = getTf();
+
             int idx;
             for (int i = 0; i < sPool->size; i++) {
                 auto data = dynamic_cast<T*>(sPool->pool.add(idx));
                 
-                data->header.name       = info.name + "_" + tk::data::ToStr(T::type) + "_" + std::to_string(sensorID);
-                data->header.type       = T::type;
-                data->header.sensorID   = sensorID;
-                data->header.tf         = getTf();
+                // copy header to all pool data, name is update apart to skip WARN message in copy function
+                data->header.name = sPool->header.name;
+                data->header = sPool->header;
 
                 sPool->pool.releaseAdd(idx);
             }

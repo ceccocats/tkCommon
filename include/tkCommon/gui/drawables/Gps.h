@@ -11,14 +11,14 @@ namespace tk{ namespace gui{
             int                 nPos;
             int                 lastPos;
             float               lineSize = 2.0f;
-            static const int    MAX_POSES = 40;
+            static const int    MAX_POSES = 1000;
             std::vector<tk::gui::shader::circle*>   circles;
             tk::projection::Projector               *proj;
             
         public:
             tk::gui::Color_t        color;
 
-             Gps(const std::string& name = "gps", tk::projection::ProjectionType prj_type = tk::projection::ProjectionType::UTM, int nPos = 10, tk::gui::Color_t color = tk::gui::color::RED);
+             Gps(const std::string& name = "gps", tk::projection::ProjectionType prj_type = tk::projection::ProjectionType::UTM, int nPos = 1000, tk::gui::Color_t color = tk::gui::color::RED);
              Gps(tk::data::GpsData* gps, const std::string& name = "gps", tk::projection::ProjectionType prj_type = tk::projection::ProjectionType::UTM, int nPos = 10, tk::gui::Color_t color = tk::gui::color::RED);
             ~Gps() = default;
 
