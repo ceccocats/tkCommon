@@ -181,7 +181,8 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log, co
                 break;
             case tk::data::DataType::GPS:
                 {
-                    entry.second->drw   = new tk::gui::Gps(info.name + "_gps_" + std::to_string(entry.first.second));
+                    entry.second->drw   = new tk::gui::Gps(info.name + "_gps_" + std::to_string(entry.first.second), 
+                        tk::projection::ProjectionType::UTM, 1000, tk::gui::randomColor(1.0));
                     entry.second->drw->setPool(&entry.second->pool);
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }

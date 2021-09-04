@@ -1,4 +1,5 @@
 #include "tkCommon/gui/drawables/Gps.h"
+#include "tkCommon/gui/utils/deprecated_primitives.h"
 
 using namespace tk::gui;
 
@@ -55,7 +56,8 @@ Gps::updateData(tk::gui::Viewer *viewer)
     tk::math::Vec3d point = proj->forward(gps->lat, gps->lon, gps->heigth);
 
     // apply message tf
-    //this->tf = tk::common::odom2tf(point.x(), point.y(), point.z(), 0.0).matrix() * gps->header.tf.matrix();
+    this->tf = tk::common::odom2tf(point.x(), point.y(), point.z(), gps->angle.z()).matrix() ;
+    //this->tf = tk::common::odom2tf(point.x(), point.y(), point.z(), atan2( (double)gps->speed.y(), (double)gps->speed.x() ) ).matrix() ;
 
     lastPos = (lastPos+1) % nPos;
     circles[lastPos]->makeCircle(point.x(), point.y(), point.z(), gps->cov(0, 0));
@@ -63,8 +65,12 @@ Gps::updateData(tk::gui::Viewer *viewer)
 
 void 
 Gps::drawData(tk::gui::Viewer *viewer){
+    // global position 
+    glm::mat4 drw = viewer->getModelView();
     for(int i = 0; i < nPos; i++)
-        circles[i]->draw(drwModelView,color,lineSize);
+        circles[i]->draw(drw,color,lineSize);
+    
+    tk::gui::prim::drawAxis(1.0);
 }
 
 void 

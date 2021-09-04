@@ -14,7 +14,7 @@ namespace tk{ namespace gui{
             static const int    MAX_POSES = 1000;
             std::vector<tk::gui::shader::circle*>   circles;
             tk::projection::Projector               *proj;
-            
+            tk::common::Tfpose point_tf;
         public:
             tk::gui::Color_t        color;
 
