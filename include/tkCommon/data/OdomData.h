@@ -26,8 +26,13 @@ namespace tk { namespace data {
             header.tf = s.header.tf;
             pose = s.pose;
             angle = s.angle;
-            speed = s.speed;
+            linear_velocity = s.linear_velocity;
+            angular_velocity = s.angular_velocity;
             mode = s.mode;
+        }
+
+        float getLinearSpeed() {
+            return std::sqrt(std::pow(linear_velocity.x(), 2) + std::pow(linear_velocity.y(), 2) + std::pow(linear_velocity.z(), 2));
         }
 #ifdef TKROS_ENABLED
 #if TKROS_VERSION == 1
@@ -55,7 +60,13 @@ namespace tk { namespace data {
             q.normalize();
             msg.pose.pose.orientation   = tf2::toMsg(q);
 
-            msg.twist.twist.linear.x    = speed.x();
+            msg.twist.twist.linear.x    = linear_velocity.x();
+            msg.twist.twist.linear.y    = linear_velocity.y();
+            msg.twist.twist.linear.z    = linear_velocity.z();
+
+            msg.twist.twist.angular.x   = angular_velocity.x();
+            msg.twist.twist.angular.y   = angular_velocity.y();
+            msg.twist.twist.angular.z   = angular_velocity.z();
         }
 
 #if TKROS_VERSION == 1
@@ -83,7 +94,13 @@ namespace tk { namespace data {
 
             mode = EULER;
 
-            this->speed.x() = std::sqrt(std::pow(msg.twist.twist.linear.x, 2) + std::pow(msg.twist.twist.linear.y, 2) + std::pow(msg.twist.twist.linear.z, 2)); 
+            linear_velocity.x()     = msg.twist.twist.linear.x; 
+            linear_velocity.y()     = msg.twist.twist.linear.y; 
+            linear_velocity.z()     = msg.twist.twist.linear.z; 
+
+            angular_velocity.x()    = msg.twist.twist.angular.x;
+            angular_velocity.y()    = msg.twist.twist.angular.y;
+            angular_velocity.z()    = msg.twist.twist.angular.z;
         }
 #endif
     };

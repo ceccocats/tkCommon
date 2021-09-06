@@ -87,6 +87,11 @@ namespace tk{ namespace data{
             return &this->data[(row*this->width + col) * this->channels];
         }
 
+        void clear() {
+            for (int i = 0; i < this->width * this->height * this->channels; ++i)
+                this->data[i] = 0;
+        }
+
 
         bool fromVar(tk::math::MatIO::var_t &var) {
             if(var.empty())

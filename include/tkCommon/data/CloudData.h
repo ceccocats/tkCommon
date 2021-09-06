@@ -96,6 +96,17 @@ namespace tk { namespace data {
             features[f].resize(size());
         }
 
+        void bounds(float &aMinX, float &aMaxX, float &aMinY, float &aMaxY, float &aMinZ, float &aMaxZ) {
+            aMinX = points.matrix().row(0).minCoeff();
+            aMaxX = points.matrix().row(0).maxCoeff();
+
+            aMinY = points.matrix().row(1).minCoeff();
+            aMaxY = points.matrix().row(1).maxCoeff(); 
+
+            aMinZ = points.matrix().row(2).minCoeff();
+            aMaxZ = points.matrix().row(2).maxCoeff();
+        }
+
         void gammaCorrectionIntensity(){
             //From ouster
 
