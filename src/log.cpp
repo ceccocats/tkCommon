@@ -31,7 +31,12 @@ namespace tk {
         // color the name for the terminal
         name = applyColor(name, level);
         
-        std::cout<<name<<msg;
+        #if TKROS_VERSION == 2
+            std::cerr<<name<<msg; // on ros2 cout is buffered, cerr not.
+                                  // using cerr we can see tk logs even on ros2
+        #else
+            std::cout<<name<<msg;    
+        #endif
     };
 
     void 
