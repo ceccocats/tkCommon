@@ -217,6 +217,13 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log, co
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
+            case tk::data::DataType::ODOM:
+                {
+                    entry.second->drw   = new tk::gui::Odom(info.name+"_odom_"+ std::to_string(entry.first.second));
+                    entry.second->drw->setPool(&entry.second->pool);
+                    tk::gui::Viewer::getInstance()->add(entry.second->drw);
+                }
+                break;
             default:
                 tkWRN("Data of type: "<<tk::data::ToStr(entry.first.first)<<" not supported in tk::Viewer.\n");
                 break;
@@ -258,6 +265,19 @@ Sensor::loop(sensorKey key)
             }
             
             bool ok = read(data);
+
+            // compute FPS
+            if(!it->second->lastStamps.empty()) {
+                it->second->lastStamps[it->second->lastStampsIdx] = data->header.stamp;
+                it->second->lastStampsIdx = (it->second->lastStampsIdx+1) % it->second->lastStamps.size();
+                float diff_sum = 0;
+                for(int i=0; i<it->second->lastStamps.size()-1; i++) {
+                    int id0 = (it->second->lastStampsIdx + i) % it->second->lastStamps.size();
+                    int id1 = (it->second->lastStampsIdx + i+1) % it->second->lastStamps.size();
+                    diff_sum += float(it->second->lastStamps[id1] - it->second->lastStamps[id0])/1000000;
+                }
+                data->header.fps = 1.0 / (diff_sum/(it->second->lastStamps.size()-1));
+            }
 
             if (it->second->empty == true && ok == true) {
                 it->second->empty = false;
