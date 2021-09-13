@@ -44,6 +44,12 @@ namespace tk { namespace common {
             return true;
         }
 
+        void buildRoutingGraph() {
+            auto trafficRules = lanelet::traffic_rules::TrafficRulesFactory::create(lanelet::Locations::Germany, lanelet::Participants::Vehicle);
+            mRoutingGraph = lanelet::routing::RoutingGraph::build(*mMap, *trafficRules);
+        }
+
+        lanelet::routing::RoutingGraphPtr mRoutingGraph;
         lanelet::LaneletMapUPtr mMap;
         double mOriginLat, mOriginLon;
         lanelet::projection::UtmProjector *mProjector;
@@ -51,6 +57,10 @@ namespace tk { namespace common {
         bool init(const std::string &aConfPath) {
             tkERR("You need to compile with lanelet2");
             return false;    
+        }
+
+        void buildRoutingGraph() {
+            tkERR("You need to compile with lanelet2");
         }
     #endif
     };
