@@ -1,12 +1,12 @@
 #pragma once
 
 #if DW_VERSION_MAJOR >= 2
-    #include <dw/core/Context.h>
-    #include <dw/core/VersionCurrent.h>
+#include <dw/core/Context.h>
+#include <dw/core/VersionCurrent.h>
 //    #include <dw/core/NvMedia.h>
-    #include <dw/sensors/Sensors.h>
+#include <dw/sensors/Sensors.h>
 
-    #define float16_t dwF16
+#define float16_t dwF16
 #endif
 
 #include <iostream>
@@ -31,105 +31,92 @@
 
 #define C_DW(x) CHECK_DW_ERROR(x)
 
-namespace tk
-{
-namespace sensors
-{
-class Driveworks
-{
-private:
-    bool initialized = false;
-
-    int deviceGPU = 0;
-
-public:
-
-    static std::vector<std::string> dontCare_warning;
-    
-    dwContextHandle_t sdk = NULL;
-
-    dwSALHandle_t sal = NULL;
-
-    Driveworks();
-
-    ~Driveworks();
-
-    void init() {}
-
-    void setGPUDevice(int device);
-
-    int getGPUDevice() { return deviceGPU; }
-
-    static void dontCare(std::string s){ dontCare_warning.push_back(s); };
-
-    void release();
-};
-
-typedef Driveworks* DriveworksHandle_t;
-
-} // namespace sensors
-} // namespace tk
-
 #include <dw/core/Logger.h>
 #include <tkCommon/common.h>
 
-dwLogCallback getConsoleLoggerCallback()
+inline dwLogCallback getConsoleLoggerCallback()
 {
-    return [](dwContextHandle_t, dwLoggerVerbosity, const char *msg) { 
-
+    static std::vector<std::string> dontCare_warning;
+    return [](dwContextHandle_t, dwLoggerVerbosity, const char *msg)
+    {
         bool flag = false;
-        for(int i = 0; i < tk::sensors::Driveworks::dontCare_warning.size(); i++){
-            std::size_t found = std::string(msg).find(tk::sensors::Driveworks::dontCare_warning[i]);
-            if (found!=std::string::npos)
+        for (int i = 0; i < dontCare_warning.size(); i++)
+        {
+            std::size_t found = std::string(msg).find(dontCare_warning[i]);
+            if (found != std::string::npos)
                 flag = true;
         }
-        
-        if(!flag && std::string(msg).length()!=22)
-            tkWRN("Driveworks"<< std::string(msg)<<"\n");
 
+        if (!flag && std::string(msg).length() != 22)
+            tkWRN("Driveworks" << std::string(msg) << "\n");
     };
 }
 
-std::vector<std::string> tk::sensors::Driveworks::dontCare_warning;
-
-tk::sensors::Driveworks::Driveworks()
+namespace tk
 {
-    C_DW(dwLogger_initialize(getConsoleLoggerCallback()));
-    C_DW(dwLogger_setLogLevel(DW_LOG_VERBOSE));
+    namespace sensors
+    {
+        class Driveworks
+        {
+        private:
+            bool initialized = false;
 
-    // DriveWorks context initialization
-    dwContextParameters sdkParams = {};
-    C_DW(dwInitialize(&sdk, DW_VERSION, &sdkParams));
+            int deviceGPU = 0;
 
-    // Sensors Abstraction Layer initialization
-    C_DW(dwSAL_initialize(&sal, sdk));
+        public:
+            dwContextHandle_t sdk = NULL;
 
-    // Set variable
-    initialized = true;
-}
+            dwSALHandle_t sal = NULL;
 
-tk::sensors::Driveworks::~Driveworks() 
-{
-    // Check if initialized and release
-    if(initialized){
-        release();
-    }
-}
+            Driveworks()
+            {
+                C_DW(dwLogger_initialize(getConsoleLoggerCallback()));
+                C_DW(dwLogger_setLogLevel(DW_LOG_VERBOSE));
 
-void tk::sensors::Driveworks::setGPUDevice(int device)
-{
-    // GPU device selection
-    dwContext_selectGPUDevice(device, sdk);
-}
+                // DriveWorks context initialization
+                dwContextParameters sdkParams = {};
+                C_DW(dwInitialize(&sdk, DW_VERSION, &sdkParams));
 
-void tk::sensors::Driveworks::release()
-{
-    // Sensors Abstraction layer release
-    dwSAL_release(sal);
+                // Sensors Abstraction Layer initialization
+                C_DW(dwSAL_initialize(&sal, sdk));
 
-    // DriveWorks context release
-    dwRelease(sdk);
+                // Set variable
+                initialized = true;
+            }
 
-    // Unset variable
-    initialized = false;
-}
+            ~Driveworks()
+            {
+                // Check if initialized and release
+                if (initialized)
+                {
+                    release();
+                }
+            }
+
+            void init() {}
+
+            void setGPUDevice(int device)
+            {
+                // GPU device selection
+                dwContext_selectGPUDevice(device, sdk);
+            }
+
+            int getGPUDevice() { return deviceGPU; }
+
+            void release()
+            {
+                // Sensors Abstraction layer release
+                dwSAL_release(sal);
+
+                // DriveWorks context release
+                dwRelease(sdk);
+
+                // Unset variable
+                initialized = false;
+            }
+        };
+
+        typedef Driveworks *DriveworksHandle_t;
+
+    } // namespace sensors
+} // namespace tk
