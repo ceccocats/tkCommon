@@ -84,9 +84,6 @@ tk::gui::Cloud4f::updateData(tk::data::CloudData* cloud){
                         minMax[0][0] = 0.95*minMax[0][0] + 0.05*min;
                         minMax[1][0] = 0.95*minMax[1][0] + 0.05*max;
                     }
-                }else{
-                    minMax[0][0] = 0.0f;
-                    minMax[1][0] = 1.0f;
                 }
             }
         }
@@ -138,6 +135,9 @@ tk::gui::Cloud4f::Cloud4f(std::string name){
     this->selected[1]       = featuresChannel0.second;
     this->selected[2]       = featuresChannel0.second;
     this->selected[3]       = featuresChannel0.second;
+
+    minMax[0][0] = 0.0f;
+    minMax[1][0] = 1.0f;
 }
 
 tk::gui::Cloud4f::Cloud4f(tk::data::CloudData* cloud, std::string name) : Cloud4f(name){

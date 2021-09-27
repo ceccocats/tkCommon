@@ -1,13 +1,13 @@
 #include "tkCommon/rt/Pool.h"
-#include "tkCommon/data/GpsImuData.h"
+#include "tkCommon/data/GpsData.h"
 
 #include <signal.h>
 #include <pthread.h>
 
 int size = 5;
 tk::rt::DataPool            pool;
-tk::data::GpsImuData           *data = nullptr;
-const tk::data::GpsImuData     *cData = nullptr;
+tk::data::GpsData           *data = nullptr;
+const tk::data::GpsData     *cData = nullptr;
 bool gRun = true;
 std::mutex mtx;
 
@@ -33,14 +33,14 @@ void
     int idx;
     int counter = 0;
     while(gRun) {
-        data = dynamic_cast<tk::data::GpsImuData*>(pool.add(idx));
+        data = dynamic_cast<tk::data::GpsData*>(pool.add(idx));
         
         if (data != nullptr) {
-            data->gps.lat = counter;
-            data->gps.lon = counter;
+            data->lat = counter;
+            data->lon = counter;
 
             //mtx.lock();
-            printf("--------------------------------------------\nwrite\tlat %f, lon %f\n", data->gps.lat, data->gps.lon);
+            printf("--------------------------------------------\nwrite\tlat %f, lon %f\n", data->lat, data->lon);
             //mtx.unlock();
 
             pool.releaseAdd(idx);
@@ -60,10 +60,10 @@ void
 
     int idx;
     while(gRun) {
-        cData = dynamic_cast<const tk::data::GpsImuData*>(pool.get(idx, (uint64_t)1e4));
+        cData = dynamic_cast<const tk::data::GpsData*>(pool.get(idx, (uint64_t)1e4));
         if (cData != nullptr)  {
             //mtx.lock();
-            printf("new\tlat %f, lon %f\n", cData->gps.lat, cData->gps.lon);
+            printf("new\tlat %f, lon %f\n", cData->lat, cData->lon);
             //mtx.unlock();
             pool.releaseGet(idx);
         }
@@ -79,10 +79,10 @@ void
     
     int idx;
     while(gRun) {
-        cData = dynamic_cast<const tk::data::GpsImuData*>(pool.get(idx));
+        cData = dynamic_cast<const tk::data::GpsData*>(pool.get(idx));
         if (cData != nullptr) {
             //mtx.lock();
-            printf("last\tlat %f, lon %f\n", cData->gps.lat, cData->gps.lon);
+            printf("last\tlat %f, lon %f\n", cData->lat, cData->lon);
             //mtx.unlock();
             pool.releaseGet(idx);
         }
@@ -97,7 +97,7 @@ int main( int argc, char** argv){
     signal(SIGINT, my_handler);
     int idx;
     // init pool data 
-    pool.init<tk::data::GpsImuData>(10);
+    pool.init<tk::data::GpsData>(10);
 
     // spawn threads
     pthread_t pt[50];

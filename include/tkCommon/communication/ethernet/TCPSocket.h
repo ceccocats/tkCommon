@@ -62,10 +62,16 @@ namespace tk{ namespace communication {
         bool close();
 
     private:
+        int             tcp_type = -1; // -1: none, 1: client, 2: server
+
         int             sock_fd = -1;    
-        int             sock_client = -1;
         sockaddr_in     sock_addr;
         ip_mreq         imr;
+
+        // server
+        sockaddr_in     server_addr;
+        int             server_fd = -1;
+        
     };
 
 }}

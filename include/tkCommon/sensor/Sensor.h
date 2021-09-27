@@ -121,6 +121,7 @@ class SensorInfo{
         bool            synched;        /**< tell if the sensor is synced with the log */
         int             width;
         int             height;
+        int             channels;
         //tk::data::DataType type;      /**< type of the sensor, used for visualization */
 
         /**

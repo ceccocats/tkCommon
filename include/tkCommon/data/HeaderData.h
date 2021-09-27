@@ -16,51 +16,53 @@ namespace tk { namespace data {
 
     
     enum class DataType : uint32_t{
-        NOT_SPEC    = 0,
-        CLOUD       = 1,
-        VEHICLE     = 2,
-        GPS         = 3,
-        IMAGE       = 4,
-        RADAR       = 5,
-        LINES       = 6,
-        PERCEPTION  = 7,
-        IMU         = 8,
-        GPSIMU      = 9,
-        STEREO      = 10,
-        CAN         = 11,
-        VECTOR      = 12,
-        ACTUATION   = 13,
-        DEPTH       = 14,
-        ODOM        = 15,
-        IMAGEU8     = 16,
-        IMAGEU16    = 17,
-        IMAGEF      = 18,
-        SONAR       = 19
+        NOT_SPEC        = 0,
+        CLOUD           = 1,
+        VEHICLE         = 2,
+        GPS             = 3,
+        IMAGE           = 4,
+        RADAR           = 5,
+        LINES           = 6,
+        PERCEPTION      = 7,
+        IMU             = 8,
+        GPSIMU          = 9,
+        STEREO          = 10,
+        CAN             = 11,
+        VECTOR          = 12,
+        ACTUATION       = 13,
+        DEPTH           = 14,
+        ODOM            = 15,
+        IMAGEU8         = 16,
+        IMAGEU16        = 17,
+        IMAGEF          = 18,
+        SONAR           = 19,
+        OCCUPANCY_GRID  = 20
     };
 
     static const char* ToStr (const DataType& type)
     {
         switch (type) {
-            case DataType::CLOUD:       return "cloud";
-            case DataType::VEHICLE:     return "vehicle";
-            case DataType::GPS:         return "gps";
-            case DataType::IMAGE:       return "image";
-            case DataType::IMAGEU8:     return "imageU8";
-            case DataType::IMAGEU16:    return "imageU16";
-            case DataType::IMAGEF:      return "imageF";
-            case DataType::RADAR:       return "radar";
-            case DataType::LINES:       return "lines";
-            case DataType::PERCEPTION:  return "perception";
-            case DataType::IMU:         return "imu";
-            case DataType::GPSIMU:      return "gps&imu";
-            case DataType::STEREO:      return "stereo";
-            case DataType::CAN:         return "can";
-            case DataType::VECTOR:      return "vector";
-            case DataType::ACTUATION:   return "actuation";
-            case DataType::DEPTH:       return "depth";
-            case DataType::ODOM:        return "odom";
-            case DataType::SONAR:       return "sonar";
-            default:                    return "???";
+            case DataType::CLOUD:           return "cloud";
+            case DataType::VEHICLE:         return "vehicle";
+            case DataType::GPS:             return "gps";
+            case DataType::IMAGE:           return "image";
+            case DataType::IMAGEU8:         return "imageU8";
+            case DataType::IMAGEU16:        return "imageU16";
+            case DataType::IMAGEF:          return "imageF";
+            case DataType::RADAR:           return "radar";
+            case DataType::LINES:           return "lines";
+            case DataType::PERCEPTION:      return "perception";
+            case DataType::IMU:             return "imu";
+            case DataType::GPSIMU:          return "gps&imu";
+            case DataType::STEREO:          return "stereo";
+            case DataType::CAN:             return "can";
+            case DataType::VECTOR:          return "vector";
+            case DataType::ACTUATION:       return "actuation";
+            case DataType::DEPTH:           return "depth";
+            case DataType::ODOM:            return "odom";
+            case DataType::SONAR:           return "sonar";
+            case DataType::OCCUPANCY_GRID:  return "occupancy_grid";
+            default:                        return "???";
                 
         }
     }

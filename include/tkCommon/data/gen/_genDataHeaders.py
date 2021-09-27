@@ -10,10 +10,11 @@ genData(className, VARS, DEPS)
 
 className = "OdomData_gen"
 DEPS = [ "#include \"tkCommon/math/Vec.h\"" ]
-VARS = [ {"name":"type",        "type":"static const DataType", "default": "DataType::ODOM"},  
-         {"name":"pose",        "type":"tk::math::Vec3<double>"},
-         {"name":"angle",       "type":"tk::math::Vec4<double>"},
-         {"name":"speed",       "type":"tk::math::Vec3<double>"}
+VARS = [ {"name":"type",                "type":"static const DataType", "default": "DataType::ODOM"},  
+         {"name":"pose",                "type":"tk::math::Vec3<double>"},
+         {"name":"angle",               "type":"tk::math::Vec4<double>"},
+         {"name":"linear_velocity",     "type":"tk::math::Vec3<double>"},
+         {"name":"angular_velocity",    "type":"tk::math::Vec3<double>"}
         ]
 genData(className, VARS, DEPS)
 
@@ -80,22 +81,16 @@ VARS = [ {"name":"type",        "type":"static const DataType", "default": "Data
          {"name":"lat",         "type":"double",  "default":"0"}, 
          {"name":"lon",         "type":"double",  "default":"0"}, 
          {"name":"heigth",      "type":"double",  "default":"0"},
+         {"name":"speed",       "type":"tk::math::Vec3<double>"}, 
+         {"name":"angle",       "type":"tk::math::Vec3<double>"}, 
          {"name":"quality",     "type":"int",     "default":"0"},
          {"name":"sats",        "type":"int",     "default":"0"},
          {"name":"age",         "type":"int",     "default":"0"},
          {"name":"cov",         "type":"tk::math::Mat3d" },
+         {"name":"covSpeed",    "type":"tk::math::Mat3d" },
+         {"name":"covAngle",    "type":"tk::math::Mat3d" },
          {"name":"pressure",    "type":"double",  "default":"0"}, 
          {"name":"temp",        "type":"double",  "default":"0"},
-        ]
-genData(className, VARS, DEPS)
-
-className = "GpsImuData_gen"
-DEPS = ["#include \"tkCommon/data/ImuData.h\"\n", 
-        "#include \"tkCommon/data/GpsData.h\"\n"]
-VARS = [ {"name":"type",        "type":"static const DataType", "default": "DataType::GPSIMU"},
-         {"name":"gps",         "type":"tk::data::GpsData", "init": "gps.init();"}, 
-         {"name":"imu",         "type":"tk::data::ImuData", "init": "imu.init();"},
-         {"name":"vel",         "type":"tk::math::Vec3<double>"},
         ]
 genData(className, VARS, DEPS)
 

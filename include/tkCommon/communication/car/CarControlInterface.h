@@ -113,7 +113,7 @@ class CarControlInterface : public tk::gui::DrawableUnManaged {
 
 
             // status
-            ImGui::Text("Speed: %lf kmh", carCtrl->odom.speed.x()*3.6);
+            ImGui::Text("Speed: %lf kmh", carCtrl->odom.linear_velocity.x()*3.6);
             ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
             float steer_act = carCtrl->getActSteer();
             ImGui::SliderFloat("SteerAct", &steer_act, -30, +30);
@@ -202,11 +202,11 @@ class CarControlInterface : public tk::gui::DrawableUnManaged {
                         timeStamp_t thisTS = getTimeStamp();
                         double dt = double(thisTS - lastTS)/1000000.0;
                         lastTS = thisTS;
-                        double act = pid.calculate(dt, speedReq - carCtrl->odom.speed.x());
+                        double act = pid.calculate(dt, speedReq - carCtrl->odom.linear_velocity.x());
                         float preBrake = 0.40;
-                        if(speedReq < 0 && carCtrl->odom.speed.x() < 1)
+                        if(speedReq < 0 && carCtrl->odom.linear_velocity.x() < 1)
                             preBrake = 0.6;
-                        if(speedReq < 0 && carCtrl->odom.speed.x() <= 0.01)
+                        if(speedReq < 0 && carCtrl->odom.linear_velocity.x() <= 0.01)
                             preBrake = 0.7;
                         if(act < 0) {
                             brakeReq = preBrake - (act);
