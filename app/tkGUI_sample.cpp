@@ -141,7 +141,7 @@ void* th_lanelet_path(void* ptrpath) {
 	tk::gui::LaneletPath *path = (tk::gui::LaneletPath*)ptrpath;
 
 	// load lanelet map
-	tk::common::Lanelet	lanelet;
+	tk::common::LaneletInterface	lanelet;
 	lanelet.init(std::string(tkCommon_PATH) + "data/lanelet.osm.yaml");
 
     // create routing graph

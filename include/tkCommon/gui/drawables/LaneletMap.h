@@ -4,7 +4,7 @@
 #include "tkCommon/gui/shader/simpleMesh.h"
 #include "tkCommon/gui/utils/SimpleMesh.h"
 #include "tkCommon/gui/utils/PerlinNoise.h"
-#include "tkCommon/lanelet/Lanelet.h"
+#include "tkCommon/lanelet/LaneletInterface.h"
 
 namespace tk { 
 namespace gui {
@@ -22,7 +22,7 @@ public:
     void onClose() final;
 private:
     std::string             mConfPath;
-    tk::common::Lanelet     mLanelet;
+    tk::common::LaneletInterface     mLanelet;
     tk::math::Vec2f         mMapMin, mMapMax, mMapSize;
 
     bool    mUpdate;
