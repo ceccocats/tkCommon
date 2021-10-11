@@ -87,7 +87,7 @@ class OccupancyGridData : public ImageDataF
         }
     }
 
-    bool point2grid(const float aX, const float aY, size_t &aR, size_t &aC)
+    bool point2grid(const float aX, const float aY, size_t &aR, size_t &aC) const
     {
         if (!this->initted)
             return false;
@@ -101,7 +101,7 @@ class OccupancyGridData : public ImageDataF
             return false;
     }
 
-    bool grid2point(const size_t aR, const size_t aC, float &aX, float &aY)
+    bool grid2point(const size_t aR, const size_t aC, float &aX, float &aY) const
     {
         if (!this->initted)
             return false;
