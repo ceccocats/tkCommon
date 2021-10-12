@@ -1,5 +1,6 @@
 #include "tkCommon/gui/Viewer.h"
 #include "tkCommon/rt/Task.h"
+#include "tkCommon/rt/Profiler.h"
 
 namespace tk { namespace gui {
 Viewer* Viewer::instance = nullptr;
@@ -310,9 +311,8 @@ Viewer::drawInfos(){
     if(imguiSelected == -1){
 
         //Usage FPS and GPU memory
-        static int update = 15;
-        if(update == 15){
-            update = 0;
+        static int update = 0;
+        if(update++ % 30 == 0){
             if(gpu){
                 glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);
                 for(int i = nUsage-1; i > 0; i--){
@@ -326,9 +326,8 @@ Viewer::drawInfos(){
             }
             ImGuiIO& io = ImGui::GetIO();
             vizFPS[0] = io.Framerate;
-        }else{
-            update++;
         }
+        
         if(gpu){
             std::string text = "GPU memory";
             std::string usage = std::to_string((int)((total_mem_kb - cur_avail_mem_kb)/1024.0)) + " / " + std::to_string((int)(total_mem_kb/1024.0)) + " MB";
@@ -339,6 +338,19 @@ Viewer::drawInfos(){
         ImGui::PlotLines(fps.c_str(),(const float*)vizFPS,IM_ARRAYSIZE(vizFPS),nFPS,textFps.c_str(),0,120.0);
 
         ImGui::Text("Window size: %d x %d", width, height);
+
+        static bool showProfiler = false;
+        static std::string strProfiler = ""; 
+        ImGui::Checkbox("Profiler", &showProfiler);
+        if(showProfiler) {
+            // update profiler string
+            if(update % 30 == 0) {
+                std::stringstream ss; 
+                tk::rt::Profiler::getInstance()->print(ss);
+                strProfiler = ss.str();
+            }
+            ImGui::Text(strProfiler.c_str());
+        }
 
     }else{
         tk::common::Vector3<float> pos = tk::common::tf2pose(drawables[imguiSelected]->tf);
