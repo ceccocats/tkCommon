@@ -46,10 +46,10 @@ namespace tk { namespace data {
         }
 
 #if TKROS_VERSION == 1
-        void fromRos(sensor_msgs::Imu &msg) {
+        void fromRos(const sensor_msgs::Imu &msg) {
 #endif
 #if TKROS_VERSION == 2
-        void fromRos(sensor_msgs::msg::Imu &msg) {
+        void fromRos(const sensor_msgs::msg::Imu &msg) {
 #endif
             this->header.fromRos(msg.header);
             this->header.type   = DataType::IMU; 

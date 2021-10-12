@@ -143,10 +143,10 @@ namespace tk{ namespace data{
         }
 
 #if TKROS_VERSION == 1
-        void fromRos(sensor_msgs::Image &msg) {
+        void fromRos(const sensor_msgs::Image &msg) {
 #endif
 #if TKROS_VERSION == 2
-        void fromRos(sensor_msgs::msg::Image &msg) {
+        void fromRos(const sensor_msgs::msg::Image &msg) {
 #endif
             this->header.fromRos(msg.header);
             int width  = msg.width;
