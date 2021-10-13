@@ -6,6 +6,7 @@
 #include <lanelet2_core/LaneletMap.h>
 #include <lanelet2_core/geometry/Area.h>
 #include <lanelet2_core/geometry/Lanelet.h>
+#include <lanelet2_core/geometry/LineString.h>
 #include <lanelet2_core/primitives/Area.h>
 #include <lanelet2_core/primitives/Lanelet.h>
 #include <lanelet2_core/primitives/LineString.h>
@@ -30,44 +31,14 @@ namespace tk { namespace common {
          LaneletInterface() = default;
         ~LaneletInterface() = default;
 
-    #ifdef LANELET_ENABLED
+        bool init(const std::string &aConfPath);
+        void buildRoutingGraph();
 
-        bool init(const std::string &aConfPath) {
-            YAML::Node conf     = YAML::LoadFile(aConfPath);
-            
-            std::string local_p = tk::common::YAMLgetConf<std::string>(conf, "file", "lanelet.osm");
-            std::string map_p   = aConfPath.substr(0, aConfPath.find_last_of('/')) + "/" + local_p;
-            mOriginLat          = tk::common::YAMLgetConf<double>(conf, "lat", 0.0f);
-            mOriginLon          = tk::common::YAMLgetConf<double>(conf, "lon", 0.0f);
-            
-            mProjector          = new lanelet::projection::UtmProjector(lanelet::Origin({mOriginLat, mOriginLon}));
-            mMap                = lanelet::load(map_p, *mProjector);
-
-            if (!mMap->empty())
-                return true;
-            else
-                return false;
-        }
-
-        void buildRoutingGraph() {
-            auto trafficRules = lanelet::traffic_rules::TrafficRulesFactory::create(lanelet::Locations::Germany, lanelet::Participants::Vehicle);
-            tkDBG("Building routing graph");
-            mRoutingGraph = lanelet::routing::RoutingGraph::build(*mMap, *trafficRules);
-        }
-
+#ifdef LANELET_ENABLED
         lanelet::routing::RoutingGraphPtr mRoutingGraph;
         lanelet::LaneletMapUPtr mMap;
         double mOriginLat, mOriginLon;
         lanelet::projection::UtmProjector *mProjector;
-    #else
-        bool init(const std::string &aConfPath) {
-            tkERR("You need to compile with lanelet2");
-            return false;    
-        }
-
-        void buildRoutingGraph() {
-            tkERR("You need to compile with lanelet2");
-        }
-    #endif
+#endif
     };
 }}

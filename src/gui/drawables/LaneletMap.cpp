@@ -66,13 +66,26 @@ LaneletMap::onInit(Viewer *viewer)
     for(const auto& lane : mLanelet.mMap->laneletLayer) {
         auto right = lane.rightBound3d();
         if (right.hasAttribute(lanelet::AttributeName::Subtype) && right.attribute(lanelet::AttributeName::Subtype) == "solid") 
-            mLineMesh.push_back(createLine(right));
+            mLineMesh.push_back(createLine(right, 0.1));
         
         auto left = lane.leftBound3d();
         if (left.hasAttribute(lanelet::AttributeName::Subtype) && left.attribute(lanelet::AttributeName::Subtype) == "solid") 
-            mLineMesh.push_back(createLine(left));
+            mLineMesh.push_back(createLine(left, 0.1));
 
         mRoadMesh.push_back(createRoad(lane));
+    }
+
+    // generate stop line mesh
+    for (const auto& line : mLanelet.mMap->lineStringLayer) {
+        if (!line.hasAttribute(lanelet::AttributeName::Type))
+            continue;
+        if (line.attribute(lanelet::AttributeName::Type) == "stop_line")
+            mLineMesh.push_back(createLine(line, 0.4));
+    }
+
+    // generate traffic light mesh
+    for (const auto& reg: mLanelet.mMap->regulatoryElementLayer) {
+        
     }
 
     mGlBuildingPose.resize(mBuildingMesh.size());
@@ -279,7 +292,7 @@ LaneletMap::createRoad(const lanelet::Lanelet &lane)
 }
 
 tk::gui::SimpleMesh 
-LaneletMap::createLine(lanelet::ConstLineString3d line)
+LaneletMap::createLine(lanelet::ConstLineString3d line, float width)
 {
     tk::gui::SimpleMesh             mesh;
     std::vector<tk::math::Vec2f>    l;
@@ -291,7 +304,7 @@ LaneletMap::createLine(lanelet::ConstLineString3d line)
         l.push_back(tk::math::Vec2f(line[i].x(), line[i].y()));
     }
 
-    mesh.createLine(l, 0.1);
+    mesh.createLine(l, width);
 
     return mesh;
 }

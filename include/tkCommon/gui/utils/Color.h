@@ -41,6 +41,9 @@ namespace tk { namespace gui {
         return Color_t { float(r/255.0), float(g/255.0), float(b/255.0), float(a/255.0) };
     }
 
+    inline void setColor(tk::gui::Color_t c) {
+        glColor4f(c.color[0], c.color[1], c.color[2], c.color[3]);
+    }
 
     namespace color {
         static Color_t RED          = {244.0/255.0, 67.0/255.0,     54.0/255.0,     1.0};

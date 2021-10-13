@@ -40,7 +40,7 @@ private:
 #ifdef LANELET_ENABLED
     tk::gui::SimpleMesh createBuilding(const lanelet::Area &area, bool height);
     tk::gui::SimpleMesh createRoad(const lanelet::Lanelet &lane);
-    tk::gui::SimpleMesh createLine(lanelet::ConstLineString3d line);
+    tk::gui::SimpleMesh createLine(lanelet::ConstLineString3d line, float width);
 #endif
 };
 }}
