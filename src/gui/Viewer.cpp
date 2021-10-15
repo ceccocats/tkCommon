@@ -185,7 +185,7 @@ Viewer::init() {
 
     //tkLogo
     int height, width;
-    uint8_t* image = tk::gui::common::loadImage(std::string(tkCommon_PATH) + "data/tk.png", &width, &height, &channels);
+    uint8_t* image = tk::gui::common::loadImage(std::string(tkCommon_PATH) + "data/er_tk.png", &width, &height, &channels);
     //Set trasparency
     for(int i = 0; i < width*height; i++){
         if(image[i*4] == 0)
@@ -415,7 +415,7 @@ Viewer::draw() {
 void
 Viewer::drawLogo(){
 
-    int w=90, h=90, padding=20;
+    int w=90*3, h=90, padding=20;
     int w2=width/2, h2=height/2;
 
     verticesCube2D[0] = (float)(w2-padding)/w2;
