@@ -173,7 +173,7 @@ LaneletMap::beforeDraw(tk::gui::Viewer *viewer)
         for (int i = 0; i < mLineMesh.size(); ++i) {
             data = mLineMesh[i].vertexBufferPositionNormal(n);
             mGlLinesData[i].setData(data, n);   
-            tf.matrix() = mLineMesh[i].pose.matrix() * tk::common::odom2tf(0.0, 0.0, 0.1, 0.0).matrix();
+            tf.matrix() = mLineMesh[i].pose.matrix() * tk::common::odom2tf(0.0, 0.0, 0.05, 0.0).matrix();
             mGlLinesPose[i] = glm::make_mat4x4(tf.matrix().data());      
         }
         mLineMesh.clear();

@@ -12,8 +12,6 @@ bool CSpline3D::init(std::vector<tk::common::Vector3<float>> waypoints) {
     // number of x waypoints
     nx = waypoints.size();
 
-    std::cout<<"mx "<<nx<<"\n";
-
     x = VectorXd(nx);
     y = VectorXd(nx);
     z = VectorXd(nx);
