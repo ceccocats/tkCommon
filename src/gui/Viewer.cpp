@@ -206,7 +206,8 @@ Viewer::init() {
 
 void 
 Viewer::imguiDraw(){
-    ImGui::SetNextWindowSize(ImVec2(500, 440), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(width, height/2), ImGuiCond_Always);
+    ImGui::SetNextWindowPos(ImVec2(0, height/2), ImGuiCond_Always);
     ImGui::Begin("tkGUI");
 
     ImGui::BeginChild("left pane", ImVec2(150, 0), true);
@@ -416,7 +417,7 @@ void
 Viewer::drawLogo(){
 
     int w=90*3, h=90, padding=20;
-    int w2=width/2, h2=height/2;
+    int w2=width/2, h2=height/4;
 
     verticesCube2D[0] = (float)(w2-padding)/w2;
     verticesCube2D[1] = (float)(-h2+padding)/h2;

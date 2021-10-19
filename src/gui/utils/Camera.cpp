@@ -43,7 +43,7 @@ void Camera::updateMatrices() {
 }
 
 void Camera::setViewPort(int x, int y, int width, int height) {
-    viewport = glm::ivec4(x,y,width,height);
+    viewport = glm::ivec4(x,y+height/2,width,height/2);
     updateEye();
     updateMatrices();
 }
