@@ -153,11 +153,13 @@ namespace tk{ namespace data{
             int height = msg.height;
             
             int channels = 0;
+            channels = msg.encoding == "bgra8"? 4 : channels;
             channels = msg.encoding == "rgba8"? 4 : channels;
+            channels = msg.encoding == "bgr8"? 3 : channels;
             channels = msg.encoding == "rgb8"? 3 : channels;
             channels = msg.encoding == "mono8"? 1 : channels;
             channels = msg.encoding == "32FC1"? 1 : channels;
-            tkASSERT(channels != 0, "image encoding not supported")
+            tkASSERT(channels != 0, "image encoding not supported "+msg.encoding)
             init(width, height, channels);
             memcpy(this->data.cpu.data, msg.data.data(), width*height*channels*sizeof(T));
         }

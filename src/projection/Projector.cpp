@@ -18,12 +18,14 @@ UtmProjector::UtmProjector()
 void 
 UtmProjector::init(const tk::math::Vec3d aGps)
 {
+    tkDBG("init proj: "<<aGps.x()<<" "<<aGps.y()<<" "<<aGps.z());
     init(aGps.x(), aGps.y(), aGps.z());
 }
 
 void 
 UtmProjector::init(const double aOriginLat, const double aOriginLon, const double aOriginEle)
 {   
+    tkDBG("init proj: "<<aOriginLat<<" "<<aOriginLon<<" "<<aOriginEle);
     GeographicLib::UTMUPS::Forward(aOriginLat, aOriginLon, mZone, mIsInNorthernHemisphere, mOffset.x(), mOffset.y()); 
     mOffset.z() = 0.0;
 
