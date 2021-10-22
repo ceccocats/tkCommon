@@ -91,6 +91,7 @@ VARS = [ {"name":"type",        "type":"static const DataType", "default": "Data
          {"name":"covAngle",    "type":"tk::math::Mat3d" },
          {"name":"pressure",    "type":"double",  "default":"0"}, 
          {"name":"temp",        "type":"double",  "default":"0"},
+         {"name":"flags",       "type":"uint32_t","default":"0"},
          {"name":"specific",    "type":"tk::common::Map<double>"},
         ]
 genData(className, VARS, DEPS)
