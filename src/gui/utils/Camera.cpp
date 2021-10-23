@@ -17,8 +17,8 @@ void Camera::init() {
     up = glm::vec3(0,0,1);
 
     // start angles
-    angles[0] = (-90.0f)/180.0f*M_PI;
-    angles[1] = (45.0f )/180.0f*M_PI;
+    angles[0] = (+90.0f)/180.0f*M_PI;
+    angles[1] = (35.0f )/180.0f*M_PI;
 
     // mouse status
     mouseOnGUI = false;
@@ -36,10 +36,24 @@ void Camera::updateEye() {
     eye.z = zoom * sin(angles[1]) + center[2];
 }
 
+glm::mat4 perspective(float fovy, float aspect, float n, float f)
+{
+    float xmin, xmax, ymin, ymax;
+
+    ymax = n * (float)tan(fovy * 0.5f);
+    ymin = -ymax;
+
+    xmin = ymin * aspect;
+    xmax = ymax * aspect;
+
+    float ym = ymax -ymin;
+    return glm::frustum(xmin, xmax, ymin +ym/5, ymax +ym/5, n, f); // offset center a bit down
+}
+
 void Camera::updateMatrices() {
     float aspect = float(viewport[2]) / float(viewport[3]);
     modelView  = glm::lookAt(eye, center, up);
-    projection = glm::perspective(fov, aspect, zNear, zFar);
+    projection = perspective(fov, aspect, zNear, zFar);
 }
 
 void Camera::setViewPort(int x, int y, int width, int height) {
