@@ -80,7 +80,35 @@ LaneletMap::onInit(Viewer *viewer)
         if (!line.hasAttribute(lanelet::AttributeName::Type))
             continue;
         if (line.attribute(lanelet::AttributeName::Type) == "stop_line")
+        {
             mLineMesh.push_back(createLine(line, 0.4));
+
+            // Draw traffic light on all stops:
+            // TODO: re-do better
+            // ----------------------------------------------------------------------------------------------------------------
+            float x = line[line.size()-1].x();
+            float y = line[line.size()-1].y();
+            float dx = line[line.size()-1].x() - line[line.size()-2].x();
+            float dy = line[line.size()-1].y() - line[line.size()-2].y();
+            float a = atan2(dy, dx);
+            tk::common::Tfpose tf = this->tf * tk::common::odom2tf(x,y,0,0,0,a + M_PI_2) * tk::common::odom2tf(0, -1, 0);
+
+            mSemBody.push_back(new tk::gui::Mesh(std::string(tkCommon_PATH)+"/data/semaphore/semaphore_body.obj"));
+            viewer->add(mSemBody[mSemBody.size()-1]);
+            mSemBody[mSemBody.size()-1]->tf = tf;
+            mSemRed.push_back(new tk::gui::Mesh(std::string(tkCommon_PATH)+"/data/semaphore/semaphore_red.obj", 1));
+            viewer->add(mSemRed[mSemRed.size()-1]);
+            mSemRed[mSemRed.size()-1]->tf = tf;
+            mSemGreen.push_back(new tk::gui::Mesh(std::string(tkCommon_PATH)+"/data/semaphore/semaphore_green.obj", 1));
+            viewer->add(mSemGreen[mSemGreen.size()-1]);
+            mSemGreen[mSemGreen.size()-1]->tf = tf;
+            mSemYellow.push_back(new tk::gui::Mesh(std::string(tkCommon_PATH)+"/data/semaphore/semaphore_yellow.obj", 1));
+            viewer->add(mSemYellow[mSemYellow.size()-1]);
+            mSemYellow[mSemYellow.size()-1]->tf = tf;
+
+            // ----------------------------------------------------------------------------------------------------------------
+        }
+
     }
 
     // generate traffic light mesh
