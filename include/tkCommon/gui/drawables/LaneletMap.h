@@ -31,7 +31,7 @@ private:
     std::vector<tk::gui::SimpleMesh>    mBuildingMesh, mGreenlandMesh, mParkingMesh, mRoadMesh, mLineMesh;
 
     bool                                mShowBuilding, mShowRoad, mShowGreenland, mShowParking;
-    std::vector<glm::mat4>              mGlBuildingPose, mGlGreenlandPose, mGlParkingPose, mGlRoadPose, mGlLinesPose;
+    std::vector<glm::mat4>              mGlBuildingPose, mGlGreenlandPose, mGlParkingPose, mGlRoadPose, mGlLinesPose, mGlTrafficLightPose;
     std::vector<tk::gui::Buffer<float>> mGlBuildingData, mGlGreenlandData, mGlParkingData, mGlRoadData, mGlLinesData;
     tk::gui::Color_t                    mBuildingColor, mGrennlandColor, mParkingColor, mRoadColor, mLineColor;
 
