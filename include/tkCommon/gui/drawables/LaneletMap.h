@@ -5,6 +5,7 @@
 #include "tkCommon/gui/utils/SimpleMesh.h"
 #include "tkCommon/gui/utils/PerlinNoise.h"
 #include "tkCommon/lanelet/LaneletInterface.h"
+#include "tkCommon/gui/drawables/Mesh.h"
 
 namespace tk { 
 namespace gui {
@@ -36,6 +37,13 @@ private:
     tk::gui::Color_t                    mBuildingColor, mGrennlandColor, mParkingColor, mRoadColor, mLineColor;
 
     tk::gui::PerlinNoise *pn;
+
+    std::vector<tk::gui::Mesh*> mSemBody;
+    std::vector<tk::gui::Mesh*> mSemRed;
+    std::vector<tk::gui::Mesh*> mSemGreen;
+    std::vector<tk::gui::Mesh*> mSemYellow;
+
+    std::vector<tk::common::Tfpose> mSemTF;
 
 #ifdef LANELET_ENABLED
     tk::gui::SimpleMesh createBuilding(const lanelet::Area &area, bool height);
