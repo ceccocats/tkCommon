@@ -122,8 +122,23 @@ LaneletMap::onInit(Viewer *viewer)
     }
 
     // generate traffic light mesh
-    for (const auto& reg: mLanelet.mMap->regulatoryElementLayer) {
-        
+    for (auto regElem: mLanelet.mMap->regulatoryElementLayer) {
+        double x, y, z;
+        if (regElem->hasAttribute(lanelet::AttributeName::Subtype) && regElem->attribute(lanelet::AttributeName::Subtype) == "traffic_light") {
+            //auto traffic_light = std::dynamic_pointer_cast<lanelet::TrafficLight>(regElem);
+            auto pose = regElem->getParameters<lanelet::ConstLineString3d>("refers");
+            if (pose.size() == 1) {
+                x = y = z = 0;
+                for (const auto& point : pose[0]) {
+                    x += point.x();
+                    y += point.y();
+                }
+                x /= pose[0].size();
+                y /= pose[0].size();
+                z  = pose[0].attributeOr<double>("ele", 0);
+                mGlTrafficLightPose.push_back(glm::make_mat4x4(tk::common::odom2tf(x, y, z, 0.0f).matrix().data()));
+            }
+        }
     }
 
     mGlBuildingPose.resize(mBuildingMesh.size());
