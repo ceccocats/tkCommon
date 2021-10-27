@@ -75,7 +75,13 @@ LaneletMap::onInit(Viewer *viewer)
         mRoadMesh.push_back(createRoad(lane));
     }
 
+    Semaphore sem;
+    sem.mBody = new tk::gui::Mesh(std::string(tkCommon_PATH)+"/data/semaphore/semaphore_body.obj");
+    sem.mRed = new tk::gui::Mesh(std::string(tkCommon_PATH)+"/data/semaphore/semaphore_red.obj", 1);
+    sem.mGreen = new tk::gui::Mesh(std::string(tkCommon_PATH)+"/data/semaphore/semaphore_green.obj", 1);
+    sem.mYellow = new tk::gui::Mesh(std::string(tkCommon_PATH)+"/data/semaphore/semaphore_yellow.obj", 1);
     // generate stop line mesh
+    int i = 0;
     for (const auto& line : mLanelet.mMap->lineStringLayer) {
         if (!line.hasAttribute(lanelet::AttributeName::Type))
             continue;
@@ -93,18 +99,22 @@ LaneletMap::onInit(Viewer *viewer)
             float a = atan2(dy, dx);
             tk::common::Tfpose tf = this->tf * tk::common::odom2tf(x,y,0,0,0,a + M_PI_2) * tk::common::odom2tf(0, -1, 0);
 
-            mSemBody.push_back(new tk::gui::Mesh(std::string(tkCommon_PATH)+"/data/semaphore/semaphore_body.obj"));
-            viewer->add(mSemBody[mSemBody.size()-1]);
-            mSemBody[mSemBody.size()-1]->tf = tf;
-            mSemRed.push_back(new tk::gui::Mesh(std::string(tkCommon_PATH)+"/data/semaphore/semaphore_red.obj", 1));
-            viewer->add(mSemRed[mSemRed.size()-1]);
-            mSemRed[mSemRed.size()-1]->tf = tf;
-            mSemGreen.push_back(new tk::gui::Mesh(std::string(tkCommon_PATH)+"/data/semaphore/semaphore_green.obj", 1));
-            viewer->add(mSemGreen[mSemGreen.size()-1]);
-            mSemGreen[mSemGreen.size()-1]->tf = tf;
-            mSemYellow.push_back(new tk::gui::Mesh(std::string(tkCommon_PATH)+"/data/semaphore/semaphore_yellow.obj", 1));
-            viewer->add(mSemYellow[mSemYellow.size()-1]);
-            mSemYellow[mSemYellow.size()-1]->tf = tf;
+            Semaphore *s = new Semaphore;
+            s->mBody = new Mesh(*sem.mBody);
+            s->mRed = new Mesh(*sem.mRed);
+            s->mGreen = new Mesh(*sem.mGreen);
+            s->mYellow = new Mesh(*sem.mYellow);
+            s->mBody->tf = tf;
+            s->mRed->tf = tf;
+            s->mGreen->tf = tf;
+            s->mYellow->tf = tf;
+
+            mSemList.push_back(*s);
+
+            viewer->add(s->mBody);
+            viewer->add(s->mGreen);
+            viewer->add(s->mYellow);
+            viewer->add(s->mRed);
 
             // ----------------------------------------------------------------------------------------------------------------
         }
@@ -205,6 +215,15 @@ LaneletMap::beforeDraw(tk::gui::Viewer *viewer)
             mGlLinesPose[i] = glm::make_mat4x4(tf.matrix().data());      
         }
         mLineMesh.clear();
+    }
+
+    int i = 0;
+    for(auto &s:mSemList){
+        s.mBody->name = "Body "+std::to_string(i);
+        s.mRed->name = "Red "+std::to_string(i);
+        s.mGreen->name = "Green "+std::to_string(i);
+        s.mYellow->name = "Yellow "+std::to_string(i);
+        i++;
     }
 }
 
@@ -337,3 +356,21 @@ LaneletMap::createLine(lanelet::ConstLineString3d line, float width)
     return mesh;
 }
 #endif
+
+void LaneletMap::Semaphore::setGreen(){
+    mRed->setAmbientStrengt(-1);
+    mYellow->setAmbientStrengt(-1);
+    mGreen->setAmbientStrengt(1);
+}
+
+void LaneletMap::Semaphore::setRed(){
+    mRed->setAmbientStrengt(1);
+    mYellow->setAmbientStrengt(-1);
+    mGreen->setAmbientStrengt(-1);
+}
+
+void LaneletMap::Semaphore::setYellow(){
+    mRed->setAmbientStrengt(-1);
+    mYellow->setAmbientStrengt(1);
+    mGreen->setAmbientStrengt(-1);
+}

@@ -21,6 +21,20 @@ public:
     void imGuiSettings() final;
     void imGuiInfos() final;
     void onClose() final;
+
+    class Semaphore {
+        public:
+            tk::gui::Mesh* mBody;
+            tk::gui::Mesh* mRed;
+            tk::gui::Mesh* mGreen;
+            tk::gui::Mesh* mYellow;
+            void setRed();
+            void setGreen();
+            void setYellow();
+    };
+
+    std::vector<Semaphore> mSemList;
+    
 private:
     std::string             mConfPath;
     tk::common::LaneletInterface     mLanelet;
@@ -37,11 +51,6 @@ private:
     tk::gui::Color_t                    mBuildingColor, mGrennlandColor, mParkingColor, mRoadColor, mLineColor;
 
     tk::gui::PerlinNoise *pn;
-
-    std::vector<tk::gui::Mesh*> mSemBody;
-    std::vector<tk::gui::Mesh*> mSemRed;
-    std::vector<tk::gui::Mesh*> mSemGreen;
-    std::vector<tk::gui::Mesh*> mSemYellow;
 
     std::vector<tk::common::Tfpose> mSemTF;
 
