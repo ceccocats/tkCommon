@@ -152,12 +152,12 @@ namespace tk { namespace data {
         }
 
 #if TKROS_VERSION == 1
-        void fromRos(std_msgs::Header &msg) {
+        void fromRos(const std_msgs::Header &msg) {
             this->messageID  = msg.seq;
             this->stamp      = msg.stamp.toNSec() / 1e3;
 #endif
 #if TKROS_VERSION == 2
-        void fromRos(std_msgs::msg::Header &msg) {
+        void fromRos(const std_msgs::msg::Header &msg) {
             this->stamp      = msg.stamp.nanosec / 1e3;
 #endif
             this->name       = msg.frame_id;

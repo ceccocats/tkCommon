@@ -329,6 +329,12 @@ namespace tk { namespace common {
      * @return
      */
     Vector3<float> tf2rot(Tfpose tf);
+    /**
+     * Extract 4d quaternion from TfPose
+     * @param tf
+     * @return
+     */
+    Vector4<float> tf2quat(Tfpose tf);
 
 
     /**

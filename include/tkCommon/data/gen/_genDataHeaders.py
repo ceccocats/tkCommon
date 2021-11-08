@@ -71,6 +71,7 @@ VARS = [ {"name":"type",        "type":"static const DataType", "default": "Data
          {"name":"covAngle",    "type":"tk::math::Mat3d" },
          {"name":"covMag",      "type":"tk::math::Mat3d" },
          {"name":"sideSlip",    "type":"double",  "default":"0"}, 
+         {"name":"specific",    "type":"tk::common::Map<double>"},
         ]
 genData(className, VARS, DEPS)
 
@@ -91,6 +92,7 @@ VARS = [ {"name":"type",        "type":"static const DataType", "default": "Data
          {"name":"covAngle",    "type":"tk::math::Mat3d" },
          {"name":"pressure",    "type":"double",  "default":"0"}, 
          {"name":"temp",        "type":"double",  "default":"0"},
+         {"name":"specific",    "type":"tk::common::Map<double>"},
         ]
 genData(className, VARS, DEPS)
 

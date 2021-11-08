@@ -70,10 +70,10 @@ namespace tk { namespace data {
         }
 
 #if TKROS_VERSION == 1
-        void fromRos(nav_msgs::Odometry &msg) {
+        void fromRos(const nav_msgs::Odometry &msg) {
 #endif
 #if TKROS_VERSION == 2
-        void fromRos(nav_msgs::msg::Odometry &msg) {
+        void fromRos(const nav_msgs::msg::Odometry &msg) {
 #endif
             this->header.fromRos(msg.header);
 

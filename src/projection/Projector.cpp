@@ -27,7 +27,7 @@ UtmProjector::init(const double aOriginLat, const double aOriginLon, const doubl
 {   
     tkDBG("init proj: "<<aOriginLat<<" "<<aOriginLon<<" "<<aOriginEle);
     GeographicLib::UTMUPS::Forward(aOriginLat, aOriginLon, mZone, mIsInNorthernHemisphere, mOffset.x(), mOffset.y()); 
-    mOffset.z() = 0.0;
+    mOffset.z() = aOriginEle;
 
     mUseOffset      = true;
     mHasReference   = true;
@@ -38,7 +38,8 @@ UtmProjector::forward(const double aLat, const double aLon, const double aEle)
 {    
     int     zone;
     bool    northp;
-    tk::math::Vec3d point;
+    tk::math::Vec3d point(0,0,0);
+    
     try {
         GeographicLib::UTMUPS::Forward(aLat, aLon, zone, northp, point.x(), point.y());
     } catch (GeographicLib::GeographicErr& e) {
@@ -65,6 +66,7 @@ UtmProjector::forward(const double aLat, const double aLon, const double aEle)
 
         point.x() = xAfterTransfer;
         point.y() = yAfterTransfer;
+        point.z() = aEle;
     }
 
     // apply reference
