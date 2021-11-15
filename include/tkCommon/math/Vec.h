@@ -161,6 +161,8 @@ public:
     T w() const { return this->mData[3]; }
 };
 
+Vec3<double> quat2euler(Vec4<double> aQuaternion);
+Vec4<double> euler2quat(Vec3<double> aEuler);
 
 typedef Vec2<double> Vec2d;
 typedef Vec3<double> Vec3d;
@@ -169,6 +171,4 @@ typedef Vec4<double> Vec4d;
 typedef Vec2<float> Vec2f;
 typedef Vec3<float> Vec3f;
 typedef Vec4<float> Vec4f;
-
-
 }}

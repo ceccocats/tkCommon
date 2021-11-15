@@ -128,6 +128,7 @@ tk::gui::shader::text::draw(glm::mat4& modelview, std::string text, float target
     }
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+    shader.unuse();
     
     glCheckError();
 }

@@ -29,6 +29,30 @@ namespace tk{ namespace common{
 			}
 			~Prism(){}
 
+			bool within(const tk::common::Vector2<float> &aPoint) const
+			{
+				int i, j;
+				bool c = false;
+				for (i = 0, j = points.size()-1; i < points.size(); j = i++) {
+					if ( ((points[i].y()>aPoint.y()) != (points[j].y()>aPoint.y())) &&
+					(aPoint.x() < (points[j].x()-points[i].x()) * (aPoint.y()-points[i].y()) / (points[j].y()-points[i].y()) + points[i].x()) )
+						c = !c;
+				}
+				return c;
+			}
+
+			float distance(const tk::common::Vector2<float> &aPoint) const 
+			{
+				float min_r = std::numeric_limits<float>::max();
+				float dx, dy, r;
+				for (int i = 0; i < points.size(); ++i) {
+					dx = points[i].x() - aPoint.x();
+					dy = points[i].y() - aPoint.y();
+					min_r = std::min(min_r, std::hypot(dx, dy));
+				}
+				return min_r;
+			}
+
 			Prism& operator=(const tk::common::Prism& d){
 				this->points = d.points;
 				this->height = d.height;
@@ -43,6 +67,12 @@ namespace tk{ namespace common{
 			std::vector<Prism> data;
 			Prisms(){}
 			~Prisms(){}
+
+			Prisms& operator=(const tk::common::Prisms& s) {
+				this->tf = s.tf;
+				this->data = s.data;
+				return *this;
+			}
 	};
 
 	/*class Polygon : public tk::gui::Drawable{

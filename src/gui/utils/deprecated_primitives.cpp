@@ -90,6 +90,27 @@ void drawLine(tk::common::Vector3<float> a, tk::common::Vector3<float> b, float 
     glEnd();
 }
 
+void drawRectangle(tk::common::Vector3<float> pose, tk::common::Vector2<float> size, bool filled) {
+    if (!filled)
+        glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
+
+    glPushMatrix();
+    glTranslatef(pose.x(), pose.y(), pose.z());
+    glScalef(size.x(), size.y(), 0.0f);
+    
+    glBegin(GL_QUADS);
+    glVertex3f(-1,-1,0);
+    glVertex3f(1,-1,0);
+    glVertex3f(1,1,0);
+    glVertex3f(-1,1,0);
+    glEnd();
+    
+    glPopMatrix();
+
+    if (!filled)
+        glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
+}
+
 void drawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, bool filled) {
     if (!filled)
         glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;

@@ -156,6 +156,7 @@ add_library(math SHARED
     src/math/CSpline.cpp 
     src/math/CSpline2D.cpp 
     src/math/CSpline3D.cpp
+    src/math/Vec.cpp
 )
 target_link_libraries(math 
     tkCommon::common
@@ -198,7 +199,8 @@ add_library(${PROJECT_NAME}::joystick ALIAS joystick)
 add_library(sensor SHARED
     src/sensor/Sensor.cpp
     src/sensor/SensorManager.cpp
-    src/sensor/LogManager.cpp    
+    src/sensor/LogManager.cpp
+    src/sensor/CameraStream.cpp
 )
 target_link_libraries(sensor
     tkCommon::common tkCommon::gui tkCommon::communication tkCommon::math 

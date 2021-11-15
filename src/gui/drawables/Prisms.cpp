@@ -94,7 +94,7 @@ tk::gui::Prisms::draw(tk::gui::Viewer *viewer){
 
         ref->lockRead();
         prisms.data.resize(ref->data.size());
-        tf = ref->tf;
+        //tf = ref->tf;
         for(int i = 0; i < ref->data.size(); i++){
             prisms.data[i].height = ref->data[i].height;
             prisms.data[i].points = ref->data[i].points;
