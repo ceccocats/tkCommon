@@ -40,8 +40,7 @@ class OccupancyGridData : public ImageDataF
                    float aResolution = 0.1f,
                    uint8_t aCellThreshold = 2,
                    size_t aMinWidth = 0,
-                   size_t aMinHeight = 0,
-                   float aMinObstacleHeight = 0.0f)
+                   size_t aMinHeight = 0)
     {
         // find bounds
         float min_x, max_x, min_y, max_y, min_z, max_z;
@@ -69,7 +68,7 @@ class OccupancyGridData : public ImageDataF
             occGrid.writableMatrix().setZero();
             for (size_t i = 0; i < aCloud->points.cols(); ++i) {
                 if (point2grid(aCloud->points(0, i), aCloud->points(1, i), r, c))
-                    if (aCloud->points(i, 2) > aMinObstacleHeight && occGrid(r, c) < 255)
+                    if (occGrid(r, c) < 255)
                         occGrid(r, c) += 1;
             }
             
@@ -83,8 +82,7 @@ class OccupancyGridData : public ImageDataF
             }
         } else {
             for (size_t i = 0; i < aCloud->points.cols(); ++i)
-                if (point2grid(aCloud->points(0, i), aCloud->points(1, i), r, c) &&
-                    aCloud->points(i, 2) > aMinObstacleHeight)
+                if (point2grid(aCloud->points(0, i), aCloud->points(1, i), r, c))
                     this->at(r, c)[0] = 1.0f;
         }
     }

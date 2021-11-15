@@ -158,6 +158,10 @@ public:
         }
     }
 
+    __host__ T
+    operator()(int i, int j) const {
+        return cpu.data[i+j*cpu.rows]; 
+    }
 
     __host__ T&
     operator()(int i, int j) {
