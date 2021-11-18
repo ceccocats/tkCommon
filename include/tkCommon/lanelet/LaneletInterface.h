@@ -6,11 +6,13 @@
 #include <lanelet2_core/LaneletMap.h>
 #include <lanelet2_core/geometry/Area.h>
 #include <lanelet2_core/geometry/Lanelet.h>
+#include <lanelet2_core/geometry/LineString.h>
 #include <lanelet2_core/primitives/Area.h>
 #include <lanelet2_core/primitives/Lanelet.h>
 #include <lanelet2_core/primitives/LineString.h>
 #include <lanelet2_core/primitives/Point.h>
 #include <lanelet2_core/primitives/Polygon.h>
+#include <lanelet2_core/primitives/BasicRegulatoryElements.h>
 #include <lanelet2_core/utility/Units.h>
 #include <lanelet2_io/Io.h>
 #include <lanelet2_io/io_handlers/Factory.h>
@@ -21,37 +23,23 @@
 #include <lanelet2_routing/RoutingGraph.h>
 #include <lanelet2_routing/RoutingGraphContainer.h>
 #include <lanelet2_traffic_rules/TrafficRulesFactory.h>
+#include <lanelet2_core/primitives/BasicRegulatoryElements.h>
 #endif
 
 namespace tk { namespace common {
-    class Lanelet {
+    class LaneletInterface {
     public:
-         Lanelet() = default;
-        ~Lanelet() = default;
+         LaneletInterface() = default;
+        ~LaneletInterface() = default;
 
-    #ifdef LANELET_ENABLED
+        bool init(const std::string &aConfPath);
+        void buildRoutingGraph();
 
-        bool init(const std::string &aConfPath) {
-            YAML::Node conf     = YAML::LoadFile(aConfPath);
-            
-            std::string local_p = tk::common::YAMLgetConf<std::string>(conf, "file", "lanelet.osm");
-            std::string map_p   = aConfPath.substr(0, aConfPath.find_last_of('/')) + "/" + local_p;
-            mOriginLat          = tk::common::YAMLgetConf<double>(conf, "lat", 0.0f);
-            mOriginLon          = tk::common::YAMLgetConf<double>(conf, "lon", 0.0f);
-            
-            mProjector          = new lanelet::projection::UtmProjector(lanelet::Origin({mOriginLat, mOriginLon}));
-            mMap                = lanelet::load(map_p, *mProjector);
-            return true;
-        }
-
+#ifdef LANELET_ENABLED
+        lanelet::routing::RoutingGraphPtr mRoutingGraph;
         lanelet::LaneletMapUPtr mMap;
         double mOriginLat, mOriginLon;
         lanelet::projection::UtmProjector *mProjector;
-    #else
-        bool init(const std::string &aConfPath) {
-            tkERR("You need to compile with lanelet2");
-            return false;    
-        }
-    #endif
+#endif
     };
 }}

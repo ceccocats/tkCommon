@@ -72,6 +72,7 @@ add_library(common SHARED
     src/CmdParser.cpp 
     src/rt/Profiler.cpp
     src/projection/Projector.cpp
+    src/lanelet/LaneletInterface.cpp
     src/PID.cpp
     ${data_gen}
     ${data} 

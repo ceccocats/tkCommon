@@ -3,7 +3,7 @@
 #include "tkCommon/gui/drawables/Drawable.h"
 #include "tkCommon/gui/shader/simpleMesh.h"
 #include "tkCommon/gui/utils/SimpleMesh.h"
-#include "tkCommon/lanelet/Lanelet.h"
+#include "tkCommon/lanelet/LaneletInterface.h"
 
 namespace tk { namespace gui {
 class LaneletPath : public Drawable {
