@@ -23,11 +23,6 @@
 #include <pcl/point_types.h>
 #endif
 
-#ifdef PCL_ENABLED
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
-#endif
-
 namespace tk { namespace data {
 
     class CloudData : public CloudData_gen{
@@ -316,10 +311,10 @@ namespace tk { namespace data {
         }
 
 #if TKROS_VERSION == 1
-        void fromRos(sensor_msgs::LaserScan &msg) {
+        void fromRos(const sensor_msgs::LaserScan &msg) {
 #endif
 #if TKROS_VERSION == 2
-        void fromRos(sensor_msgs::msg::LaserScan &msg) {
+        void fromRos(const sensor_msgs::msg::LaserScan &msg) {
 #endif
             this->header.fromRos(msg.header);
             this->header.type   = DataType::CLOUD; 
@@ -352,12 +347,12 @@ namespace tk { namespace data {
         }
 
 #if TKROS_VERSION == 1
-        void fromRos(sensor_msgs::PointCloud2 &msg) {
+        void fromRos(const sensor_msgs::PointCloud2 &msg) {
             //convert
             sensor_msgs::PointCloud     tmp;
 #endif
 #if TKROS_VERSION == 2
-        void fromRos(sensor_msgs::msg::PointCloud2 &msg) {
+        void fromRos(const sensor_msgs::msg::PointCloud2 &msg) {
             //convert
             sensor_msgs::msg::PointCloud     tmp;
 #endif

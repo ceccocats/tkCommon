@@ -108,8 +108,8 @@ namespace tk { namespace data {
 
             // safe string update
             if(this->name != s.name) {
-                tkWRN("Changing header name from " + name + " to " + s.name +
-                       " if this message appers it is a problem\n");
+                /*tkWRN("Changing header name from " + name + " to " + s.name +
+                       " if this message appers it is a problem\n");*/
                 // this WARNING could be caused by the use of a tmpData in the sensor
                 // if you are using tmpData please be sure to not rewrite the header name
                 this->name = s.name;
@@ -152,12 +152,12 @@ namespace tk { namespace data {
         }
 
 #if TKROS_VERSION == 1
-        void fromRos(std_msgs::Header &msg) {
+        void fromRos(const std_msgs::Header &msg) {
             this->messageID  = msg.seq;
             this->stamp      = msg.stamp.toNSec() / 1e3;
 #endif
 #if TKROS_VERSION == 2
-        void fromRos(std_msgs::msg::Header &msg) {
+        void fromRos(const std_msgs::msg::Header &msg) {
             this->stamp      = msg.stamp.nanosec / 1e3;
 #endif
             this->name       = msg.frame_id;
