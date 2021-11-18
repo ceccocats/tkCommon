@@ -23,11 +23,6 @@
 #include <pcl/point_types.h>
 #endif
 
-#ifdef PCL_ENABLED
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
-#endif
-
 namespace tk { namespace data {
 
     class CloudData : public CloudData_gen{
@@ -434,6 +429,7 @@ namespace tk { namespace data {
         }
 #endif
 #endif
+
 
 #ifdef PCL_ENABLED
         void toPcl(pcl::PointCloud<pcl::PointXYZI>::Ptr &aPclCloud) {
