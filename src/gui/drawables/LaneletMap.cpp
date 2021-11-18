@@ -49,28 +49,96 @@ LaneletMap::onInit(Viewer *viewer)
 
     // generate area mesh
     for(const auto& area : mLanelet.mMap->areaLayer) {
-        if (area.attribute(lanelet::AttributeName::Subtype) == "building") {
-            mBuildingMesh.push_back(createBuilding(area, true));
-        }
-        if (area.attribute(lanelet::AttributeName::Subtype) == "vegetation") {
-            mGreenlandMesh.push_back(createBuilding(area, false));
-        }
-        if (area.attribute(lanelet::AttributeName::Subtype) == "parking") {
-            mParkingMesh.push_back(createBuilding(area, false));
+        if (area.hasAttribute(lanelet::AttributeName::Subtype)) {
+            if (area.attribute(lanelet::AttributeName::Subtype) == "building") {
+                mBuildingMesh.push_back(createBuilding(area, true));
+            }
+            if (area.attribute(lanelet::AttributeName::Subtype) == "vegetation") {
+                mGreenlandMesh.push_back(createBuilding(area, false));
+            }
+            if (area.attribute(lanelet::AttributeName::Subtype) == "parking") {
+                mParkingMesh.push_back(createBuilding(area, false));
+            }
         }
     }
 
     // generate road mesh
     for(const auto& lane : mLanelet.mMap->laneletLayer) {
         auto right = lane.rightBound3d();
-        if (right.attribute(lanelet::AttributeName::Subtype) == "solid") 
-            mLineMesh.push_back(createLine(right));
+        if (right.hasAttribute(lanelet::AttributeName::Subtype) && right.attribute(lanelet::AttributeName::Subtype) == "solid") 
+            mLineMesh.push_back(createLine(right, 0.1));
         
         auto left = lane.leftBound3d();
-        if (left.attribute(lanelet::AttributeName::Subtype) == "solid") 
-            mLineMesh.push_back(createLine(left));
+        if (left.hasAttribute(lanelet::AttributeName::Subtype) && left.attribute(lanelet::AttributeName::Subtype) == "solid") 
+            mLineMesh.push_back(createLine(left, 0.1));
 
         mRoadMesh.push_back(createRoad(lane));
+    }
+
+    Semaphore sem;
+    sem.mBody = new tk::gui::Mesh(std::string(tkCommon_PATH)+"/data/semaphore/semaphore_body.obj");
+    sem.mRed = new tk::gui::Mesh(std::string(tkCommon_PATH)+"/data/semaphore/semaphore_red.obj", 1);
+    sem.mGreen = new tk::gui::Mesh(std::string(tkCommon_PATH)+"/data/semaphore/semaphore_green.obj", 1);
+    sem.mYellow = new tk::gui::Mesh(std::string(tkCommon_PATH)+"/data/semaphore/semaphore_yellow.obj", 1);
+    // generate stop line mesh
+    int i = 0;
+    for (const auto& line : mLanelet.mMap->lineStringLayer) {
+        if (!line.hasAttribute(lanelet::AttributeName::Type))
+            continue;
+        if (line.attribute(lanelet::AttributeName::Type) == "stop_line")
+        {
+            mLineMesh.push_back(createLine(line, 0.4));
+
+            // Draw traffic light on all stops:
+            // TODO: re-do better
+            // ----------------------------------------------------------------------------------------------------------------
+            float x = line[line.size()-1].x();
+            float y = line[line.size()-1].y();
+            float dx = line[line.size()-1].x() - line[line.size()-2].x();
+            float dy = line[line.size()-1].y() - line[line.size()-2].y();
+            float a = atan2(dy, dx);
+            tk::common::Tfpose tf = this->tf * tk::common::odom2tf(x,y,0,0,0,a + M_PI_2) * tk::common::odom2tf(0, -1, 0);
+
+            Semaphore *s = new Semaphore;
+            s->mBody = new Mesh(*sem.mBody);
+            s->mRed = new Mesh(*sem.mRed);
+            s->mGreen = new Mesh(*sem.mGreen);
+            s->mYellow = new Mesh(*sem.mYellow);
+            s->mBody->tf = tf;
+            s->mRed->tf = tf;
+            s->mGreen->tf = tf;
+            s->mYellow->tf = tf;
+
+            mSemList.push_back(*s);
+
+            viewer->add(s->mBody);
+            viewer->add(s->mGreen);
+            viewer->add(s->mYellow);
+            viewer->add(s->mRed);
+
+            // ----------------------------------------------------------------------------------------------------------------
+        }
+
+    }
+
+    // generate traffic light mesh
+    for (auto regElem: mLanelet.mMap->regulatoryElementLayer) {
+        double x, y, z;
+        if (regElem->hasAttribute(lanelet::AttributeName::Subtype) && regElem->attribute(lanelet::AttributeName::Subtype) == "traffic_light") {
+            //auto traffic_light = std::dynamic_pointer_cast<lanelet::TrafficLight>(regElem);
+            auto pose = regElem->getParameters<lanelet::ConstLineString3d>("refers");
+            if (pose.size() == 1) {
+                x = y = z = 0;
+                for (const auto& point : pose[0]) {
+                    x += point.x();
+                    y += point.y();
+                }
+                x /= pose[0].size();
+                y /= pose[0].size();
+                z  = pose[0].attributeOr<double>("ele", 0);
+                mGlTrafficLightPose.push_back(glm::make_mat4x4(tk::common::odom2tf(x, y, z, 0.0f).matrix().data()));
+            }
+        }
     }
 
     mGlBuildingPose.resize(mBuildingMesh.size());
@@ -158,10 +226,19 @@ LaneletMap::beforeDraw(tk::gui::Viewer *viewer)
         for (int i = 0; i < mLineMesh.size(); ++i) {
             data = mLineMesh[i].vertexBufferPositionNormal(n);
             mGlLinesData[i].setData(data, n);   
-            tf.matrix() = mLineMesh[i].pose.matrix() * tk::common::odom2tf(0.0, 0.0, 0.1, 0.0).matrix();
+            tf.matrix() = mLineMesh[i].pose.matrix() * tk::common::odom2tf(0.0, 0.0, 0.05, 0.0).matrix();
             mGlLinesPose[i] = glm::make_mat4x4(tf.matrix().data());      
         }
         mLineMesh.clear();
+    }
+
+    int i = 0;
+    for(auto &s:mSemList){
+        s.mBody->name = "Body "+std::to_string(i);
+        s.mRed->name = "Red "+std::to_string(i);
+        s.mGreen->name = "Green "+std::to_string(i);
+        s.mYellow->name = "Yellow "+std::to_string(i);
+        i++;
     }
 }
 
@@ -277,7 +354,7 @@ LaneletMap::createRoad(const lanelet::Lanelet &lane)
 }
 
 tk::gui::SimpleMesh 
-LaneletMap::createLine(lanelet::ConstLineString3d line)
+LaneletMap::createLine(lanelet::ConstLineString3d line, float width)
 {
     tk::gui::SimpleMesh             mesh;
     std::vector<tk::math::Vec2f>    l;
@@ -289,8 +366,26 @@ LaneletMap::createLine(lanelet::ConstLineString3d line)
         l.push_back(tk::math::Vec2f(line[i].x(), line[i].y()));
     }
 
-    mesh.createLine(l, 0.1);
+    mesh.createLine(l, width);
 
     return mesh;
 }
 #endif
+
+void LaneletMap::Semaphore::setGreen(){
+    mRed->setAmbientStrengt(-1);
+    mYellow->setAmbientStrengt(-1);
+    mGreen->setAmbientStrengt(1);
+}
+
+void LaneletMap::Semaphore::setRed(){
+    mRed->setAmbientStrengt(1);
+    mYellow->setAmbientStrengt(-1);
+    mGreen->setAmbientStrengt(-1);
+}
+
+void LaneletMap::Semaphore::setYellow(){
+    mRed->setAmbientStrengt(-1);
+    mYellow->setAmbientStrengt(1);
+    mGreen->setAmbientStrengt(-1);
+}

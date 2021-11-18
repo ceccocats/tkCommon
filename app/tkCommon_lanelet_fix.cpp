@@ -1,6 +1,6 @@
 #include <tkCommon/common.h>
 
-#include <tkCommon/lanelet/Lanelet.h>
+#include <tkCommon/lanelet/LaneletInterface.h>
 
 YAML::Node  conf;
 std::string laneletConfPath, laneletMapPath, laneletMapFixedPath;
@@ -97,7 +97,7 @@ main (int argc, char *argv[])
     cmd.parse();
 
     // get conf from YAML
-    tk::common::Lanelet lanelet;
+    tk::common::LaneletInterface lanelet;
     lanelet.init(laneletConfPath);
 
     #ifdef LANELET_ENABLED

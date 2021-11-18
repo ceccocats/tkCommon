@@ -41,12 +41,11 @@ private:
                 return nullptr;
             }
 
-            id = last;
             // starting from last,
             int i = 0;
             while(true) {
                 // starting from last search for unlocked element
-                id = (id + (size-i)) % size;
+                id = (last + (size-i)) % size;
                 if(data[id]->tryLockRead())
                     break;
                 i++;
@@ -193,7 +192,67 @@ public:
         } 
     }
 
+    /**
+     * @brief Get the data with the closest timestamp
+     * 
+     * @param id    index of the sensor data returned, used to release
+     * @param stamp timestamp to search
+     * @return const tk::data::SensorData* 
+     */
+    const tk::data::SensorData* 
+    getStamped(int &id, timeStamp_t stamp) {
+        
+        if (inserted == 0) {
+            id = -1;
+            return nullptr;
+        }
 
+        gmtx.lock();
+
+            // no free element in the pool
+            if(locked >= size) {
+                id  = -2;
+                gmtx.unlock();
+                return nullptr;
+            }
+
+            id = last;
+            // starting from last,
+            int a = last;
+            int b;
+            bool first = true;
+            while(true) {
+                // starting from last search for unlocked element
+                b = a;
+                if( !first || data[a]->tryLockRead() ){
+                    int dt_a = std::abs(int(data[a]->header.stamp-stamp));
+                    b = ( a + (size-1)) % size;
+                    bool found = false;
+                    while(!data[b]->tryLockRead()){
+                        b = ( b + (size-1)) % size;
+                    }
+                    int dt_b = std::abs(int(data[b]->header.stamp-stamp));
+                    if(dt_b >= dt_a){
+                        // a is the closest
+                        data[b]->unlockRead();
+                        break;
+                    }else{
+                        // a is wrong
+                        data[a]->unlockRead();
+                        a = b;
+                        first = false;
+                    }
+                }else{
+                    a = (a + (size-1)) % size;
+                }
+            }
+
+            id = a;
+            if (data[id]->getReaders() == 1)
+                locked++;
+        gmtx.unlock();
+        return dynamic_cast<const tk::data::SensorData*>(data[id]);
+    }
     
     /**
      * @brief Method to release a pointer to sensor data in reading mode.

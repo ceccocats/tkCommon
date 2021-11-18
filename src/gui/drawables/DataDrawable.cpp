@@ -64,25 +64,6 @@ DataDrawable::draw(Viewer *viewer)
         } 
     }
 
-    if(data != nullptr) {
-        drwModelView = drwModelView * glm::make_mat4x4(data->header.tf.matrix().data());
-        // draw sensor tf
-        glPushMatrix();
-        glMultMatrixf((tf*data->header.tf).matrix().data());
-        glLineWidth(2.5);
-        glBegin(GL_LINES);
-        glColor3f (1.0f,0.0f,0.0f);
-        glVertex3f(0.0f,0.0f,0.0f);
-        glVertex3f(1.0f,0.0f,0.0f);
-        glColor3f (0.0f,1.0f,0.0f);
-        glVertex3f(0.0f,0.0f,0.0f);
-        glVertex3f(0.0f,1.0f,0.0f);
-        glColor3f (0.0f,0.0f,1.0f);
-        glVertex3f(0.0f,0.0f,0.0f);
-        glVertex3f(0.0f,0.0f,1.0f);
-        glEnd();
-        glPopMatrix();
-    }
     this->drawData(viewer);
 }
 

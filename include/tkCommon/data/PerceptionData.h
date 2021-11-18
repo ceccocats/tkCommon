@@ -80,6 +80,18 @@ class object {
         int id = -1;
         int sensorID = 0;
         timeStamp_t ts;
+
+        object& 
+        operator=(const object& b){
+            this->world = b.world;
+            this->confidence = b.confidence;
+            this->score = b.score;
+            this->cl = b.cl;
+            this->id = b.id;
+            this->sensorID = b.sensorID;
+            this->ts = b.ts;
+            return *this;
+        }
 };
 
 class ObjectBuffer : public std::vector<object>, public tk::rt::Lockable {};
