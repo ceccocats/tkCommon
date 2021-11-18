@@ -110,7 +110,7 @@ void CarControl::readLoop() {
                 y =  __bswap_32(y);
                 vel =  __bswap_16(vel);               
                 odom.pose.y() = float(y)/2e4;
-                odom.speed.x() = float(vel)*0.517/3.6;
+                odom.linear_velocity.x() = float(vel)*0.517/3.6;
                 odom.header.stamp = data.header.stamp;
             }
         }

@@ -15,7 +15,8 @@ Viewer::~Viewer(){
 }
 
 void 
-Viewer::start(bool useImGUI){
+Viewer::start(bool fullscreen, bool useImGUI){
+    fullScreen = fullscreen;
     if(Viewer::disabled) {
         running = true;
         glThread.init(fake_run,Viewer::instance);
@@ -94,7 +95,11 @@ Viewer::init() {
     glfwWindowHint(GLFW_SAMPLES, 3);
 
     // Create a windowed mode window and its OpenGL context
-    window = glfwCreateWindow(width, height, windowName.c_str(), NULL, NULL);
+    if(fullScreen)
+        window = glfwCreateWindow(glfwGetVideoMode(glfwGetPrimaryMonitor())->width,
+                glfwGetVideoMode(glfwGetPrimaryMonitor())->height, windowName.c_str(), glfwGetPrimaryMonitor(), NULL);
+    else    
+        window = glfwCreateWindow(width, height, windowName.c_str(), NULL, NULL);
     if (!window) {
         glfwTerminate();
     }

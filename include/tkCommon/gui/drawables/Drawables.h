@@ -19,6 +19,7 @@
 #include <tkCommon/gui/drawables/PolyLine.h>
 #include <tkCommon/gui/drawables/ReplayInfo.h>
 #include <tkCommon/gui/drawables/Mesh.h>
+#include <tkCommon/gui/drawables/Sonar.h>
 #include <tkCommon/gui/drawables/LaneletMap.h>
 #include <tkCommon/gui/drawables/LaneletPath.h>
 #include <tkCommon/gui/drawables/Odom.h>

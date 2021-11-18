@@ -26,7 +26,7 @@ namespace tk { namespace gui {
 
     public:
         ~Viewer();
-        void start(bool useImGUI = true);
+        void start(bool fullscreen = false, bool useImGUI = true);
         bool isRunning();
         void stop();
         void join();
@@ -102,6 +102,7 @@ namespace tk { namespace gui {
         bool useImGUI;
         int imguiSelected = -1;
         bool running = false;
+        bool fullScreen = false;
 
         glm::vec3   lightPos;
         glm::mat4   modelview;

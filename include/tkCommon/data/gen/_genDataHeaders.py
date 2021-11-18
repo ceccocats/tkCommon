@@ -10,10 +10,11 @@ genData(className, VARS, DEPS)
 
 className = "OdomData_gen"
 DEPS = [ "#include \"tkCommon/math/Vec.h\"" ]
-VARS = [ {"name":"type",        "type":"static const DataType", "default": "DataType::ODOM"},  
-         {"name":"pose",        "type":"tk::math::Vec3<double>"},
-         {"name":"angle",       "type":"tk::math::Vec4<double>"},
-         {"name":"speed",       "type":"tk::math::Vec3<double>"}
+VARS = [ {"name":"type",                "type":"static const DataType", "default": "DataType::ODOM"},  
+         {"name":"pose",                "type":"tk::math::Vec3<double>"},
+         {"name":"angle",               "type":"tk::math::Vec4<double>"},
+         {"name":"linear_velocity",     "type":"tk::math::Vec3<double>"},
+         {"name":"angular_velocity",    "type":"tk::math::Vec3<double>"}
         ]
 genData(className, VARS, DEPS)
 
@@ -90,16 +91,6 @@ VARS = [ {"name":"type",        "type":"static const DataType", "default": "Data
          {"name":"covAngle",    "type":"tk::math::Mat3d" },
          {"name":"pressure",    "type":"double",  "default":"0"}, 
          {"name":"temp",        "type":"double",  "default":"0"},
-        ]
-genData(className, VARS, DEPS)
-
-className = "GpsImuData_gen"
-DEPS = ["#include \"tkCommon/data/ImuData.h\"\n", 
-        "#include \"tkCommon/data/GpsData.h\"\n"]
-VARS = [ {"name":"type",        "type":"static const DataType", "default": "DataType::GPSIMU"},
-         {"name":"gps",         "type":"tk::data::GpsData", "init": "gps.init();"}, 
-         {"name":"imu",         "type":"tk::data::ImuData", "init": "imu.init();"},
-         {"name":"vel",         "type":"tk::math::Vec3<double>"},
         ]
 genData(className, VARS, DEPS)
 
@@ -198,4 +189,17 @@ VARS = [ {"name":"type",        "type":"static const DataType", "default": "Data
          {"name":"color",       "type":"tk::data::ImageData", "init": "color.init()"},
          {"name":"depth",       "type":"tk::data::ImageDataX<uint16_t>", "init": "depth.init()"}
         ]
+genData(className, VARS, DEPS)
+
+className = "SonarData_gen"
+DEPS = ["#include \"tkCommon/data/ImageData.h\"" ]
+VARS = [ {"name":"type",        "type":"static const DataType", "default": "DataType::SONAR"},
+         {"name":"azimuth",     "type":"tk::math::Vec<float>"},
+         {"name":"resolution",  "type":"float",                 "default": "0"},
+         {"name":"bits",        "type":"int",                   "default": "0"},
+         {"name":"image",       "type":"tk::data::ImageDataF",  "init": "image.init()"},
+         {"name":"raw",         "type":"tk::data::ImageDataF",  "init": "image.init()"},
+         {"name":"roll",        "type":"double",                "default": "0"},
+         {"name":"pitch",       "type":"double",                "default": "0"},
+         {"name":"yaw",         "type":"double",                "default": "0"}]
 genData(className, VARS, DEPS)

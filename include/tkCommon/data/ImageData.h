@@ -57,7 +57,8 @@ namespace tk{ namespace data{
         }
 
         ImageDataX<T>& operator=(ImageDataX<T>& s){
- 
+
+            SensorData::operator=(s);
             if(s.width != this->width || s.height != this->height || s.channels != this->channels){
                 init(s.width, s.height, s.channels);
             }
@@ -85,6 +86,11 @@ namespace tk{ namespace data{
 
         T* at(int row, int col){
             return &this->data[(row*this->width + col) * this->channels];
+        }
+
+        void clear() {
+            for (int i = 0; i < this->width * this->height * this->channels; ++i)
+                this->data[i] = 0;
         }
 
 

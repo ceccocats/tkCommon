@@ -96,6 +96,17 @@ namespace tk { namespace data {
             features[f].resize(size());
         }
 
+        void bounds(float &aMinX, float &aMaxX, float &aMinY, float &aMaxY, float &aMinZ, float &aMaxZ) {
+            aMinX = points.matrix().row(0).minCoeff();
+            aMaxX = points.matrix().row(0).maxCoeff();
+
+            aMinY = points.matrix().row(1).minCoeff();
+            aMaxY = points.matrix().row(1).maxCoeff(); 
+
+            aMinZ = points.matrix().row(2).minCoeff();
+            aMaxZ = points.matrix().row(2).maxCoeff();
+        }
+
         void gammaCorrectionIntensity(){
             //From ouster
 
@@ -444,7 +455,8 @@ namespace tk { namespace data {
         void fromPcl(const pcl::PointCloud<pcl::PointXYZI>::Ptr aPclCloud) {
             this->init();
             this->resize(aPclCloud->size());
-            this->addFeature(tk::data::CloudData::FEATURES_I);
+            if (!features.exists(tk::data::CloudData_gen::FEATURES_I))
+                this->addFeature(tk::data::CloudData::FEATURES_I);
             auto *intensity = &this->features[tk::data::CloudData::FEATURES_I];
             
             for(int i=0; i<aPclCloud->size(); ++i) {

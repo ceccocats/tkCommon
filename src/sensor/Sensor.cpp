@@ -217,6 +217,13 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log, co
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
+            case tk::data::DataType::SONAR:
+                {
+                    entry.second->drw   = new tk::gui::Sonar(info.name);
+                    entry.second->drw->setPool(&entry.second->pool);
+                    tk::gui::Viewer::getInstance()->add(entry.second->drw);
+                }
+                break;
             case tk::data::DataType::ODOM:
                 {
                     entry.second->drw   = new tk::gui::Odom(info.name+"_odom_"+ std::to_string(entry.first.second));
