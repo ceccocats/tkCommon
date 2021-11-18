@@ -21,7 +21,7 @@ find_package(CUDAToolkit QUIET)
 # External Libraries
 #-------------------------------------------------------------------------------
 find_package(OpenMP REQUIRED)
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 3.4.0 EXACT REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 find_package(GLEW REQUIRED)

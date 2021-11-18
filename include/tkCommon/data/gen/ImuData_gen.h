@@ -19,6 +19,7 @@ public:
     tk::math::Mat3d covAngle;
     tk::math::Mat3d covMag;
     double sideSlip;
+    tk::common::Map<double> specific;
     
     void init() override
     {
@@ -38,6 +39,7 @@ public:
         covAngle = s.covAngle;
         covMag = s.covMag;
         sideSlip = s.sideSlip;
+        specific = s.specific;
         return *this;
     }
     friend std::ostream& operator<<(std::ostream& os, ImuData_gen& s)
@@ -55,11 +57,12 @@ public:
         os<<"	covAngle: "<<s.covAngle<<std::endl;
         os<<"	covMag: "<<s.covMag<<std::endl;
         os<<"	sideSlip: "<<s.sideSlip<<std::endl;
+        os<<"	specific: "<<s.specific<<std::endl;
         return os;
     }
     bool toVar(std::string name, tk::math::MatIO::var_t &var)
     {
-        std::vector<tk::math::MatIO::var_t> structVars(10);
+        std::vector<tk::math::MatIO::var_t> structVars(11);
         structVars[0].set("header", header);
         structVars[1].set("acc", acc);
         structVars[2].set("angleVel", angleVel);
@@ -70,6 +73,7 @@ public:
         structVars[7].set("covAngle", covAngle);
         structVars[8].set("covMag", covMag);
         structVars[9].set("sideSlip", sideSlip);
+        structVars[10].set("specific", specific);
         return var.setStruct(name, structVars);
     }
     bool fromVar(tk::math::MatIO::var_t &var)
@@ -85,6 +89,7 @@ public:
         var["covAngle"].get(covAngle);
         var["covMag"].get(covMag);
         var["sideSlip"].get(sideSlip);
+        var["specific"].get(specific);
         return true;
     }
 };
