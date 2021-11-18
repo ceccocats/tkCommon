@@ -149,6 +149,7 @@ bool closeSocket(int fd) {      // *not* the Windows closesocket()
          return true;
       return false;
    }
+   return false;
 }
 
 bool 
@@ -164,5 +165,4 @@ tk::communication::TCPSocket::close(){
         ok = ok && closeSocket(this->server_fd);
     }
     return ok;
-
 }
