@@ -166,6 +166,13 @@ namespace tk { namespace common {
         return out;
     }
 
+    Vector4<float> tf2quat(Tfpose tf) {
+        Eigen::Quaternionf q;
+        q = tf.linear();
+        return Vector4<float>(q.x(), q.y(), q.z(), q.w());
+    }
+
+
     Eigen::Vector3f unproj_3d(Eigen::Matrix4f p_mat, Eigen::Matrix4f v_mat,
                                      float screenW, float screenH, Eigen::Vector3f pos) {
 

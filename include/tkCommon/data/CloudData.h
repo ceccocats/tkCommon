@@ -13,7 +13,7 @@
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/point_cloud2_iterator.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
-#include <sensor_msgs/point_cloud_conversion.hpp>
+//#include <sensor_msgs/point_cloud_conversion.hpp>
 #endif
 
 #endif
@@ -271,6 +271,7 @@ namespace tk { namespace data {
             msg.row_step = msg.width * msg.point_step;
             msg.data.resize(msg.height * msg.row_step);
             
+            tkWRN("in this methos there are new and delete each time, must be fixed for performance");
             sensor_msgs::PointCloud2Iterator<float>     iter_x(msg, "x");
             sensor_msgs::PointCloud2Iterator<float>     iter_y(msg, "y");
             sensor_msgs::PointCloud2Iterator<float>     iter_z(msg, "z");
@@ -308,6 +309,9 @@ namespace tk { namespace data {
                 }
             }
 
+            if (hasI)  delete iter_intensity; 
+            if (hasC)  delete iter_ring; 
+            if (hasT)  delete iter_time; 
         }
 
 #if TKROS_VERSION == 1
@@ -350,12 +354,6 @@ namespace tk { namespace data {
         void fromRos(const sensor_msgs::PointCloud2 &msg) {
             //convert
             sensor_msgs::PointCloud     tmp;
-#endif
-#if TKROS_VERSION == 2
-        void fromRos(const sensor_msgs::msg::PointCloud2 &msg) {
-            //convert
-            sensor_msgs::msg::PointCloud     tmp;
-#endif
             this->header.fromRos(msg.header);
             this->header.type   = DataType::CLOUD; 
 
@@ -425,6 +423,13 @@ namespace tk { namespace data {
             }
         }
 #endif
+#if TKROS_VERSION == 2
+        void fromRos(const sensor_msgs::msg::PointCloud2 &msg) {
+            tkFATAL("NOT implemented, must be whitout PointCloud1 message (deprecated)");
+        }
+#endif
+#endif
+
 
 #ifdef PCL_ENABLED
         void toPcl(pcl::PointCloud<pcl::PointXYZI>::Ptr &aPclCloud) {

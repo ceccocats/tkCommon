@@ -28,9 +28,9 @@ namespace tk { namespace data {
             }
 
 #if TKROS_VERSION == 1
-            void fromRos(ackermann_msgs::AckermannDriveStamped &msg)
+            void fromRos(const ackermann_msgs::AckermannDriveStamped &msg)
 #elif TKROS_VERSION == 2
-            void fromRos(ackermann_msgs::msg::AckermannDriveStamped &msg)
+            void fromRos(const ackermann_msgs::msg::AckermannDriveStamped &msg)
 #endif
             {
                 this->header.fromRos(msg.header);

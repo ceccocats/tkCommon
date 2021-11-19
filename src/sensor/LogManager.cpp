@@ -21,7 +21,7 @@ namespace tk { namespace sensors {
 
         std::chrono::microseconds inc_chrono {ts};
         std::chrono::system_clock::time_point currentpt = std::chrono::system_clock::now();
-        while (tk::gui::Viewer::getInstance()->isRunning()) {
+        while (!self->stopped) {
             if(self->manualTick) { 
                 // manual tick (do nothing and restore start point in case it will switch automatic tick)
                 usleep(500000);

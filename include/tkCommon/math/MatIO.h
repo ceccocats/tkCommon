@@ -582,11 +582,11 @@ public:
 class MatDump {
     public: 
 
-    bool toVar(std::string name, MatIO::var_t &var) {
+    virtual bool toVar(std::string name, MatIO::var_t &var) {
         tkFATAL("Not implemented");
         return false;
     }
-    bool fromVar(MatIO::var_t &var) {
+    virtual bool fromVar(MatIO::var_t &var) {
         tkFATAL("Not implemented");
         return false;
     }

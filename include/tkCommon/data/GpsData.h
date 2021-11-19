@@ -31,10 +31,10 @@ namespace tk { namespace data {
             memcpy(msg.position_covariance.data(), e_cov.data(), 3*3*sizeof(double)); 
         }
 #if TKROS_VERSION == 1
-        void fromRos(sensor_msgs::NavSatFix &msg) {
+        void fromRos(const sensor_msgs::NavSatFix &msg) {
 #endif
 #if TKROS_VERSION == 2
-        void fromRos(sensor_msgs::msg::NavSatFix &msg) {
+        void fromRos(const sensor_msgs::msg::NavSatFix &msg) {
 #endif
             this->header.fromRos(msg.header);
             this->header.type   = DataType::GPS; 
