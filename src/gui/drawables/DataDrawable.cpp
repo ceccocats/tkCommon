@@ -1,5 +1,5 @@
 #include "tkCommon/gui/drawables/DataDrawable.h"
-
+#include "tkCommon/gui/utils/deprecated_primitives.h"
 using namespace tk::gui;
 
 DataDrawable::DataDrawable()
@@ -63,7 +63,17 @@ DataDrawable::draw(Viewer *viewer)
             }
         } 
     }
-
+    if(data != nullptr) {
+        drwModelView = drwModelView * glm::make_mat4x4(data->header.tf.matrix().data());
+        
+        // draw sensor tf
+        if(enableTf) {
+            glPushMatrix();
+            glMultMatrixf((tf*data->header.tf).matrix().data());
+            tk::gui::prim::drawAxis(0.2);
+            glPopMatrix();
+        }
+    }
     this->drawData(viewer);
 }
 
