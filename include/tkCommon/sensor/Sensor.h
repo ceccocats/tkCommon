@@ -356,6 +356,28 @@ class Sensor {
          * @return  void*   null
          */
         void loop(sensorKey key);
+        template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
+        bool preGrab(const T* &data, std::map<sensorKey, SensorPool_t*>::iterator &it, int sensorID = 0){
+            // check if the passed template is the same as the pointer
+            if (T::type != data->type) {
+                tkERR("Type mismatch between template ("<<tk::data::ToStr(T::type)<<" and passed const pointer ("<<tk::data::ToStr(data->type)<<").\n");
+                return false;
+            }
+
+            // check if template type is present inside pool
+            it = pool.find(std::make_pair(T::type, sensorID)); 
+            if (it == pool.end()) {
+                tkERR("No pool present with this template type "<<tk::data::ToStr(T::type)<<" and this ID "<<sensorID<<".\n");
+                return false;
+            }
+
+            // check if pool is empty
+            if (it->second->empty == true) {
+                //tkWRN("Pool empty.\n");
+                return false;
+            }
+            return true;
+        }
 
     public:
         
@@ -374,24 +396,9 @@ class Sensor {
         template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
         bool grab(const T* &data, int &idx, uint64_t timeout = 0, int sensorID = 0) 
         {   
-            // check if the passed template is the same as the pointer
-            if (T::type != data->type) {
-                tkERR("Type mismatch between template ("<<tk::data::ToStr(T::type)<<" and passed const pointer ("<<tk::data::ToStr(data->type)<<").\n");
+            std::map<sensorKey, SensorPool_t*>::iterator it;
+            if( !preGrab(data, it, sensorID))
                 return false;
-            }
-
-            // check if template type is present inside pool
-            std::map<sensorKey, SensorPool_t*>::iterator it = pool.find(std::make_pair(T::type, sensorID)); 
-            if (it == pool.end()) {
-                tkERR("No pool present with this template type "<<tk::data::ToStr(T::type)<<" and this ID "<<sensorID<<".\n");
-                return false;
-            }
-
-            // check if pool is empty
-            if (it->second->empty == true) {
-                //tkWRN("Pool empty.\n");
-                return false;
-            }
             
             // grab
             if (timeout != 0) {     // locking
@@ -405,10 +412,41 @@ class Sensor {
                 //tkWRN("Timeout.\n");
             } else if (idx == -2) {
                 tkWRN("No free elemnt in the pool.\n");
+            } else if(data){
+                postGrab(data);
             }
 
-            if(data)
+            return (data != nullptr)?true:false;
+        }
+
+        /**
+         * @brief   Extract last or newest element from the pool, based on timeout parameter value
+         *          passed. Must be called after start() method.
+         * 
+         * @param data      returned data
+         * @param idx       index of the data returned from the pool, used in release() method.
+         * @param timeout   grab timeout [micro]
+         * @return true     data is available
+         * @return false    data is not available
+         */
+        template<typename T, typename = std::enable_if<std::is_base_of<tk::data::SensorData, T>::value>>
+        bool grabStamped(const T* &data, int &idx, timeStamp_t timestamp, int sensorID = 0) 
+        {   
+            std::map<sensorKey, SensorPool_t*>::iterator it;
+            if( !preGrab(data, it, sensorID))
+                return false;
+            
+            // grab
+            data = dynamic_cast<const T*>(it->second->pool.getStamped(idx, timestamp));
+
+            // error handling
+            if (idx == -1) {
+                tkWRN("Timeout.\n");
+            } else if (idx == -2) {
+                tkWRN("No free elemnt in the pool.\n");
+            } else if(data){
                 postGrab(data);
+            }
 
             return (data != nullptr)?true:false;
         }

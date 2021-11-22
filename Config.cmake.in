@@ -2,8 +2,8 @@
 
 include(CMakeFindDependencyMacro)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_MODULE_PATH})
+find_package(Eigen3 3.4.0 EXACT REQUIRED)
 find_dependency(OpenMP)
-find_dependency(Eigen3)
 find_dependency(OpenGL)
 find_dependency(GLUT)
 find_dependency(GLEW)

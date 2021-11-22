@@ -163,8 +163,11 @@ struct CircularArray {
  * @return double   degrees in radiant
  */
 inline double toRadians(double x){
-    
     return ((x * M_PI) / 180.0);
+}
+
+inline double toDegrees(double x) {
+    return ((x * 180.0)/ M_PI);
 }
 
 inline std::vector<std::string> splitString(const std::string &s, char delim, int maxelems = -1) {

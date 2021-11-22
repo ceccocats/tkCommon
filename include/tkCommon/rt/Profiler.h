@@ -26,8 +26,8 @@ public:
         int avg = 0;
         int min = 0, max = 0;
 
-        void print() {
-            std::cout<<"Avg: "<<avg<<" Min: "<<min<<" Max: "<< max<<" (us)\n";
+        void print(std::ostream &os = std::cout) {
+            os<<"Avg: "<<avg<<" Min: "<<min<<" Max: "<< max<<" (us)\n";
         }
     };
     std::map<std::string, std::map<std::thread::id,ProfileInfo_t>> infos;
@@ -71,8 +71,8 @@ private:
     }
 
 public:
-    void print() {
-        std::cout<<"Profiler:\n";
+    void print(std::ostream &os = std::cout) {
+        os<<"Profiler:\n";
         for (auto& i : infos) {
             ProfileInfo_t p;
             bool first = true;
@@ -91,8 +91,8 @@ public:
             }
             p.avg = p.sum / p.count;
 
-            std::cout<<i.first<<"   ";
-            p.print();
+            os<<i.first<<"   ";
+            p.print(os);
         }
     }
 };

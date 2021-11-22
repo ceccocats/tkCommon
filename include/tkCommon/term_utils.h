@@ -68,6 +68,13 @@ namespace tk { namespace term {
             counter += 1;
             return *this;
         }
+
+        Pbar operator +=(const int &value) {
+            counter += value;
+            return *this;
+
+        }
+        
         friend bool operator< (Pbar &c1, const int &end) {
             c1.end = end;
             bool alive = c1.counter < end;

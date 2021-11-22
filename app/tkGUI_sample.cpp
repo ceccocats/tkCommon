@@ -141,7 +141,7 @@ void* th_lanelet_path(void* ptrpath) {
 	tk::gui::LaneletPath *path = (tk::gui::LaneletPath*)ptrpath;
 
 	// load lanelet map
-	tk::common::Lanelet	lanelet;
+	tk::common::LaneletInterface	lanelet;
 	lanelet.init(std::string(tkCommon_PATH) + "data/lanelet.osm.yaml");
 
     // create routing graph
@@ -231,8 +231,14 @@ int main(int argc, char* argv[]){
 	}
 	viewer->add(new tk::gui::Axis());
 
-	mesh = new tk::gui::Mesh(std::string(tkCommon_PATH) + "data/levante.obj");
+	mesh = new tk::gui::Mesh("/home/fabio/Downloads/untitled.obj");
 	viewer->add(mesh);
+	usleep(1000000);
+    std::vector<tk::gui::Color_t> &colors = mesh->getColors();
+	for(auto &c:colors){
+		c = tk::gui::color::GREEN;
+		c.a() = 0.5;
+	}
 	
 #ifdef LANELET_ENABLED
 	if (draw_lanelet) {
