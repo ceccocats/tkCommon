@@ -23,8 +23,8 @@ public:
     tk::math::Mat3d covAngle;
     double pressure;
     double temp;
-    uint32_t flags;
     tk::common::Map<double> specific;
+    uint32_t flags;
     
     void init() override
     {
@@ -58,8 +58,8 @@ public:
         covAngle = s.covAngle;
         pressure = s.pressure;
         temp = s.temp;
-        flags = s.flags;
         specific = s.specific;
+        flags = s.flags;
         return *this;
     }
     friend std::ostream& operator<<(std::ostream& os, GpsData_gen& s)
@@ -82,6 +82,7 @@ public:
         os<<"	covAngle: "<<s.covAngle<<std::endl;
         os<<"	pressure: "<<s.pressure<<std::endl;
         os<<"	temp: "<<s.temp<<std::endl;
+        os<<"	specific: "<<s.specific<<std::endl;
         os<<"	flags: "<<s.flags<<std::endl;
         return os;
     }
@@ -103,8 +104,8 @@ public:
         structVars[12].set("covAngle", covAngle);
         structVars[13].set("pressure", pressure);
         structVars[14].set("temp", temp);
-        structVars[15].set("flags", flags);
-        structVars[16].set("specific", specific);
+        structVars[15].set("specific", specific);
+        structVars[16].set("flags", flags);
         return var.setStruct(name, structVars);
     }
     bool fromVar(tk::math::MatIO::var_t &var)
@@ -125,8 +126,8 @@ public:
         var["covAngle"].get(covAngle);
         var["pressure"].get(pressure);
         var["temp"].get(temp);
-        var["flags"].get(flags);
         var["specific"].get(specific);
+        var["flags"].get(flags);
         return true;
     }
 };
