@@ -10,6 +10,7 @@
 #include "tkCommon/gui/drawables/Drawable.h"
 #include "tkCommon/gui/shader/texture.h"
 #include "tkCommon/gui/utils/Camera.h"
+#include "tkCommon/gui/utils/deprecated_primitives.h"
 #include "tkCommon/gui/imgui/imgui.h"
 #include "tkCommon/gui/imgui/imgui_impl_glfw.h"
 #include "tkCommon/gui/imgui/imgui_impl_opengl3.h"

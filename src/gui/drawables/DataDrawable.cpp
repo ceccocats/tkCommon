@@ -9,6 +9,7 @@ DataDrawable::DataDrawable()
     this->mDrwHasReference      = true;
     this->mDrwHasPool           = false;
     this->mFirstData            = true;
+    this->mFirstDraw            = true;
 }
 
 /*
@@ -31,11 +32,16 @@ DataDrawable::setPool(tk::rt::DataPool *aPool)
     this->mPoolLastData     = 0;
     this->mDrwHasPool       = true;
     this->mDrwHasReference  = false;
+    this->mDataEnableTf     = true;
 }
 
 void 
 DataDrawable::draw(Viewer *viewer) 
-{
+{   
+    if (mFirstDraw) {
+        mShaderText = tk::gui::shader::text::getInstance();
+        mFirstDraw = false;
+    }
     if (this->mDrwHasPool) {
         if(this->mPool->newData(this->mPoolLastData)) {
             this->mPoolLastData = this->mPool->inserted;
@@ -67,11 +73,17 @@ DataDrawable::draw(Viewer *viewer)
         drwModelView = drwModelView * glm::make_mat4x4(data->header.tf.matrix().data());
         
         // draw sensor tf
-        if(enableTf) {
+        if(mDataEnableTf) {
             glPushMatrix();
-            glMultMatrixf((tf*data->header.tf).matrix().data());
+            auto sensor_tf = tf*data->header.tf;
+            tk::gui::setColor(tk::gui::color::WHITE);
+            tk::gui::prim::drawLine(tk::common::tf2pose(tf), tk::common::tf2pose(sensor_tf), 1.0);
+            glMultMatrixf(sensor_tf.matrix().data());
             tk::gui::prim::drawAxis(0.2);
             glPopMatrix();
+
+            // draw sensor name
+            mShaderText->draw(drwModelView, data->header.name, 0.05, tk::gui::color::WHITE);
         }
     }
     this->drawData(viewer);

@@ -399,18 +399,7 @@ Viewer::draw() {
         if(drawable.second->enableTf){
             glPushMatrix();
             glMultMatrixf(drawable.second->tf.matrix().data());
-            glLineWidth(2.5);
-            glBegin(GL_LINES);
-            glColor3f (1.0f,0.0f,0.0f);
-            glVertex3f(0.0f,0.0f,0.0f);
-            glVertex3f(1.0f,0.0f,0.0f);
-            glColor3f (0.0f,1.0f,0.0f);
-            glVertex3f(0.0f,0.0f,0.0f);
-            glVertex3f(0.0f,1.0f,0.0f);
-            glColor3f (0.0f,0.0f,1.0f);
-            glVertex3f(0.0f,0.0f,0.0f);
-            glVertex3f(0.0f,0.0f,1.0f);
-            glEnd();
+            tk::gui::prim::drawAxis(0.5);
             glPopMatrix();
         }
     }

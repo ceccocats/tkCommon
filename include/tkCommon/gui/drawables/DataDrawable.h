@@ -2,6 +2,7 @@
 #include "tkCommon/gui/drawables/Drawable.h"
 #include "tkCommon/data/SensorData.h"
 #include "tkCommon/rt/Pool.h"
+#include "tkCommon/gui/shader/text.h"
 
 
 namespace tk{ namespace gui{
@@ -17,6 +18,8 @@ class DataDrawable : public Drawable {
         virtual void setPool(tk::rt::DataPool *aPool) final;
 
         tk::data::SensorData* data;
+
+        bool mDataEnableTf = false;
     protected:
 
         void forceUpdate();
@@ -30,7 +33,6 @@ class DataDrawable : public Drawable {
         std::stringstream print;
 
         bool mDrwHasReference;
-
     private:
 
         //std::mutex  mPointerMutex;
@@ -41,5 +43,8 @@ class DataDrawable : public Drawable {
         bool mDrwHasPool;
         tk::rt::DataPool *mPool;
         int mPoolLastData;
+
+        bool mFirstDraw;
+        tk::gui::shader::text *mShaderText;
 	};
 }}
