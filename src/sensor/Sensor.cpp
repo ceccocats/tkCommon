@@ -267,7 +267,7 @@ Sensor::loop(sensorKey key)
             tk::data::SensorData* data = it->second->pool.add(idx);
 
             if (idx == -2) {
-                tkWRN("No free element in the pool. Trying again in 2 seconds...\n");
+                tkWRN("No free element in the "<<tk::data::ToStr(it->first.first)<<" pool. Trying again in 2 seconds...\n");
                 sleep(2);
                 continue;
             }
@@ -298,7 +298,7 @@ Sensor::loop(sensorKey key)
             } else {
                 if (status() == SensorStatus::STOPPING)
                     continue;
-                tkWRN("Error while reading. Trying again in 2 seconds...\n");
+                tkWRN("Error while reading "<<tk::data::ToStr(it->first.first)<<". Trying again in 2 seconds...\n");
                 sleep(2);
                 continue;
             }
