@@ -89,7 +89,7 @@ tk::gui::Cloud4f::updateData(tk::data::CloudData* cloud){
         }
 
         //using features
-        selected[0] = clamp<int>(selected[0], 0, cloud->features.size());
+        selected[0] = clamp<int>(selected[0], 0, cloud->features.size() + 3);
         if(selected[0] > 2){
             axisShader = -1;
             tk::math::Vec<float> *f = &cloud->features[features[selected[0]]];
@@ -132,7 +132,7 @@ tk::gui::Cloud4f::Cloud4f(std::string name){
     //DefaultSelected
     this->cloudMod          = 0;
     this->selectedColorMap  = cloudMod0.second;
-    this->selected[0]       = feature0.second +3;
+    this->selected[0]       = feature0.second + 3;
     this->selected[1]       = featuresChannel0.second;
     this->selected[2]       = featuresChannel0.second;
     this->selected[3]       = featuresChannel0.second;
