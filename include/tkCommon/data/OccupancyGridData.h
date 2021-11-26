@@ -40,7 +40,8 @@ class OccupancyGridData : public ImageDataF
                    float aResolution = 0.1f,
                    uint8_t aCellThreshold = 2,
                    size_t aMinWidth = 0,
-                   size_t aMinHeight = 0)
+                   size_t aMinHeight = 0,
+                   bool staticSize = false)
     {
         // find bounds
         float min_x, max_x, min_y, max_y, min_z, max_z;
@@ -49,8 +50,14 @@ class OccupancyGridData : public ImageDataF
         // init
         float size_x = std::max(std::fabs(min_x), std::fabs(max_x));
         float size_y = std::max(std::fabs(min_y), std::fabs(max_y));
-        size_t cloud_h = size_t((size_y * 2) / aResolution);
-        size_t cloud_w = size_t((size_x * 2) / aResolution);
+        size_t cloud_h, cloud_w;
+        if(staticSize){
+            cloud_h = aMinHeight;
+            cloud_w = aMinWidth;
+        }else{
+            cloud_h = size_t((size_y * 2) / aResolution);
+            cloud_w = size_t((size_x * 2) / aResolution);
+        }
         if (cloud_w < aMinWidth && cloud_h < aMinHeight)
             init(aMinWidth,
                  aMinHeight,
