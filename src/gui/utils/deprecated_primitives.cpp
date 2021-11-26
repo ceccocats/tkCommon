@@ -164,5 +164,40 @@ void drawCube(tk::common::Vector3<float> pose, tk::common::Vector3<float> size, 
     if (!filled)
         glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
 }
+
+void
+drawEllipse(tk::common::Vector3<float> pose, float rot, float rx, float ry, int res, bool filled) 
+{
+    if (!filled)
+        glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
+
+    float theta = 2.0 * M_PI/ float(res); 
+    float c = cosf(theta);//precalculate the sine and cosine
+    float s = sinf(theta);
+    float t;
+
+    float x = 1;//we start at angle = 0 
+    float y = 0; 
+
+    glPushMatrix();
+    glTranslatef(pose.x(), pose.y(), pose.z());
+    glRotatef(toDegrees(rot), 0.0f, 0.0f, 1.0f);
+    glBegin(GL_LINE_LOOP); 
+    for(int ii = 0; ii < res; ii++) 
+    { 
+        //apply radius and offset
+        glVertex2f(x * rx, y * ry);//output vertex 
+
+        //apply the rotation matrix
+        t = x;
+        x = c * x - s * y;
+        y = s * t + c * y;
+    } 
+    glEnd(); 
+    glPopMatrix();
+
+    if (!filled)
+        glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
+}
   
 }}} // namespace name
