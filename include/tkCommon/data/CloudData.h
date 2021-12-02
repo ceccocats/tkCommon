@@ -455,7 +455,8 @@ namespace tk { namespace data {
         void fromPcl(const pcl::PointCloud<pcl::PointXYZI>::Ptr aPclCloud) {
             this->init();
             this->resize(aPclCloud->size());
-            this->addFeature(tk::data::CloudData::FEATURES_I);
+	        if (!this->features.exists(tk::data::CloudData_gen::FEATURES_I))
+                this->addFeature(tk::data::CloudData::FEATURES_I);
             auto *intensity = &this->features[tk::data::CloudData::FEATURES_I];
             
             for(int i=0; i<aPclCloud->size(); ++i) {
