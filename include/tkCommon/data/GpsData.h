@@ -17,18 +17,17 @@ namespace tk { namespace data {
     public:
 #ifdef TKROS_ENABLED
 #if TKROS_VERSION == 1
-        void toRos(sensor_msgs::NavSatFix &msg) {
+        void toRos(sensor_msgs::NavSatFix &msg) const {
 #endif
 #if TKROS_VERSION == 2
-        void toRos(sensor_msgs::msg::NavSatFix &msg) {
+        void toRos(sensor_msgs::msg::NavSatFix &msg) const {
 #endif
             this->header.toRos(msg.header);
 
             msg.latitude    = this->lat;
             msg.longitude   = this->lon;
             msg.altitude    = this->heigth;
-            Eigen::Matrix3d e_cov = this->cov.matrix().transpose();
-            memcpy(msg.position_covariance.data(), e_cov.data(), 3*3*sizeof(double)); 
+            memcpy(msg.position_covariance.data(), cov.data(), 3*3*sizeof(double)); 
         }
 #if TKROS_VERSION == 1
         void fromRos(const sensor_msgs::NavSatFix &msg) {

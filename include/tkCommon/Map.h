@@ -30,10 +30,10 @@ namespace tk { namespace common {
                 tkFATAL(key + " key already inside map")
             }
         }
-        bool exists(unsigned key) {
+        bool exists(unsigned key) const {
             return _map.count(key);
         }
-        bool exists(std::string key) {
+        bool exists(std::string key) const {
             unsigned hash_key = tk::common::key(key.c_str());
             return _map.count(hash_key);
         }

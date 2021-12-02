@@ -392,16 +392,16 @@ Viewer::draw() {
     glfwGetFramebufferSize(window, &width, &height);
 
     for (auto const& drawable : drawables){
+        glPushMatrix();
+        glMultMatrixf(drawable.second->tf.matrix().data());
+        if(drawable.second->enableTf){
+            tk::gui::prim::drawAxis(0.5);       
+        }
         if(drawable.second->enabled){
             drawable.second->drwModelView = modelview * glm::make_mat4x4(drawable.second->tf.matrix().data());
             drawable.second->draw(Viewer::instance);
         }
-        if(drawable.second->enableTf){
-            glPushMatrix();
-            glMultMatrixf(drawable.second->tf.matrix().data());
-            tk::gui::prim::drawAxis(0.5);
-            glPopMatrix();
-        }
+        glPopMatrix();
     }
     drawLogo();
 }

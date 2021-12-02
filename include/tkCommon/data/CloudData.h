@@ -53,7 +53,7 @@ namespace tk { namespace data {
             tkASSERT(checkConsistency());
         }
 
-        int size() {
+        int size() const {
             return points.cols();
         }
 

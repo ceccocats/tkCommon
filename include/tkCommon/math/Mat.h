@@ -150,6 +150,9 @@ public:
     __host__ T*
     data() { return cpu.data; }
 
+    __host__ const T*
+    data() const { return cpu.data; }
+
     __host__ void 
     resize(int r, int c) {
         cpu.resize(r,c);
@@ -222,7 +225,7 @@ public:
     }
 
 
-    bool   toVar(std::string name, MatIO::var_t &var) {
+    bool toVar(std::string name, MatIO::var_t &var) {
         return var.set(name, cpu);
     }
     bool fromVar(MatIO::var_t &var) {
@@ -263,6 +266,9 @@ public:
 
     __host__ T*
     data() { return this->mData; }
+
+    __host__ const T*
+    data() const { return this->mData; }
 
     friend std::ostream& 
     operator<<(std::ostream& os, MatStatic<T,R,C>& s) {

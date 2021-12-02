@@ -21,10 +21,10 @@ namespace tk { namespace data {
     public:
 #ifdef TKROS_ENABLED
 #if TKROS_VERSION == 1
-        void toRos(sensor_msgs::Imu &msg) {
+        void toRos(sensor_msgs::Imu &msg) const {
 #endif
 #if TKROS_VERSION == 2
-        void toRos(sensor_msgs::msg::Imu &msg) {
+        void toRos(sensor_msgs::msg::Imu &msg) const {
 #endif
             this->header.toRos(msg.header);
 

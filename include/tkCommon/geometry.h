@@ -14,6 +14,18 @@ namespace tk{ namespace common{
 				this->points = d.points;
 			}
 			~Polygon(){}
+
+			bool within(const tk::common::Vector2<float> &aPoint) const
+			{
+				int i, j;
+				bool c = false;
+				for (i = 0, j = points.size()-1; i < points.size(); j = i++) {
+					if ( ((points[i].y()>aPoint.y()) != (points[j].y()>aPoint.y())) &&
+					(aPoint.x() < (points[j].x()-points[i].x()) * (aPoint.y()-points[i].y()) / (points[j].y()-points[i].y()) + points[i].x()) )
+						c = !c;
+				}
+				return c;
+			}
 	};
 
 	class Prism : public Polygon{
@@ -28,18 +40,6 @@ namespace tk{ namespace common{
 				this->base_z = d.base_z;
 			}
 			~Prism(){}
-
-			bool within(const tk::common::Vector2<float> &aPoint) const
-			{
-				int i, j;
-				bool c = false;
-				for (i = 0, j = points.size()-1; i < points.size(); j = i++) {
-					if ( ((points[i].y()>aPoint.y()) != (points[j].y()>aPoint.y())) &&
-					(aPoint.x() < (points[j].x()-points[i].x()) * (aPoint.y()-points[i].y()) / (points[j].y()-points[i].y()) + points[i].x()) )
-						c = !c;
-				}
-				return c;
-			}
 
 			float distance(const tk::common::Vector2<float> &aPoint) const 
 			{

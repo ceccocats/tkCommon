@@ -36,10 +36,10 @@ namespace tk { namespace data {
         }
 #ifdef TKROS_ENABLED
 #if TKROS_VERSION == 1
-        void toRos(nav_msgs::Odometry &msg) {
+        void toRos(nav_msgs::Odometry &msg) const {
 #endif
 #if TKROS_VERSION == 2
-        void toRos(nav_msgs::msg::Odometry &msg) {
+        void toRos(nav_msgs::msg::Odometry &msg) const {
 #endif
             this->header.toRos(msg.header);
 
