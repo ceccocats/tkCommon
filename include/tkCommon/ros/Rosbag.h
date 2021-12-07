@@ -1,3 +1,4 @@
+#pragma once
 #define LZ4_stream_t LZ4_stream_t_deprecated
 #define LZ4_resetStream LZ4_resetStream_deprecated
 #define LZ4_createStream LZ4_createStream_deprecated

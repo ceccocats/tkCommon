@@ -61,6 +61,23 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawa
 add_custom_target(tkdrawablesgen DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/include/tkCommon/gui/drawables/*)
 
 #-------------------------------------------------------------------------------
+# tkRos library
+#-------------------------------------------------------------------------------
+if(ROS_FOUND)
+    add_library(ros_wrapper SHARED
+        src/ros/RosWrapper.cpp
+    )
+    target_include_directories(ros_wrapper PUBLIC 
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include> 
+        ${ROS_INCLUDE_DIRS}
+    ) 
+    target_link_libraries(ros_wrapper ${ROS_LIBRARIES})
+    target_compile_options(ros_wrapper PUBLIC -DTKROS_ENABLED -DTKROS_VERSION=${ROS_VERSION})
+    target_compile_features(ros_wrapper PUBLIC cxx_std_14)
+    add_library(${PROJECT_NAME}::ros_wrapper ALIAS ros_wrapper)
+endif()
+#-------------------------------------------------------------------------------
 # tkCommon library
 #-------------------------------------------------------------------------------
 file(GLOB data_gen  include/tkCommon/data/gen/*.cpp)
@@ -96,10 +113,7 @@ if (CUDAToolkit_FOUND)
     set_property(TARGET common PROPERTY CUDA_SEPARABLE_COMPILATION ON) 
 endif()
 if(ROS_FOUND)
-    target_include_directories(common PUBLIC ${ROS_INCLUDE_DIRS}) 
-    target_link_libraries(common ${ROS_LIBRARIES})
-    target_compile_options(common PUBLIC -DTKROS_ENABLED -DTKROS_VERSION=${ROS_VERSION})
-    target_compile_features(common PUBLIC cxx_std_14)
+    target_link_libraries(common ${PROJECT_NAME}::ros_wrapper)
 endif()
 if(PCL_FOUND)
     target_include_directories(common PUBLIC ${PCL_INCLUDE_DIRS}) 
@@ -256,7 +270,7 @@ target_link_libraries(tkCommon_test tkCommon::common tkCommon::gui tkCommon::com
 install(TARGETS ${tkpackage_APPS} 
     DESTINATION "bin/"
 )
-install(TARGETS common gui communication math joystick sensor
+install(TARGETS ros_wrapper common gui communication math joystick sensor
     DESTINATION "lib/"
     EXPORT ${PROJECT_NAME}Targets
 )
