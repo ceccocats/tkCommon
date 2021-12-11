@@ -62,6 +62,10 @@ void genTexture(uint8_t *data, int width, int height, int channels, GLuint &tex)
 }
 
 void drawCircle(tk::common::Vector3<float> pose, float r, int res, bool filled) {
+    drawEllipse(pose, r, r, res, filled);
+}
+
+void drawEllipse(tk::common::Vector3<float> pose, float rx, float ry, int res, bool filled) {
 
     int res_1 = res;
     if(filled) {
@@ -73,8 +77,8 @@ void drawCircle(tk::common::Vector3<float> pose, float r, int res, bool filled) 
     }
     for (int j = 0; j < res_1; j++)   {
         float theta = 2.0f * 3.1415926f * float(j) / float(res);//get the current angle 
-        float xr = r * cosf(theta);//calculate the x component 
-        float yr = r * sinf(theta);//calculate the y component
+        float xr = rx * cosf(theta);//calculate the x component 
+        float yr = ry * sinf(theta);//calculate the y component
 
         glVertex3f(pose.x() + xr, pose.y() + yr, pose.z());//output vertex
     }

@@ -343,6 +343,8 @@ Viewer::drawInfos(){
         ImGui::PlotLines(fps.c_str(),(const float*)vizFPS,IM_ARRAYSIZE(vizFPS),nFPS,textFps.c_str(),0,120.0);
 
         ImGui::Text("Window size: %d x %d", width, height);
+        ImGui::Text("Camera pose: x: %f y: %f z: %f", camera.center.x, camera.center.y, camera.center.z);
+        ImGui::Text("Camera rot: yaw: %f pitch: %f", camera.angles[0], camera.angles[1]);
 
         static bool showProfiler = false;
         static std::string strProfiler = ""; 
