@@ -206,3 +206,9 @@ VARS = [ {"name":"type",        "type":"static const DataType", "default": "Data
          {"name":"pitch",       "type":"double",                "default": "0"},
          {"name":"yaw",         "type":"double",                "default": "0"}]
 genData(className, VARS, DEPS)
+
+className = "KistlerData_gen"
+DEPS = ["#include \"tkCommon/math/Vec.h\"\n"]
+VARS = [ {"name":"type",        "type":"static const DataType", "default": "DataType::KISTLER"},
+         {"name":"data",        "type":"tk::math::Vec4<double>"}]
+genData(className, VARS, DEPS)

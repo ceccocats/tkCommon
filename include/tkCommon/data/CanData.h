@@ -7,7 +7,7 @@ namespace tk { namespace data {
         
     public:
         // return integer ID
-        int     id()     { return frame.can_id; }
+        unsigned int id() const { return frame.can_id; }
        
         // return data as a uint64_t pointer, useful for DBC encoding
         uint64_t *data() { return reinterpret_cast<uint64_t*>(frame.data); }
