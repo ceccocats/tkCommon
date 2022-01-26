@@ -33,6 +33,8 @@ public:
 
     tk::common::Vector2<float> calc_position(double s, double d=0);
 
+    tk::common::Vector2<float> calc_projection(tk::common::Vector2<float> pose, double s_guess = 0.0);
+
     double calc_curvature(double s);
 
     double calc_yaw(double s);

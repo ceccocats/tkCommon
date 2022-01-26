@@ -59,6 +59,43 @@ namespace tk{ namespace common{
 				this->base_z = d.base_z;
 				return *this;
 			}
+
+			tk::math::Vec2f centroid() const {
+				tk::math::Vec2f centroid;
+
+				/*
+				float a, t;
+				size_t i, i1;
+
+				// First calculate the polygon's signed area A 
+				a = 0.0f;
+				i1 = 1;
+				for (i=0; i<points.size(); i++) {
+					a += points[i].x() * points[i1].y() - points[i1].x() * points[i].y();
+					i1 = (i1 + 1) % points.size();
+				}
+				a *= 0.5;
+
+				// Now calculate the centroid coordinates Cx and Cy 
+				i1 = 1;
+				for (i=0; i<points.size(); i++) {
+					t = points[i].x()*points[i1].y() - points[i1].x()*points[i].y();
+					centroid.x() += (points[i].x()+points[i1].x()) * t;
+					centroid.y() += (points[i].y()+points[i1].y()) * t;
+					i1 = (i1 + 1) % points.size();
+				}
+				centroid.x() = centroid.x() / (6.0 * a);
+				centroid.y() = centroid.y() / (6.0 * a);
+				*/
+				for (size_t i = 0; i<points.size(); ++i) {
+					centroid.x() += points[i].x();
+					centroid.y() += points[i].y();
+				}
+				centroid.x() /= points.size();
+				centroid.y() /= points.size();
+
+				return centroid;
+			}
 	};
 
 	class Prisms : public tk::rt::Lockable{

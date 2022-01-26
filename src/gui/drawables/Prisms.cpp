@@ -1,14 +1,15 @@
 #include "tkCommon/gui/drawables/Prisms.h"
 
 tk::gui::Prisms::Prisms(tk::gui::Color_t color, std::string name){
-    this->name = name;
-    update = false;
-    this->color = color;
+    this->name      = name;
+    this->update    = false;
+    this->color     = color;
+    this->color.a() = 90.f/255.f;
 }
 
 tk::gui::Prisms::Prisms(tk::common::Prisms& prisms,tk::gui::Color_t color, std::string name) : Prisms(color, name){
-    ref     = &prisms;
-    update  = true;
+    this->ref     = &prisms;
+    this->update  = true;
 }
 
 tk::gui::Prisms::~Prisms(){
@@ -17,8 +18,8 @@ tk::gui::Prisms::~Prisms(){
 
 void 
 tk::gui::Prisms::updateData(tk::common::Prisms& prisms){
-    ref     = &prisms;
-    update  = true;
+    this->ref     = &prisms;
+    this->update  = true;
 }
 
 void 
@@ -34,7 +35,7 @@ tk::gui::Prisms::drawPrisms(tk::gui::Viewer *viewer){
         auto height = prisms.data[i].height;
 
         glPushMatrix();{
-            glMultMatrixf(glm::value_ptr(glm::make_mat4x4(tf.matrix().data())));
+            glMultMatrixf(glm::value_ptr(glm::make_mat4x4((tf * prisms.tf).matrix().data())));
             glDepthMask(GL_FALSE);
             if(i < colors.size()){
                 glColor4f(colors[i].r(),colors[i].g(),colors[i].b(),color.a());
@@ -94,7 +95,7 @@ tk::gui::Prisms::draw(tk::gui::Viewer *viewer){
 
         ref->lockRead();
         prisms.data.resize(ref->data.size());
-        //tf = ref->tf;
+        prisms.tf = ref->tf;
         for(int i = 0; i < ref->data.size(); i++){
             prisms.data[i].height = ref->data[i].height;
             prisms.data[i].points = ref->data[i].points;
