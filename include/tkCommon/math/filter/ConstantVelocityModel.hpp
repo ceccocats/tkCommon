@@ -6,15 +6,15 @@ namespace tk {
 namespace math {
 
 template <typename T>
-class ConstantVelocityModel : public Model<T, 4, 2, 2>
+class ConstantVelocityModel : public Model<T, 4, 3, 2>
 {
 public:
-    using VectorN = typename Model<T, 4, 2, 2>::VectorN;
-    using VectorM = typename Model<T, 4, 2, 2>::VectorM;
-    using VectorK = typename Model<T, 4, 2, 2>::VectorK;
-    using MatrixNN = typename Model<T, 4, 2, 2>::MatrixNN;
-    using MatrixKN = typename Model<T, 4, 2, 2>::MatrixKN;
-    using MatrixNM = typename Model<T, 4, 2, 2>::MatrixNM;
+    using VectorN = typename Model<T, 4, 3, 2>::VectorN;
+    using VectorM = typename Model<T, 4, 3, 2>::VectorM;
+    using VectorK = typename Model<T, 4, 3, 2>::VectorK;
+    using MatrixNN = typename Model<T, 4, 3, 2>::MatrixNN;
+    using MatrixKN = typename Model<T, 4, 3, 2>::MatrixKN;
+    using MatrixNM = typename Model<T, 4, 3, 2>::MatrixNM;
 
 private:
     MatrixNN mA;	// transition matrix
@@ -34,7 +34,19 @@ public:
     {
         mA(0, 2) = aDt;
         mA(1, 3) = aDt;
-        return mA * aState + mB * aControl;
+
+        T theta = atan2(aState[1], aState[0]);
+        T r = sqrt(pow(aState[0], 2) + pow(aState[1], 2));
+
+        mB <<  0,  0,             0,
+               0,  0,             0,
+              -1,  0,  r*sin(theta),
+               0, -1, -r*cos(theta);
+
+        mB *= aDt;
+
+        VectorN state = mA * aState + mB * aControl;
+        return state;
     }
 
     VectorK measurementFunction(const VectorN &aState, const VectorM &aControl = VectorM::Zero())
