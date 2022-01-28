@@ -232,6 +232,13 @@ Sensor::init(const YAML::Node conf, const std::string &name, LogManager *log, co
                     tk::gui::Viewer::getInstance()->add(entry.second->drw);
                 }
                 break;
+            case tk::data::DataType::KISTLER:
+            {
+                entry.second->drw   = new tk::gui::Kistler(info.name+"_kistler_"+ std::to_string(entry.first.second));
+                entry.second->drw->setPool(&entry.second->pool);
+                tk::gui::Viewer::getInstance()->add(entry.second->drw);
+            }
+            break;
             default:
                 tkWRN("Data of type: "<<tk::data::ToStr(entry.first.first)<<" not supported in tk::Viewer.\n");
                 break;

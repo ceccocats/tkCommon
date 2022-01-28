@@ -49,8 +49,9 @@ Gps::updateData(tk::gui::Viewer *viewer)
 
     this->tf = gps->header.tf;
 
-    if (!proj->hasReference())
-        proj->init(gps->lat, gps->lon, gps->heigth);
+    if (!proj->hasReference()){
+        proj->init(49.8955, 8.8978, gps->heigth);
+    }
 
     // get projected values    
     tk::math::Vec3d point = proj->forward(gps->lat, gps->lon, gps->heigth);

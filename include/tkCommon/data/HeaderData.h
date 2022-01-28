@@ -36,7 +36,8 @@ namespace tk { namespace data {
         IMAGEU16        = 17,
         IMAGEF          = 18,
         SONAR           = 19,
-        OCCUPANCY_GRID  = 20
+        OCCUPANCY_GRID  = 20,
+        KISTLER         = 21
     };
 
     static const char* ToStr (const DataType& type)
@@ -62,6 +63,7 @@ namespace tk { namespace data {
             case DataType::ODOM:            return "odom";
             case DataType::SONAR:           return "sonar";
             case DataType::OCCUPANCY_GRID:  return "occupancy_grid";
+            case DataType::KISTLER:         return "kistler";
             default:                        return "???";
                 
         }
