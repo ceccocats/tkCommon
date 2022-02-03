@@ -21,6 +21,8 @@ public:
 	uint64_t wakeups_missed;
     uint64_t last_ts;
 
+    uint64_t last_delta;
+    uint64_t total_compute_time;
 
      Task() {}
     ~Task() {}
@@ -30,6 +32,9 @@ public:
         this->wakeups = 0;
         this->wakeups_missed = 0;
 
+        this->last_ts = 0;
+        this->total_compute_time = 0;
+        this->last_delta = 0;
 
         int ret;
         unsigned int ns;
@@ -64,6 +69,14 @@ public:
         uint64_t missed;
         int ret;
 
+        // update stats
+        clock_gettime(CLOCK_MONOTONIC, &tp);
+        uint64_t ts = uint64_t(tp.tv_sec)*1e6 + tp.tv_nsec/1000;
+        if(last_ts > 0) {
+            last_delta = ts - last_ts;
+            total_compute_time += last_delta;
+        }
+
         /* Wait for the next timer event. If we have missed any the
         number is written to "missed" */
         ret = read(timer_fd, &missed, sizeof(missed));
@@ -72,6 +85,7 @@ public:
             perror("read timer");
             return;
         }
+
         clock_gettime(CLOCK_MONOTONIC, &tp);
         
         // update stats
@@ -85,6 +99,8 @@ public:
         std::cout<<"\tperiod:  "<<period_us<<"\n";
         std::cout<<"\twakeups: "<<wakeups<<"\n";
         std::cout<<"\tmissed:  "<<wakeups_missed<<"\n";
+        if(wakeups > 0)
+            std::cout<<"\tAvg time(us):  "<<total_compute_time / wakeups<<"\n";
     }
 
 };
