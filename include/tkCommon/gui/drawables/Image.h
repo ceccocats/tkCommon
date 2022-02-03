@@ -7,7 +7,7 @@ namespace tk{ namespace gui{
 
 	class Image : public DataDrawable {
 
-        private:
+        protected:
             tk::gui::TextureGeneric* texture = nullptr;
             int textureType = -1;
 
@@ -22,7 +22,7 @@ namespace tk{ namespace gui{
             void onClose();
             void updateData(tk::gui::Viewer *viewer);
         
-        private:
+        protected:
             void drawData(tk::gui::Viewer *viewer);
             
 	};
