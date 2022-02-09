@@ -37,7 +37,10 @@ namespace tk { namespace data {
         IMAGEF          = 18,
         SONAR           = 19,
         OCCUPANCY_GRID  = 20,
-        KISTLER         = 21
+        KISTLER         = 21,
+        POSE            = 22,
+        TWIST           = 23,
+        PATH            = 24
     };
 
     static const char* ToStr (const DataType& type)
@@ -64,6 +67,9 @@ namespace tk { namespace data {
             case DataType::SONAR:           return "sonar";
             case DataType::OCCUPANCY_GRID:  return "occupancy_grid";
             case DataType::KISTLER:         return "kistler";
+            case DataType::POSE:            return "pose";
+            case DataType::TWIST:           return "twist";
+            case DataType::PATH:            return "path";
             default:                        return "???";
                 
         }

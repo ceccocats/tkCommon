@@ -212,3 +212,24 @@ DEPS = ["#include \"tkCommon/math/Vec.h\"\n"]
 VARS = [ {"name":"type",        "type":"static const DataType", "default": "DataType::KISTLER"},
          {"name":"data",        "type":"tk::math::Vec4<double>"}]
 genData(className, VARS, DEPS)
+
+className = "PoseData_gen"
+DEPS = ["#include \"tkCommon/math/Vec.h\"\n"]
+VARS = [ {"name":"type",                "type":"static const DataType", "default": "DataType::POSE"},
+         {"name":"position",            "type":"tk::math::Vec3<double>"},
+         {"name":"orientation",         "type":"tk::math::Vec3<double>"}]
+genData(className, VARS, DEPS)
+
+className = "TwistData_gen"
+DEPS = ["#include \"tkCommon/math/Vec.h\"\n"]
+VARS = [ {"name":"type",                "type":"static const DataType", "default": "DataType::TWIST"},
+         {"name":"linear",              "type":"tk::math::Vec3<double>"},
+         {"name":"angular",             "type":"tk::math::Vec3<double>"}]
+genData(className, VARS, DEPS)
+
+className = "PathData_gen"
+DEPS = ["#include \"tkCommon/math/Vec.h\"\n"]
+DEPS = ["#include \"tkCommon/data/PoseData.h\"\n"]
+VARS = [ {"name":"type",                "type":"static const DataType", "default": "DataType::PATH"},
+         {"name":"poses",              "type":"std::vector<tk::data::PoseData>"}]
+genData(className, VARS, DEPS)

@@ -294,8 +294,8 @@ public:
     }
 
     __host__
-    const Eigen::Map<Eigen::Matrix<T,R,C>> matrix() {
-        return Eigen::Map<Eigen::Matrix<T,R,C>>(mData);
+    const Eigen::Map<const Eigen::Matrix<T,R,C>> matrix() const {
+        return Eigen::Map<const Eigen::Matrix<T,R,C>>(mData);
     }
     
     __host__
