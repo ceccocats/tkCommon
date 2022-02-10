@@ -112,6 +112,11 @@ CSpline2D::calc_projection(tk::common::Vector2<float> pose, double s_guess)
 		double jac = 2.0 * diff_x * dx + 2.0 * diff_y * dy;
         double hessian = 2.0 * dx * dx + 2.0 * diff_x * ddx +
                          2.0 * dy * dy + 2.0 * diff_y * ddy;
+
+        // giove temp fix
+        if (hessian < 1e-20f) 
+			break;
+
         // Newton method
         s_opt -= jac/hessian;
         s_opt = s_opt - this->s_end*std::floor(s_opt/this->s_end);
