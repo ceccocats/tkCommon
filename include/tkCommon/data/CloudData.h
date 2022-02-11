@@ -91,7 +91,7 @@ namespace tk { namespace data {
             features[f].resize(size());
         }
 
-        void bounds(float &aMinX, float &aMaxX, float &aMinY, float &aMaxY, float &aMinZ, float &aMaxZ) {
+        void bounds(float &aMinX, float &aMaxX, float &aMinY, float &aMaxY, float &aMinZ, float &aMaxZ) const {
             aMinX = points.matrix().row(0).minCoeff();
             aMaxX = points.matrix().row(0).maxCoeff();
 

@@ -84,6 +84,7 @@ tk::gui::Prisms::drawPrisms(tk::gui::Viewer *viewer){
                 glVertex3f(points[(i+1)%points.size()].x(), points[(i+1)%points.size()].y(), base_z+height);
             }
             glEnd();
+            glLineWidth(1);
         }glPopMatrix();
     }
 }

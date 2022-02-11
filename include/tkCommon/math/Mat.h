@@ -186,8 +186,8 @@ public:
     }
 
     __host__
-    const Eigen::Map<Eigen::Matrix<T,-1,-1>> matrix() {
-        return Eigen::Map<Eigen::Matrix<T,-1,-1>>(cpu.data, cpu.rows, cpu.cols);
+    const Eigen::Map<const Eigen::Matrix<T,-1,-1>> matrix() const {
+        return Eigen::Map<const Eigen::Matrix<T,-1,-1>>(cpu.data, cpu.rows, cpu.cols);
     }
     
     __host__
