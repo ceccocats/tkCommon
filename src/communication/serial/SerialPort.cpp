@@ -22,6 +22,9 @@ SerialPort::init(const std::string& port, int baud)
     case 9600:
         serialPort.SetBaudRate(LibSerial::BaudRate::BAUD_9600);
         break;
+    case 38400:
+        serialPort.SetBaudRate(LibSerial::BaudRate::BAUD_38400);
+        break;
     case 115200:
         serialPort.SetBaudRate(LibSerial::BaudRate::BAUD_115200);
         break;
