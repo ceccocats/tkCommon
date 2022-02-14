@@ -9,6 +9,7 @@
 #if TKROS_VERSION == 2
 #include <std_msgs/msg/header.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
+#include <geometry_msgs/msg/twist.hpp>
 #endif
 #endif
 
@@ -32,6 +33,7 @@ namespace tk { namespace data {
             msg.twist.angular.y = this->angular.y();
             msg.twist.angular.z = this->angular.z();
         }
+
 #if TKROS_VERSION == 1
         void toRos(geometry_msgs::Twist &msg) const {
 #endif
@@ -46,6 +48,7 @@ namespace tk { namespace data {
             msg.angular.y = this->angular.y();
             msg.angular.z = this->angular.z();
         }
+
 #if TKROS_VERSION == 1
         void fromRos(const geometry_msgs::TwistStamped &msg) {
 #endif
@@ -62,6 +65,23 @@ namespace tk { namespace data {
             this->angular.x() = msg.twist.angular.x;
             this->angular.y() = msg.twist.angular.y;
             this->angular.z() = msg.twist.angular.z;
+        }
+
+#if TKROS_VERSION == 1
+        void fromRos(const geometry_msgs::Twist &msg) {
+#endif
+#if TKROS_VERSION == 2
+        void fromRos(const geometry_msgs::msg::Twist &msg) {
+#endif
+            this->header.type   = DataType::TWIST; 
+
+            this->linear.x() = msg.linear.x;
+            this->linear.y() = msg.linear.y;
+            this->linear.z() = msg.linear.z;
+
+            this->angular.x() = msg.angular.x;
+            this->angular.y() = msg.angular.y;
+            this->angular.z() = msg.angular.z;
         }
 #endif
     };

@@ -23,6 +23,10 @@ namespace tk { namespace data {
         void toRos(nav_msgs::msg::Path &msg) const {
 #endif
             this->header.toRos(msg.header);
+            
+            msg.poses.resize(this->poses.size());
+            for (size_t i = 0; i < this->poses.size(); ++i)
+                this->poses[i].toRos(msg.poses[i]);
         }
 #if TKROS_VERSION == 1
         void fromRos(const nav_msgs::Path &msg) {
@@ -32,6 +36,10 @@ namespace tk { namespace data {
 #endif
             this->header.fromRos(msg.header);
             this->header.type   = DataType::PATH; 
+            
+            this->poses.resize(msg.poses.size());
+            for (size_t i = 0; i < this->poses.size(); ++i)
+                this->poses[i].fromRos(msg.poses[i]);
         }
 #endif
     };
