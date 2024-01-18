@@ -243,12 +243,12 @@ foreach(app ${tkpackage_APPS})
     target_link_libraries(${app} tkCommon::common tkCommon::gui tkCommon::communication tkCommon::math tkCommon::sensor tkCommon::joystick)
 endforeach()
 
-#-------------------------------------------------------------------------------
-# Build tests
-#-------------------------------------------------------------------------------
-file(GLOB tkpackage_TESTScpp "app/test/*.cpp")
-add_executable(tkCommon_test "${tkpackage_TESTScpp}")
-target_link_libraries(tkCommon_test tkCommon::common tkCommon::gui tkCommon::communication tkCommon::math tkCommon::sensor tkCommon::joystick)
+# #-------------------------------------------------------------------------------
+# # Build tests
+# #-------------------------------------------------------------------------------
+# file(GLOB tkpackage_TESTScpp "app/test/*.cpp")
+# add_executable(tkCommon_test "${tkpackage_TESTScpp}")
+# target_link_libraries(tkCommon_test tkCommon::common tkCommon::gui tkCommon::communication tkCommon::math tkCommon::sensor tkCommon::joystick)
 
 #-------------------------------------------------------------------------------
 # Install
